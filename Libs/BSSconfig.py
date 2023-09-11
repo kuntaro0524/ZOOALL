@@ -21,7 +21,7 @@ class BSSconfig:
 
         self.isRead = False
         self.isPrep = False
-        self.debug = False
+        self.debug = True
 
     def storeLines(self):
         ifile = open(self.confile, "r")
@@ -100,7 +100,6 @@ class BSSconfig:
             
         self.all_dicts=[]
         for block in axesBlocks:
-            #print("############################3")
             tmp_dict={}
             for each_line in block:
                 # print("LINE %s" % each_line)
@@ -122,8 +121,9 @@ class BSSconfig:
                         print("Integer dehanaiyo")
                     """
                     tmp_dict[key] = svalue
-            #print(tmp_dict)
-            self.all_dicts.append(tmp_dict)
+            # if 'tmp_dict' has values
+            if tmp_dict:
+                self.all_dicts.append(tmp_dict)
         
         #for ddd in self.all_dicts:
             #print(ddd)
@@ -136,6 +136,8 @@ class BSSconfig:
     def getDictOf(self, axis_name):
         if self.isPrepDict==False:
             self.storeAxesBlocks()
+
+        print(self.all_dicts)
         
         for ddiicc in self.all_dicts:
             if self.debug:
@@ -431,7 +433,10 @@ class BSSconfig:
 if __name__ == "__main__":
     bssconf = BSSconfig()
     #bssconf.getThinnestAtt()
-    axis_name="st2_gonio_1_z"
+    axis_name="st1_col_1_z"
+    print(bssconf.getPulseInfo(axis_name))
+
+    """
     # collimator evacuation parameters
     print("#####################3")
     e,a,b=bssconf.getEvacuateInfo("collimator")
@@ -451,5 +456,6 @@ if __name__ == "__main__":
 
     print("################################")
     print(bssconf.getLimit("st2_detector_1_x"))
-    print(bssconf.getPulseInfo("st2_detector_1_x"))
     print(bssconf.getHomeValue("st2_detector_1_x"))
+
+    """

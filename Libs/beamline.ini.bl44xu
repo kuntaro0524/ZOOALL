@@ -81,22 +81,21 @@ min_camera_dim = 233.0
 
 [axes]
 # beam stopper axis
-bs_y_name = st2_bs_1_y
-bs_z_name = st2_bs_1_z
+bs_y_name = st1_bs_1_y
+bs_z_name = st1_bs_1_z
 bs_evacinfo = beam stop
 # gonio meter axes
-gonio_x_name = st2_gonio_1_x
-gonio_y_name = st2_gonio_1_y
-gonio_z_name = st2_gonio_1_z
-gonio_zz_name = st2_gonio_1_zz
-gonio_rot_name = st2_gonio_1_phi
+gonio_x_name = st1_gonio_1_x
+gonio_y_name = st1_gonio_1_y
+gonio_z_name = st1_gonio_1_z
+gonio_zz_name = st1_gonio_1_zz
+gonio_rot_name = st1_gonio_1_phi
 # Cryo Z axis
-cryo_z_name = st2_cryo_1_z
+cryo_z_name = st1_cryo_1_z
 # Cryo evac info  to extract 'evacuation' information
 cryo_evacinfo = cryo
 # Collimator 
-col_y_name = st2_collimator_1_y
-col_z_name = st2_collimator_1_z
+col_z_name = st1_col_1_z
 col_evacinfo = collimator
 # Camera distance
-ccdlen = st2_detector_1_x
+ccdlen = st1_detector_1_x

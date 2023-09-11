@@ -22,18 +22,35 @@ class Colli:
 
         self.s = server
         # names of collimator axes
+        self.coly_axis = ""
+        self.colz_axis = ""
         # coly > section: axes, option: col_y_name
-        self.coly_axis = self.config.get("axes", "col_y_name")
-        # colz > section: axes, option: col_z_name
-        self.colz_axis = self.config.get("axes", "col_z_name")
+        try:
+            self.coly_axis = self.config.get("axes", "col_y_name")
+        except:
+            # display 'warning' if the option is not found
+            print("WARNING: col_y_name is not found in beamline.ini")
 
-        self.coly = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.coly_axis), "pulse")
-        self.colz = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.colz_axis), "pulse")
-        # pulse information of each axis
-        self.v2p_y, self.sense_y = self.bssconf.getPulseInfo(self.coly_axis)
-        self.v2p_z, self.sense_z = self.bssconf.getPulseInfo(self.colz_axis)
+        try:
+            # colz > section: axes, option: col_z_name
+            self.colz_axis = self.config.get("axes", "col_z_name")
+        except:
+            # display 'warning' if the option is not found
+            print("WARNING: col_z_name is not found in beamline.ini")
 
-        print(self.v2p_y, self.sense_y, self.v2p_z, self.sense_z)
+        # if 'coly' exists in the configuration file.
+        if self.coly_axis != "":
+            self.coly = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.coly_axis), "pulse")
+            # pulse information of each axis
+            self.v2p_y, self.sense_y = self.bssconf.getPulseInfo(self.coly_axis)
+        if self.colz_axis != "":
+            self.colz = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.colz_axis), "pulse")
+            print("Serching %s" % self.colz_axis)
+            # print("bl_%s_%s" %(self.bl_object, self.colz_axis))
+            # pulse information of each axis
+            self.v2p_z, self.sense_z = self.bssconf.getPulseInfo(self.colz_axis)
+
+        # print(self.v2p_y, self.sense_y, self.v2p_z, self.sense_z)
 
         self.isInit = False
 
@@ -454,7 +471,12 @@ class Colli:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.41'
+    import configparser
+    # read IP address for BSS connection from beamline.config 
+    config = ConfigParser(interpolation=ExtendedInterpolation())
+    config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    config.read(config_path)
+    host = config.get("server", "bss_server")
     port = 10101
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
