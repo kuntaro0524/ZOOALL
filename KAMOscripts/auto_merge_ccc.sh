@@ -1,0 +1,13 @@
+/oys/xtal/cctbx/snapshots/upstream/build/bin/kamo.auto_multi_merge \
+csv=automerge.csv \
+workdir=$PWD \
+prefix=merge_ \
+datadir=$PWD \
+merge.max_clusters=10 \
+merge.d_min_start=2.50 \
+merge.clustering=cc \
+merge.cc_clustering.min_acmpl=90 \
+merge.cc_clustering.min_aredun=4 \
+batch.engine=sge \
+merge.batch.engine=sge \
+merge.batch.par_run=merging \

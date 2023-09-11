@@ -1,0 +1,3 @@
+target    7018 32.2  0.1 601740 48200 pts/4    Sl+  18:32   4:58 /usr/local/bss/videosrv2 --v4l2
+target    8295  0.0  0.0   9244  1088 pts/5    S+   18:47   0:00 sh -c ps aux | grep videosrv2 > ./tmp
+target    8297  0.0  0.0   6452   688 pts/5    S+   18:47   0:00 grep videosrv2

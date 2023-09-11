@@ -1,0 +1,82 @@
+import sys
+import socket
+import time
+
+# My library
+from Motor import *
+
+#
+class BM:
+	def __init__(self,server):
+		self.s=server
+    		self.moni_y=Motor(self.s,"bl_32in_st2_monitor_1_y","pulse")
+    		self.moni_z=Motor(self.s,"bl_32in_st2_monitor_1_z","pulse")
+    		self.moni_x=Motor(self.s,"bl_32in_st2_monitor_1_x","pulse")
+		
+		self.off_pos=-75000 # pulse
+		self.on_pos=-500 # pulse
+	
+	def on(self):
+		self.moni_z.move(self.on_pos)
+
+	def off(self):
+		self.moni_z.move(self.off_pos)
+
+	def set(self,position):
+		self.moni_z.move(position)
+
+# 110530 by Y.K.
+	def goOn(self):
+		self.go(self.on_pos)
+
+# 110530 by Y.K.
+	def goOff(self):
+		self.go(self.off_pos)
+
+	def go(self,position):
+		self.moni_z.nageppa(position)
+
+	def relmove(self,value):
+		self.moni_z.relmove(value)
+
+	def onXYZ(self):
+		self.moni_x.move(1000)
+		self.moni_z.move(-25000)
+
+	def offXYZ(self):
+		self.moni_z.move(-125000)
+		self.moni_x.move(4500)
+
+	def onPika(self):
+		#self.moni_x.move(-4351)
+		# From ##### to 150924
+		#self.moni_x.move(-4323)
+		# From 150924
+		#self.moni_x.move(-4333)
+		#self.moni_z.move(-39750)
+		# From 151030
+		self.moni_x.move(-4323)
+		self.moni_z.move(-39850)
+
+	def isMoved(self):
+		isY=self.moni_y.isMoved()
+		isZ=self.moni_z.isMoved()
+
+		if isY==0 and isZ==0:
+			return True
+		if isY==1 and isZ==1:
+			return False
+
+if __name__=="__main__":
+	host = '192.168.163.1'
+	port = 10101
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.connect((host,port))
+
+	print "Moving Scintillator Monitor"
+	moni=BM(s)
+
+	moni.offXYZ()
+	#moni.onPika()
+
+	s.close()

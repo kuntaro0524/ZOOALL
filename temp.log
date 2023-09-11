@@ -1,0 +1,4 @@
+2021-07-27 16:41:55 - Zoo - INFO - getSampleInformation - 77 - getSampleInformation:sample/get/15784_pxbl_server/CPS2721_3_CPS2720_3_CPS1715_3_Not-Mounted_0_Not-Mounted_0_5_3_Not-Mounted_0_Not-Mounted_0/0
+2021-07-27 16:41:55 - Zoo - INFO - getCurrentPin - 160 - getCurrentPin.RECSTR=sample/get/15784_pxbl_server/Not-Mounted_0/0
+2021-07-27 16:41:56 - Zoo - DEBUG - skipSample - 380 - recstr = sample/put/15784_pxbl_server/ok/0
+2022-02-08 14:27:41 - Zoo - INFO - getSampleInformation - 77 - getSampleInformation:b'sample/get/699189_pxbl_server/SP81002_3_SP81003_3_Not-Mounted_0_Not-Mounted_0_Not-Mounted_0_Not-Mounted_0_Not-Mounted_0_Not-Mounted_0/0'

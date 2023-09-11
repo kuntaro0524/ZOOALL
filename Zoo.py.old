@@ -1,0 +1,319 @@
+import os,sys,glob
+import time
+import numpy as np
+import socket
+sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
+from MyException import *
+import MXserver
+
+# 150722 AM4:00
+# Debug: when SPACE has some troubles Zoo stops immediately
+
+bss_srv="192.168.163.2"
+bss_port=5555
+
+class Zoo:
+    def __init__(self,emulator=True):
+        self.isConnect=False
+        #self.SPACE=SPACE.SPACE()
+        self.isEmu=emulator
+
+    def connect(self):
+        self.bssr = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        for i in range(0,20):
+            try:
+                self.bssr.connect((bss_srv, bss_port))
+                self.isConnect=True
+                return True
+            except MyException, ttt:
+                print "connect: failed. %s"%ttt.args[0]
+                time.sleep(20.0)
+        return False
+
+    def disconnect(self):
+        time.sleep(3.0)
+        if self.isConnect:
+            command="put/bss/disconnect"
+            self.bssr.sendall(command)
+            recstr=self.bssr.recv(8000)
+            print recstr
+            self.bssr.close()
+        return True
+
+    def disconnectServers(self):
+        query_com="put/device_server/disconnect"
+        if self.isConnect==False:
+            print "Connection first!"
+            return False
+        else:
+            self.bssr.sendall(query_com)
+            recstr=self.bssr.recv(8000)
+            print recstr
+
+    def connectServers(self):
+        query_com="put/device_server/connect"
+        if self.isConnect==False:
+            print "Connection first!"
+            return False
+        else:
+            self.bssr.sendall(query_com)
+            recstr=self.bssr.recv(8000)
+            print recstr
+
+    def getSampleInformation(self):
+        query_com="get/sample/information"
+        if self.isConnect==False:
+            print "Connection first!"
+            return False
+        else:
+            self.bssr.sendall(query_com)
+            recstr=self.bssr.recv(8000)
+        #print "getSample:",recstr
+        cols=recstr.split('/')[3].split('_')
+        idx=0
+        self.tray_list=[]
+        for col in cols:
+            if idx%2==0:
+                self.tray_list.append(col)
+            idx+=1
+        #print self.tray_list
+        return self.tray_list
+
+    def mountSample(self,trayID,pinID):
+        print trayID,pinID
+        com="put/sample/mount_%s_%s"%(trayID,pinID)
+        print com
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        try:
+            self.waitTillReady()
+        except MyException, ttt:
+            raise MyException("mountSample: failed. %s"%ttt.args[0])
+
+    def dismountSample(self,trayID,pinID):
+        print trayID,pinID
+        com="put/sample/unmount_%s_%s"%(trayID,pinID)
+        print com
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        try:
+            self.waitTillReady()
+        except MyException, ttt:
+            raise MyException("mountSample: failed. %s"%ttt.args[0])
+
+    def getCurrentPin(self):
+        com="get/sample/on_gonio"
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        puck_pin=self.getSVOC_C(recstr)
+        puck_char,pin_char=puck_pin.split('_')
+        puck_id=puck_char
+        pin_id=int(pin_char)
+        if pin_id==0:
+            return 0,0
+        else:
+            return puck_id,pin_id
+
+    def dismountCurrentPin(self):
+        puck_id,pin_id=self.getCurrentPin()
+        if pin_id==0:
+            print "Already none"
+        else:
+            self.dismountSample(puck_id,pin_id)
+
+    def cleaning(self):
+        com="put/sample/cleaning"
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        print recstr
+
+    def capture(self,filename):
+        command="put/video/capture_%s"%filename
+        print "Capturing %s"%filename
+        self.bssr.sendall(command)
+        recstr=self.bssr.recv(8000)
+
+    def getSVOC_C(self,recmes):
+        ## ['measurement', 'get', '17475_pxbl_server', 'ready', '0']
+        ## ready is targeto
+        ## column number = 3
+        cols=recmes.split("/")
+        return cols[3]
+
+    def ZoomUp(self):
+        com="put/video/zoomer_1"
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        print recstr
+
+    def ZoomDown(self):
+        com="put/video/zoomer_-1"
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        print recstr
+
+    def isBusy(self):
+        if self.isConnect==False:
+            print "Connection first!"
+            return False
+        else:
+            command="get/measurement/query"
+            self.bssr.sendall(command)
+            recstr=self.bssr.recv(8000)
+            #print "Received buffer in isBusy: %s"%recstr
+            svoc_c=self.getSVOC_C(recstr)
+            if svoc_c.rfind("ready")!=-1:
+                print "isBusy:RECBUF=",recstr
+                return False
+            elif svoc_c.rfind("fail")!=-1:
+                raise MyException("Something failed.")
+            else:
+                return True
+        # 150702 17:50
+        # "measurement/get/6257_pxbl_server/ready/0"
+        #elif svoc_c.rfind("working")!=-1:
+        #return True
+
+    def doRaster(self,jobfile):
+        # JOB FILE NAME MUST NOT INCLUDE "_"
+        com="put/measurement/start_1_3_1_schedule_%s"%jobfile
+        print com
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        print recstr
+
+    def reconnectHSserver(self):
+        self.disconnectServers()
+        mxs=MXserver.MXserver()
+        if mxs.checkRunning()==True:
+            mxs.end_automation()
+            time.sleep(10)
+            mxs.startServer()
+        else:
+            mxs.startServer()
+
+        time.sleep(10)
+        self.connectServers()
+
+    def waitTillReady(self):
+        while (1):
+            try:
+                if self.isBusy():
+                    print "Now busy..."
+                    time.sleep(2.0)
+                else:
+                    break
+            except MyException, ttt:
+                raise MyException("Some error occurred : %s"%ttt.args[0])
+
+    def waitTillReadySeconds(self,time_thresh=1000.0):
+        while (1):
+            try:
+                if self.isBusy():
+                    print "Now busy..."
+                    time.sleep(2.0)
+                else:
+                    break
+            except MyException, ttt:
+                raise MyException("Some error occurred : %s"%ttt.args[0])
+
+    def doDataCollection(self,jobfile):
+        # JOB FILE NAME MUST NOT INCLUDE "_"
+        com="put/measurement/start_1_3_1_schedule_%s"%jobfile
+        print "Submitting command: %s"%com
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        print recstr
+
+    def stop(self):
+        # JOB FILE NAME MUST NOT INCLUDE "_"
+        com="put/measurement/stop"
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        print recstr
+
+    def setPhi(self,phi_abs):
+        com="put/gonio_spindle/abs_%fdegree"%phi_abs
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        print com
+
+    def autoCentering(self):
+        com="put/sample/autocenter"
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+        print com
+
+    #def getCurrPinInfo(self):
+    #com="I/get/bl_32in_sc_all/ongonio"
+    #trayid,pinid=self.SPACE.checkOnGonio()
+    #return trayid,pinid
+
+    def skipSample(self):
+        com="put/sample/clear_warning"
+        self.bssr.sendall(com)
+        recstr=self.bssr.recv(8000)
+
+if __name__ == "__main__":
+    zoo=Zoo()
+    zoo.connect()
+    zoo.getSampleInformation()
+
+    #while(1):
+    #zoo.skipSample()
+    #zoo.dismountCurrPin()
+    #zoo.sampleQuery()
+    #zoo.stop()
+    #time.sleep(10.0)
+    #zoo.disconnectServers()
+    #time.sleep(5.0)
+    #zoo.connectServers()
+    #zoo.reconnectHSserver()
+    #zoo.autoCentering()
+    #zoo.dismountSample("CPS1019",12)
+    #print zoo.getCurrentPin()
+    #zoo.skipSample()
+    #zoo.dismountCurrentPin()
+
+    #try:
+    #zoo.mountSample("CPS0294",1)
+    #zoo.waitTillReady()
+    #except MyException, ttt:
+    #print "Sample mounting failed. Contact BL staff!"
+    #sys.exit(1)
+    #"""
+
+    #time.sleep(60)
+    #zoo.dismountCurrentPin()
+    #zoo.waitTillReady()
+    #try:
+    #zoo.mountSample("CPS0294",1)
+    #zoo.waitTillReady()
+    #except MyException, ttt:
+    #print "Sample mounting failed. Contact BL staff!"
+    #sys.exit(1)
+    #time.sleep(60)
+    #zoo.dismountCurrentPin()
+    #zoo.waitTillReady()
+    #zoo.mountSample("CPS1968",3)
+    #zoo.waitTillReady()
+    #zoo.waitTillReady()
+    #zoo.capture("pppp.ppm")
+    #zoo.ZoomUp()
+    #zoo.ZoomDown()
+    #schfile="/isilon/users/target/target/Staff/kuntaro/171118-PH/PH5deg-CPS0293-11/data/multi.sch"
+    #schfile="/isilon/users/target/target/Staff/ZooTest/Schedule/test.sch"
+    #schfile="/isilon/users/target/target/Staff/ZooTest//lys07/data///lys07.sch"
+    #zoo.setPhi(140.0)
+    #schfile_hirata="/isilon/users/target/target/Staff/ZooTest/Schedule/test.sch"
+    #schfile_yaruzo="/isilon/users/target/target/Staff/ZooTest/Schedule/yaruzo.sch"
+    #time.sleep(10.0)
+    #zoo.doRaster("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/TEST/data1/scan/2d/2d.sch")
+    #zoo.doRaster(sys.argv[1])
+    #zoo.doRaster("/isilon/users/target/target/AutoUsers/160509/Xiangyu/Xi-KLaT005-01/scan/Xi-KLaT005-01.sch")
+    zoo.doDataCollection(sys.argv[1])
+    #zoo.doDataCollection("/isilon/users/target/target/Staff/kuntaro/160715/Auto/KUN10-CPS1013-07/data/cry01.sch")
+    #zoo.doDataCollection(schfile)
+    #zoo.doDataCollection("/isilon/users/target/target/AutoUsers/kuntaro/161218/RR-test//mbeam09-CPS1716-02/data//multi.sch")
+    #zoo.waitTillReady()
+    zoo.disconnect()

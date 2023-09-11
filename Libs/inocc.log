@@ -1,0 +1,59 @@
+2021-07-19 16:20:51 - CoaxImage - INFO - get_coax_center - 199 - Origin shift = 0.01 0.0
+2021-07-19 16:20:51 - INOCC - DEBUG - doAll - 597 - The first edge centering..
+2021-07-19 16:20:51 - INOCC - INFO - edgeCentering - 496 - ################### EDGE CENTERING ######################
+2021-07-19 16:20:51 - INOCC - INFO - simpleCenter - 330 - ##################### TOP CENTERING  0.00 deg.
+
+2021-07-19 16:20:51 - INOCC - INFO - simpleCenter - 331 - INOCC.coreCentering captures /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/001_center.ppm
+
+2021-07-19 16:20:51 - CryImageProc - INFO - setImages - 139 - CIP.setImages: T: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/001_center.ppm, B: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/dark_bg.ppm
+2021-07-19 16:20:52 - INOCC - INFO - simpleCenter - 330 - ##################### TOP CENTERING 45.00 deg.
+
+2021-07-19 16:20:52 - INOCC - INFO - simpleCenter - 331 - INOCC.coreCentering captures /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/002_center.ppm
+
+2021-07-19 16:20:52 - CryImageProc - INFO - setImages - 139 - CIP.setImages: T: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/002_center.ppm, B: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/dark_bg.ppm
+2021-07-19 16:20:52 - CryImageProc - INFO - getCenterInfo - 402 - area of ROI: 42780.000
+2021-07-19 16:20:52 - INOCC - INFO - simpleCenter - 344 - PHI: 45.00 deg Option=top Centering: (Xtarget, Ytarget) = (    7,     7) HAMIDASHI = True
+
+2021-07-19 16:20:52 - CoaxImage - INFO - get_coax_center - 199 - Origin shift = 0.01 0.0
+2021-07-19 16:20:52 - CoaxImage - DEBUG - calc_shift_by_img_px - 271 - cen_x, cen_y = (  309.07,   240.00)
+2021-07-19 16:20:56 - INOCC - INFO - simpleCenter - 348 - >>>>>> FILE=/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/002_center.ppm Area=42780.000 at   45.000
+2021-07-19 16:20:56 - INOCC - INFO - suribachiCentering - 353 - OOOOOOOOOOOOOOOOOO  SURIBACHI STARTS center: 45.00 OOOOOOOOOOOOOO
+
+2021-07-19 16:20:56 - INOCC - INFO - simpleCenter - 330 - ##################### TOP CENTERING  0.00 deg.
+
+2021-07-19 16:20:56 - INOCC - INFO - simpleCenter - 331 - INOCC.coreCentering captures /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/102_center.ppm
+
+2021-07-19 16:20:57 - CryImageProc - INFO - setImages - 139 - CIP.setImages: T: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/102_center.ppm, B: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/dark_bg.ppm
+2021-07-19 16:20:58 - CryImageProc - INFO - getCenterInfo - 402 - area of ROI: 85560.000
+2021-07-19 16:20:58 - INOCC - INFO - simpleCenter - 344 - PHI:  0.00 deg Option=top Centering: (Xtarget, Ytarget) = (    7,     7) HAMIDASHI = True
+
+2021-07-19 16:20:58 - CoaxImage - INFO - get_coax_center - 199 - Origin shift = 0.01 0.0
+2021-07-19 16:20:58 - CoaxImage - DEBUG - calc_shift_by_img_px - 271 - cen_x, cen_y = (  309.07,   240.00)
+2021-07-19 16:21:00 - INOCC - INFO - simpleCenter - 330 - ##################### TOP CENTERING 10.00 deg.
+
+2021-07-19 16:21:00 - INOCC - INFO - simpleCenter - 331 - INOCC.coreCentering captures /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/103_center.ppm
+
+2021-07-19 16:21:01 - CryImageProc - INFO - setImages - 139 - CIP.setImages: T: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/103_center.ppm, B: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/dark_bg.ppm
+2021-07-19 16:21:01 - CryImageProc - INFO - getCenterInfo - 402 - area of ROI: 85560.000
+2021-07-19 16:21:01 - INOCC - INFO - simpleCenter - 344 - PHI: 10.00 deg Option=top Centering: (Xtarget, Ytarget) = (    7,     7) HAMIDASHI = True
+
+2021-07-19 16:21:01 - INOCC - INFO - simpleCenter - 330 - ##################### TOP CENTERING 20.00 deg.
+
+2021-07-19 16:21:01 - INOCC - INFO - simpleCenter - 331 - INOCC.coreCentering captures /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/104_center.ppm
+
+2021-07-19 16:21:01 - CryImageProc - INFO - setImages - 139 - CIP.setImages: T: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/104_center.ppm, B: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/dark_bg.ppm
+2021-07-19 16:21:01 - INOCC - INFO - simpleCenter - 330 - ##################### TOP CENTERING 30.00 deg.
+
+2021-07-19 16:21:01 - INOCC - INFO - simpleCenter - 331 - INOCC.coreCentering captures /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/105_center.ppm
+
+2021-07-19 16:21:01 - CryImageProc - INFO - setImages - 139 - CIP.setImages: T: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/105_center.ppm, B: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/dark_bg.ppm
+2021-07-19 16:21:01 - INOCC - INFO - simpleCenter - 330 - ##################### TOP CENTERING 40.00 deg.
+
+2021-07-19 16:21:01 - INOCC - INFO - simpleCenter - 331 - INOCC.coreCentering captures /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/106_center.ppm
+
+2021-07-19 16:21:01 - CryImageProc - INFO - setImages - 139 - CIP.setImages: T: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log//210719/0099_sample/106_center.ppm, B: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/dark_bg.ppm
+2021-07-19 16:21:02 - CryImageProc - INFO - getCenterInfo - 402 - area of ROI: 85560.000
+2021-07-19 16:21:02 - INOCC - INFO - simpleCenter - 344 - PHI: 16.59 deg Option=top Centering: (Xtarget, Ytarget) = (    7,     7) HAMIDASHI = True
+
+2021-07-19 16:21:02 - CoaxImage - INFO - get_coax_center - 199 - Origin shift = 0.01 0.0
+2021-07-19 16:21:02 - CoaxImage - DEBUG - calc_shift_by_img_px - 271 - cen_x, cen_y = (  309.07,   240.00)

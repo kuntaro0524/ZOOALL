@@ -1,0 +1,93 @@
+./mount_unmount.py:    logging.config.fileConfig('/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/logging.conf', defaults={'logfile_name': logname})
+./SummarySHIKA.py:	sshika=SummarySHIKA("/isilon/users/target/target/Yokoyama/thori160622BL32XU/hori-1096-01/scan/_spotfinder/","hori-1096-01_")
+
+./INOCC.py:        self.backimg = "/isilon/%s/BLsoft/PPPP/10.Zoo/BackImages/back-210324.ppm" % beamline
+./INOCC.py:    root_dir = "/isilon/BL32XU/BLsoft/PPPP/93.ZooSandbox/"
+./INOCC.py:    backimg = "/isilon/BL32XU/BLsoft/PPPP/93.ZooSandbox/BackImages/back-2302151858.ppm"
+./HITO.py:sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
+./HITO.py:    #root_dir="/isilon/users/target/target/Staff/kuntaro/171218-kohebi/test14-CPS1010-07/"
+./HITO.py:    #root_dir="/isilon/users/target/target/Staff/kuntaro/180120-hito/hito-debug3-CPS1010-04/"
+./HITO.py:    root_dir="/isilon/users/target/target/AutoUsers/180123/xiangyu/xi-KLaT006-15/scan/2d/"
+./ZooNavigator.py:        self.backimg = "/isilon/%s/BLsoft/PPPP/10.Zoo/BackImages/back-1811221806.ppm" % beamline.upper()
+./ZooNavigator.py:        self.config_dir = "/isilon/blconfig/%s/" % beamline.lower()
+./ZooNavigator.py:        self.zooprog = open("/isilon/%s/BLsoft/PPPP/10.Zoo/ZooLogs/zoo_progress.log" % beamline.upper(), "a")
+./ZooNavigator.py:        backdir = "/isilon/%s/BLsoft/PPPP/10.Zoo/BackImages/" % beamline.upper()
+./Libs/BSSconfig.py:    def __init__(self, config_file="/isilon/blconfig/bl32xu/bss/bss.config"):
+./Libs/File.py:        # dire="/isilon/BL32XU/BL/target/Staff/"
+./Libs/File.py:        dire = "/isilon/BL32XU/BLtune/"
+./Libs/File.py:    root_dir = "/isilon/BL32XU/BLsoft/PPPP/93.ZooSandBox/Log/230216/0027_sample/"
+./Libs/File.py:    root_dir = "/isilon/BL32XU/BLsoft/PPPP/93.ZooSandbox/Log/230216/0027_sample/"
+./Libs/File.py:    # p="/isilon/users/target/target/AutoUsers/180411/test/test-path"
+./Libs/ExposureConditioner.py:    logging.config.fileConfig('/isilon/%s/BLsoft/PPPP/10.Zoo/Libs/logging.conf' % beamline, defaults={'logfile_name': logname})
+./Libs/ExposureConditioner.py:    expcon = ExposureConditioner("/isilon/blconfig/bl32xu/bss/bss.config")
+./Libs/AttFactor.py:    def __init__(self, config_file="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooConfig/bss/bss.config"):
+./Libs/AttFactor.py:        self.bssconfig = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooConfig/bss/bss.config"
+./Libs/DiffscanLog.py:    diffpath = "/isilon/users/target/target/AutoUsers/180123/xiangyu/xi-KLaT005-04/scan/"
+./Libs/DiffscanLog.py:    # dl=DiffscanLog("/isilon/users/target/target/Staff/kuntaro/160726/JidoHeli//klys9-CPS1013-01/scan/lv-fin-02/")
+./Libs/AnaShika.py:	#summary_dat_path="/isilon/users/target/target/AutoUsers/180123/xiangyu/xi-KLaT006-12/scan/_spotfinder/"
+./Libs/AnaShika.py:	summary_dat_path="/isilon/users/target/target/AutoUsers/180521/test1/CPS0294-02/scan00/2d/_spotfinder/"
+./Libs/KUMAtune.py:		basedir="/isilon/BL32XU/BLsoft/Logs/"
+./Libs/KUMAtune.py:		self.bplogname="/isilon/BL32XU/BLsoft/Logs/beam.log"
+./Libs/KUMAtune.py:		dirname="/isilon/BL32XU/BLsoft/Logs/%s/"%(self.today())
+./Libs/KUMAtune.py:		self.dirname="/isilon/BL32XU/BLsoft/Logs/%s/%s/"%(
+./Libs/ZooStatus.py:	zs=ZooStatus("/isilon/users/target/target/Staff/kuntaro/160701/Auto/")
+./Libs/ConfigFile.py:        self.ourconf = "/isilon/BL32XU/BLsoft/PPPP/bl32xu.conf"
+./Libs/Raddose.py:        self.common_dir = "/isilon/BL32XU/BLsoft/PPPP/RADDOSE/"
+./Libs/FindNeedle.py:		#self.tmplow_ppm="/isilon/BL32XU/BLsoft/PPPP/01.Data/00.CenteringPictures/TemplateFile/template_low.ppm"
+./Libs/FindNeedle.py:		self.tmplow_ppm="/isilon/BL32XU/BLsoft/PPPP/01.Data/00.CenteringPictures/TemplateFile/hosoi_template.ppm"
+./Libs/FindNeedle.py:	def collectData(self,outdir="/isilon/users/target/target/Staff/BLtune/"):
+./Libs/FindNeedle.py:	def pintData(self,outdir="/isilon/users/target/target/Staff/BLtune/"):
+./Libs/BeamsizeConfig.py:    config_dir = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooConfig/"
+./Libs/Device.py:    def changeEnergy(self,en,isTune=True,logpath="/isilon/BL32XU/BLsoft/Logs/Zoo/"):
+./Libs/Device.py:    def getBeamsize(self,config_dir="/isilon/blconfig/bl32xu/"):
+./Libs/Device.py:    logpath="/isilon/users/target/target/Staff/2016B/161003/03.Test/"
+./Libs/Device.py:    print "%e"%dev.measureFlux(logpath,tune=False,config_dir="/isilon/blconfig/bl32xu/bss/")
+./Libs/Device.py:    #hbeam,vbeam=dev.getCurrentBeamsize(config_dir="/isilon/blconfig/bl32xu/")
+./Libs/Beamsize.py:    config_dir="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooConfig/"
+./Libs/Beamsize.py:  File "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/LoopMeasurement.py", line 497, in genHelical
+./Libs/Beamsize.py:  File "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/LoopMeasurement.py", line 42, in setBeamsize
+./Libs/Beamsize.py:  File "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/Beamsize.py", line 86, in changeBeamsizeHV
+./Libs/EigerLog.py:		self.outdir="/isilon/BL32XU/BLsoft/PPPP/Logs/"
+./Libs/SummaryDat.py:    summary_dat_path="/isilon/users/target/target/AutoUsers/180123/xiangyu/xi-KLaT006-12/scan/_spotfinder/"
+./Libs/CenteringNeedle.py:        	fn.collectData("/isilon/users/target/target/Staff/BLtune/")
+./Libs/CenteringNeedle.py:	def centeringLow(self,outdir="/isilon/users/target/target/Staff/BLtune/"):
+./Libs/CenteringNeedle.py:		tmplow_ppm="/isilon/BL32XU/BLsoft/PPPP/01.Data/00.CenteringPictures/TemplateFile/template_low.ppm"
+./Libs/CenteringNeedle.py:		tmphigh_ppm="/isilon/BL32XU/BLsoft/PPPP/01.Data/00.CenteringPictures/TemplateFile/template_high2.ppm"
+./Libs/CenteringNeedle.py:		odir="/isilon/users/target/target/Staff/"
+./Libs/CenteringNeedle.py:		zz_db_file="/isilon/users/target/target/Staff/zz_db.txt"
+./Libs/Mono.py:        # Please see /isilon/users/target/target/Staff/2015B/151020/03.MakeTableTy1Z2/Z2.plt
+./Libs/DirectoryProc.py:    check_dir = "/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Log/190520/025_sample/"
+./Libs/TemplateMatch.py:	tmplowppm="/isilon/BL32XU/BLsoft/PPPP/01.Data/00.CenteringPictures/TemplateFile/template_low.ppm"
+./Libs/TemplateMatch.py:	tm=TemplateMatch(tmplowppm,"/isilon/users/target/target/image005.ppm")
+./Libs/Capture.py:    # cappath = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/"
+./Libs/Capture.py:    cappath = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/BackImages"
+./Libs/Capture.py:    # cappath = "/isilon/users/target/target/"
+./Libs/IDparam.py:    # /isilon/BL32XU/BLsoft/PPPP/07.IDparams/id32xu.tbl
+./Libs/IDparam.py:        ana = AnalyzePeak("/isilon/BL32XU/BLsoft/PPPP/07.IDparams/id32xu.tbl")
+./Libs/Spline.py:sfile="/isilon/BL32XU/BLsoft/PPPP/07.IDparams/id32xu.tbl"
+./Libs/CryImageProc.py:    cip.setImages(testimage,"/isilon/users/target/target/PPPP/10.Zoo/BackImages/back-2004082221.ppm")
+./LargePlateMatchingBC.py:        self.base_imgdir = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/LargeHolder/Data/"
+./LargePlateMatchingBC.py:        self.backimg = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Images/bcbg.png"
+./LargePlateMatchingBC.py:    tm = LargePlateMatching("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/TemplateImages/", "holder01")
+./ensoku_NMver3.21.py:sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs")
+./MultiCrystal.py:    schedule_file = "/isilon/users/target/target/ikekekeke.sch"
+./MultiCrystal.py:    t.setDir("/isilon/users/target/target/Staff/2019B/200120/04.BSStest/02/")
+./HEBI.py:    # sc= h2.getSortedCryList("/isilon/users/target/target/nagano/190121/Auto/1575-07/scan00/2d/","2d_",260.0,isWeakScan=False)
+./HEBI.py:    sc = h2.getSortedCryList("/isilon/users/target/target/AutoUsers/190122/Toma/PF0082-03/scan00/2d", "2d_", 260.0,
+./HEBI.py:    # print h2.anaVscan("/isilon/users/target/target/Staff/kuntaro/181211-esa2/test8/CPS1991-09/scan00/rv/","rv",0.0,isWeakScan=True)
+./HEBI.py:    # print h2.anaVscan("/isilon/users/target/target/Staff/kuntaro/181211-esa2/test8/CPS1991-08/scan00/rv/","rv",0.0)
+./Centering.py:sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
+./Centering.py:        self.fname="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/test.ppm"
+./Centering.py:        self.logdir="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log/"
+./Centering.py:        self.backimg="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/BackImages/back-1811211645.ppm"
+./Centering.py:        self.bssconfig_file="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooConfig/bss/bss.config"
+./Centering.py:            img_log="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ec_debug.jpg"
+./Centering.py:    #backimg="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/red_50000_back.ppm"
+./Centering.py:    backimg="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/BackImages/back-1904150917.ppm"
+./Centering.py:    backimg="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/back.ppm"
+./RasterSchedule.py:        self.imgdir = "/isilon/users/admin41/admin41/ZooTest/"
+./RasterSchedule.py:        schstr.append("PPM save directory: /isilon/BL26B2/")
+./RasterSchedule.py:        schstr.append("PPM load directory: /isilon/BL26B2/")
+./RasterSchedule.py:    sc_name="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/raster-test.sch"
+./RasterSchedule.py:    rs.setImgDire("/isilon/users/target/target/Staff/2015B/151125/08.ZooMod/")
+./RasterSchedule.py:    rs.setImgDire("/isilon/users/target/target/Staff/2015B/151211/01.BSS-console-SHIKA-Zoo/")

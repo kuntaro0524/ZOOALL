@@ -1,0 +1,210 @@
+import cv2,sys,datetime, socket, time
+import matplotlib.pyplot as plt
+import numpy as np
+import copy
+
+sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs")
+
+from MyException import *
+import CryImageProc
+import Device
+
+class FittingForFacing:
+    def __init__(self,phis,areas):
+        self.phis=phis # simple array (not numpy array)
+        self.areas=areas
+        self.isDone=False
+
+    def prep(self):
+        self.phi_list=np.array(self.phis)
+        self.area_list=np.array(self.areas)
+
+        # Mean value in amplitude
+        self.mean=np.mean(self.area_list)
+
+        # Scipy fitting
+        import scipy.optimize
+
+        # initial guess for the parameters
+        parameter_initial = np.array([0.0, 0.0, self.mean]) #a, b
+
+        param_opt, covariance = scipy.optimize.curve_fit(self.func, self.phi_list, self.area_list, p0=parameter_initial)
+
+        print("phi_list = ", self.phi_list)
+        print("area_list = ", self.area_list)
+        print("parameter =", param_opt)
+
+        # DEBUGGING PLOT
+        phi_tmp = np.linspace(0, 360, 100)
+        ny = self.func(phi_tmp,param_opt[0],param_opt[1],param_opt[2])
+        plt.plot(self.phi_list, self.area_list, 'o')
+        plt.plot(phi_tmp, ny, '-')
+        plt.show()
+
+        self.isDone=True
+        return param_opt
+
+    def func(self,phi,a,b,c):
+        return a*np.cos(np.pi/90.0*(phi+b))+c
+
+    def findFaceAngle(self):
+        if self.isDone==False:
+            param_opt=self.prep()
+
+        phi_tmp = np.linspace(0, 180, 36)
+        ny = self.func(phi_tmp,param_opt[0],param_opt[1],param_opt[2])
+
+        min_value=1000000.0
+        for phi,value in zip(phi_tmp,ny):
+            if value < min_value:
+                min_value=value
+                phi_min=phi
+
+        face_angle=phi_min+90.0
+        print("findFaceAngle=%5.1f deg."%face_angle)
+        return face_angle
+    
+if __name__=="__main__":
+    ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ms.connect(("172.24.242.59", 10101))
+
+    dev = Device.Device(ms)
+    dev.init()
+    
+    roi_len_um = 600.0
+    phis = []
+    areas = []
+    idx = 0
+
+    for phi in [0, 45, 90, 135]:
+        dev.gonio.rotatePhi(phi)
+        testimage = "/isilon/BL45XU/BLsoft/PPPP/10.Zoo/%03d_%05.2fdeg.ppm"% (idx,phi)
+        dev.capture.capture(testimage)
+        cip = CryImageProc.CryImageProc()
+        cip.setImages(testimage,"back_180517-10000-54000.ppm")
+        time.sleep(0.1)
+
+        prefix = "tttt"
+        cont = cip.getContour()
+
+        #top_xy = cip.find_top_x(cont)
+        #roi_xy = cip.selectHoriROI(cont, top_xy, 300)
+
+        top_xy = cip.find_top_x(cont)
+        roi_xy = cip.selectHoriROI(cont, top_xy, roi_len_um)
+
+        outimage = "%03d_topcontour.png" % idx
+        cip.drawContourOnTarget(roi_xy, outimage)
+
+        outimage = "%03d_minbox.png" % idx
+        cip.getMinArea(loop_size = roi_len_um, filepath = outimage)
+
+        area = cip.getArea(loop_size = roi_len_um)
+
+        phis.append(phi)
+        areas.append(area)
+
+        print("Area = %5.2f"% area)
+        idx += 1
+
+ffff = FittingForFacing(phis, areas)
+#ffff.prep()
+face_angle = ffff.findFaceAngle()
+
+yoko = face_angle - 90.0
+
+dev.gonio.rotatePhi(yoko)
+import cv2,sys,datetime, socket, time
+import matplotlib.pyplot as plt
+import numpy as np
+import copy
+
+sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs")
+
+from MyException import *
+import CryImageProc
+import Device
+
+class FittingForFacing:
+    def __init__(self,phis,areas,logpath= "./"):
+        self.phis=phis # simple array (not numpy array)
+        self.areas=areas
+        self.isDone=False
+        self.logpath = logpath
+
+    def prep(self):
+        self.phi_list=np.array(self.phis)
+        self.area_list=np.array(self.areas)
+
+        # Observed min phi & area
+        imin = self.area_list.argmin()
+        self.phi_min_obs = self.phi_list[imin]
+        self.area_min_obs = self.area_list[imin]
+
+        # Mean value in amplitude
+        self.mean=np.mean(self.area_list)
+
+        # Scipy fitting
+        import scipy.optimize
+
+        # initial guess for the parameters
+        parameter_initial = np.array([0.0, 0.0, self.mean]) #a, b
+
+        param_opt, covariance = scipy.optimize.curve_fit(self.func, self.phi_list, self.area_list, p0=parameter_initial)
+
+        print("phi_list = ", self.phi_list)
+        print("area_list = ", self.area_list)
+        print("parameter =", param_opt)
+
+        # DEBUGGING PLOT
+        phi_tmp = np.linspace(0, 360, 100)
+        ny = self.func(phi_tmp,param_opt[0],param_opt[1],param_opt[2])
+        plt.plot(self.phi_list, self.area_list, 'o')
+        plt.plot(phi_tmp, ny, '-')
+        plt.savefig("%s/fitted.png" % self.logpath)
+
+        self.isDone=True
+        return param_opt
+
+    def func(self,phi,a,b,c):
+        return a*np.cos(np.pi/90.0*(phi+b))+c
+
+    def findFaceAngle(self):
+        if self.isDone==False:
+            param_opt=self.prep()
+
+        phi_tmp = np.linspace(0, 180, 36)
+        ny = self.func(phi_tmp,param_opt[0],param_opt[1],param_opt[2])
+
+        min_value=1000000.0
+        for phi,value in zip(phi_tmp,ny):
+            if value < min_value:
+                min_value=value
+                phi_min=phi
+
+        print(phi_min, self.phi_min_obs)
+        print(min_value, self.area_min_obs)
+
+        face_angle=phi_min+90.0
+        print("findFaceAngle=%5.1f deg."%face_angle)
+        return face_angle
+    
+if __name__=="__main__":
+    lines = open(sys.argv[1], "r").readlines()
+
+    phis = []
+    areas = []
+
+    logpath = sys.argv[2]
+
+    for line in lines:
+        cols = line.split()
+        phi = float(cols[0])
+        area = float(cols[1])
+        phis.append(phi)
+        areas.append(area)
+
+    ffff = FittingForFacing(phis, areas, logpath = logpath)
+    face_angle = ffff.findFaceAngle()
+
+    print("eog %s/fitted.png" % logpath)

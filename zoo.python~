@@ -1,0 +1,8 @@
+#!/bin/bash
+export PYTHONPATH="/isilon/BL32XU/BLsoft/PPPP/93.ZooSandbox/:/isilon/BL32XU/BLsoft/PPPP/93.ZooSandbox/Libs/"
+export ZOOCONFIGPATH="/isilon/BL32XU/BLsoft/PPPP/93.ZooSandbox/Libs/"
+
+args=("$*")
+echo $args
+
+python3.8 $args

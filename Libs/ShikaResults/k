@@ -1,0 +1,909 @@
+['xiangyu-KLaT003-08_ 0.235 0.2475 n_spots 0 xiangyu-KLaT003-08_000001.img\n', 'xiangyu-KLaT003-08_ 0.225 0.2475 n_spots 0 xiangyu-KLaT003-08_000002.img\n', 'xiangyu-KLaT003-08_ 0.215 0.2475 n_spots 0 xiangyu-KLaT003-08_000003.img\n', 'xiangyu-KLaT003-08_ 0.205 0.2475 n_spots 0 xiangyu-KLaT003-08_000004.img\n', 'xiangyu-KLaT003-08_ 0.195 0.2475 n_spots 0 xiangyu-KLaT003-08_000005.img\n', 'xiangyu-KLaT003-08_ 0.185 0.2475 n_spots 0 xiangyu-KLaT003-08_000006.img\n', 'xiangyu-KLaT003-08_ 0.175 0.2475 n_spots 0 xiangyu-KLaT003-08_000007.img\n', 'xiangyu-KLaT003-08_ 0.165 0.2475 n_spots 0 xiangyu-KLaT003-08_000008.img\n', 'xiangyu-KLaT003-08_ 0.155 0.2475 n_spots 0 xiangyu-KLaT003-08_000009.img\n', 'xiangyu-KLaT003-08_ 0.145 0.2475 n_spots 0 xiangyu-KLaT003-08_000010.img\n', 'xiangyu-KLaT003-08_ 0.135 0.2475 n_spots 0 xiangyu-KLaT003-08_000011.img\n', 'xiangyu-KLaT003-08_ 0.125 0.2475 n_spots 0 xiangyu-KLaT003-08_000012.img\n', 'xiangyu-KLaT003-08_ 0.115 0.2475 n_spots 0 xiangyu-KLaT003-08_000013.img\n', 'xiangyu-KLaT003-08_ 0.105 0.2475 n_spots 0 xiangyu-KLaT003-08_000014.img\n', 'xiangyu-KLaT003-08_ 0.095 0.2475 n_spots 0 xiangyu-KLaT003-08_000015.img\n', 'xiangyu-KLaT003-08_ 0.085 0.2475 n_spots 0 xiangyu-KLaT003-08_000016.img\n', 'xiangyu-KLaT003-08_ 0.075 0.2475 n_spots 0 xiangyu-KLaT003-08_000017.img\n', 'xiangyu-KLaT003-08_ 0.065 0.2475 n_spots 0 xiangyu-KLaT003-08_000018.img\n', 'xiangyu-KLaT003-08_ 0.055 0.2475 n_spots 0 xiangyu-KLaT003-08_000019.img\n', 'xiangyu-KLaT003-08_ 0.045 0.2475 n_spots 0 xiangyu-KLaT003-08_000020.img\n', 'xiangyu-KLaT003-08_ 0.035 0.2475 n_spots 0 xiangyu-KLaT003-08_000021.img\n', 'xiangyu-KLaT003-08_ 0.025 0.2475 n_spots 0 xiangyu-KLaT003-08_000022.img\n', 'xiangyu-KLaT003-08_ 0.015 0.2475 n_spots 0 xiangyu-KLaT003-08_000023.img\n', 'xiangyu-KLaT003-08_ 0.005 0.2475 n_spots 0 xiangyu-KLaT003-08_000024.img\n', 'xiangyu-KLaT003-08_ -0.005 0.2475 n_spots 0 xiangyu-KLaT003-08_000025.img\n', 'xiangyu-KLaT003-08_ -0.015 0.2475 n_spots 0 xiangyu-KLaT003-08_000026.img\n', 'xiangyu-KLaT003-08_ -0.025 0.2475 n_spots 0 xiangyu-KLaT003-08_000027.img\n', 'xiangyu-KLaT003-08_ -0.035 0.2475 n_spots 0 xiangyu-KLaT003-08_000028.img\n', 'xiangyu-KLaT003-08_ -0.045 0.2475 n_spots 0 xiangyu-KLaT003-08_000029.img\n', 'xiangyu-KLaT003-08_ -0.055 0.2475 n_spots 0 xiangyu-KLaT003-08_000030.img\n', 'xiangyu-KLaT003-08_ -0.065 0.2475 n_spots 0 xiangyu-KLaT003-08_000031.img\n', 'xiangyu-KLaT003-08_ -0.075 0.2475 n_spots 0 xiangyu-KLaT003-08_000032.img\n', 'xiangyu-KLaT003-08_ -0.085 0.2475 n_spots 0 xiangyu-KLaT003-08_000033.img\n', 'xiangyu-KLaT003-08_ -0.095 0.2475 n_spots 0 xiangyu-KLaT003-08_000034.img\n', 'xiangyu-KLaT003-08_ -0.105 0.2475 n_spots 0 xiangyu-KLaT003-08_000035.img\n', 'xiangyu-KLaT003-08_ -0.115 0.2475 n_spots 0 xiangyu-KLaT003-08_000036.img\n', 'xiangyu-KLaT003-08_ -0.125 0.2475 n_spots 0 xiangyu-KLaT003-08_000037.img\n', 'xiangyu-KLaT003-08_ -0.135 0.2475 n_spots 0 xiangyu-KLaT003-08_000038.img\n', 'xiangyu-KLaT003-08_ -0.145 0.2475 n_spots 0 xiangyu-KLaT003-08_000039.img\n', 'xiangyu-KLaT003-08_ -0.155 0.2475 n_spots 0 xiangyu-KLaT003-08_000040.img\n', 'xiangyu-KLaT003-08_ -0.165 0.2475 n_spots 0 xiangyu-KLaT003-08_000041.img\n', 'xiangyu-KLaT003-08_ -0.175 0.2475 n_spots 0 xiangyu-KLaT003-08_000042.img\n', 'xiangyu-KLaT003-08_ -0.185 0.2475 n_spots 0 xiangyu-KLaT003-08_000043.img\n', 'xiangyu-KLaT003-08_ -0.195 0.2475 n_spots 0 xiangyu-KLaT003-08_000044.img\n', 'xiangyu-KLaT003-08_ -0.205 0.2475 n_spots 0 xiangyu-KLaT003-08_000045.img\n', 'xiangyu-KLaT003-08_ -0.215 0.2475 n_spots 0 xiangyu-KLaT003-08_000046.img\n', 'xiangyu-KLaT003-08_ -0.225 0.2475 n_spots 0 xiangyu-KLaT003-08_000047.img\n', 'xiangyu-KLaT003-08_ -0.235 0.2475 n_spots 0 xiangyu-KLaT003-08_000048.img\n', 'xiangyu-KLaT003-08_ -0.235 0.2325 n_spots 0 xiangyu-KLaT003-08_000049.img\n', 'xiangyu-KLaT003-08_ -0.225 0.2325 n_spots 0 xiangyu-KLaT003-08_000050.img\n', 'xiangyu-KLaT003-08_ -0.215 0.2325 n_spots 0 xiangyu-KLaT003-08_000051.img\n', 'xiangyu-KLaT003-08_ -0.205 0.2325 n_spots 0 xiangyu-KLaT003-08_000052.img\n', 'xiangyu-KLaT003-08_ -0.195 0.2325 n_spots 0 xiangyu-KLaT003-08_000053.img\n', 'xiangyu-KLaT003-08_ -0.185 0.2325 n_spots 0 xiangyu-KLaT003-08_000054.img\n', 'xiangyu-KLaT003-08_ -0.175 0.2325 n_spots 0 xiangyu-KLaT003-08_000055.img\n', 'xiangyu-KLaT003-08_ -0.165 0.2325 n_spots 0 xiangyu-KLaT003-08_000056.img\n', 'xiangyu-KLaT003-08_ -0.155 0.2325 n_spots 0 xiangyu-KLaT003-08_000057.img\n', 'xiangyu-KLaT003-08_ -0.145 0.2325 n_spots 0 xiangyu-KLaT003-08_000058.img\n', 'xiangyu-KLaT003-08_ -0.135 0.2325 n_spots 0 xiangyu-KLaT003-08_000059.img\n', 'xiangyu-KLaT003-08_ -0.125 0.2325 n_spots 0 xiangyu-KLaT003-08_000060.img\n', 'xiangyu-KLaT003-08_ -0.115 0.2325 n_spots 0 xiangyu-KLaT003-08_000061.img\n', 'xiangyu-KLaT003-08_ -0.105 0.2325 n_spots 0 xiangyu-KLaT003-08_000062.img\n', 'xiangyu-KLaT003-08_ -0.095 0.2325 n_spots 0 xiangyu-KLaT003-08_000063.img\n', 'xiangyu-KLaT003-08_ -0.085 0.2325 n_spots 0 xiangyu-KLaT003-08_000064.img\n', 'xiangyu-KLaT003-08_ -0.075 0.2325 n_spots 0 xiangyu-KLaT003-08_000065.img\n', 'xiangyu-KLaT003-08_ -0.065 0.2325 n_spots 0 xiangyu-KLaT003-08_000066.img\n', 'xiangyu-KLaT003-08_ -0.055 0.2325 n_spots 0 xiangyu-KLaT003-08_000067.img\n', 'xiangyu-KLaT003-08_ -0.045 0.2325 n_spots 0 xiangyu-KLaT003-08_000068.img\n', 'xiangyu-KLaT003-08_ -0.035 0.2325 n_spots 0 xiangyu-KLaT003-08_000069.img\n', 'xiangyu-KLaT003-08_ -0.025 0.2325 n_spots 0 xiangyu-KLaT003-08_000070.img\n', 'xiangyu-KLaT003-08_ -0.015 0.2325 n_spots 0 xiangyu-KLaT003-08_000071.img\n', 'xiangyu-KLaT003-08_ -0.005 0.2325 n_spots 0 xiangyu-KLaT003-08_000072.img\n', 'xiangyu-KLaT003-08_ 0.005 0.2325 n_spots 0 xiangyu-KLaT003-08_000073.img\n', 'xiangyu-KLaT003-08_ 0.015 0.2325 n_spots 0 xiangyu-KLaT003-08_000074.img\n', 'xiangyu-KLaT003-08_ 0.025 0.2325 n_spots 0 xiangyu-KLaT003-08_000075.img\n', 'xiangyu-KLaT003-08_ 0.035 0.2325 n_spots 0 xiangyu-KLaT003-08_000076.img\n', 'xiangyu-KLaT003-08_ 0.045 0.2325 n_spots 0 xiangyu-KLaT003-08_000077.img\n', 'xiangyu-KLaT003-08_ 0.055 0.2325 n_spots 0 xiangyu-KLaT003-08_000078.img\n', 'xiangyu-KLaT003-08_ 0.065 0.2325 n_spots 0 xiangyu-KLaT003-08_000079.img\n', 'xiangyu-KLaT003-08_ 0.075 0.2325 n_spots 0 xiangyu-KLaT003-08_000080.img\n', 'xiangyu-KLaT003-08_ 0.085 0.2325 n_spots 0 xiangyu-KLaT003-08_000081.img\n', 'xiangyu-KLaT003-08_ 0.095 0.2325 n_spots 0 xiangyu-KLaT003-08_000082.img\n', 'xiangyu-KLaT003-08_ 0.105 0.2325 n_spots 0 xiangyu-KLaT003-08_000083.img\n', 'xiangyu-KLaT003-08_ 0.115 0.2325 n_spots 0 xiangyu-KLaT003-08_000084.img\n', 'xiangyu-KLaT003-08_ 0.125 0.2325 n_spots 0 xiangyu-KLaT003-08_000085.img\n', 'xiangyu-KLaT003-08_ 0.135 0.2325 n_spots 0 xiangyu-KLaT003-08_000086.img\n', 'xiangyu-KLaT003-08_ 0.145 0.2325 n_spots 0 xiangyu-KLaT003-08_000087.img\n', 'xiangyu-KLaT003-08_ 0.155 0.2325 n_spots 0 xiangyu-KLaT003-08_000088.img\n', 'xiangyu-KLaT003-08_ 0.165 0.2325 n_spots 0 xiangyu-KLaT003-08_000089.img\n', 'xiangyu-KLaT003-08_ 0.175 0.2325 n_spots 0 xiangyu-KLaT003-08_000090.img\n', 'xiangyu-KLaT003-08_ 0.185 0.2325 n_spots 0 xiangyu-KLaT003-08_000091.img\n', 'xiangyu-KLaT003-08_ 0.195 0.2325 n_spots 0 xiangyu-KLaT003-08_000092.img\n', 'xiangyu-KLaT003-08_ 0.205 0.2325 n_spots 0 xiangyu-KLaT003-08_000093.img\n', 'xiangyu-KLaT003-08_ 0.215 0.2325 n_spots 0 xiangyu-KLaT003-08_000094.img\n', 'xiangyu-KLaT003-08_ 0.225 0.2325 n_spots 0 xiangyu-KLaT003-08_000095.img\n', 'xiangyu-KLaT003-08_ 0.235 0.2325 n_spots 0 xiangyu-KLaT003-08_000096.img\n', 'xiangyu-KLaT003-08_ 0.235 0.2175 n_spots 0 xiangyu-KLaT003-08_000097.img\n', 'xiangyu-KLaT003-08_ 0.225 0.2175 n_spots 0 xiangyu-KLaT003-08_000098.img\n', 'xiangyu-KLaT003-08_ 0.215 0.2175 n_spots 0 xiangyu-KLaT003-08_000099.img\n', 'xiangyu-KLaT003-08_ 0.205 0.2175 n_spots 0 xiangyu-KLaT003-08_000100.img\n', 'xiangyu-KLaT003-08_ 0.195 0.2175 n_spots 0 xiangyu-KLaT003-08_000101.img\n', 'xiangyu-KLaT003-08_ 0.185 0.2175 n_spots 0 xiangyu-KLaT003-08_000102.img\n', 'xiangyu-KLaT003-08_ 0.175 0.2175 n_spots 0 xiangyu-KLaT003-08_000103.img\n', 'xiangyu-KLaT003-08_ 0.165 0.2175 n_spots 0 xiangyu-KLaT003-08_000104.img\n', 'xiangyu-KLaT003-08_ 0.155 0.2175 n_spots 0 xiangyu-KLaT003-08_000105.img\n', 'xiangyu-KLaT003-08_ 0.145 0.2175 n_spots 0 xiangyu-KLaT003-08_000106.img\n', 'xiangyu-KLaT003-08_ 0.135 0.2175 n_spots 0 xiangyu-KLaT003-08_000107.img\n', 'xiangyu-KLaT003-08_ 0.125 0.2175 n_spots 0 xiangyu-KLaT003-08_000108.img\n', 'xiangyu-KLaT003-08_ 0.115 0.2175 n_spots 0 xiangyu-KLaT003-08_000109.img\n', 'xiangyu-KLaT003-08_ 0.105 0.2175 n_spots 0 xiangyu-KLaT003-08_000110.img\n', 'xiangyu-KLaT003-08_ 0.095 0.2175 n_spots 0 xiangyu-KLaT003-08_000111.img\n', 'xiangyu-KLaT003-08_ 0.085 0.2175 n_spots 0 xiangyu-KLaT003-08_000112.img\n', 'xiangyu-KLaT003-08_ 0.075 0.2175 n_spots 0 xiangyu-KLaT003-08_000113.img\n', 'xiangyu-KLaT003-08_ 0.065 0.2175 n_spots 0 xiangyu-KLaT003-08_000114.img\n', 'xiangyu-KLaT003-08_ 0.055 0.2175 n_spots 0 xiangyu-KLaT003-08_000115.img\n', 'xiangyu-KLaT003-08_ 0.045 0.2175 n_spots 0 xiangyu-KLaT003-08_000116.img\n', 'xiangyu-KLaT003-08_ 0.035 0.2175 n_spots 0 xiangyu-KLaT003-08_000117.img\n', 'xiangyu-KLaT003-08_ 0.025 0.2175 n_spots 0 xiangyu-KLaT003-08_000118.img\n', 'xiangyu-KLaT003-08_ 0.015 0.2175 n_spots 0 xiangyu-KLaT003-08_000119.img\n', 'xiangyu-KLaT003-08_ 0.005 0.2175 n_spots 0 xiangyu-KLaT003-08_000120.img\n', 'xiangyu-KLaT003-08_ -0.005 0.2175 n_spots 0 xiangyu-KLaT003-08_000121.img\n', 'xiangyu-KLaT003-08_ -0.015 0.2175 n_spots 0 xiangyu-KLaT003-08_000122.img\n', 'xiangyu-KLaT003-08_ -0.025 0.2175 n_spots 0 xiangyu-KLaT003-08_000123.img\n', 'xiangyu-KLaT003-08_ -0.035 0.2175 n_spots 0 xiangyu-KLaT003-08_000124.img\n', 'xiangyu-KLaT003-08_ -0.045 0.2175 n_spots 0 xiangyu-KLaT003-08_000125.img\n', 'xiangyu-KLaT003-08_ -0.055 0.2175 n_spots 0 xiangyu-KLaT003-08_000126.img\n', 'xiangyu-KLaT003-08_ -0.065 0.2175 n_spots 0 xiangyu-KLaT003-08_000127.img\n', 'xiangyu-KLaT003-08_ -0.075 0.2175 n_spots 0 xiangyu-KLaT003-08_000128.img\n', 'xiangyu-KLaT003-08_ -0.085 0.2175 n_spots 0 xiangyu-KLaT003-08_000129.img\n', 'xiangyu-KLaT003-08_ -0.095 0.2175 n_spots 0 xiangyu-KLaT003-08_000130.img\n', 'xiangyu-KLaT003-08_ -0.105 0.2175 n_spots 0 xiangyu-KLaT003-08_000131.img\n', 'xiangyu-KLaT003-08_ -0.115 0.2175 n_spots 0 xiangyu-KLaT003-08_000132.img\n', 'xiangyu-KLaT003-08_ -0.125 0.2175 n_spots 0 xiangyu-KLaT003-08_000133.img\n', 'xiangyu-KLaT003-08_ -0.135 0.2175 n_spots 0 xiangyu-KLaT003-08_000134.img\n', 'xiangyu-KLaT003-08_ -0.145 0.2175 n_spots 0 xiangyu-KLaT003-08_000135.img\n', 'xiangyu-KLaT003-08_ -0.155 0.2175 n_spots 0 xiangyu-KLaT003-08_000136.img\n', 'xiangyu-KLaT003-08_ -0.165 0.2175 n_spots 0 xiangyu-KLaT003-08_000137.img\n', 'xiangyu-KLaT003-08_ -0.175 0.2175 n_spots 0 xiangyu-KLaT003-08_000138.img\n', 'xiangyu-KLaT003-08_ -0.185 0.2175 n_spots 0 xiangyu-KLaT003-08_000139.img\n', 'xiangyu-KLaT003-08_ -0.195 0.2175 n_spots 0 xiangyu-KLaT003-08_000140.img\n', 'xiangyu-KLaT003-08_ -0.205 0.2175 n_spots 0 xiangyu-KLaT003-08_000141.img\n', 'xiangyu-KLaT003-08_ -0.215 0.2175 n_spots 0 xiangyu-KLaT003-08_000142.img\n', 'xiangyu-KLaT003-08_ -0.225 0.2175 n_spots 0 xiangyu-KLaT003-08_000143.img\n', 'xiangyu-KLaT003-08_ -0.235 0.2175 n_spots 0 xiangyu-KLaT003-08_000144.img\n', 'xiangyu-KLaT003-08_ -0.235 0.2025 n_spots 0 xiangyu-KLaT003-08_000145.img\n', 'xiangyu-KLaT003-08_ -0.225 0.2025 n_spots 0 xiangyu-KLaT003-08_000146.img\n', 'xiangyu-KLaT003-08_ -0.215 0.2025 n_spots 0 xiangyu-KLaT003-08_000147.img\n', 'xiangyu-KLaT003-08_ -0.205 0.2025 n_spots 0 xiangyu-KLaT003-08_000148.img\n', 'xiangyu-KLaT003-08_ -0.195 0.2025 n_spots 0 xiangyu-KLaT003-08_000149.img\n', 'xiangyu-KLaT003-08_ -0.185 0.2025 n_spots 0 xiangyu-KLaT003-08_000150.img\n', 'xiangyu-KLaT003-08_ -0.175 0.2025 n_spots 0 xiangyu-KLaT003-08_000151.img\n', 'xiangyu-KLaT003-08_ -0.165 0.2025 n_spots 0 xiangyu-KLaT003-08_000152.img\n', 'xiangyu-KLaT003-08_ -0.155 0.2025 n_spots 0 xiangyu-KLaT003-08_000153.img\n', 'xiangyu-KLaT003-08_ -0.145 0.2025 n_spots 0 xiangyu-KLaT003-08_000154.img\n', 'xiangyu-KLaT003-08_ -0.135 0.2025 n_spots 0 xiangyu-KLaT003-08_000155.img\n', 'xiangyu-KLaT003-08_ -0.125 0.2025 n_spots 0 xiangyu-KLaT003-08_000156.img\n', 'xiangyu-KLaT003-08_ -0.115 0.2025 n_spots 0 xiangyu-KLaT003-08_000157.img\n', 'xiangyu-KLaT003-08_ -0.105 0.2025 n_spots 0 xiangyu-KLaT003-08_000158.img\n', 'xiangyu-KLaT003-08_ -0.095 0.2025 n_spots 0 xiangyu-KLaT003-08_000159.img\n', 'xiangyu-KLaT003-08_ -0.085 0.2025 n_spots 0 xiangyu-KLaT003-08_000160.img\n', 'xiangyu-KLaT003-08_ -0.075 0.2025 n_spots 0 xiangyu-KLaT003-08_000161.img\n', 'xiangyu-KLaT003-08_ -0.065 0.2025 n_spots 0 xiangyu-KLaT003-08_000162.img\n', 'xiangyu-KLaT003-08_ -0.055 0.2025 n_spots 4 xiangyu-KLaT003-08_000163.img\n', 'xiangyu-KLaT003-08_ -0.045 0.2025 n_spots 1 xiangyu-KLaT003-08_000164.img\n', 'xiangyu-KLaT003-08_ -0.035 0.2025 n_spots 0 xiangyu-KLaT003-08_000165.img\n', 'xiangyu-KLaT003-08_ -0.025 0.2025 n_spots 1 xiangyu-KLaT003-08_000166.img\n', 'xiangyu-KLaT003-08_ -0.015 0.2025 n_spots 0 xiangyu-KLaT003-08_000167.img\n', 'xiangyu-KLaT003-08_ -0.005 0.2025 n_spots 1 xiangyu-KLaT003-08_000168.img\n', 'xiangyu-KLaT003-08_ 0.005 0.2025 n_spots 2 xiangyu-KLaT003-08_000169.img\n', 'xiangyu-KLaT003-08_ 0.015 0.2025 n_spots 4 xiangyu-KLaT003-08_000170.img\n', 'xiangyu-KLaT003-08_ 0.025 0.2025 n_spots 0 xiangyu-KLaT003-08_000171.img\n', 'xiangyu-KLaT003-08_ 0.035 0.2025 n_spots 0 xiangyu-KLaT003-08_000172.img\n', 'xiangyu-KLaT003-08_ 0.045 0.2025 n_spots 0 xiangyu-KLaT003-08_000173.img\n', 'xiangyu-KLaT003-08_ 0.055 0.2025 n_spots 0 xiangyu-KLaT003-08_000174.img\n', 'xiangyu-KLaT003-08_ 0.065 0.2025 n_spots 0 xiangyu-KLaT003-08_000175.img\n', 'xiangyu-KLaT003-08_ 0.075 0.2025 n_spots 0 xiangyu-KLaT003-08_000176.img\n', 'xiangyu-KLaT003-08_ 0.085 0.2025 n_spots 0 xiangyu-KLaT003-08_000177.img\n', 'xiangyu-KLaT003-08_ 0.095 0.2025 n_spots 0 xiangyu-KLaT003-08_000178.img\n', 'xiangyu-KLaT003-08_ 0.105 0.2025 n_spots 0 xiangyu-KLaT003-08_000179.img\n', 'xiangyu-KLaT003-08_ 0.115 0.2025 n_spots 0 xiangyu-KLaT003-08_000180.img\n', 'xiangyu-KLaT003-08_ 0.125 0.2025 n_spots 0 xiangyu-KLaT003-08_000181.img\n', 'xiangyu-KLaT003-08_ 0.135 0.2025 n_spots 0 xiangyu-KLaT003-08_000182.img\n', 'xiangyu-KLaT003-08_ 0.145 0.2025 n_spots 0 xiangyu-KLaT003-08_000183.img\n', 'xiangyu-KLaT003-08_ 0.155 0.2025 n_spots 0 xiangyu-KLaT003-08_000184.img\n', 'xiangyu-KLaT003-08_ 0.165 0.2025 n_spots 0 xiangyu-KLaT003-08_000185.img\n', 'xiangyu-KLaT003-08_ 0.175 0.2025 n_spots 0 xiangyu-KLaT003-08_000186.img\n', 'xiangyu-KLaT003-08_ 0.185 0.2025 n_spots 0 xiangyu-KLaT003-08_000187.img\n', 'xiangyu-KLaT003-08_ 0.195 0.2025 n_spots 0 xiangyu-KLaT003-08_000188.img\n', 'xiangyu-KLaT003-08_ 0.205 0.2025 n_spots 0 xiangyu-KLaT003-08_000189.img\n', 'xiangyu-KLaT003-08_ 0.215 0.2025 n_spots 0 xiangyu-KLaT003-08_000190.img\n', 'xiangyu-KLaT003-08_ 0.225 0.2025 n_spots 0 xiangyu-KLaT003-08_000191.img\n', 'xiangyu-KLaT003-08_ 0.235 0.2025 n_spots 0 xiangyu-KLaT003-08_000192.img\n', 'xiangyu-KLaT003-08_ 0.235 0.1875 n_spots 0 xiangyu-KLaT003-08_000193.img\n', 'xiangyu-KLaT003-08_ 0.225 0.1875 n_spots 0 xiangyu-KLaT003-08_000194.img\n', 'xiangyu-KLaT003-08_ 0.215 0.1875 n_spots 0 xiangyu-KLaT003-08_000195.img\n', 'xiangyu-KLaT003-08_ 0.205 0.1875 n_spots 0 xiangyu-KLaT003-08_000196.img\n', 'xiangyu-KLaT003-08_ 0.195 0.1875 n_spots 0 xiangyu-KLaT003-08_000197.img\n', 'xiangyu-KLaT003-08_ 0.185 0.1875 n_spots 0 xiangyu-KLaT003-08_000198.img\n', 'xiangyu-KLaT003-08_ 0.175 0.1875 n_spots 0 xiangyu-KLaT003-08_000199.img\n', 'xiangyu-KLaT003-08_ 0.165 0.1875 n_spots 0 xiangyu-KLaT003-08_000200.img\n', 'xiangyu-KLaT003-08_ 0.155 0.1875 n_spots 0 xiangyu-KLaT003-08_000201.img\n', 'xiangyu-KLaT003-08_ 0.145 0.1875 n_spots 0 xiangyu-KLaT003-08_000202.img\n', 'xiangyu-KLaT003-08_ 0.135 0.1875 n_spots 0 xiangyu-KLaT003-08_000203.img\n', 'xiangyu-KLaT003-08_ 0.125 0.1875 n_spots 0 xiangyu-KLaT003-08_000204.img\n', 'xiangyu-KLaT003-08_ 0.115 0.1875 n_spots 0 xiangyu-KLaT003-08_000205.img\n', 'xiangyu-KLaT003-08_ 0.105 0.1875 n_spots 0 xiangyu-KLaT003-08_000206.img\n', 'xiangyu-KLaT003-08_ 0.095 0.1875 n_spots 0 xiangyu-KLaT003-08_000207.img\n', 'xiangyu-KLaT003-08_ 0.085 0.1875 n_spots 0 xiangyu-KLaT003-08_000208.img\n', 'xiangyu-KLaT003-08_ 0.075 0.1875 n_spots 0 xiangyu-KLaT003-08_000209.img\n', 'xiangyu-KLaT003-08_ 0.065 0.1875 n_spots 0 xiangyu-KLaT003-08_000210.img\n', 'xiangyu-KLaT003-08_ 0.055 0.1875 n_spots 0 xiangyu-KLaT003-08_000211.img\n', 'xiangyu-KLaT003-08_ 0.045 0.1875 n_spots 1 xiangyu-KLaT003-08_000212.img\n', 'xiangyu-KLaT003-08_ 0.035 0.1875 n_spots 0 xiangyu-KLaT003-08_000213.img\n', 'xiangyu-KLaT003-08_ 0.025 0.1875 n_spots 0 xiangyu-KLaT003-08_000214.img\n', 'xiangyu-KLaT003-08_ 0.015 0.1875 n_spots 0 xiangyu-KLaT003-08_000215.img\n', 'xiangyu-KLaT003-08_ 0.005 0.1875 n_spots 0 xiangyu-KLaT003-08_000216.img\n', 'xiangyu-KLaT003-08_ -0.005 0.1875 n_spots 3 xiangyu-KLaT003-08_000217.img\n', 'xiangyu-KLaT003-08_ -0.015 0.1875 n_spots 1 xiangyu-KLaT003-08_000218.img\n', 'xiangyu-KLaT003-08_ -0.025 0.1875 n_spots 0 xiangyu-KLaT003-08_000219.img\n', 'xiangyu-KLaT003-08_ -0.035 0.1875 n_spots 0 xiangyu-KLaT003-08_000220.img\n', 'xiangyu-KLaT003-08_ -0.045 0.1875 n_spots 0 xiangyu-KLaT003-08_000221.img\n', 'xiangyu-KLaT003-08_ -0.055 0.1875 n_spots 1 xiangyu-KLaT003-08_000222.img\n', 'xiangyu-KLaT003-08_ -0.065 0.1875 n_spots 0 xiangyu-KLaT003-08_000223.img\n', 'xiangyu-KLaT003-08_ -0.075 0.1875 n_spots 1 xiangyu-KLaT003-08_000224.img\n', 'xiangyu-KLaT003-08_ -0.085 0.1875 n_spots 0 xiangyu-KLaT003-08_000225.img\n', 'xiangyu-KLaT003-08_ -0.095 0.1875 n_spots 0 xiangyu-KLaT003-08_000226.img\n', 'xiangyu-KLaT003-08_ -0.105 0.1875 n_spots 0 xiangyu-KLaT003-08_000227.img\n', 'xiangyu-KLaT003-08_ -0.115 0.1875 n_spots 0 xiangyu-KLaT003-08_000228.img\n', 'xiangyu-KLaT003-08_ -0.125 0.1875 n_spots 0 xiangyu-KLaT003-08_000229.img\n', 'xiangyu-KLaT003-08_ -0.135 0.1875 n_spots 0 xiangyu-KLaT003-08_000230.img\n', 'xiangyu-KLaT003-08_ -0.145 0.1875 n_spots 0 xiangyu-KLaT003-08_000231.img\n', 'xiangyu-KLaT003-08_ -0.155 0.1875 n_spots 0 xiangyu-KLaT003-08_000232.img\n', 'xiangyu-KLaT003-08_ -0.165 0.1875 n_spots 0 xiangyu-KLaT003-08_000233.img\n', 'xiangyu-KLaT003-08_ -0.175 0.1875 n_spots 0 xiangyu-KLaT003-08_000234.img\n', 'xiangyu-KLaT003-08_ -0.185 0.1875 n_spots 0 xiangyu-KLaT003-08_000235.img\n', 'xiangyu-KLaT003-08_ -0.195 0.1875 n_spots 0 xiangyu-KLaT003-08_000236.img\n', 'xiangyu-KLaT003-08_ -0.205 0.1875 n_spots 0 xiangyu-KLaT003-08_000237.img\n', 'xiangyu-KLaT003-08_ -0.215 0.1875 n_spots 0 xiangyu-KLaT003-08_000238.img\n', 'xiangyu-KLaT003-08_ -0.225 0.1875 n_spots 0 xiangyu-KLaT003-08_000239.img\n', 'xiangyu-KLaT003-08_ -0.235 0.1875 n_spots 0 xiangyu-KLaT003-08_000240.img\n', 'xiangyu-KLaT003-08_ -0.235 0.1725 n_spots 0 xiangyu-KLaT003-08_000241.img\n', 'xiangyu-KLaT003-08_ -0.225 0.1725 n_spots 0 xiangyu-KLaT003-08_000242.img\n', 'xiangyu-KLaT003-08_ -0.215 0.1725 n_spots 0 xiangyu-KLaT003-08_000243.img\n', 'xiangyu-KLaT003-08_ -0.205 0.1725 n_spots 0 xiangyu-KLaT003-08_000244.img\n', 'xiangyu-KLaT003-08_ -0.195 0.1725 n_spots 0 xiangyu-KLaT003-08_000245.img\n', 'xiangyu-KLaT003-08_ -0.185 0.1725 n_spots 0 xiangyu-KLaT003-08_000246.img\n', 'xiangyu-KLaT003-08_ -0.175 0.1725 n_spots 0 xiangyu-KLaT003-08_000247.img\n', 'xiangyu-KLaT003-08_ -0.165 0.1725 n_spots 0 xiangyu-KLaT003-08_000248.img\n', 'xiangyu-KLaT003-08_ -0.155 0.1725 n_spots 0 xiangyu-KLaT003-08_000249.img\n', 'xiangyu-KLaT003-08_ -0.145 0.1725 n_spots 0 xiangyu-KLaT003-08_000250.img\n', 'xiangyu-KLaT003-08_ -0.135 0.1725 n_spots 0 xiangyu-KLaT003-08_000251.img\n', 'xiangyu-KLaT003-08_ -0.125 0.1725 n_spots 1 xiangyu-KLaT003-08_000252.img\n', 'xiangyu-KLaT003-08_ -0.115 0.1725 n_spots 2 xiangyu-KLaT003-08_000253.img\n', 'xiangyu-KLaT003-08_ -0.105 0.1725 n_spots 0 xiangyu-KLaT003-08_000254.img\n', 'xiangyu-KLaT003-08_ -0.095 0.1725 n_spots 0 xiangyu-KLaT003-08_000255.img\n', 'xiangyu-KLaT003-08_ -0.085 0.1725 n_spots 4 xiangyu-KLaT003-08_000256.img\n', 'xiangyu-KLaT003-08_ -0.075 0.1725 n_spots 2 xiangyu-KLaT003-08_000257.img\n', 'xiangyu-KLaT003-08_ -0.065 0.1725 n_spots 0 xiangyu-KLaT003-08_000258.img\n', 'xiangyu-KLaT003-08_ -0.055 0.1725 n_spots 1 xiangyu-KLaT003-08_000259.img\n', 'xiangyu-KLaT003-08_ -0.045 0.1725 n_spots 3 xiangyu-KLaT003-08_000260.img\n', 'xiangyu-KLaT003-08_ -0.035 0.1725 n_spots 1 xiangyu-KLaT003-08_000261.img\n', 'xiangyu-KLaT003-08_ -0.025 0.1725 n_spots 2 xiangyu-KLaT003-08_000262.img\n', 'xiangyu-KLaT003-08_ -0.015 0.1725 n_spots 0 xiangyu-KLaT003-08_000263.img\n', 'xiangyu-KLaT003-08_ -0.005 0.1725 n_spots 0 xiangyu-KLaT003-08_000264.img\n', 'xiangyu-KLaT003-08_ 0.005 0.1725 n_spots 0 xiangyu-KLaT003-08_000265.img\n', 'xiangyu-KLaT003-08_ 0.015 0.1725 n_spots 0 xiangyu-KLaT003-08_000266.img\n', 'xiangyu-KLaT003-08_ 0.025 0.1725 n_spots 0 xiangyu-KLaT003-08_000267.img\n', 'xiangyu-KLaT003-08_ 0.035 0.1725 n_spots 0 xiangyu-KLaT003-08_000268.img\n', 'xiangyu-KLaT003-08_ 0.045 0.1725 n_spots 0 xiangyu-KLaT003-08_000269.img\n', 'xiangyu-KLaT003-08_ 0.055 0.1725 n_spots 0 xiangyu-KLaT003-08_000270.img\n', 'xiangyu-KLaT003-08_ 0.065 0.1725 n_spots 0 xiangyu-KLaT003-08_000271.img\n', 'xiangyu-KLaT003-08_ 0.075 0.1725 n_spots 0 xiangyu-KLaT003-08_000272.img\n', 'xiangyu-KLaT003-08_ 0.085 0.1725 n_spots 0 xiangyu-KLaT003-08_000273.img\n', 'xiangyu-KLaT003-08_ 0.095 0.1725 n_spots 0 xiangyu-KLaT003-08_000274.img\n', 'xiangyu-KLaT003-08_ 0.105 0.1725 n_spots 0 xiangyu-KLaT003-08_000275.img\n', 'xiangyu-KLaT003-08_ 0.115 0.1725 n_spots 0 xiangyu-KLaT003-08_000276.img\n', 'xiangyu-KLaT003-08_ 0.125 0.1725 n_spots 0 xiangyu-KLaT003-08_000277.img\n', 'xiangyu-KLaT003-08_ 0.135 0.1725 n_spots 0 xiangyu-KLaT003-08_000278.img\n', 'xiangyu-KLaT003-08_ 0.145 0.1725 n_spots 0 xiangyu-KLaT003-08_000279.img\n', 'xiangyu-KLaT003-08_ 0.155 0.1725 n_spots 0 xiangyu-KLaT003-08_000280.img\n', 'xiangyu-KLaT003-08_ 0.165 0.1725 n_spots 0 xiangyu-KLaT003-08_000281.img\n', 'xiangyu-KLaT003-08_ 0.175 0.1725 n_spots 0 xiangyu-KLaT003-08_000282.img\n', 'xiangyu-KLaT003-08_ 0.185 0.1725 n_spots 0 xiangyu-KLaT003-08_000283.img\n', 'xiangyu-KLaT003-08_ 0.195 0.1725 n_spots 0 xiangyu-KLaT003-08_000284.img\n', 'xiangyu-KLaT003-08_ 0.205 0.1725 n_spots 0 xiangyu-KLaT003-08_000285.img\n', 'xiangyu-KLaT003-08_ 0.215 0.1725 n_spots 0 xiangyu-KLaT003-08_000286.img\n', 'xiangyu-KLaT003-08_ 0.225 0.1725 n_spots 0 xiangyu-KLaT003-08_000287.img\n', 'xiangyu-KLaT003-08_ 0.235 0.1725 n_spots 0 xiangyu-KLaT003-08_000288.img\n', 'xiangyu-KLaT003-08_ 0.235 0.1575 n_spots 0 xiangyu-KLaT003-08_000289.img\n', 'xiangyu-KLaT003-08_ 0.225 0.1575 n_spots 0 xiangyu-KLaT003-08_000290.img\n', 'xiangyu-KLaT003-08_ 0.215 0.1575 n_spots 0 xiangyu-KLaT003-08_000291.img\n', 'xiangyu-KLaT003-08_ 0.205 0.1575 n_spots 0 xiangyu-KLaT003-08_000292.img\n', 'xiangyu-KLaT003-08_ 0.195 0.1575 n_spots 0 xiangyu-KLaT003-08_000293.img\n', 'xiangyu-KLaT003-08_ 0.185 0.1575 n_spots 0 xiangyu-KLaT003-08_000294.img\n', 'xiangyu-KLaT003-08_ 0.175 0.1575 n_spots 0 xiangyu-KLaT003-08_000295.img\n', 'xiangyu-KLaT003-08_ 0.165 0.1575 n_spots 0 xiangyu-KLaT003-08_000296.img\n', 'xiangyu-KLaT003-08_ 0.155 0.1575 n_spots 0 xiangyu-KLaT003-08_000297.img\n', 'xiangyu-KLaT003-08_ 0.145 0.1575 n_spots 0 xiangyu-KLaT003-08_000298.img\n', 'xiangyu-KLaT003-08_ 0.135 0.1575 n_spots 0 xiangyu-KLaT003-08_000299.img\n', 'xiangyu-KLaT003-08_ 0.125 0.1575 n_spots 0 xiangyu-KLaT003-08_000300.img\n', 'xiangyu-KLaT003-08_ 0.115 0.1575 n_spots 0 xiangyu-KLaT003-08_000301.img\n', 'xiangyu-KLaT003-08_ 0.105 0.1575 n_spots 0 xiangyu-KLaT003-08_000302.img\n', 'xiangyu-KLaT003-08_ 0.095 0.1575 n_spots 0 xiangyu-KLaT003-08_000303.img\n', 'xiangyu-KLaT003-08_ 0.085 0.1575 n_spots 0 xiangyu-KLaT003-08_000304.img\n', 'xiangyu-KLaT003-08_ 0.075 0.1575 n_spots 0 xiangyu-KLaT003-08_000305.img\n', 'xiangyu-KLaT003-08_ 0.065 0.1575 n_spots 0 xiangyu-KLaT003-08_000306.img\n', 'xiangyu-KLaT003-08_ 0.055 0.1575 n_spots 0 xiangyu-KLaT003-08_000307.img\n', 'xiangyu-KLaT003-08_ 0.045 0.1575 n_spots 0 xiangyu-KLaT003-08_000308.img\n', 'xiangyu-KLaT003-08_ 0.035 0.1575 n_spots 0 xiangyu-KLaT003-08_000309.img\n', 'xiangyu-KLaT003-08_ 0.025 0.1575 n_spots 0 xiangyu-KLaT003-08_000310.img\n', 'xiangyu-KLaT003-08_ 0.015 0.1575 n_spots 0 xiangyu-KLaT003-08_000311.img\n', 'xiangyu-KLaT003-08_ 0.005 0.1575 n_spots 0 xiangyu-KLaT003-08_000312.img\n', 'xiangyu-KLaT003-08_ -0.005 0.1575 n_spots 0 xiangyu-KLaT003-08_000313.img\n', 'xiangyu-KLaT003-08_ -0.015 0.1575 n_spots 0 xiangyu-KLaT003-08_000314.img\n', 'xiangyu-KLaT003-08_ -0.025 0.1575 n_spots 0 xiangyu-KLaT003-08_000315.img\n', 'xiangyu-KLaT003-08_ -0.035 0.1575 n_spots 9 xiangyu-KLaT003-08_000316.img\n', 'xiangyu-KLaT003-08_ -0.045 0.1575 n_spots 15 xiangyu-KLaT003-08_000317.img\n', 'xiangyu-KLaT003-08_ -0.055 0.1575 n_spots 2 xiangyu-KLaT003-08_000318.img\n', 'xiangyu-KLaT003-08_ -0.065 0.1575 n_spots 0 xiangyu-KLaT003-08_000319.img\n', 'xiangyu-KLaT003-08_ -0.075 0.1575 n_spots 0 xiangyu-KLaT003-08_000320.img\n', 'xiangyu-KLaT003-08_ -0.085 0.1575 n_spots 2 xiangyu-KLaT003-08_000321.img\n', 'xiangyu-KLaT003-08_ -0.095 0.1575 n_spots 0 xiangyu-KLaT003-08_000322.img\n', 'xiangyu-KLaT003-08_ -0.105 0.1575 n_spots 0 xiangyu-KLaT003-08_000323.img\n', 'xiangyu-KLaT003-08_ -0.115 0.1575 n_spots 6 xiangyu-KLaT003-08_000324.img\n', 'xiangyu-KLaT003-08_ -0.125 0.1575 n_spots 5 xiangyu-KLaT003-08_000325.img\n', 'xiangyu-KLaT003-08_ -0.135 0.1575 n_spots 0 xiangyu-KLaT003-08_000326.img\n', 'xiangyu-KLaT003-08_ -0.145 0.1575 n_spots 0 xiangyu-KLaT003-08_000327.img\n', 'xiangyu-KLaT003-08_ -0.155 0.1575 n_spots 0 xiangyu-KLaT003-08_000328.img\n', 'xiangyu-KLaT003-08_ -0.165 0.1575 n_spots 0 xiangyu-KLaT003-08_000329.img\n', 'xiangyu-KLaT003-08_ -0.175 0.1575 n_spots 0 xiangyu-KLaT003-08_000330.img\n', 'xiangyu-KLaT003-08_ -0.185 0.1575 n_spots 0 xiangyu-KLaT003-08_000331.img\n', 'xiangyu-KLaT003-08_ -0.195 0.1575 n_spots 0 xiangyu-KLaT003-08_000332.img\n', 'xiangyu-KLaT003-08_ -0.205 0.1575 n_spots 0 xiangyu-KLaT003-08_000333.img\n', 'xiangyu-KLaT003-08_ -0.215 0.1575 n_spots 0 xiangyu-KLaT003-08_000334.img\n', 'xiangyu-KLaT003-08_ -0.225 0.1575 n_spots 0 xiangyu-KLaT003-08_000335.img\n', 'xiangyu-KLaT003-08_ -0.235 0.1575 n_spots 0 xiangyu-KLaT003-08_000336.img\n', 'xiangyu-KLaT003-08_ -0.235 0.1425 n_spots 0 xiangyu-KLaT003-08_000337.img\n', 'xiangyu-KLaT003-08_ -0.225 0.1425 n_spots 0 xiangyu-KLaT003-08_000338.img\n', 'xiangyu-KLaT003-08_ -0.215 0.1425 n_spots 0 xiangyu-KLaT003-08_000339.img\n', 'xiangyu-KLaT003-08_ -0.205 0.1425 n_spots 0 xiangyu-KLaT003-08_000340.img\n', 'xiangyu-KLaT003-08_ -0.195 0.1425 n_spots 0 xiangyu-KLaT003-08_000341.img\n', 'xiangyu-KLaT003-08_ -0.185 0.1425 n_spots 0 xiangyu-KLaT003-08_000342.img\n', 'xiangyu-KLaT003-08_ -0.175 0.1425 n_spots 0 xiangyu-KLaT003-08_000343.img\n', 'xiangyu-KLaT003-08_ -0.165 0.1425 n_spots 0 xiangyu-KLaT003-08_000344.img\n', 'xiangyu-KLaT003-08_ -0.155 0.1425 n_spots 0 xiangyu-KLaT003-08_000345.img\n', 'xiangyu-KLaT003-08_ -0.145 0.1425 n_spots 3 xiangyu-KLaT003-08_000346.img\n', 'xiangyu-KLaT003-08_ -0.135 0.1425 n_spots 2 xiangyu-KLaT003-08_000347.img\n', 'xiangyu-KLaT003-08_ -0.125 0.1425 n_spots 0 xiangyu-KLaT003-08_000348.img\n', 'xiangyu-KLaT003-08_ -0.115 0.1425 n_spots 13 xiangyu-KLaT003-08_000349.img\n', 'xiangyu-KLaT003-08_ -0.105 0.1425 n_spots 0 xiangyu-KLaT003-08_000350.img\n', 'xiangyu-KLaT003-08_ -0.095 0.1425 n_spots 0 xiangyu-KLaT003-08_000351.img\n', 'xiangyu-KLaT003-08_ -0.085 0.1425 n_spots 0 xiangyu-KLaT003-08_000352.img\n', 'xiangyu-KLaT003-08_ -0.075 0.1425 n_spots 0 xiangyu-KLaT003-08_000353.img\n', 'xiangyu-KLaT003-08_ -0.065 0.1425 n_spots 0 xiangyu-KLaT003-08_000354.img\n', 'xiangyu-KLaT003-08_ -0.055 0.1425 n_spots 0 xiangyu-KLaT003-08_000355.img\n', 'xiangyu-KLaT003-08_ -0.045 0.1425 n_spots 2 xiangyu-KLaT003-08_000356.img\n', 'xiangyu-KLaT003-08_ -0.035 0.1425 n_spots 2 xiangyu-KLaT003-08_000357.img\n', 'xiangyu-KLaT003-08_ -0.025 0.1425 n_spots 0 xiangyu-KLaT003-08_000358.img\n', 'xiangyu-KLaT003-08_ -0.015 0.1425 n_spots 0 xiangyu-KLaT003-08_000359.img\n', 'xiangyu-KLaT003-08_ -0.005 0.1425 n_spots 0 xiangyu-KLaT003-08_000360.img\n', 'xiangyu-KLaT003-08_ 0.005 0.1425 n_spots 0 xiangyu-KLaT003-08_000361.img\n', 'xiangyu-KLaT003-08_ 0.015 0.1425 n_spots 0 xiangyu-KLaT003-08_000362.img\n', 'xiangyu-KLaT003-08_ 0.025 0.1425 n_spots 0 xiangyu-KLaT003-08_000363.img\n', 'xiangyu-KLaT003-08_ 0.035 0.1425 n_spots 0 xiangyu-KLaT003-08_000364.img\n', 'xiangyu-KLaT003-08_ 0.045 0.1425 n_spots 0 xiangyu-KLaT003-08_000365.img\n', 'xiangyu-KLaT003-08_ 0.055 0.1425 n_spots 0 xiangyu-KLaT003-08_000366.img\n', 'xiangyu-KLaT003-08_ 0.065 0.1425 n_spots 0 xiangyu-KLaT003-08_000367.img\n', 'xiangyu-KLaT003-08_ 0.075 0.1425 n_spots 0 xiangyu-KLaT003-08_000368.img\n', 'xiangyu-KLaT003-08_ 0.085 0.1425 n_spots 0 xiangyu-KLaT003-08_000369.img\n', 'xiangyu-KLaT003-08_ 0.095 0.1425 n_spots 0 xiangyu-KLaT003-08_000370.img\n', 'xiangyu-KLaT003-08_ 0.105 0.1425 n_spots 0 xiangyu-KLaT003-08_000371.img\n', 'xiangyu-KLaT003-08_ 0.115 0.1425 n_spots 0 xiangyu-KLaT003-08_000372.img\n', 'xiangyu-KLaT003-08_ 0.125 0.1425 n_spots 0 xiangyu-KLaT003-08_000373.img\n', 'xiangyu-KLaT003-08_ 0.135 0.1425 n_spots 0 xiangyu-KLaT003-08_000374.img\n', 'xiangyu-KLaT003-08_ 0.145 0.1425 n_spots 0 xiangyu-KLaT003-08_000375.img\n', 'xiangyu-KLaT003-08_ 0.155 0.1425 n_spots 0 xiangyu-KLaT003-08_000376.img\n', 'xiangyu-KLaT003-08_ 0.165 0.1425 n_spots 0 xiangyu-KLaT003-08_000377.img\n', 'xiangyu-KLaT003-08_ 0.175 0.1425 n_spots 0 xiangyu-KLaT003-08_000378.img\n', 'xiangyu-KLaT003-08_ 0.185 0.1425 n_spots 0 xiangyu-KLaT003-08_000379.img\n', 'xiangyu-KLaT003-08_ 0.195 0.1425 n_spots 0 xiangyu-KLaT003-08_000380.img\n', 'xiangyu-KLaT003-08_ 0.205 0.1425 n_spots 0 xiangyu-KLaT003-08_000381.img\n', 'xiangyu-KLaT003-08_ 0.215 0.1425 n_spots 0 xiangyu-KLaT003-08_000382.img\n', 'xiangyu-KLaT003-08_ 0.225 0.1425 n_spots 0 xiangyu-KLaT003-08_000383.img\n', 'xiangyu-KLaT003-08_ 0.235 0.1425 n_spots 0 xiangyu-KLaT003-08_000384.img\n', 'xiangyu-KLaT003-08_ 0.235 0.1275 n_spots 0 xiangyu-KLaT003-08_000385.img\n', 'xiangyu-KLaT003-08_ 0.225 0.1275 n_spots 0 xiangyu-KLaT003-08_000386.img\n', 'xiangyu-KLaT003-08_ 0.215 0.1275 n_spots 0 xiangyu-KLaT003-08_000387.img\n', 'xiangyu-KLaT003-08_ 0.205 0.1275 n_spots 0 xiangyu-KLaT003-08_000388.img\n', 'xiangyu-KLaT003-08_ 0.195 0.1275 n_spots 0 xiangyu-KLaT003-08_000389.img\n', 'xiangyu-KLaT003-08_ 0.185 0.1275 n_spots 0 xiangyu-KLaT003-08_000390.img\n', 'xiangyu-KLaT003-08_ 0.175 0.1275 n_spots 0 xiangyu-KLaT003-08_000391.img\n', 'xiangyu-KLaT003-08_ 0.165 0.1275 n_spots 0 xiangyu-KLaT003-08_000392.img\n', 'xiangyu-KLaT003-08_ 0.155 0.1275 n_spots 0 xiangyu-KLaT003-08_000393.img\n', 'xiangyu-KLaT003-08_ 0.145 0.1275 n_spots 0 xiangyu-KLaT003-08_000394.img\n', 'xiangyu-KLaT003-08_ 0.135 0.1275 n_spots 0 xiangyu-KLaT003-08_000395.img\n', 'xiangyu-KLaT003-08_ 0.125 0.1275 n_spots 0 xiangyu-KLaT003-08_000396.img\n', 'xiangyu-KLaT003-08_ 0.115 0.1275 n_spots 0 xiangyu-KLaT003-08_000397.img\n', 'xiangyu-KLaT003-08_ 0.105 0.1275 n_spots 0 xiangyu-KLaT003-08_000398.img\n', 'xiangyu-KLaT003-08_ 0.095 0.1275 n_spots 0 xiangyu-KLaT003-08_000399.img\n', 'xiangyu-KLaT003-08_ 0.085 0.1275 n_spots 0 xiangyu-KLaT003-08_000400.img\n', 'xiangyu-KLaT003-08_ 0.075 0.1275 n_spots 0 xiangyu-KLaT003-08_000401.img\n', 'xiangyu-KLaT003-08_ 0.065 0.1275 n_spots 0 xiangyu-KLaT003-08_000402.img\n', 'xiangyu-KLaT003-08_ 0.055 0.1275 n_spots 0 xiangyu-KLaT003-08_000403.img\n', 'xiangyu-KLaT003-08_ 0.045 0.1275 n_spots 0 xiangyu-KLaT003-08_000404.img\n', 'xiangyu-KLaT003-08_ 0.035 0.1275 n_spots 0 xiangyu-KLaT003-08_000405.img\n', 'xiangyu-KLaT003-08_ 0.025 0.1275 n_spots 0 xiangyu-KLaT003-08_000406.img\n', 'xiangyu-KLaT003-08_ 0.015 0.1275 n_spots 0 xiangyu-KLaT003-08_000407.img\n', 'xiangyu-KLaT003-08_ 0.005 0.1275 n_spots 2 xiangyu-KLaT003-08_000408.img\n', 'xiangyu-KLaT003-08_ -0.005 0.1275 n_spots 0 xiangyu-KLaT003-08_000409.img\n', 'xiangyu-KLaT003-08_ -0.015 0.1275 n_spots 0 xiangyu-KLaT003-08_000410.img\n', 'xiangyu-KLaT003-08_ -0.025 0.1275 n_spots 0 xiangyu-KLaT003-08_000411.img\n', 'xiangyu-KLaT003-08_ -0.035 0.1275 n_spots 0 xiangyu-KLaT003-08_000412.img\n', 'xiangyu-KLaT003-08_ -0.045 0.1275 n_spots 0 xiangyu-KLaT003-08_000413.img\n', 'xiangyu-KLaT003-08_ -0.055 0.1275 n_spots 6 xiangyu-KLaT003-08_000414.img\n', 'xiangyu-KLaT003-08_ -0.065 0.1275 n_spots 1 xiangyu-KLaT003-08_000415.img\n', 'xiangyu-KLaT003-08_ -0.075 0.1275 n_spots 0 xiangyu-KLaT003-08_000416.img\n', 'xiangyu-KLaT003-08_ -0.085 0.1275 n_spots 0 xiangyu-KLaT003-08_000417.img\n', 'xiangyu-KLaT003-08_ -0.095 0.1275 n_spots 0 xiangyu-KLaT003-08_000418.img\n', 'xiangyu-KLaT003-08_ -0.105 0.1275 n_spots 2 xiangyu-KLaT003-08_000419.img\n', 'xiangyu-KLaT003-08_ -0.115 0.1275 n_spots 1 xiangyu-KLaT003-08_000420.img\n', 'xiangyu-KLaT003-08_ -0.125 0.1275 n_spots 0 xiangyu-KLaT003-08_000421.img\n', 'xiangyu-KLaT003-08_ -0.135 0.1275 n_spots 1 xiangyu-KLaT003-08_000422.img\n', 'xiangyu-KLaT003-08_ -0.145 0.1275 n_spots 0 xiangyu-KLaT003-08_000423.img\n', 'xiangyu-KLaT003-08_ -0.155 0.1275 n_spots 0 xiangyu-KLaT003-08_000424.img\n', 'xiangyu-KLaT003-08_ -0.165 0.1275 n_spots 0 xiangyu-KLaT003-08_000425.img\n', 'xiangyu-KLaT003-08_ -0.175 0.1275 n_spots 0 xiangyu-KLaT003-08_000426.img\n', 'xiangyu-KLaT003-08_ -0.185 0.1275 n_spots 0 xiangyu-KLaT003-08_000427.img\n', 'xiangyu-KLaT003-08_ -0.195 0.1275 n_spots 0 xiangyu-KLaT003-08_000428.img\n', 'xiangyu-KLaT003-08_ -0.205 0.1275 n_spots 0 xiangyu-KLaT003-08_000429.img\n', 'xiangyu-KLaT003-08_ -0.215 0.1275 n_spots 0 xiangyu-KLaT003-08_000430.img\n', 'xiangyu-KLaT003-08_ -0.225 0.1275 n_spots 0 xiangyu-KLaT003-08_000431.img\n', 'xiangyu-KLaT003-08_ -0.235 0.1275 n_spots 0 xiangyu-KLaT003-08_000432.img\n', 'xiangyu-KLaT003-08_ -0.235 0.1125 n_spots 0 xiangyu-KLaT003-08_000433.img\n', 'xiangyu-KLaT003-08_ -0.225 0.1125 n_spots 0 xiangyu-KLaT003-08_000434.img\n', 'xiangyu-KLaT003-08_ -0.215 0.1125 n_spots 0 xiangyu-KLaT003-08_000435.img\n', 'xiangyu-KLaT003-08_ -0.205 0.1125 n_spots 0 xiangyu-KLaT003-08_000436.img\n', 'xiangyu-KLaT003-08_ -0.195 0.1125 n_spots 0 xiangyu-KLaT003-08_000437.img\n', 'xiangyu-KLaT003-08_ -0.185 0.1125 n_spots 0 xiangyu-KLaT003-08_000438.img\n', 'xiangyu-KLaT003-08_ -0.175 0.1125 n_spots 0 xiangyu-KLaT003-08_000439.img\n', 'xiangyu-KLaT003-08_ -0.165 0.1125 n_spots 0 xiangyu-KLaT003-08_000440.img\n', 'xiangyu-KLaT003-08_ -0.155 0.1125 n_spots 0 xiangyu-KLaT003-08_000441.img\n', 'xiangyu-KLaT003-08_ -0.145 0.1125 n_spots 0 xiangyu-KLaT003-08_000442.img\n', 'xiangyu-KLaT003-08_ -0.135 0.1125 n_spots 0 xiangyu-KLaT003-08_000443.img\n', 'xiangyu-KLaT003-08_ -0.125 0.1125 n_spots 0 xiangyu-KLaT003-08_000444.img\n', 'xiangyu-KLaT003-08_ -0.115 0.1125 n_spots 0 xiangyu-KLaT003-08_000445.img\n', 'xiangyu-KLaT003-08_ -0.105 0.1125 n_spots 0 xiangyu-KLaT003-08_000446.img\n', 'xiangyu-KLaT003-08_ -0.095 0.1125 n_spots 0 xiangyu-KLaT003-08_000447.img\n', 'xiangyu-KLaT003-08_ -0.085 0.1125 n_spots 0 xiangyu-KLaT003-08_000448.img\n', 'xiangyu-KLaT003-08_ -0.075 0.1125 n_spots 0 xiangyu-KLaT003-08_000449.img\n', 'xiangyu-KLaT003-08_ -0.065 0.1125 n_spots 7 xiangyu-KLaT003-08_000450.img\n', 'xiangyu-KLaT003-08_ -0.055 0.1125 n_spots 13 xiangyu-KLaT003-08_000451.img\n', 'xiangyu-KLaT003-08_ -0.045 0.1125 n_spots 0 xiangyu-KLaT003-08_000452.img\n', 'xiangyu-KLaT003-08_ -0.035 0.1125 n_spots 0 xiangyu-KLaT003-08_000453.img\n', 'xiangyu-KLaT003-08_ -0.025 0.1125 n_spots 1 xiangyu-KLaT003-08_000454.img\n', 'xiangyu-KLaT003-08_ -0.015 0.1125 n_spots 4 xiangyu-KLaT003-08_000455.img\n', 'xiangyu-KLaT003-08_ -0.005 0.1125 n_spots 3 xiangyu-KLaT003-08_000456.img\n', 'xiangyu-KLaT003-08_ 0.005 0.1125 n_spots 4 xiangyu-KLaT003-08_000457.img\n', 'xiangyu-KLaT003-08_ 0.015 0.1125 n_spots 0 xiangyu-KLaT003-08_000458.img\n', 'xiangyu-KLaT003-08_ 0.025 0.1125 n_spots 0 xiangyu-KLaT003-08_000459.img\n', 'xiangyu-KLaT003-08_ 0.035 0.1125 n_spots 0 xiangyu-KLaT003-08_000460.img\n', 'xiangyu-KLaT003-08_ 0.045 0.1125 n_spots 0 xiangyu-KLaT003-08_000461.img\n', 'xiangyu-KLaT003-08_ 0.055 0.1125 n_spots 0 xiangyu-KLaT003-08_000462.img\n', 'xiangyu-KLaT003-08_ 0.065 0.1125 n_spots 0 xiangyu-KLaT003-08_000463.img\n', 'xiangyu-KLaT003-08_ 0.075 0.1125 n_spots 0 xiangyu-KLaT003-08_000464.img\n', 'xiangyu-KLaT003-08_ 0.085 0.1125 n_spots 0 xiangyu-KLaT003-08_000465.img\n', 'xiangyu-KLaT003-08_ 0.095 0.1125 n_spots 0 xiangyu-KLaT003-08_000466.img\n', 'xiangyu-KLaT003-08_ 0.105 0.1125 n_spots 0 xiangyu-KLaT003-08_000467.img\n', 'xiangyu-KLaT003-08_ 0.115 0.1125 n_spots 0 xiangyu-KLaT003-08_000468.img\n', 'xiangyu-KLaT003-08_ 0.125 0.1125 n_spots 0 xiangyu-KLaT003-08_000469.img\n', 'xiangyu-KLaT003-08_ 0.135 0.1125 n_spots 0 xiangyu-KLaT003-08_000470.img\n', 'xiangyu-KLaT003-08_ 0.145 0.1125 n_spots 0 xiangyu-KLaT003-08_000471.img\n', 'xiangyu-KLaT003-08_ 0.155 0.1125 n_spots 0 xiangyu-KLaT003-08_000472.img\n', 'xiangyu-KLaT003-08_ 0.165 0.1125 n_spots 0 xiangyu-KLaT003-08_000473.img\n', 'xiangyu-KLaT003-08_ 0.175 0.1125 n_spots 0 xiangyu-KLaT003-08_000474.img\n', 'xiangyu-KLaT003-08_ 0.185 0.1125 n_spots 0 xiangyu-KLaT003-08_000475.img\n', 'xiangyu-KLaT003-08_ 0.195 0.1125 n_spots 0 xiangyu-KLaT003-08_000476.img\n', 'xiangyu-KLaT003-08_ 0.205 0.1125 n_spots 0 xiangyu-KLaT003-08_000477.img\n', 'xiangyu-KLaT003-08_ 0.215 0.1125 n_spots 0 xiangyu-KLaT003-08_000478.img\n', 'xiangyu-KLaT003-08_ 0.225 0.1125 n_spots 0 xiangyu-KLaT003-08_000479.img\n', 'xiangyu-KLaT003-08_ 0.235 0.1125 n_spots 0 xiangyu-KLaT003-08_000480.img\n', 'xiangyu-KLaT003-08_ 0.235 0.0975 n_spots 0 xiangyu-KLaT003-08_000481.img\n', 'xiangyu-KLaT003-08_ 0.225 0.0975 n_spots 0 xiangyu-KLaT003-08_000482.img\n', 'xiangyu-KLaT003-08_ 0.215 0.0975 n_spots 0 xiangyu-KLaT003-08_000483.img\n', 'xiangyu-KLaT003-08_ 0.205 0.0975 n_spots 0 xiangyu-KLaT003-08_000484.img\n', 'xiangyu-KLaT003-08_ 0.195 0.0975 n_spots 0 xiangyu-KLaT003-08_000485.img\n', 'xiangyu-KLaT003-08_ 0.185 0.0975 n_spots 0 xiangyu-KLaT003-08_000486.img\n', 'xiangyu-KLaT003-08_ 0.175 0.0975 n_spots 0 xiangyu-KLaT003-08_000487.img\n', 'xiangyu-KLaT003-08_ 0.165 0.0975 n_spots 0 xiangyu-KLaT003-08_000488.img\n', 'xiangyu-KLaT003-08_ 0.155 0.0975 n_spots 0 xiangyu-KLaT003-08_000489.img\n', 'xiangyu-KLaT003-08_ 0.145 0.0975 n_spots 0 xiangyu-KLaT003-08_000490.img\n', 'xiangyu-KLaT003-08_ 0.135 0.0975 n_spots 0 xiangyu-KLaT003-08_000491.img\n', 'xiangyu-KLaT003-08_ 0.125 0.0975 n_spots 0 xiangyu-KLaT003-08_000492.img\n', 'xiangyu-KLaT003-08_ 0.115 0.0975 n_spots 0 xiangyu-KLaT003-08_000493.img\n', 'xiangyu-KLaT003-08_ 0.105 0.0975 n_spots 0 xiangyu-KLaT003-08_000494.img\n', 'xiangyu-KLaT003-08_ 0.095 0.0975 n_spots 5 xiangyu-KLaT003-08_000495.img\n', 'xiangyu-KLaT003-08_ 0.085 0.0975 n_spots 11 xiangyu-KLaT003-08_000496.img\n', 'xiangyu-KLaT003-08_ 0.075 0.0975 n_spots 5 xiangyu-KLaT003-08_000497.img\n', 'xiangyu-KLaT003-08_ 0.065 0.0975 n_spots 0 xiangyu-KLaT003-08_000498.img\n', 'xiangyu-KLaT003-08_ 0.055 0.0975 n_spots 0 xiangyu-KLaT003-08_000499.img\n', 'xiangyu-KLaT003-08_ 0.045 0.0975 n_spots 0 xiangyu-KLaT003-08_000500.img\n', 'xiangyu-KLaT003-08_ 0.035 0.0975 n_spots 0 xiangyu-KLaT003-08_000501.img\n', 'xiangyu-KLaT003-08_ 0.025 0.0975 n_spots 0 xiangyu-KLaT003-08_000502.img\n', 'xiangyu-KLaT003-08_ 0.015 0.0975 n_spots 0 xiangyu-KLaT003-08_000503.img\n', 'xiangyu-KLaT003-08_ 0.005 0.0975 n_spots 1 xiangyu-KLaT003-08_000504.img\n', 'xiangyu-KLaT003-08_ -0.005 0.0975 n_spots 5 xiangyu-KLaT003-08_000505.img\n', 'xiangyu-KLaT003-08_ -0.015 0.0975 n_spots 2 xiangyu-KLaT003-08_000506.img\n', 'xiangyu-KLaT003-08_ -0.025 0.0975 n_spots 0 xiangyu-KLaT003-08_000507.img\n', 'xiangyu-KLaT003-08_ -0.035 0.0975 n_spots 0 xiangyu-KLaT003-08_000508.img\n', 'xiangyu-KLaT003-08_ -0.045 0.0975 n_spots 0 xiangyu-KLaT003-08_000509.img\n', 'xiangyu-KLaT003-08_ -0.055 0.0975 n_spots 0 xiangyu-KLaT003-08_000510.img\n', 'xiangyu-KLaT003-08_ -0.065 0.0975 n_spots 0 xiangyu-KLaT003-08_000511.img\n', 'xiangyu-KLaT003-08_ -0.075 0.0975 n_spots 0 xiangyu-KLaT003-08_000512.img\n', 'xiangyu-KLaT003-08_ -0.085 0.0975 n_spots 0 xiangyu-KLaT003-08_000513.img\n', 'xiangyu-KLaT003-08_ -0.095 0.0975 n_spots 0 xiangyu-KLaT003-08_000514.img\n', 'xiangyu-KLaT003-08_ -0.105 0.0975 n_spots 0 xiangyu-KLaT003-08_000515.img\n', 'xiangyu-KLaT003-08_ -0.115 0.0975 n_spots 0 xiangyu-KLaT003-08_000516.img\n', 'xiangyu-KLaT003-08_ -0.125 0.0975 n_spots 0 xiangyu-KLaT003-08_000517.img\n', 'xiangyu-KLaT003-08_ -0.135 0.0975 n_spots 0 xiangyu-KLaT003-08_000518.img\n', 'xiangyu-KLaT003-08_ -0.145 0.0975 n_spots 0 xiangyu-KLaT003-08_000519.img\n', 'xiangyu-KLaT003-08_ -0.155 0.0975 n_spots 0 xiangyu-KLaT003-08_000520.img\n', 'xiangyu-KLaT003-08_ -0.165 0.0975 n_spots 0 xiangyu-KLaT003-08_000521.img\n', 'xiangyu-KLaT003-08_ -0.175 0.0975 n_spots 0 xiangyu-KLaT003-08_000522.img\n', 'xiangyu-KLaT003-08_ -0.185 0.0975 n_spots 0 xiangyu-KLaT003-08_000523.img\n', 'xiangyu-KLaT003-08_ -0.195 0.0975 n_spots 0 xiangyu-KLaT003-08_000524.img\n', 'xiangyu-KLaT003-08_ -0.205 0.0975 n_spots 0 xiangyu-KLaT003-08_000525.img\n', 'xiangyu-KLaT003-08_ -0.215 0.0975 n_spots 0 xiangyu-KLaT003-08_000526.img\n', 'xiangyu-KLaT003-08_ -0.225 0.0975 n_spots 0 xiangyu-KLaT003-08_000527.img\n', 'xiangyu-KLaT003-08_ -0.235 0.0975 n_spots 0 xiangyu-KLaT003-08_000528.img\n', 'xiangyu-KLaT003-08_ -0.235 0.0825 n_spots 0 xiangyu-KLaT003-08_000529.img\n', 'xiangyu-KLaT003-08_ -0.225 0.0825 n_spots 0 xiangyu-KLaT003-08_000530.img\n', 'xiangyu-KLaT003-08_ -0.215 0.0825 n_spots 0 xiangyu-KLaT003-08_000531.img\n', 'xiangyu-KLaT003-08_ -0.205 0.0825 n_spots 0 xiangyu-KLaT003-08_000532.img\n', 'xiangyu-KLaT003-08_ -0.195 0.0825 n_spots 0 xiangyu-KLaT003-08_000533.img\n', 'xiangyu-KLaT003-08_ -0.185 0.0825 n_spots 0 xiangyu-KLaT003-08_000534.img\n', 'xiangyu-KLaT003-08_ -0.175 0.0825 n_spots 5 xiangyu-KLaT003-08_000535.img\n', 'xiangyu-KLaT003-08_ -0.165 0.0825 n_spots 20 xiangyu-KLaT003-08_000536.img\n', 'xiangyu-KLaT003-08_ -0.155 0.0825 n_spots 5 xiangyu-KLaT003-08_000537.img\n', 'xiangyu-KLaT003-08_ -0.145 0.0825 n_spots 0 xiangyu-KLaT003-08_000538.img\n', 'xiangyu-KLaT003-08_ -0.135 0.0825 n_spots 0 xiangyu-KLaT003-08_000539.img\n', 'xiangyu-KLaT003-08_ -0.125 0.0825 n_spots 0 xiangyu-KLaT003-08_000540.img\n', 'xiangyu-KLaT003-08_ -0.115 0.0825 n_spots 0 xiangyu-KLaT003-08_000541.img\n', 'xiangyu-KLaT003-08_ -0.105 0.0825 n_spots 1 xiangyu-KLaT003-08_000542.img\n', 'xiangyu-KLaT003-08_ -0.095 0.0825 n_spots 1 xiangyu-KLaT003-08_000543.img\n', 'xiangyu-KLaT003-08_ -0.085 0.0825 n_spots 3 xiangyu-KLaT003-08_000544.img\n', 'xiangyu-KLaT003-08_ -0.075 0.0825 n_spots 5 xiangyu-KLaT003-08_000545.img\n', 'xiangyu-KLaT003-08_ -0.065 0.0825 n_spots 4 xiangyu-KLaT003-08_000546.img\n', 'xiangyu-KLaT003-08_ -0.055 0.0825 n_spots 0 xiangyu-KLaT003-08_000547.img\n', 'xiangyu-KLaT003-08_ -0.045 0.0825 n_spots 0 xiangyu-KLaT003-08_000548.img\n', 'xiangyu-KLaT003-08_ -0.035 0.0825 n_spots 0 xiangyu-KLaT003-08_000549.img\n', 'xiangyu-KLaT003-08_ -0.025 0.0825 n_spots 4 xiangyu-KLaT003-08_000550.img\n', 'xiangyu-KLaT003-08_ -0.015 0.0825 n_spots 6 xiangyu-KLaT003-08_000551.img\n', 'xiangyu-KLaT003-08_ -0.005 0.0825 n_spots 0 xiangyu-KLaT003-08_000552.img\n', 'xiangyu-KLaT003-08_ 0.005 0.0825 n_spots 0 xiangyu-KLaT003-08_000553.img\n', 'xiangyu-KLaT003-08_ 0.015 0.0825 n_spots 0 xiangyu-KLaT003-08_000554.img\n', 'xiangyu-KLaT003-08_ 0.025 0.0825 n_spots 0 xiangyu-KLaT003-08_000555.img\n', 'xiangyu-KLaT003-08_ 0.035 0.0825 n_spots 0 xiangyu-KLaT003-08_000556.img\n', 'xiangyu-KLaT003-08_ 0.045 0.0825 n_spots 0 xiangyu-KLaT003-08_000557.img\n', 'xiangyu-KLaT003-08_ 0.055 0.0825 n_spots 0 xiangyu-KLaT003-08_000558.img\n', 'xiangyu-KLaT003-08_ 0.065 0.0825 n_spots 0 xiangyu-KLaT003-08_000559.img\n', 'xiangyu-KLaT003-08_ 0.075 0.0825 n_spots 0 xiangyu-KLaT003-08_000560.img\n', 'xiangyu-KLaT003-08_ 0.085 0.0825 n_spots 0 xiangyu-KLaT003-08_000561.img\n', 'xiangyu-KLaT003-08_ 0.095 0.0825 n_spots 0 xiangyu-KLaT003-08_000562.img\n', 'xiangyu-KLaT003-08_ 0.105 0.0825 n_spots 0 xiangyu-KLaT003-08_000563.img\n', 'xiangyu-KLaT003-08_ 0.115 0.0825 n_spots 0 xiangyu-KLaT003-08_000564.img\n', 'xiangyu-KLaT003-08_ 0.125 0.0825 n_spots 0 xiangyu-KLaT003-08_000565.img\n', 'xiangyu-KLaT003-08_ 0.135 0.0825 n_spots 0 xiangyu-KLaT003-08_000566.img\n', 'xiangyu-KLaT003-08_ 0.145 0.0825 n_spots 0 xiangyu-KLaT003-08_000567.img\n', 'xiangyu-KLaT003-08_ 0.155 0.0825 n_spots 0 xiangyu-KLaT003-08_000568.img\n', 'xiangyu-KLaT003-08_ 0.165 0.0825 n_spots 0 xiangyu-KLaT003-08_000569.img\n', 'xiangyu-KLaT003-08_ 0.175 0.0825 n_spots 0 xiangyu-KLaT003-08_000570.img\n', 'xiangyu-KLaT003-08_ 0.185 0.0825 n_spots 0 xiangyu-KLaT003-08_000571.img\n', 'xiangyu-KLaT003-08_ 0.195 0.0825 n_spots 0 xiangyu-KLaT003-08_000572.img\n', 'xiangyu-KLaT003-08_ 0.205 0.0825 n_spots 0 xiangyu-KLaT003-08_000573.img\n', 'xiangyu-KLaT003-08_ 0.215 0.0825 n_spots 0 xiangyu-KLaT003-08_000574.img\n', 'xiangyu-KLaT003-08_ 0.225 0.0825 n_spots 0 xiangyu-KLaT003-08_000575.img\n', 'xiangyu-KLaT003-08_ 0.235 0.0825 n_spots 0 xiangyu-KLaT003-08_000576.img\n', 'xiangyu-KLaT003-08_ 0.235 0.0675 n_spots 0 xiangyu-KLaT003-08_000577.img\n', 'xiangyu-KLaT003-08_ 0.225 0.0675 n_spots 0 xiangyu-KLaT003-08_000578.img\n', 'xiangyu-KLaT003-08_ 0.215 0.0675 n_spots 0 xiangyu-KLaT003-08_000579.img\n', 'xiangyu-KLaT003-08_ 0.205 0.0675 n_spots 0 xiangyu-KLaT003-08_000580.img\n', 'xiangyu-KLaT003-08_ 0.195 0.0675 n_spots 0 xiangyu-KLaT003-08_000581.img\n', 'xiangyu-KLaT003-08_ 0.185 0.0675 n_spots 0 xiangyu-KLaT003-08_000582.img\n', 'xiangyu-KLaT003-08_ 0.175 0.0675 n_spots 0 xiangyu-KLaT003-08_000583.img\n', 'xiangyu-KLaT003-08_ 0.165 0.0675 n_spots 0 xiangyu-KLaT003-08_000584.img\n', 'xiangyu-KLaT003-08_ 0.155 0.0675 n_spots 0 xiangyu-KLaT003-08_000585.img\n', 'xiangyu-KLaT003-08_ 0.145 0.0675 n_spots 1 xiangyu-KLaT003-08_000586.img\n', 'xiangyu-KLaT003-08_ 0.135 0.0675 n_spots 0 xiangyu-KLaT003-08_000587.img\n', 'xiangyu-KLaT003-08_ 0.125 0.0675 n_spots 0 xiangyu-KLaT003-08_000588.img\n', 'xiangyu-KLaT003-08_ 0.115 0.0675 n_spots 0 xiangyu-KLaT003-08_000589.img\n', 'xiangyu-KLaT003-08_ 0.105 0.0675 n_spots 0 xiangyu-KLaT003-08_000590.img\n', 'xiangyu-KLaT003-08_ 0.095 0.0675 n_spots 0 xiangyu-KLaT003-08_000591.img\n', 'xiangyu-KLaT003-08_ 0.085 0.0675 n_spots 0 xiangyu-KLaT003-08_000592.img\n', 'xiangyu-KLaT003-08_ 0.075 0.0675 n_spots 0 xiangyu-KLaT003-08_000593.img\n', 'xiangyu-KLaT003-08_ 0.065 0.0675 n_spots 0 xiangyu-KLaT003-08_000594.img\n', 'xiangyu-KLaT003-08_ 0.055 0.0675 n_spots 0 xiangyu-KLaT003-08_000595.img\n', 'xiangyu-KLaT003-08_ 0.045 0.0675 n_spots 0 xiangyu-KLaT003-08_000596.img\n', 'xiangyu-KLaT003-08_ 0.035 0.0675 n_spots 0 xiangyu-KLaT003-08_000597.img\n', 'xiangyu-KLaT003-08_ 0.025 0.0675 n_spots 0 xiangyu-KLaT003-08_000598.img\n', 'xiangyu-KLaT003-08_ 0.015 0.0675 n_spots 5 xiangyu-KLaT003-08_000599.img\n', 'xiangyu-KLaT003-08_ 0.005 0.0675 n_spots 4 xiangyu-KLaT003-08_000600.img\n', 'xiangyu-KLaT003-08_ -0.005 0.0675 n_spots 4 xiangyu-KLaT003-08_000601.img\n', 'xiangyu-KLaT003-08_ -0.015 0.0675 n_spots 1 xiangyu-KLaT003-08_000602.img\n', 'xiangyu-KLaT003-08_ -0.025 0.0675 n_spots 0 xiangyu-KLaT003-08_000603.img\n', 'xiangyu-KLaT003-08_ -0.035 0.0675 n_spots 1 xiangyu-KLaT003-08_000604.img\n', 'xiangyu-KLaT003-08_ -0.045 0.0675 n_spots 1 xiangyu-KLaT003-08_000605.img\n', 'xiangyu-KLaT003-08_ -0.055 0.0675 n_spots 0 xiangyu-KLaT003-08_000606.img\n', 'xiangyu-KLaT003-08_ -0.065 0.0675 n_spots 2 xiangyu-KLaT003-08_000607.img\n', 'xiangyu-KLaT003-08_ -0.075 0.0675 n_spots 0 xiangyu-KLaT003-08_000608.img\n', 'xiangyu-KLaT003-08_ -0.085 0.0675 n_spots 6 xiangyu-KLaT003-08_000609.img\n', 'xiangyu-KLaT003-08_ -0.095 0.0675 n_spots 0 xiangyu-KLaT003-08_000610.img\n', 'xiangyu-KLaT003-08_ -0.105 0.0675 n_spots 5 xiangyu-KLaT003-08_000611.img\n', 'xiangyu-KLaT003-08_ -0.115 0.0675 n_spots 3 xiangyu-KLaT003-08_000612.img\n', 'xiangyu-KLaT003-08_ -0.125 0.0675 n_spots 0 xiangyu-KLaT003-08_000613.img\n', 'xiangyu-KLaT003-08_ -0.135 0.0675 n_spots 0 xiangyu-KLaT003-08_000614.img\n', 'xiangyu-KLaT003-08_ -0.145 0.0675 n_spots 0 xiangyu-KLaT003-08_000615.img\n', 'xiangyu-KLaT003-08_ -0.155 0.0675 n_spots 2 xiangyu-KLaT003-08_000616.img\n', 'xiangyu-KLaT003-08_ -0.165 0.0675 n_spots 3 xiangyu-KLaT003-08_000617.img\n', 'xiangyu-KLaT003-08_ -0.175 0.0675 n_spots 0 xiangyu-KLaT003-08_000618.img\n', 'xiangyu-KLaT003-08_ -0.185 0.0675 n_spots 0 xiangyu-KLaT003-08_000619.img\n', 'xiangyu-KLaT003-08_ -0.195 0.0675 n_spots 0 xiangyu-KLaT003-08_000620.img\n', 'xiangyu-KLaT003-08_ -0.205 0.0675 n_spots 0 xiangyu-KLaT003-08_000621.img\n', 'xiangyu-KLaT003-08_ -0.215 0.0675 n_spots 0 xiangyu-KLaT003-08_000622.img\n', 'xiangyu-KLaT003-08_ -0.225 0.0675 n_spots 0 xiangyu-KLaT003-08_000623.img\n', 'xiangyu-KLaT003-08_ -0.235 0.0675 n_spots 0 xiangyu-KLaT003-08_000624.img\n', 'xiangyu-KLaT003-08_ -0.235 0.0525 n_spots 0 xiangyu-KLaT003-08_000625.img\n', 'xiangyu-KLaT003-08_ -0.225 0.0525 n_spots 0 xiangyu-KLaT003-08_000626.img\n', 'xiangyu-KLaT003-08_ -0.215 0.0525 n_spots 0 xiangyu-KLaT003-08_000627.img\n', 'xiangyu-KLaT003-08_ -0.205 0.0525 n_spots 0 xiangyu-KLaT003-08_000628.img\n', 'xiangyu-KLaT003-08_ -0.195 0.0525 n_spots 0 xiangyu-KLaT003-08_000629.img\n', 'xiangyu-KLaT003-08_ -0.185 0.0525 n_spots 0 xiangyu-KLaT003-08_000630.img\n', 'xiangyu-KLaT003-08_ -0.175 0.0525 n_spots 0 xiangyu-KLaT003-08_000631.img\n', 'xiangyu-KLaT003-08_ -0.165 0.0525 n_spots 3 xiangyu-KLaT003-08_000632.img\n', 'xiangyu-KLaT003-08_ -0.155 0.0525 n_spots 12 xiangyu-KLaT003-08_000633.img\n', 'xiangyu-KLaT003-08_ -0.145 0.0525 n_spots 1 xiangyu-KLaT003-08_000634.img\n', 'xiangyu-KLaT003-08_ -0.135 0.0525 n_spots 0 xiangyu-KLaT003-08_000635.img\n', 'xiangyu-KLaT003-08_ -0.125 0.0525 n_spots 0 xiangyu-KLaT003-08_000636.img\n', 'xiangyu-KLaT003-08_ -0.115 0.0525 n_spots 0 xiangyu-KLaT003-08_000637.img\n', 'xiangyu-KLaT003-08_ -0.105 0.0525 n_spots 0 xiangyu-KLaT003-08_000638.img\n', 'xiangyu-KLaT003-08_ -0.095 0.0525 n_spots 0 xiangyu-KLaT003-08_000639.img\n', 'xiangyu-KLaT003-08_ -0.085 0.0525 n_spots 0 xiangyu-KLaT003-08_000640.img\n', 'xiangyu-KLaT003-08_ -0.075 0.0525 n_spots 0 xiangyu-KLaT003-08_000641.img\n', 'xiangyu-KLaT003-08_ -0.065 0.0525 n_spots 0 xiangyu-KLaT003-08_000642.img\n', 'xiangyu-KLaT003-08_ -0.055 0.0525 n_spots 0 xiangyu-KLaT003-08_000643.img\n', 'xiangyu-KLaT003-08_ -0.045 0.0525 n_spots 1 xiangyu-KLaT003-08_000644.img\n', 'xiangyu-KLaT003-08_ -0.035 0.0525 n_spots 10 xiangyu-KLaT003-08_000645.img\n', 'xiangyu-KLaT003-08_ -0.025 0.0525 n_spots 6 xiangyu-KLaT003-08_000646.img\n', 'xiangyu-KLaT003-08_ -0.015 0.0525 n_spots 4 xiangyu-KLaT003-08_000647.img\n', 'xiangyu-KLaT003-08_ -0.005 0.0525 n_spots 2 xiangyu-KLaT003-08_000648.img\n', 'xiangyu-KLaT003-08_ 0.005 0.0525 n_spots 0 xiangyu-KLaT003-08_000649.img\n', 'xiangyu-KLaT003-08_ 0.015 0.0525 n_spots 2 xiangyu-KLaT003-08_000650.img\n', 'xiangyu-KLaT003-08_ 0.025 0.0525 n_spots 2 xiangyu-KLaT003-08_000651.img\n', 'xiangyu-KLaT003-08_ 0.035 0.0525 n_spots 0 xiangyu-KLaT003-08_000652.img\n', 'xiangyu-KLaT003-08_ 0.045 0.0525 n_spots 0 xiangyu-KLaT003-08_000653.img\n', 'xiangyu-KLaT003-08_ 0.055 0.0525 n_spots 0 xiangyu-KLaT003-08_000654.img\n', 'xiangyu-KLaT003-08_ 0.065 0.0525 n_spots 0 xiangyu-KLaT003-08_000655.img\n', 'xiangyu-KLaT003-08_ 0.075 0.0525 n_spots 0 xiangyu-KLaT003-08_000656.img\n', 'xiangyu-KLaT003-08_ 0.085 0.0525 n_spots 0 xiangyu-KLaT003-08_000657.img\n', 'xiangyu-KLaT003-08_ 0.095 0.0525 n_spots 0 xiangyu-KLaT003-08_000658.img\n', 'xiangyu-KLaT003-08_ 0.105 0.0525 n_spots 0 xiangyu-KLaT003-08_000659.img\n', 'xiangyu-KLaT003-08_ 0.115 0.0525 n_spots 0 xiangyu-KLaT003-08_000660.img\n', 'xiangyu-KLaT003-08_ 0.125 0.0525 n_spots 1 xiangyu-KLaT003-08_000661.img\n', 'xiangyu-KLaT003-08_ 0.135 0.0525 n_spots 0 xiangyu-KLaT003-08_000662.img\n', 'xiangyu-KLaT003-08_ 0.145 0.0525 n_spots 0 xiangyu-KLaT003-08_000663.img\n', 'xiangyu-KLaT003-08_ 0.155 0.0525 n_spots 0 xiangyu-KLaT003-08_000664.img\n', 'xiangyu-KLaT003-08_ 0.165 0.0525 n_spots 0 xiangyu-KLaT003-08_000665.img\n', 'xiangyu-KLaT003-08_ 0.175 0.0525 n_spots 0 xiangyu-KLaT003-08_000666.img\n', 'xiangyu-KLaT003-08_ 0.185 0.0525 n_spots 0 xiangyu-KLaT003-08_000667.img\n', 'xiangyu-KLaT003-08_ 0.195 0.0525 n_spots 0 xiangyu-KLaT003-08_000668.img\n', 'xiangyu-KLaT003-08_ 0.205 0.0525 n_spots 0 xiangyu-KLaT003-08_000669.img\n', 'xiangyu-KLaT003-08_ 0.215 0.0525 n_spots 0 xiangyu-KLaT003-08_000670.img\n', 'xiangyu-KLaT003-08_ 0.225 0.0525 n_spots 0 xiangyu-KLaT003-08_000671.img\n', 'xiangyu-KLaT003-08_ 0.235 0.0525 n_spots 0 xiangyu-KLaT003-08_000672.img\n', 'xiangyu-KLaT003-08_ 0.235 0.0375 n_spots 0 xiangyu-KLaT003-08_000673.img\n', 'xiangyu-KLaT003-08_ 0.225 0.0375 n_spots 0 xiangyu-KLaT003-08_000674.img\n', 'xiangyu-KLaT003-08_ 0.215 0.0375 n_spots 0 xiangyu-KLaT003-08_000675.img\n', 'xiangyu-KLaT003-08_ 0.205 0.0375 n_spots 0 xiangyu-KLaT003-08_000676.img\n', 'xiangyu-KLaT003-08_ 0.195 0.0375 n_spots 0 xiangyu-KLaT003-08_000677.img\n', 'xiangyu-KLaT003-08_ 0.185 0.0375 n_spots 0 xiangyu-KLaT003-08_000678.img\n', 'xiangyu-KLaT003-08_ 0.175 0.0375 n_spots 0 xiangyu-KLaT003-08_000679.img\n', 'xiangyu-KLaT003-08_ 0.165 0.0375 n_spots 0 xiangyu-KLaT003-08_000680.img\n', 'xiangyu-KLaT003-08_ 0.155 0.0375 n_spots 0 xiangyu-KLaT003-08_000681.img\n', 'xiangyu-KLaT003-08_ 0.145 0.0375 n_spots 0 xiangyu-KLaT003-08_000682.img\n', 'xiangyu-KLaT003-08_ 0.135 0.0375 n_spots 0 xiangyu-KLaT003-08_000683.img\n', 'xiangyu-KLaT003-08_ 0.125 0.0375 n_spots 0 xiangyu-KLaT003-08_000684.img\n', 'xiangyu-KLaT003-08_ 0.115 0.0375 n_spots 0 xiangyu-KLaT003-08_000685.img\n', 'xiangyu-KLaT003-08_ 0.105 0.0375 n_spots 0 xiangyu-KLaT003-08_000686.img\n', 'xiangyu-KLaT003-08_ 0.095 0.0375 n_spots 0 xiangyu-KLaT003-08_000687.img\n', 'xiangyu-KLaT003-08_ 0.085 0.0375 n_spots 0 xiangyu-KLaT003-08_000688.img\n', 'xiangyu-KLaT003-08_ 0.075 0.0375 n_spots 0 xiangyu-KLaT003-08_000689.img\n', 'xiangyu-KLaT003-08_ 0.065 0.0375 n_spots 0 xiangyu-KLaT003-08_000690.img\n', 'xiangyu-KLaT003-08_ 0.055 0.0375 n_spots 0 xiangyu-KLaT003-08_000691.img\n', 'xiangyu-KLaT003-08_ 0.045 0.0375 n_spots 0 xiangyu-KLaT003-08_000692.img\n', 'xiangyu-KLaT003-08_ 0.035 0.0375 n_spots 0 xiangyu-KLaT003-08_000693.img\n', 'xiangyu-KLaT003-08_ 0.025 0.0375 n_spots 0 xiangyu-KLaT003-08_000694.img\n', 'xiangyu-KLaT003-08_ 0.015 0.0375 n_spots 0 xiangyu-KLaT003-08_000695.img\n', 'xiangyu-KLaT003-08_ 0.005 0.0375 n_spots 8 xiangyu-KLaT003-08_000696.img\n', 'xiangyu-KLaT003-08_ -0.005 0.0375 n_spots 10 xiangyu-KLaT003-08_000697.img\n', 'xiangyu-KLaT003-08_ -0.015 0.0375 n_spots 16 xiangyu-KLaT003-08_000698.img\n', 'xiangyu-KLaT003-08_ -0.025 0.0375 n_spots 10 xiangyu-KLaT003-08_000699.img\n', 'xiangyu-KLaT003-08_ -0.035 0.0375 n_spots 8 xiangyu-KLaT003-08_000700.img\n', 'xiangyu-KLaT003-08_ -0.045 0.0375 n_spots 0 xiangyu-KLaT003-08_000701.img\n', 'xiangyu-KLaT003-08_ -0.055 0.0375 n_spots 0 xiangyu-KLaT003-08_000702.img\n', 'xiangyu-KLaT003-08_ -0.065 0.0375 n_spots 0 xiangyu-KLaT003-08_000703.img\n', 'xiangyu-KLaT003-08_ -0.075 0.0375 n_spots 2 xiangyu-KLaT003-08_000704.img\n', 'xiangyu-KLaT003-08_ -0.085 0.0375 n_spots 10 xiangyu-KLaT003-08_000705.img\n', 'xiangyu-KLaT003-08_ -0.095 0.0375 n_spots 10 xiangyu-KLaT003-08_000706.img\n', 'xiangyu-KLaT003-08_ -0.105 0.0375 n_spots 9 xiangyu-KLaT003-08_000707.img\n', 'xiangyu-KLaT003-08_ -0.115 0.0375 n_spots 5 xiangyu-KLaT003-08_000708.img\n', 'xiangyu-KLaT003-08_ -0.125 0.0375 n_spots 1 xiangyu-KLaT003-08_000709.img\n', 'xiangyu-KLaT003-08_ -0.135 0.0375 n_spots 0 xiangyu-KLaT003-08_000710.img\n', 'xiangyu-KLaT003-08_ -0.145 0.0375 n_spots 2 xiangyu-KLaT003-08_000711.img\n', 'xiangyu-KLaT003-08_ -0.155 0.0375 n_spots 5 xiangyu-KLaT003-08_000712.img\n', 'xiangyu-KLaT003-08_ -0.165 0.0375 n_spots 1 xiangyu-KLaT003-08_000713.img\n', 'xiangyu-KLaT003-08_ -0.175 0.0375 n_spots 0 xiangyu-KLaT003-08_000714.img\n', 'xiangyu-KLaT003-08_ -0.185 0.0375 n_spots 0 xiangyu-KLaT003-08_000715.img\n', 'xiangyu-KLaT003-08_ -0.195 0.0375 n_spots 0 xiangyu-KLaT003-08_000716.img\n', 'xiangyu-KLaT003-08_ -0.205 0.0375 n_spots 0 xiangyu-KLaT003-08_000717.img\n', 'xiangyu-KLaT003-08_ -0.215 0.0375 n_spots 0 xiangyu-KLaT003-08_000718.img\n', 'xiangyu-KLaT003-08_ -0.225 0.0375 n_spots 0 xiangyu-KLaT003-08_000719.img\n', 'xiangyu-KLaT003-08_ -0.235 0.0375 n_spots 0 xiangyu-KLaT003-08_000720.img\n', 'xiangyu-KLaT003-08_ -0.235 0.0225 n_spots 0 xiangyu-KLaT003-08_000721.img\n', 'xiangyu-KLaT003-08_ -0.225 0.0225 n_spots 0 xiangyu-KLaT003-08_000722.img\n', 'xiangyu-KLaT003-08_ -0.215 0.0225 n_spots 0 xiangyu-KLaT003-08_000723.img\n', 'xiangyu-KLaT003-08_ -0.205 0.0225 n_spots 0 xiangyu-KLaT003-08_000724.img\n', 'xiangyu-KLaT003-08_ -0.195 0.0225 n_spots 0 xiangyu-KLaT003-08_000725.img\n', 'xiangyu-KLaT003-08_ -0.185 0.0225 n_spots 0 xiangyu-KLaT003-08_000726.img\n', 'xiangyu-KLaT003-08_ -0.175 0.0225 n_spots 2 xiangyu-KLaT003-08_000727.img\n', 'xiangyu-KLaT003-08_ -0.165 0.0225 n_spots 1 xiangyu-KLaT003-08_000728.img\n', 'xiangyu-KLaT003-08_ -0.155 0.0225 n_spots 2 xiangyu-KLaT003-08_000729.img\n', 'xiangyu-KLaT003-08_ -0.145 0.0225 n_spots 3 xiangyu-KLaT003-08_000730.img\n', 'xiangyu-KLaT003-08_ -0.135 0.0225 n_spots 5 xiangyu-KLaT003-08_000731.img\n', 'xiangyu-KLaT003-08_ -0.125 0.0225 n_spots 2 xiangyu-KLaT003-08_000732.img\n', 'xiangyu-KLaT003-08_ -0.115 0.0225 n_spots 9 xiangyu-KLaT003-08_000733.img\n', 'xiangyu-KLaT003-08_ -0.105 0.0225 n_spots 26 xiangyu-KLaT003-08_000734.img\n', 'xiangyu-KLaT003-08_ -0.095 0.0225 n_spots 25 xiangyu-KLaT003-08_000735.img\n', 'xiangyu-KLaT003-08_ -0.085 0.0225 n_spots 0 xiangyu-KLaT003-08_000736.img\n', 'xiangyu-KLaT003-08_ -0.075 0.0225 n_spots 0 xiangyu-KLaT003-08_000737.img\n', 'xiangyu-KLaT003-08_ -0.065 0.0225 n_spots 0 xiangyu-KLaT003-08_000738.img\n', 'xiangyu-KLaT003-08_ -0.055 0.0225 n_spots 0 xiangyu-KLaT003-08_000739.img\n', 'xiangyu-KLaT003-08_ -0.045 0.0225 n_spots 1 xiangyu-KLaT003-08_000740.img\n', 'xiangyu-KLaT003-08_ -0.035 0.0225 n_spots 6 xiangyu-KLaT003-08_000741.img\n', 'xiangyu-KLaT003-08_ -0.025 0.0225 n_spots 10 xiangyu-KLaT003-08_000742.img\n', 'xiangyu-KLaT003-08_ -0.015 0.0225 n_spots 10 xiangyu-KLaT003-08_000743.img\n', 'xiangyu-KLaT003-08_ -0.005 0.0225 n_spots 1 xiangyu-KLaT003-08_000744.img\n', 'xiangyu-KLaT003-08_ 0.005 0.0225 n_spots 1 xiangyu-KLaT003-08_000745.img\n', 'xiangyu-KLaT003-08_ 0.015 0.0225 n_spots 0 xiangyu-KLaT003-08_000746.img\n', 'xiangyu-KLaT003-08_ 0.025 0.0225 n_spots 0 xiangyu-KLaT003-08_000747.img\n', 'xiangyu-KLaT003-08_ 0.035 0.0225 n_spots 0 xiangyu-KLaT003-08_000748.img\n', 'xiangyu-KLaT003-08_ 0.045 0.0225 n_spots 0 xiangyu-KLaT003-08_000749.img\n', 'xiangyu-KLaT003-08_ 0.055 0.0225 n_spots 0 xiangyu-KLaT003-08_000750.img\n', 'xiangyu-KLaT003-08_ 0.065 0.0225 n_spots 0 xiangyu-KLaT003-08_000751.img\n', 'xiangyu-KLaT003-08_ 0.075 0.0225 n_spots 0 xiangyu-KLaT003-08_000752.img\n', 'xiangyu-KLaT003-08_ 0.085 0.0225 n_spots 0 xiangyu-KLaT003-08_000753.img\n', 'xiangyu-KLaT003-08_ 0.095 0.0225 n_spots 0 xiangyu-KLaT003-08_000754.img\n', 'xiangyu-KLaT003-08_ 0.105 0.0225 n_spots 0 xiangyu-KLaT003-08_000755.img\n', 'xiangyu-KLaT003-08_ 0.115 0.0225 n_spots 0 xiangyu-KLaT003-08_000756.img\n', 'xiangyu-KLaT003-08_ 0.125 0.0225 n_spots 0 xiangyu-KLaT003-08_000757.img\n', 'xiangyu-KLaT003-08_ 0.135 0.0225 n_spots 0 xiangyu-KLaT003-08_000758.img\n', 'xiangyu-KLaT003-08_ 0.145 0.0225 n_spots 0 xiangyu-KLaT003-08_000759.img\n', 'xiangyu-KLaT003-08_ 0.155 0.0225 n_spots 0 xiangyu-KLaT003-08_000760.img\n', 'xiangyu-KLaT003-08_ 0.165 0.0225 n_spots 0 xiangyu-KLaT003-08_000761.img\n', 'xiangyu-KLaT003-08_ 0.175 0.0225 n_spots 0 xiangyu-KLaT003-08_000762.img\n', 'xiangyu-KLaT003-08_ 0.185 0.0225 n_spots 0 xiangyu-KLaT003-08_000763.img\n', 'xiangyu-KLaT003-08_ 0.195 0.0225 n_spots 0 xiangyu-KLaT003-08_000764.img\n', 'xiangyu-KLaT003-08_ 0.205 0.0225 n_spots 0 xiangyu-KLaT003-08_000765.img\n', 'xiangyu-KLaT003-08_ 0.215 0.0225 n_spots 0 xiangyu-KLaT003-08_000766.img\n', 'xiangyu-KLaT003-08_ 0.225 0.0225 n_spots 0 xiangyu-KLaT003-08_000767.img\n', 'xiangyu-KLaT003-08_ 0.235 0.0225 n_spots 0 xiangyu-KLaT003-08_000768.img\n', 'xiangyu-KLaT003-08_ 0.235 0.0075 n_spots 0 xiangyu-KLaT003-08_000769.img\n', 'xiangyu-KLaT003-08_ 0.225 0.0075 n_spots 0 xiangyu-KLaT003-08_000770.img\n', 'xiangyu-KLaT003-08_ 0.215 0.0075 n_spots 0 xiangyu-KLaT003-08_000771.img\n', 'xiangyu-KLaT003-08_ 0.205 0.0075 n_spots 0 xiangyu-KLaT003-08_000772.img\n', 'xiangyu-KLaT003-08_ 0.195 0.0075 n_spots 0 xiangyu-KLaT003-08_000773.img\n', 'xiangyu-KLaT003-08_ 0.185 0.0075 n_spots 0 xiangyu-KLaT003-08_000774.img\n', 'xiangyu-KLaT003-08_ 0.175 0.0075 n_spots 0 xiangyu-KLaT003-08_000775.img\n', 'xiangyu-KLaT003-08_ 0.165 0.0075 n_spots 0 xiangyu-KLaT003-08_000776.img\n', 'xiangyu-KLaT003-08_ 0.155 0.0075 n_spots 0 xiangyu-KLaT003-08_000777.img\n', 'xiangyu-KLaT003-08_ 0.145 0.0075 n_spots 0 xiangyu-KLaT003-08_000778.img\n', 'xiangyu-KLaT003-08_ 0.135 0.0075 n_spots 0 xiangyu-KLaT003-08_000779.img\n', 'xiangyu-KLaT003-08_ 0.125 0.0075 n_spots 0 xiangyu-KLaT003-08_000780.img\n', 'xiangyu-KLaT003-08_ 0.115 0.0075 n_spots 0 xiangyu-KLaT003-08_000781.img\n', 'xiangyu-KLaT003-08_ 0.105 0.0075 n_spots 0 xiangyu-KLaT003-08_000782.img\n', 'xiangyu-KLaT003-08_ 0.095 0.0075 n_spots 0 xiangyu-KLaT003-08_000783.img\n', 'xiangyu-KLaT003-08_ 0.085 0.0075 n_spots 0 xiangyu-KLaT003-08_000784.img\n', 'xiangyu-KLaT003-08_ 0.075 0.0075 n_spots 0 xiangyu-KLaT003-08_000785.img\n', 'xiangyu-KLaT003-08_ 0.065 0.0075 n_spots 0 xiangyu-KLaT003-08_000786.img\n', 'xiangyu-KLaT003-08_ 0.055 0.0075 n_spots 0 xiangyu-KLaT003-08_000787.img\n', 'xiangyu-KLaT003-08_ 0.045 0.0075 n_spots 0 xiangyu-KLaT003-08_000788.img\n', 'xiangyu-KLaT003-08_ 0.035 0.0075 n_spots 0 xiangyu-KLaT003-08_000789.img\n', 'xiangyu-KLaT003-08_ 0.025 0.0075 n_spots 0 xiangyu-KLaT003-08_000790.img\n', 'xiangyu-KLaT003-08_ 0.015 0.0075 n_spots 0 xiangyu-KLaT003-08_000791.img\n', 'xiangyu-KLaT003-08_ 0.005 0.0075 n_spots 0 xiangyu-KLaT003-08_000792.img\n', 'xiangyu-KLaT003-08_ -0.005 0.0075 n_spots 0 xiangyu-KLaT003-08_000793.img\n', 'xiangyu-KLaT003-08_ -0.015 0.0075 n_spots 2 xiangyu-KLaT003-08_000794.img\n', 'xiangyu-KLaT003-08_ -0.025 0.0075 n_spots 3 xiangyu-KLaT003-08_000795.img\n', 'xiangyu-KLaT003-08_ -0.035 0.0075 n_spots 2 xiangyu-KLaT003-08_000796.img\n', 'xiangyu-KLaT003-08_ -0.045 0.0075 n_spots 3 xiangyu-KLaT003-08_000797.img\n', 'xiangyu-KLaT003-08_ -0.055 0.0075 n_spots 0 xiangyu-KLaT003-08_000798.img\n', 'xiangyu-KLaT003-08_ -0.065 0.0075 n_spots 1 xiangyu-KLaT003-08_000799.img\n', 'xiangyu-KLaT003-08_ -0.075 0.0075 n_spots 0 xiangyu-KLaT003-08_000800.img\n', 'xiangyu-KLaT003-08_ -0.085 0.0075 n_spots 0 xiangyu-KLaT003-08_000801.img\n', 'xiangyu-KLaT003-08_ -0.095 0.0075 n_spots 2 xiangyu-KLaT003-08_000802.img\n', 'xiangyu-KLaT003-08_ -0.105 0.0075 n_spots 1 xiangyu-KLaT003-08_000803.img\n', 'xiangyu-KLaT003-08_ -0.115 0.0075 n_spots 1 xiangyu-KLaT003-08_000804.img\n', 'xiangyu-KLaT003-08_ -0.125 0.0075 n_spots 0 xiangyu-KLaT003-08_000805.img\n', 'xiangyu-KLaT003-08_ -0.135 0.0075 n_spots 0 xiangyu-KLaT003-08_000806.img\n', 'xiangyu-KLaT003-08_ -0.145 0.0075 n_spots 0 xiangyu-KLaT003-08_000807.img\n', 'xiangyu-KLaT003-08_ -0.155 0.0075 n_spots 0 xiangyu-KLaT003-08_000808.img\n', 'xiangyu-KLaT003-08_ -0.165 0.0075 n_spots 0 xiangyu-KLaT003-08_000809.img\n', 'xiangyu-KLaT003-08_ -0.175 0.0075 n_spots 3 xiangyu-KLaT003-08_000810.img\n', 'xiangyu-KLaT003-08_ -0.185 0.0075 n_spots 1 xiangyu-KLaT003-08_000811.img\n', 'xiangyu-KLaT003-08_ -0.195 0.0075 n_spots 0 xiangyu-KLaT003-08_000812.img\n', 'xiangyu-KLaT003-08_ -0.205 0.0075 n_spots 0 xiangyu-KLaT003-08_000813.img\n', 'xiangyu-KLaT003-08_ -0.215 0.0075 n_spots 0 xiangyu-KLaT003-08_000814.img\n', 'xiangyu-KLaT003-08_ -0.225 0.0075 n_spots 0 xiangyu-KLaT003-08_000815.img\n', 'xiangyu-KLaT003-08_ -0.235 0.0075 n_spots 0 xiangyu-KLaT003-08_000816.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.0075 n_spots 0 xiangyu-KLaT003-08_000817.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.0075 n_spots 0 xiangyu-KLaT003-08_000818.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.0075 n_spots 0 xiangyu-KLaT003-08_000819.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.0075 n_spots 0 xiangyu-KLaT003-08_000820.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.0075 n_spots 0 xiangyu-KLaT003-08_000821.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.0075 n_spots 0 xiangyu-KLaT003-08_000822.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.0075 n_spots 5 xiangyu-KLaT003-08_000823.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.0075 n_spots 2 xiangyu-KLaT003-08_000824.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.0075 n_spots 12 xiangyu-KLaT003-08_000825.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.0075 n_spots 10 xiangyu-KLaT003-08_000826.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.0075 n_spots 14 xiangyu-KLaT003-08_000827.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.0075 n_spots 30 xiangyu-KLaT003-08_000828.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.0075 n_spots 19 xiangyu-KLaT003-08_000829.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.0075 n_spots 3 xiangyu-KLaT003-08_000830.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.0075 n_spots 4 xiangyu-KLaT003-08_000831.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.0075 n_spots 2 xiangyu-KLaT003-08_000832.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.0075 n_spots 1 xiangyu-KLaT003-08_000833.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.0075 n_spots 1 xiangyu-KLaT003-08_000834.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.0075 n_spots 1 xiangyu-KLaT003-08_000835.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.0075 n_spots 3 xiangyu-KLaT003-08_000836.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.0075 n_spots 7 xiangyu-KLaT003-08_000837.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.0075 n_spots 4 xiangyu-KLaT003-08_000838.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.0075 n_spots 12 xiangyu-KLaT003-08_000839.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.0075 n_spots 6 xiangyu-KLaT003-08_000840.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.0075 n_spots 0 xiangyu-KLaT003-08_000841.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.0075 n_spots 0 xiangyu-KLaT003-08_000842.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.0075 n_spots 1 xiangyu-KLaT003-08_000843.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.0075 n_spots 0 xiangyu-KLaT003-08_000844.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.0075 n_spots 0 xiangyu-KLaT003-08_000845.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.0075 n_spots 0 xiangyu-KLaT003-08_000846.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.0075 n_spots 0 xiangyu-KLaT003-08_000847.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.0075 n_spots 0 xiangyu-KLaT003-08_000848.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.0075 n_spots 0 xiangyu-KLaT003-08_000849.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.0075 n_spots 0 xiangyu-KLaT003-08_000850.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.0075 n_spots 0 xiangyu-KLaT003-08_000851.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.0075 n_spots 0 xiangyu-KLaT003-08_000852.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.0075 n_spots 0 xiangyu-KLaT003-08_000853.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.0075 n_spots 0 xiangyu-KLaT003-08_000854.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.0075 n_spots 0 xiangyu-KLaT003-08_000855.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.0075 n_spots 0 xiangyu-KLaT003-08_000856.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.0075 n_spots 0 xiangyu-KLaT003-08_000857.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.0075 n_spots 0 xiangyu-KLaT003-08_000858.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.0075 n_spots 0 xiangyu-KLaT003-08_000859.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.0075 n_spots 0 xiangyu-KLaT003-08_000860.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.0075 n_spots 0 xiangyu-KLaT003-08_000861.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.0075 n_spots 0 xiangyu-KLaT003-08_000862.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.0075 n_spots 0 xiangyu-KLaT003-08_000863.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.0075 n_spots 0 xiangyu-KLaT003-08_000864.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.0225 n_spots 0 xiangyu-KLaT003-08_000865.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.0225 n_spots 0 xiangyu-KLaT003-08_000866.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.0225 n_spots 0 xiangyu-KLaT003-08_000867.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.0225 n_spots 0 xiangyu-KLaT003-08_000868.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.0225 n_spots 0 xiangyu-KLaT003-08_000869.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.0225 n_spots 0 xiangyu-KLaT003-08_000870.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.0225 n_spots 0 xiangyu-KLaT003-08_000871.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.0225 n_spots 0 xiangyu-KLaT003-08_000872.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.0225 n_spots 0 xiangyu-KLaT003-08_000873.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.0225 n_spots 0 xiangyu-KLaT003-08_000874.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.0225 n_spots 0 xiangyu-KLaT003-08_000875.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.0225 n_spots 0 xiangyu-KLaT003-08_000876.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.0225 n_spots 0 xiangyu-KLaT003-08_000877.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.0225 n_spots 0 xiangyu-KLaT003-08_000878.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.0225 n_spots 0 xiangyu-KLaT003-08_000879.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.0225 n_spots 0 xiangyu-KLaT003-08_000880.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.0225 n_spots 0 xiangyu-KLaT003-08_000881.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.0225 n_spots 0 xiangyu-KLaT003-08_000882.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.0225 n_spots 0 xiangyu-KLaT003-08_000883.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.0225 n_spots 0 xiangyu-KLaT003-08_000884.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.0225 n_spots 0 xiangyu-KLaT003-08_000885.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.0225 n_spots 0 xiangyu-KLaT003-08_000886.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.0225 n_spots 1 xiangyu-KLaT003-08_000887.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.0225 n_spots 4 xiangyu-KLaT003-08_000888.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.0225 n_spots 6 xiangyu-KLaT003-08_000889.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.0225 n_spots 4 xiangyu-KLaT003-08_000890.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.0225 n_spots 1 xiangyu-KLaT003-08_000891.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.0225 n_spots 7 xiangyu-KLaT003-08_000892.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.0225 n_spots 3 xiangyu-KLaT003-08_000893.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.0225 n_spots 0 xiangyu-KLaT003-08_000894.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.0225 n_spots 3 xiangyu-KLaT003-08_000895.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.0225 n_spots 6 xiangyu-KLaT003-08_000896.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.0225 n_spots 6 xiangyu-KLaT003-08_000897.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.0225 n_spots 0 xiangyu-KLaT003-08_000898.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.0225 n_spots 2 xiangyu-KLaT003-08_000899.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.0225 n_spots 0 xiangyu-KLaT003-08_000900.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.0225 n_spots 5 xiangyu-KLaT003-08_000901.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.0225 n_spots 10 xiangyu-KLaT003-08_000902.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.0225 n_spots 14 xiangyu-KLaT003-08_000903.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.0225 n_spots 9 xiangyu-KLaT003-08_000904.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.0225 n_spots 1 xiangyu-KLaT003-08_000905.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.0225 n_spots 4 xiangyu-KLaT003-08_000906.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.0225 n_spots 0 xiangyu-KLaT003-08_000907.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.0225 n_spots 0 xiangyu-KLaT003-08_000908.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.0225 n_spots 0 xiangyu-KLaT003-08_000909.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.0225 n_spots 0 xiangyu-KLaT003-08_000910.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.0225 n_spots 0 xiangyu-KLaT003-08_000911.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.0225 n_spots 0 xiangyu-KLaT003-08_000912.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.0375 n_spots 0 xiangyu-KLaT003-08_000913.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.0375 n_spots 0 xiangyu-KLaT003-08_000914.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.0375 n_spots 0 xiangyu-KLaT003-08_000915.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.0375 n_spots 1 xiangyu-KLaT003-08_000916.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.0375 n_spots 6 xiangyu-KLaT003-08_000917.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.0375 n_spots 11 xiangyu-KLaT003-08_000918.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.0375 n_spots 11 xiangyu-KLaT003-08_000919.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.0375 n_spots 2 xiangyu-KLaT003-08_000920.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.0375 n_spots 0 xiangyu-KLaT003-08_000921.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.0375 n_spots 0 xiangyu-KLaT003-08_000922.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.0375 n_spots 0 xiangyu-KLaT003-08_000923.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.0375 n_spots 1 xiangyu-KLaT003-08_000924.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.0375 n_spots 9 xiangyu-KLaT003-08_000925.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.0375 n_spots 5 xiangyu-KLaT003-08_000926.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.0375 n_spots 6 xiangyu-KLaT003-08_000927.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.0375 n_spots 7 xiangyu-KLaT003-08_000928.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.0375 n_spots 3 xiangyu-KLaT003-08_000929.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.0375 n_spots 5 xiangyu-KLaT003-08_000930.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.0375 n_spots 14 xiangyu-KLaT003-08_000931.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.0375 n_spots 2 xiangyu-KLaT003-08_000932.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.0375 n_spots 4 xiangyu-KLaT003-08_000933.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.0375 n_spots 0 xiangyu-KLaT003-08_000934.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.0375 n_spots 0 xiangyu-KLaT003-08_000935.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.0375 n_spots 0 xiangyu-KLaT003-08_000936.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.0375 n_spots 1 xiangyu-KLaT003-08_000937.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.0375 n_spots 0 xiangyu-KLaT003-08_000938.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.0375 n_spots 0 xiangyu-KLaT003-08_000939.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.0375 n_spots 0 xiangyu-KLaT003-08_000940.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.0375 n_spots 0 xiangyu-KLaT003-08_000941.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.0375 n_spots 0 xiangyu-KLaT003-08_000942.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.0375 n_spots 0 xiangyu-KLaT003-08_000943.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.0375 n_spots 0 xiangyu-KLaT003-08_000944.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.0375 n_spots 0 xiangyu-KLaT003-08_000945.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.0375 n_spots 0 xiangyu-KLaT003-08_000946.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.0375 n_spots 0 xiangyu-KLaT003-08_000947.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.0375 n_spots 0 xiangyu-KLaT003-08_000948.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.0375 n_spots 0 xiangyu-KLaT003-08_000949.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.0375 n_spots 0 xiangyu-KLaT003-08_000950.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.0375 n_spots 0 xiangyu-KLaT003-08_000951.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.0375 n_spots 0 xiangyu-KLaT003-08_000952.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.0375 n_spots 0 xiangyu-KLaT003-08_000953.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.0375 n_spots 0 xiangyu-KLaT003-08_000954.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.0375 n_spots 0 xiangyu-KLaT003-08_000955.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.0375 n_spots 0 xiangyu-KLaT003-08_000956.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.0375 n_spots 0 xiangyu-KLaT003-08_000957.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.0375 n_spots 0 xiangyu-KLaT003-08_000958.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.0375 n_spots 0 xiangyu-KLaT003-08_000959.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.0375 n_spots 0 xiangyu-KLaT003-08_000960.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.0525 n_spots 0 xiangyu-KLaT003-08_000961.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.0525 n_spots 0 xiangyu-KLaT003-08_000962.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.0525 n_spots 0 xiangyu-KLaT003-08_000963.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.0525 n_spots 0 xiangyu-KLaT003-08_000964.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.0525 n_spots 0 xiangyu-KLaT003-08_000965.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.0525 n_spots 0 xiangyu-KLaT003-08_000966.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.0525 n_spots 0 xiangyu-KLaT003-08_000967.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.0525 n_spots 0 xiangyu-KLaT003-08_000968.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.0525 n_spots 0 xiangyu-KLaT003-08_000969.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.0525 n_spots 0 xiangyu-KLaT003-08_000970.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.0525 n_spots 0 xiangyu-KLaT003-08_000971.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.0525 n_spots 0 xiangyu-KLaT003-08_000972.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.0525 n_spots 0 xiangyu-KLaT003-08_000973.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.0525 n_spots 0 xiangyu-KLaT003-08_000974.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.0525 n_spots 0 xiangyu-KLaT003-08_000975.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.0525 n_spots 0 xiangyu-KLaT003-08_000976.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.0525 n_spots 0 xiangyu-KLaT003-08_000977.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.0525 n_spots 0 xiangyu-KLaT003-08_000978.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.0525 n_spots 0 xiangyu-KLaT003-08_000979.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.0525 n_spots 0 xiangyu-KLaT003-08_000980.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.0525 n_spots 0 xiangyu-KLaT003-08_000981.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.0525 n_spots 0 xiangyu-KLaT003-08_000982.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.0525 n_spots 0 xiangyu-KLaT003-08_000983.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.0525 n_spots 0 xiangyu-KLaT003-08_000984.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.0525 n_spots 1 xiangyu-KLaT003-08_000985.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.0525 n_spots 0 xiangyu-KLaT003-08_000986.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.0525 n_spots 0 xiangyu-KLaT003-08_000987.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.0525 n_spots 0 xiangyu-KLaT003-08_000988.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.0525 n_spots 0 xiangyu-KLaT003-08_000989.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.0525 n_spots 0 xiangyu-KLaT003-08_000990.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.0525 n_spots 0 xiangyu-KLaT003-08_000991.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.0525 n_spots 0 xiangyu-KLaT003-08_000992.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.0525 n_spots 4 xiangyu-KLaT003-08_000993.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.0525 n_spots 7 xiangyu-KLaT003-08_000994.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.0525 n_spots 26 xiangyu-KLaT003-08_000995.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.0525 n_spots 27 xiangyu-KLaT003-08_000996.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.0525 n_spots 3 xiangyu-KLaT003-08_000997.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.0525 n_spots 0 xiangyu-KLaT003-08_000998.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.0525 n_spots 2 xiangyu-KLaT003-08_000999.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.0525 n_spots 2 xiangyu-KLaT003-08_001000.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.0525 n_spots 9 xiangyu-KLaT003-08_001001.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.0525 n_spots 24 xiangyu-KLaT003-08_001002.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.0525 n_spots 23 xiangyu-KLaT003-08_001003.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.0525 n_spots 21 xiangyu-KLaT003-08_001004.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.0525 n_spots 12 xiangyu-KLaT003-08_001005.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.0525 n_spots 0 xiangyu-KLaT003-08_001006.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.0525 n_spots 0 xiangyu-KLaT003-08_001007.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.0525 n_spots 0 xiangyu-KLaT003-08_001008.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.0675 n_spots 0 xiangyu-KLaT003-08_001009.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.0675 n_spots 0 xiangyu-KLaT003-08_001010.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.0675 n_spots 0 xiangyu-KLaT003-08_001011.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.0675 n_spots 0 xiangyu-KLaT003-08_001012.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.0675 n_spots 0 xiangyu-KLaT003-08_001013.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.0675 n_spots 0 xiangyu-KLaT003-08_001014.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.0675 n_spots 4 xiangyu-KLaT003-08_001015.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.0675 n_spots 1 xiangyu-KLaT003-08_001016.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.0675 n_spots 0 xiangyu-KLaT003-08_001017.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.0675 n_spots 0 xiangyu-KLaT003-08_001018.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.0675 n_spots 0 xiangyu-KLaT003-08_001019.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.0675 n_spots 1 xiangyu-KLaT003-08_001020.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.0675 n_spots 11 xiangyu-KLaT003-08_001021.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.0675 n_spots 9 xiangyu-KLaT003-08_001022.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.0675 n_spots 4 xiangyu-KLaT003-08_001023.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.0675 n_spots 1 xiangyu-KLaT003-08_001024.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.0675 n_spots 4 xiangyu-KLaT003-08_001025.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.0675 n_spots 2 xiangyu-KLaT003-08_001026.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.0675 n_spots 5 xiangyu-KLaT003-08_001027.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.0675 n_spots 0 xiangyu-KLaT003-08_001028.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.0675 n_spots 0 xiangyu-KLaT003-08_001029.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.0675 n_spots 0 xiangyu-KLaT003-08_001030.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.0675 n_spots 3 xiangyu-KLaT003-08_001031.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.0675 n_spots 1 xiangyu-KLaT003-08_001032.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.0675 n_spots 2 xiangyu-KLaT003-08_001033.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.0675 n_spots 0 xiangyu-KLaT003-08_001034.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.0675 n_spots 0 xiangyu-KLaT003-08_001035.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.0675 n_spots 5 xiangyu-KLaT003-08_001036.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.0675 n_spots 3 xiangyu-KLaT003-08_001037.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.0675 n_spots 0 xiangyu-KLaT003-08_001038.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.0675 n_spots 0 xiangyu-KLaT003-08_001039.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.0675 n_spots 0 xiangyu-KLaT003-08_001040.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.0675 n_spots 0 xiangyu-KLaT003-08_001041.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.0675 n_spots 0 xiangyu-KLaT003-08_001042.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.0675 n_spots 0 xiangyu-KLaT003-08_001043.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.0675 n_spots 0 xiangyu-KLaT003-08_001044.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.0675 n_spots 0 xiangyu-KLaT003-08_001045.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.0675 n_spots 0 xiangyu-KLaT003-08_001046.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.0675 n_spots 0 xiangyu-KLaT003-08_001047.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.0675 n_spots 0 xiangyu-KLaT003-08_001048.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.0675 n_spots 0 xiangyu-KLaT003-08_001049.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.0675 n_spots 0 xiangyu-KLaT003-08_001050.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.0675 n_spots 0 xiangyu-KLaT003-08_001051.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.0675 n_spots 0 xiangyu-KLaT003-08_001052.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.0675 n_spots 0 xiangyu-KLaT003-08_001053.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.0675 n_spots 0 xiangyu-KLaT003-08_001054.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.0675 n_spots 0 xiangyu-KLaT003-08_001055.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.0675 n_spots 0 xiangyu-KLaT003-08_001056.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.0825 n_spots 0 xiangyu-KLaT003-08_001057.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.0825 n_spots 0 xiangyu-KLaT003-08_001058.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.0825 n_spots 0 xiangyu-KLaT003-08_001059.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.0825 n_spots 0 xiangyu-KLaT003-08_001060.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.0825 n_spots 0 xiangyu-KLaT003-08_001061.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.0825 n_spots 0 xiangyu-KLaT003-08_001062.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.0825 n_spots 0 xiangyu-KLaT003-08_001063.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.0825 n_spots 0 xiangyu-KLaT003-08_001064.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.0825 n_spots 0 xiangyu-KLaT003-08_001065.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.0825 n_spots 0 xiangyu-KLaT003-08_001066.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.0825 n_spots 0 xiangyu-KLaT003-08_001067.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.0825 n_spots 0 xiangyu-KLaT003-08_001068.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.0825 n_spots 0 xiangyu-KLaT003-08_001069.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.0825 n_spots 0 xiangyu-KLaT003-08_001070.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.0825 n_spots 0 xiangyu-KLaT003-08_001071.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.0825 n_spots 0 xiangyu-KLaT003-08_001072.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.0825 n_spots 0 xiangyu-KLaT003-08_001073.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.0825 n_spots 0 xiangyu-KLaT003-08_001074.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.0825 n_spots 0 xiangyu-KLaT003-08_001075.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.0825 n_spots 0 xiangyu-KLaT003-08_001076.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.0825 n_spots 0 xiangyu-KLaT003-08_001077.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.0825 n_spots 0 xiangyu-KLaT003-08_001078.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.0825 n_spots 2 xiangyu-KLaT003-08_001079.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.0825 n_spots 0 xiangyu-KLaT003-08_001080.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.0825 n_spots 2 xiangyu-KLaT003-08_001081.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.0825 n_spots 8 xiangyu-KLaT003-08_001082.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.0825 n_spots 0 xiangyu-KLaT003-08_001083.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.0825 n_spots 0 xiangyu-KLaT003-08_001084.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.0825 n_spots 13 xiangyu-KLaT003-08_001085.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.0825 n_spots 24 xiangyu-KLaT003-08_001086.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.0825 n_spots 22 xiangyu-KLaT003-08_001087.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.0825 n_spots 17 xiangyu-KLaT003-08_001088.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.0825 n_spots 0 xiangyu-KLaT003-08_001089.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.0825 n_spots 1 xiangyu-KLaT003-08_001090.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.0825 n_spots 0 xiangyu-KLaT003-08_001091.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.0825 n_spots 0 xiangyu-KLaT003-08_001092.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.0825 n_spots 2 xiangyu-KLaT003-08_001093.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.0825 n_spots 5 xiangyu-KLaT003-08_001094.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.0825 n_spots 0 xiangyu-KLaT003-08_001095.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.0825 n_spots 1 xiangyu-KLaT003-08_001096.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.0825 n_spots 3 xiangyu-KLaT003-08_001097.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.0825 n_spots 7 xiangyu-KLaT003-08_001098.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.0825 n_spots 1 xiangyu-KLaT003-08_001099.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.0825 n_spots 0 xiangyu-KLaT003-08_001100.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.0825 n_spots 0 xiangyu-KLaT003-08_001101.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.0825 n_spots 0 xiangyu-KLaT003-08_001102.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.0825 n_spots 0 xiangyu-KLaT003-08_001103.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.0825 n_spots 0 xiangyu-KLaT003-08_001104.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.0975 n_spots 0 xiangyu-KLaT003-08_001105.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.0975 n_spots 0 xiangyu-KLaT003-08_001106.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.0975 n_spots 0 xiangyu-KLaT003-08_001107.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.0975 n_spots 0 xiangyu-KLaT003-08_001108.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.0975 n_spots 2 xiangyu-KLaT003-08_001109.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.0975 n_spots 5 xiangyu-KLaT003-08_001110.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.0975 n_spots 2 xiangyu-KLaT003-08_001111.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.0975 n_spots 20 xiangyu-KLaT003-08_001112.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.0975 n_spots 23 xiangyu-KLaT003-08_001113.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.0975 n_spots 14 xiangyu-KLaT003-08_001114.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.0975 n_spots 14 xiangyu-KLaT003-08_001115.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.0975 n_spots 3 xiangyu-KLaT003-08_001116.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.0975 n_spots 0 xiangyu-KLaT003-08_001117.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.0975 n_spots 2 xiangyu-KLaT003-08_001118.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.0975 n_spots 7 xiangyu-KLaT003-08_001119.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.0975 n_spots 3 xiangyu-KLaT003-08_001120.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.0975 n_spots 0 xiangyu-KLaT003-08_001121.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.0975 n_spots 2 xiangyu-KLaT003-08_001122.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.0975 n_spots 0 xiangyu-KLaT003-08_001123.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.0975 n_spots 0 xiangyu-KLaT003-08_001124.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.0975 n_spots 0 xiangyu-KLaT003-08_001125.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.0975 n_spots 0 xiangyu-KLaT003-08_001126.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.0975 n_spots 0 xiangyu-KLaT003-08_001127.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.0975 n_spots 0 xiangyu-KLaT003-08_001128.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.0975 n_spots 0 xiangyu-KLaT003-08_001129.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.0975 n_spots 6 xiangyu-KLaT003-08_001130.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.0975 n_spots 5 xiangyu-KLaT003-08_001131.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.0975 n_spots 0 xiangyu-KLaT003-08_001132.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.0975 n_spots 0 xiangyu-KLaT003-08_001133.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.0975 n_spots 0 xiangyu-KLaT003-08_001134.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.0975 n_spots 0 xiangyu-KLaT003-08_001135.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.0975 n_spots 0 xiangyu-KLaT003-08_001136.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.0975 n_spots 0 xiangyu-KLaT003-08_001137.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.0975 n_spots 0 xiangyu-KLaT003-08_001138.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.0975 n_spots 0 xiangyu-KLaT003-08_001139.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.0975 n_spots 0 xiangyu-KLaT003-08_001140.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.0975 n_spots 0 xiangyu-KLaT003-08_001141.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.0975 n_spots 0 xiangyu-KLaT003-08_001142.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.0975 n_spots 0 xiangyu-KLaT003-08_001143.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.0975 n_spots 0 xiangyu-KLaT003-08_001144.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.0975 n_spots 0 xiangyu-KLaT003-08_001145.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.0975 n_spots 0 xiangyu-KLaT003-08_001146.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.0975 n_spots 0 xiangyu-KLaT003-08_001147.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.0975 n_spots 0 xiangyu-KLaT003-08_001148.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.0975 n_spots 0 xiangyu-KLaT003-08_001149.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.0975 n_spots 0 xiangyu-KLaT003-08_001150.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.0975 n_spots 0 xiangyu-KLaT003-08_001151.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.0975 n_spots 0 xiangyu-KLaT003-08_001152.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.1125 n_spots 0 xiangyu-KLaT003-08_001153.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.1125 n_spots 0 xiangyu-KLaT003-08_001154.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.1125 n_spots 0 xiangyu-KLaT003-08_001155.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.1125 n_spots 0 xiangyu-KLaT003-08_001156.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.1125 n_spots 0 xiangyu-KLaT003-08_001157.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.1125 n_spots 0 xiangyu-KLaT003-08_001158.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.1125 n_spots 0 xiangyu-KLaT003-08_001159.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.1125 n_spots 0 xiangyu-KLaT003-08_001160.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.1125 n_spots 0 xiangyu-KLaT003-08_001161.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.1125 n_spots 0 xiangyu-KLaT003-08_001162.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.1125 n_spots 0 xiangyu-KLaT003-08_001163.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.1125 n_spots 0 xiangyu-KLaT003-08_001164.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.1125 n_spots 0 xiangyu-KLaT003-08_001165.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.1125 n_spots 0 xiangyu-KLaT003-08_001166.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.1125 n_spots 0 xiangyu-KLaT003-08_001167.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.1125 n_spots 0 xiangyu-KLaT003-08_001168.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.1125 n_spots 0 xiangyu-KLaT003-08_001169.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.1125 n_spots 0 xiangyu-KLaT003-08_001170.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.1125 n_spots 0 xiangyu-KLaT003-08_001171.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.1125 n_spots 0 xiangyu-KLaT003-08_001172.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.1125 n_spots 0 xiangyu-KLaT003-08_001173.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.1125 n_spots 0 xiangyu-KLaT003-08_001174.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.1125 n_spots 0 xiangyu-KLaT003-08_001175.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.1125 n_spots 0 xiangyu-KLaT003-08_001176.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.1125 n_spots 0 xiangyu-KLaT003-08_001177.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.1125 n_spots 0 xiangyu-KLaT003-08_001178.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.1125 n_spots 1 xiangyu-KLaT003-08_001179.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.1125 n_spots 1 xiangyu-KLaT003-08_001180.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.1125 n_spots 1 xiangyu-KLaT003-08_001181.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.1125 n_spots 1 xiangyu-KLaT003-08_001182.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.1125 n_spots 2 xiangyu-KLaT003-08_001183.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.1125 n_spots 0 xiangyu-KLaT003-08_001184.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.1125 n_spots 3 xiangyu-KLaT003-08_001185.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.1125 n_spots 8 xiangyu-KLaT003-08_001186.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.1125 n_spots 2 xiangyu-KLaT003-08_001187.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.1125 n_spots 0 xiangyu-KLaT003-08_001188.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.1125 n_spots 5 xiangyu-KLaT003-08_001189.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.1125 n_spots 10 xiangyu-KLaT003-08_001190.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.1125 n_spots 19 xiangyu-KLaT003-08_001191.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.1125 n_spots 22 xiangyu-KLaT003-08_001192.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.1125 n_spots 7 xiangyu-KLaT003-08_001193.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.1125 n_spots 0 xiangyu-KLaT003-08_001194.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.1125 n_spots 0 xiangyu-KLaT003-08_001195.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.1125 n_spots 0 xiangyu-KLaT003-08_001196.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.1125 n_spots 0 xiangyu-KLaT003-08_001197.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.1125 n_spots 0 xiangyu-KLaT003-08_001198.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.1125 n_spots 0 xiangyu-KLaT003-08_001199.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.1125 n_spots 0 xiangyu-KLaT003-08_001200.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.1275 n_spots 0 xiangyu-KLaT003-08_001201.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.1275 n_spots 0 xiangyu-KLaT003-08_001202.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.1275 n_spots 0 xiangyu-KLaT003-08_001203.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.1275 n_spots 0 xiangyu-KLaT003-08_001204.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.1275 n_spots 0 xiangyu-KLaT003-08_001205.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.1275 n_spots 0 xiangyu-KLaT003-08_001206.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.1275 n_spots 0 xiangyu-KLaT003-08_001207.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.1275 n_spots 3 xiangyu-KLaT003-08_001208.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.1275 n_spots 2 xiangyu-KLaT003-08_001209.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.1275 n_spots 4 xiangyu-KLaT003-08_001210.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.1275 n_spots 7 xiangyu-KLaT003-08_001211.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.1275 n_spots 2 xiangyu-KLaT003-08_001212.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.1275 n_spots 1 xiangyu-KLaT003-08_001213.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.1275 n_spots 4 xiangyu-KLaT003-08_001214.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.1275 n_spots 7 xiangyu-KLaT003-08_001215.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.1275 n_spots 2 xiangyu-KLaT003-08_001216.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.1275 n_spots 0 xiangyu-KLaT003-08_001217.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.1275 n_spots 0 xiangyu-KLaT003-08_001218.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.1275 n_spots 1 xiangyu-KLaT003-08_001219.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.1275 n_spots 0 xiangyu-KLaT003-08_001220.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.1275 n_spots 0 xiangyu-KLaT003-08_001221.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.1275 n_spots 0 xiangyu-KLaT003-08_001222.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.1275 n_spots 0 xiangyu-KLaT003-08_001223.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.1275 n_spots 0 xiangyu-KLaT003-08_001224.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.1275 n_spots 0 xiangyu-KLaT003-08_001225.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.1275 n_spots 0 xiangyu-KLaT003-08_001226.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.1275 n_spots 0 xiangyu-KLaT003-08_001227.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.1275 n_spots 0 xiangyu-KLaT003-08_001228.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.1275 n_spots 0 xiangyu-KLaT003-08_001229.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.1275 n_spots 0 xiangyu-KLaT003-08_001230.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.1275 n_spots 0 xiangyu-KLaT003-08_001231.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.1275 n_spots 0 xiangyu-KLaT003-08_001232.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.1275 n_spots 0 xiangyu-KLaT003-08_001233.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.1275 n_spots 0 xiangyu-KLaT003-08_001234.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.1275 n_spots 0 xiangyu-KLaT003-08_001235.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.1275 n_spots 0 xiangyu-KLaT003-08_001236.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.1275 n_spots 0 xiangyu-KLaT003-08_001237.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.1275 n_spots 0 xiangyu-KLaT003-08_001238.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.1275 n_spots 0 xiangyu-KLaT003-08_001239.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.1275 n_spots 0 xiangyu-KLaT003-08_001240.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.1275 n_spots 0 xiangyu-KLaT003-08_001241.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.1275 n_spots 1 xiangyu-KLaT003-08_001242.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.1275 n_spots 0 xiangyu-KLaT003-08_001243.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.1275 n_spots 0 xiangyu-KLaT003-08_001244.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.1275 n_spots 0 xiangyu-KLaT003-08_001245.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.1275 n_spots 0 xiangyu-KLaT003-08_001246.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.1275 n_spots 0 xiangyu-KLaT003-08_001247.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.1275 n_spots 0 xiangyu-KLaT003-08_001248.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.1425 n_spots 0 xiangyu-KLaT003-08_001249.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.1425 n_spots 0 xiangyu-KLaT003-08_001250.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.1425 n_spots 0 xiangyu-KLaT003-08_001251.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.1425 n_spots 0 xiangyu-KLaT003-08_001252.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.1425 n_spots 0 xiangyu-KLaT003-08_001253.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.1425 n_spots 0 xiangyu-KLaT003-08_001254.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.1425 n_spots 0 xiangyu-KLaT003-08_001255.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.1425 n_spots 0 xiangyu-KLaT003-08_001256.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.1425 n_spots 0 xiangyu-KLaT003-08_001257.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.1425 n_spots 0 xiangyu-KLaT003-08_001258.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.1425 n_spots 0 xiangyu-KLaT003-08_001259.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.1425 n_spots 0 xiangyu-KLaT003-08_001260.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.1425 n_spots 0 xiangyu-KLaT003-08_001261.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.1425 n_spots 0 xiangyu-KLaT003-08_001262.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.1425 n_spots 0 xiangyu-KLaT003-08_001263.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.1425 n_spots 0 xiangyu-KLaT003-08_001264.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.1425 n_spots 0 xiangyu-KLaT003-08_001265.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.1425 n_spots 0 xiangyu-KLaT003-08_001266.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.1425 n_spots 0 xiangyu-KLaT003-08_001267.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.1425 n_spots 0 xiangyu-KLaT003-08_001268.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.1425 n_spots 0 xiangyu-KLaT003-08_001269.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.1425 n_spots 0 xiangyu-KLaT003-08_001270.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.1425 n_spots 0 xiangyu-KLaT003-08_001271.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.1425 n_spots 0 xiangyu-KLaT003-08_001272.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.1425 n_spots 1 xiangyu-KLaT003-08_001273.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.1425 n_spots 2 xiangyu-KLaT003-08_001274.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.1425 n_spots 0 xiangyu-KLaT003-08_001275.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.1425 n_spots 0 xiangyu-KLaT003-08_001276.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.1425 n_spots 1 xiangyu-KLaT003-08_001277.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.1425 n_spots 0 xiangyu-KLaT003-08_001278.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.1425 n_spots 0 xiangyu-KLaT003-08_001279.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.1425 n_spots 0 xiangyu-KLaT003-08_001280.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.1425 n_spots 3 xiangyu-KLaT003-08_001281.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.1425 n_spots 7 xiangyu-KLaT003-08_001282.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.1425 n_spots 7 xiangyu-KLaT003-08_001283.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.1425 n_spots 10 xiangyu-KLaT003-08_001284.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.1425 n_spots 0 xiangyu-KLaT003-08_001285.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.1425 n_spots 0 xiangyu-KLaT003-08_001286.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.1425 n_spots 2 xiangyu-KLaT003-08_001287.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.1425 n_spots 0 xiangyu-KLaT003-08_001288.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.1425 n_spots 0 xiangyu-KLaT003-08_001289.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.1425 n_spots 0 xiangyu-KLaT003-08_001290.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.1425 n_spots 0 xiangyu-KLaT003-08_001291.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.1425 n_spots 0 xiangyu-KLaT003-08_001292.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.1425 n_spots 0 xiangyu-KLaT003-08_001293.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.1425 n_spots 0 xiangyu-KLaT003-08_001294.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.1425 n_spots 0 xiangyu-KLaT003-08_001295.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.1425 n_spots 0 xiangyu-KLaT003-08_001296.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.1575 n_spots 0 xiangyu-KLaT003-08_001297.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.1575 n_spots 0 xiangyu-KLaT003-08_001298.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.1575 n_spots 0 xiangyu-KLaT003-08_001299.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.1575 n_spots 0 xiangyu-KLaT003-08_001300.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.1575 n_spots 0 xiangyu-KLaT003-08_001301.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.1575 n_spots 0 xiangyu-KLaT003-08_001302.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.1575 n_spots 0 xiangyu-KLaT003-08_001303.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.1575 n_spots 0 xiangyu-KLaT003-08_001304.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.1575 n_spots 0 xiangyu-KLaT003-08_001305.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.1575 n_spots 0 xiangyu-KLaT003-08_001306.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.1575 n_spots 0 xiangyu-KLaT003-08_001307.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.1575 n_spots 0 xiangyu-KLaT003-08_001308.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.1575 n_spots 0 xiangyu-KLaT003-08_001309.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.1575 n_spots 1 xiangyu-KLaT003-08_001310.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.1575 n_spots 2 xiangyu-KLaT003-08_001311.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.1575 n_spots 3 xiangyu-KLaT003-08_001312.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.1575 n_spots 0 xiangyu-KLaT003-08_001313.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.1575 n_spots 0 xiangyu-KLaT003-08_001314.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.1575 n_spots 1 xiangyu-KLaT003-08_001315.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.1575 n_spots 0 xiangyu-KLaT003-08_001316.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.1575 n_spots 0 xiangyu-KLaT003-08_001317.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.1575 n_spots 0 xiangyu-KLaT003-08_001318.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.1575 n_spots 16 xiangyu-KLaT003-08_001319.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.1575 n_spots 7 xiangyu-KLaT003-08_001320.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.1575 n_spots 11 xiangyu-KLaT003-08_001321.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.1575 n_spots 4 xiangyu-KLaT003-08_001322.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.1575 n_spots 3 xiangyu-KLaT003-08_001323.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.1575 n_spots 3 xiangyu-KLaT003-08_001324.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.1575 n_spots 6 xiangyu-KLaT003-08_001325.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.1575 n_spots 1 xiangyu-KLaT003-08_001326.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.1575 n_spots 0 xiangyu-KLaT003-08_001327.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.1575 n_spots 0 xiangyu-KLaT003-08_001328.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.1575 n_spots 0 xiangyu-KLaT003-08_001329.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.1575 n_spots 0 xiangyu-KLaT003-08_001330.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.1575 n_spots 0 xiangyu-KLaT003-08_001331.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.1575 n_spots 0 xiangyu-KLaT003-08_001332.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.1575 n_spots 0 xiangyu-KLaT003-08_001333.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.1575 n_spots 0 xiangyu-KLaT003-08_001334.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.1575 n_spots 0 xiangyu-KLaT003-08_001335.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.1575 n_spots 0 xiangyu-KLaT003-08_001336.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.1575 n_spots 0 xiangyu-KLaT003-08_001337.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.1575 n_spots 0 xiangyu-KLaT003-08_001338.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.1575 n_spots 1 xiangyu-KLaT003-08_001339.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.1575 n_spots 0 xiangyu-KLaT003-08_001340.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.1575 n_spots 0 xiangyu-KLaT003-08_001341.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.1575 n_spots 0 xiangyu-KLaT003-08_001342.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.1575 n_spots 0 xiangyu-KLaT003-08_001343.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.1575 n_spots 0 xiangyu-KLaT003-08_001344.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.1725 n_spots 0 xiangyu-KLaT003-08_001345.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.1725 n_spots 0 xiangyu-KLaT003-08_001346.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.1725 n_spots 0 xiangyu-KLaT003-08_001347.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.1725 n_spots 0 xiangyu-KLaT003-08_001348.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.1725 n_spots 0 xiangyu-KLaT003-08_001349.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.1725 n_spots 0 xiangyu-KLaT003-08_001350.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.1725 n_spots 0 xiangyu-KLaT003-08_001351.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.1725 n_spots 0 xiangyu-KLaT003-08_001352.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.1725 n_spots 0 xiangyu-KLaT003-08_001353.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.1725 n_spots 0 xiangyu-KLaT003-08_001354.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.1725 n_spots 0 xiangyu-KLaT003-08_001355.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.1725 n_spots 0 xiangyu-KLaT003-08_001356.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.1725 n_spots 0 xiangyu-KLaT003-08_001357.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.1725 n_spots 1 xiangyu-KLaT003-08_001358.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.1725 n_spots 2 xiangyu-KLaT003-08_001359.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.1725 n_spots 0 xiangyu-KLaT003-08_001360.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.1725 n_spots 3 xiangyu-KLaT003-08_001361.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.1725 n_spots 3 xiangyu-KLaT003-08_001362.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.1725 n_spots 1 xiangyu-KLaT003-08_001363.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.1725 n_spots 2 xiangyu-KLaT003-08_001364.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.1725 n_spots 0 xiangyu-KLaT003-08_001365.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.1725 n_spots 0 xiangyu-KLaT003-08_001366.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.1725 n_spots 1 xiangyu-KLaT003-08_001367.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.1725 n_spots 2 xiangyu-KLaT003-08_001368.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.1725 n_spots 5 xiangyu-KLaT003-08_001369.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.1725 n_spots 1 xiangyu-KLaT003-08_001370.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.1725 n_spots 1 xiangyu-KLaT003-08_001371.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.1725 n_spots 7 xiangyu-KLaT003-08_001372.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.1725 n_spots 0 xiangyu-KLaT003-08_001373.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.1725 n_spots 1 xiangyu-KLaT003-08_001374.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.1725 n_spots 1 xiangyu-KLaT003-08_001375.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.1725 n_spots 3 xiangyu-KLaT003-08_001376.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.1725 n_spots 2 xiangyu-KLaT003-08_001377.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.1725 n_spots 0 xiangyu-KLaT003-08_001378.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.1725 n_spots 5 xiangyu-KLaT003-08_001379.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.1725 n_spots 7 xiangyu-KLaT003-08_001380.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.1725 n_spots 3 xiangyu-KLaT003-08_001381.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.1725 n_spots 7 xiangyu-KLaT003-08_001382.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.1725 n_spots 3 xiangyu-KLaT003-08_001383.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.1725 n_spots 0 xiangyu-KLaT003-08_001384.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.1725 n_spots 0 xiangyu-KLaT003-08_001385.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.1725 n_spots 0 xiangyu-KLaT003-08_001386.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.1725 n_spots 0 xiangyu-KLaT003-08_001387.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.1725 n_spots 0 xiangyu-KLaT003-08_001388.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.1725 n_spots 0 xiangyu-KLaT003-08_001389.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.1725 n_spots 0 xiangyu-KLaT003-08_001390.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.1725 n_spots 0 xiangyu-KLaT003-08_001391.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.1725 n_spots 0 xiangyu-KLaT003-08_001392.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.1875 n_spots 0 xiangyu-KLaT003-08_001393.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.1875 n_spots 0 xiangyu-KLaT003-08_001394.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.1875 n_spots 0 xiangyu-KLaT003-08_001395.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.1875 n_spots 0 xiangyu-KLaT003-08_001396.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.1875 n_spots 0 xiangyu-KLaT003-08_001397.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.1875 n_spots 0 xiangyu-KLaT003-08_001398.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.1875 n_spots 0 xiangyu-KLaT003-08_001399.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.1875 n_spots 0 xiangyu-KLaT003-08_001400.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.1875 n_spots 0 xiangyu-KLaT003-08_001401.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.1875 n_spots 0 xiangyu-KLaT003-08_001402.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.1875 n_spots 6 xiangyu-KLaT003-08_001403.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.1875 n_spots 11 xiangyu-KLaT003-08_001404.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.1875 n_spots 7 xiangyu-KLaT003-08_001405.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.1875 n_spots 3 xiangyu-KLaT003-08_001406.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.1875 n_spots 0 xiangyu-KLaT003-08_001407.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.1875 n_spots 0 xiangyu-KLaT003-08_001408.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.1875 n_spots 0 xiangyu-KLaT003-08_001409.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.1875 n_spots 0 xiangyu-KLaT003-08_001410.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.1875 n_spots 0 xiangyu-KLaT003-08_001411.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.1875 n_spots 19 xiangyu-KLaT003-08_001412.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.1875 n_spots 2 xiangyu-KLaT003-08_001413.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.1875 n_spots 0 xiangyu-KLaT003-08_001414.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.1875 n_spots 0 xiangyu-KLaT003-08_001415.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.1875 n_spots 2 xiangyu-KLaT003-08_001416.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.1875 n_spots 1 xiangyu-KLaT003-08_001417.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.1875 n_spots 12 xiangyu-KLaT003-08_001418.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.1875 n_spots 6 xiangyu-KLaT003-08_001419.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.1875 n_spots 0 xiangyu-KLaT003-08_001420.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.1875 n_spots 0 xiangyu-KLaT003-08_001421.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.1875 n_spots 0 xiangyu-KLaT003-08_001422.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.1875 n_spots 0 xiangyu-KLaT003-08_001423.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.1875 n_spots 1 xiangyu-KLaT003-08_001424.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.1875 n_spots 0 xiangyu-KLaT003-08_001425.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.1875 n_spots 0 xiangyu-KLaT003-08_001426.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.1875 n_spots 0 xiangyu-KLaT003-08_001427.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.1875 n_spots 0 xiangyu-KLaT003-08_001428.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.1875 n_spots 0 xiangyu-KLaT003-08_001429.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.1875 n_spots 0 xiangyu-KLaT003-08_001430.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.1875 n_spots 0 xiangyu-KLaT003-08_001431.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.1875 n_spots 0 xiangyu-KLaT003-08_001432.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.1875 n_spots 0 xiangyu-KLaT003-08_001433.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.1875 n_spots 0 xiangyu-KLaT003-08_001434.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.1875 n_spots 0 xiangyu-KLaT003-08_001435.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.1875 n_spots 0 xiangyu-KLaT003-08_001436.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.1875 n_spots 0 xiangyu-KLaT003-08_001437.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.1875 n_spots 0 xiangyu-KLaT003-08_001438.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.1875 n_spots 0 xiangyu-KLaT003-08_001439.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.1875 n_spots 0 xiangyu-KLaT003-08_001440.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.2025 n_spots 0 xiangyu-KLaT003-08_001441.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.2025 n_spots 0 xiangyu-KLaT003-08_001442.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.2025 n_spots 0 xiangyu-KLaT003-08_001443.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.2025 n_spots 0 xiangyu-KLaT003-08_001444.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.2025 n_spots 0 xiangyu-KLaT003-08_001445.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.2025 n_spots 0 xiangyu-KLaT003-08_001446.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.2025 n_spots 0 xiangyu-KLaT003-08_001447.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.2025 n_spots 0 xiangyu-KLaT003-08_001448.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.2025 n_spots 0 xiangyu-KLaT003-08_001449.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.2025 n_spots 0 xiangyu-KLaT003-08_001450.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.2025 n_spots 0 xiangyu-KLaT003-08_001451.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.2025 n_spots 0 xiangyu-KLaT003-08_001452.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.2025 n_spots 0 xiangyu-KLaT003-08_001453.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.2025 n_spots 0 xiangyu-KLaT003-08_001454.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.2025 n_spots 0 xiangyu-KLaT003-08_001455.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.2025 n_spots 0 xiangyu-KLaT003-08_001456.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.2025 n_spots 0 xiangyu-KLaT003-08_001457.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.2025 n_spots 0 xiangyu-KLaT003-08_001458.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.2025 n_spots 1 xiangyu-KLaT003-08_001459.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.2025 n_spots 0 xiangyu-KLaT003-08_001460.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.2025 n_spots 0 xiangyu-KLaT003-08_001461.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.2025 n_spots 5 xiangyu-KLaT003-08_001462.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.2025 n_spots 11 xiangyu-KLaT003-08_001463.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.2025 n_spots 1 xiangyu-KLaT003-08_001464.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.2025 n_spots 1 xiangyu-KLaT003-08_001465.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.2025 n_spots 0 xiangyu-KLaT003-08_001466.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.2025 n_spots 1 xiangyu-KLaT003-08_001467.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.2025 n_spots 3 xiangyu-KLaT003-08_001468.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.2025 n_spots 0 xiangyu-KLaT003-08_001469.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.2025 n_spots 0 xiangyu-KLaT003-08_001470.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.2025 n_spots 7 xiangyu-KLaT003-08_001471.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.2025 n_spots 9 xiangyu-KLaT003-08_001472.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.2025 n_spots 5 xiangyu-KLaT003-08_001473.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.2025 n_spots 10 xiangyu-KLaT003-08_001474.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.2025 n_spots 4 xiangyu-KLaT003-08_001475.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.2025 n_spots 0 xiangyu-KLaT003-08_001476.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.2025 n_spots 0 xiangyu-KLaT003-08_001477.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.2025 n_spots 0 xiangyu-KLaT003-08_001478.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.2025 n_spots 0 xiangyu-KLaT003-08_001479.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.2025 n_spots 0 xiangyu-KLaT003-08_001480.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.2025 n_spots 0 xiangyu-KLaT003-08_001481.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.2025 n_spots 0 xiangyu-KLaT003-08_001482.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.2025 n_spots 0 xiangyu-KLaT003-08_001483.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.2025 n_spots 0 xiangyu-KLaT003-08_001484.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.2025 n_spots 0 xiangyu-KLaT003-08_001485.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.2025 n_spots 0 xiangyu-KLaT003-08_001486.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.2025 n_spots 0 xiangyu-KLaT003-08_001487.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.2025 n_spots 0 xiangyu-KLaT003-08_001488.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.2175 n_spots 0 xiangyu-KLaT003-08_001489.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.2175 n_spots 0 xiangyu-KLaT003-08_001490.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.2175 n_spots 0 xiangyu-KLaT003-08_001491.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.2175 n_spots 0 xiangyu-KLaT003-08_001492.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.2175 n_spots 0 xiangyu-KLaT003-08_001493.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.2175 n_spots 0 xiangyu-KLaT003-08_001494.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.2175 n_spots 0 xiangyu-KLaT003-08_001495.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.2175 n_spots 0 xiangyu-KLaT003-08_001496.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.2175 n_spots 0 xiangyu-KLaT003-08_001497.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.2175 n_spots 0 xiangyu-KLaT003-08_001498.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.2175 n_spots 0 xiangyu-KLaT003-08_001499.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.2175 n_spots 0 xiangyu-KLaT003-08_001500.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.2175 n_spots 0 xiangyu-KLaT003-08_001501.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.2175 n_spots 0 xiangyu-KLaT003-08_001502.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.2175 n_spots 0 xiangyu-KLaT003-08_001503.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.2175 n_spots 9 xiangyu-KLaT003-08_001504.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.2175 n_spots 5 xiangyu-KLaT003-08_001505.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.2175 n_spots 6 xiangyu-KLaT003-08_001506.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.2175 n_spots 11 xiangyu-KLaT003-08_001507.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.2175 n_spots 2 xiangyu-KLaT003-08_001508.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.2175 n_spots 1 xiangyu-KLaT003-08_001509.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.2175 n_spots 1 xiangyu-KLaT003-08_001510.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.2175 n_spots 0 xiangyu-KLaT003-08_001511.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.2175 n_spots 1 xiangyu-KLaT003-08_001512.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.2175 n_spots 0 xiangyu-KLaT003-08_001513.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.2175 n_spots 1 xiangyu-KLaT003-08_001514.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.2175 n_spots 6 xiangyu-KLaT003-08_001515.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.2175 n_spots 9 xiangyu-KLaT003-08_001516.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.2175 n_spots 5 xiangyu-KLaT003-08_001517.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.2175 n_spots 10 xiangyu-KLaT003-08_001518.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.2175 n_spots 1 xiangyu-KLaT003-08_001519.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.2175 n_spots 0 xiangyu-KLaT003-08_001520.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.2175 n_spots 0 xiangyu-KLaT003-08_001521.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.2175 n_spots 0 xiangyu-KLaT003-08_001522.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.2175 n_spots 0 xiangyu-KLaT003-08_001523.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.2175 n_spots 0 xiangyu-KLaT003-08_001524.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.2175 n_spots 0 xiangyu-KLaT003-08_001525.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.2175 n_spots 0 xiangyu-KLaT003-08_001526.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.2175 n_spots 0 xiangyu-KLaT003-08_001527.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.2175 n_spots 0 xiangyu-KLaT003-08_001528.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.2175 n_spots 0 xiangyu-KLaT003-08_001529.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.2175 n_spots 0 xiangyu-KLaT003-08_001530.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.2175 n_spots 0 xiangyu-KLaT003-08_001531.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.2175 n_spots 0 xiangyu-KLaT003-08_001532.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.2175 n_spots 0 xiangyu-KLaT003-08_001533.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.2175 n_spots 0 xiangyu-KLaT003-08_001534.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.2175 n_spots 0 xiangyu-KLaT003-08_001535.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.2175 n_spots 0 xiangyu-KLaT003-08_001536.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.2325 n_spots 0 xiangyu-KLaT003-08_001537.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.2325 n_spots 0 xiangyu-KLaT003-08_001538.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.2325 n_spots 0 xiangyu-KLaT003-08_001539.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.2325 n_spots 0 xiangyu-KLaT003-08_001540.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.2325 n_spots 0 xiangyu-KLaT003-08_001541.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.2325 n_spots 0 xiangyu-KLaT003-08_001542.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.2325 n_spots 0 xiangyu-KLaT003-08_001543.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.2325 n_spots 0 xiangyu-KLaT003-08_001544.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.2325 n_spots 0 xiangyu-KLaT003-08_001545.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.2325 n_spots 0 xiangyu-KLaT003-08_001546.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.2325 n_spots 0 xiangyu-KLaT003-08_001547.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.2325 n_spots 0 xiangyu-KLaT003-08_001548.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.2325 n_spots 0 xiangyu-KLaT003-08_001549.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.2325 n_spots 0 xiangyu-KLaT003-08_001550.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.2325 n_spots 0 xiangyu-KLaT003-08_001551.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.2325 n_spots 0 xiangyu-KLaT003-08_001552.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.2325 n_spots 0 xiangyu-KLaT003-08_001553.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.2325 n_spots 0 xiangyu-KLaT003-08_001554.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.2325 n_spots 1 xiangyu-KLaT003-08_001555.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.2325 n_spots 3 xiangyu-KLaT003-08_001556.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.2325 n_spots 1 xiangyu-KLaT003-08_001557.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.2325 n_spots 7 xiangyu-KLaT003-08_001558.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.2325 n_spots 4 xiangyu-KLaT003-08_001559.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.2325 n_spots 0 xiangyu-KLaT003-08_001560.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.2325 n_spots 1 xiangyu-KLaT003-08_001561.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.2325 n_spots 1 xiangyu-KLaT003-08_001562.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.2325 n_spots 0 xiangyu-KLaT003-08_001563.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.2325 n_spots 0 xiangyu-KLaT003-08_001564.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.2325 n_spots 6 xiangyu-KLaT003-08_001565.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.2325 n_spots 0 xiangyu-KLaT003-08_001566.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.2325 n_spots 0 xiangyu-KLaT003-08_001567.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.2325 n_spots 0 xiangyu-KLaT003-08_001568.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.2325 n_spots 0 xiangyu-KLaT003-08_001569.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.2325 n_spots 0 xiangyu-KLaT003-08_001570.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.2325 n_spots 0 xiangyu-KLaT003-08_001571.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.2325 n_spots 0 xiangyu-KLaT003-08_001572.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.2325 n_spots 0 xiangyu-KLaT003-08_001573.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.2325 n_spots 0 xiangyu-KLaT003-08_001574.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.2325 n_spots 0 xiangyu-KLaT003-08_001575.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.2325 n_spots 0 xiangyu-KLaT003-08_001576.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.2325 n_spots 0 xiangyu-KLaT003-08_001577.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.2325 n_spots 0 xiangyu-KLaT003-08_001578.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.2325 n_spots 0 xiangyu-KLaT003-08_001579.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.2325 n_spots 0 xiangyu-KLaT003-08_001580.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.2325 n_spots 0 xiangyu-KLaT003-08_001581.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.2325 n_spots 0 xiangyu-KLaT003-08_001582.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.2325 n_spots 0 xiangyu-KLaT003-08_001583.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.2325 n_spots 0 xiangyu-KLaT003-08_001584.img\n', 'xiangyu-KLaT003-08_ -0.235 -0.2475 n_spots 0 xiangyu-KLaT003-08_001585.img\n', 'xiangyu-KLaT003-08_ -0.225 -0.2475 n_spots 0 xiangyu-KLaT003-08_001586.img\n', 'xiangyu-KLaT003-08_ -0.215 -0.2475 n_spots 0 xiangyu-KLaT003-08_001587.img\n', 'xiangyu-KLaT003-08_ -0.205 -0.2475 n_spots 0 xiangyu-KLaT003-08_001588.img\n', 'xiangyu-KLaT003-08_ -0.195 -0.2475 n_spots 0 xiangyu-KLaT003-08_001589.img\n', 'xiangyu-KLaT003-08_ -0.185 -0.2475 n_spots 0 xiangyu-KLaT003-08_001590.img\n', 'xiangyu-KLaT003-08_ -0.175 -0.2475 n_spots 0 xiangyu-KLaT003-08_001591.img\n', 'xiangyu-KLaT003-08_ -0.165 -0.2475 n_spots 0 xiangyu-KLaT003-08_001592.img\n', 'xiangyu-KLaT003-08_ -0.155 -0.2475 n_spots 0 xiangyu-KLaT003-08_001593.img\n', 'xiangyu-KLaT003-08_ -0.145 -0.2475 n_spots 0 xiangyu-KLaT003-08_001594.img\n', 'xiangyu-KLaT003-08_ -0.135 -0.2475 n_spots 0 xiangyu-KLaT003-08_001595.img\n', 'xiangyu-KLaT003-08_ -0.125 -0.2475 n_spots 0 xiangyu-KLaT003-08_001596.img\n', 'xiangyu-KLaT003-08_ -0.115 -0.2475 n_spots 0 xiangyu-KLaT003-08_001597.img\n', 'xiangyu-KLaT003-08_ -0.105 -0.2475 n_spots 0 xiangyu-KLaT003-08_001598.img\n', 'xiangyu-KLaT003-08_ -0.095 -0.2475 n_spots 0 xiangyu-KLaT003-08_001599.img\n', 'xiangyu-KLaT003-08_ -0.085 -0.2475 n_spots 0 xiangyu-KLaT003-08_001600.img\n', 'xiangyu-KLaT003-08_ -0.075 -0.2475 n_spots 0 xiangyu-KLaT003-08_001601.img\n', 'xiangyu-KLaT003-08_ -0.065 -0.2475 n_spots 0 xiangyu-KLaT003-08_001602.img\n', 'xiangyu-KLaT003-08_ -0.055 -0.2475 n_spots 0 xiangyu-KLaT003-08_001603.img\n', 'xiangyu-KLaT003-08_ -0.045 -0.2475 n_spots 1 xiangyu-KLaT003-08_001604.img\n', 'xiangyu-KLaT003-08_ -0.035 -0.2475 n_spots 4 xiangyu-KLaT003-08_001605.img\n', 'xiangyu-KLaT003-08_ -0.025 -0.2475 n_spots 1 xiangyu-KLaT003-08_001606.img\n', 'xiangyu-KLaT003-08_ -0.015 -0.2475 n_spots 0 xiangyu-KLaT003-08_001607.img\n', 'xiangyu-KLaT003-08_ -0.005 -0.2475 n_spots 2 xiangyu-KLaT003-08_001608.img\n', 'xiangyu-KLaT003-08_ 0.005 -0.2475 n_spots 0 xiangyu-KLaT003-08_001609.img\n', 'xiangyu-KLaT003-08_ 0.015 -0.2475 n_spots 0 xiangyu-KLaT003-08_001610.img\n', 'xiangyu-KLaT003-08_ 0.025 -0.2475 n_spots 0 xiangyu-KLaT003-08_001611.img\n', 'xiangyu-KLaT003-08_ 0.035 -0.2475 n_spots 0 xiangyu-KLaT003-08_001612.img\n', 'xiangyu-KLaT003-08_ 0.045 -0.2475 n_spots 0 xiangyu-KLaT003-08_001613.img\n', 'xiangyu-KLaT003-08_ 0.055 -0.2475 n_spots 0 xiangyu-KLaT003-08_001614.img\n', 'xiangyu-KLaT003-08_ 0.065 -0.2475 n_spots 0 xiangyu-KLaT003-08_001615.img\n', 'xiangyu-KLaT003-08_ 0.075 -0.2475 n_spots 0 xiangyu-KLaT003-08_001616.img\n', 'xiangyu-KLaT003-08_ 0.085 -0.2475 n_spots 0 xiangyu-KLaT003-08_001617.img\n', 'xiangyu-KLaT003-08_ 0.095 -0.2475 n_spots 0 xiangyu-KLaT003-08_001618.img\n', 'xiangyu-KLaT003-08_ 0.105 -0.2475 n_spots 0 xiangyu-KLaT003-08_001619.img\n', 'xiangyu-KLaT003-08_ 0.115 -0.2475 n_spots 0 xiangyu-KLaT003-08_001620.img\n', 'xiangyu-KLaT003-08_ 0.125 -0.2475 n_spots 0 xiangyu-KLaT003-08_001621.img\n', 'xiangyu-KLaT003-08_ 0.135 -0.2475 n_spots 0 xiangyu-KLaT003-08_001622.img\n', 'xiangyu-KLaT003-08_ 0.145 -0.2475 n_spots 0 xiangyu-KLaT003-08_001623.img\n', 'xiangyu-KLaT003-08_ 0.155 -0.2475 n_spots 0 xiangyu-KLaT003-08_001624.img\n', 'xiangyu-KLaT003-08_ 0.165 -0.2475 n_spots 0 xiangyu-KLaT003-08_001625.img\n', 'xiangyu-KLaT003-08_ 0.175 -0.2475 n_spots 0 xiangyu-KLaT003-08_001626.img\n', 'xiangyu-KLaT003-08_ 0.185 -0.2475 n_spots 0 xiangyu-KLaT003-08_001627.img\n', 'xiangyu-KLaT003-08_ 0.195 -0.2475 n_spots 0 xiangyu-KLaT003-08_001628.img\n', 'xiangyu-KLaT003-08_ 0.205 -0.2475 n_spots 0 xiangyu-KLaT003-08_001629.img\n', 'xiangyu-KLaT003-08_ 0.215 -0.2475 n_spots 0 xiangyu-KLaT003-08_001630.img\n', 'xiangyu-KLaT003-08_ 0.225 -0.2475 n_spots 0 xiangyu-KLaT003-08_001631.img\n', 'xiangyu-KLaT003-08_ 0.235 -0.2475 n_spots 0 xiangyu-KLaT003-08_001632.img\n']
+Unchecked list loop!(Top of while)
+[]
+ -0.0450   0.1575 15.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.1150   0.1425 13.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.0550   0.1125 13.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+  0.0850   0.0975 11.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.1650   0.0825 20.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.1550   0.0525 12.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.0350   0.0525 10.00
+### All of them will be investigated ########
+[]
+##################
+Adding the code!
+2
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.015, 0.0375, 16.0)
+[(-0.015, 0.0375, 16.0)]
+ -0.0050   0.0375 10.00
+ -0.0150   0.0375 16.00
+### All of them will be investigated ########
+[(-0.015, 0.0375, 16.0)]
+##################
+Searching  -0.015 0.0375  grids
+Adding the code!
+3
+Adding the code!
+4
+CrystalSpot.check -0.005 0.0375 -0.015 0.0375 True
+CrystalSpot.check -0.015 0.0375 -0.015 0.0375 False
+CrystalSpot.check True= -0.015 0.0375
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.025, 0.0375, 10.0)
+UNUNUNUN (-0.015, 0.0225, 10.0)
+[(-0.025, 0.0375, 10.0), (-0.015, 0.0225, 10.0)]
+ -0.0050   0.0375 10.00
+ -0.0150   0.0375 16.00
+ -0.0250   0.0375 10.00
+ -0.0150   0.0225 10.00
+### All of them will be investigated ########
+[(-0.025, 0.0375, 10.0), (-0.015, 0.0225, 10.0)]
+##################
+Searching  -0.025 0.0375  grids
+Adding the code!
+5
+CrystalSpot.check -0.005 0.0375 -0.025 0.0375 True
+CrystalSpot.check -0.015 0.0375 -0.025 0.0375 True
+CrystalSpot.check -0.025 0.0375 -0.025 0.0375 False
+CrystalSpot.check True= -0.025 0.0375
+Atta!
+Searching  -0.015 0.0225  grids
+CrystalSpot.check -0.005 0.0375 -0.015 0.0225 True
+CrystalSpot.check -0.015 0.0375 -0.015 0.0225 True
+CrystalSpot.check -0.025 0.0375 -0.015 0.0225 True
+CrystalSpot.check -0.015 0.0225 -0.015 0.0225 False
+CrystalSpot.check True= -0.015 0.0225
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.025, 0.0225, 10.0)
+[(-0.025, 0.0225, 10.0)]
+ -0.0050   0.0375 10.00
+ -0.0150   0.0375 16.00
+ -0.0250   0.0375 10.00
+ -0.0150   0.0225 10.00
+ -0.0250   0.0225 10.00
+### All of them will be investigated ########
+[(-0.025, 0.0225, 10.0)]
+##################
+Searching  -0.025 0.0225  grids
+CrystalSpot.check -0.005 0.0375 -0.025 0.0225 True
+CrystalSpot.check -0.015 0.0375 -0.025 0.0225 True
+CrystalSpot.check -0.025 0.0375 -0.025 0.0225 True
+CrystalSpot.check -0.015 0.0225 -0.025 0.0225 True
+CrystalSpot.check -0.025 0.0225 -0.025 0.0225 False
+CrystalSpot.check True= -0.025 0.0225
+Atta!
+Unchecked list loop!(Top of while)
+[]
+ -0.0050   0.0375 10.00
+ -0.0150   0.0375 16.00
+ -0.0250   0.0375 10.00
+ -0.0150   0.0225 10.00
+ -0.0250   0.0225 10.00
+### All of them will be investigated ########
+[]
+##################
+Adding the code!
+2
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.095, 0.0375, 10.0)
+[(-0.095, 0.0375, 10.0)]
+ -0.0850   0.0375 10.00
+ -0.0950   0.0375 10.00
+### All of them will be investigated ########
+[(-0.095, 0.0375, 10.0)]
+##################
+Searching  -0.095 0.0375  grids
+Adding the code!
+3
+CrystalSpot.check -0.085 0.0375 -0.095 0.0375 True
+CrystalSpot.check -0.095 0.0375 -0.095 0.0375 False
+CrystalSpot.check True= -0.095 0.0375
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.095, 0.0225, 25.0)
+[(-0.095, 0.0225, 25.0)]
+ -0.0850   0.0375 10.00
+ -0.0950   0.0375 10.00
+ -0.0950   0.0225 25.00
+### All of them will be investigated ########
+[(-0.095, 0.0225, 25.0)]
+##################
+Searching  -0.095 0.0225  grids
+Adding the code!
+4
+CrystalSpot.check -0.085 0.0375 -0.095 0.0225 True
+CrystalSpot.check -0.095 0.0375 -0.095 0.0225 True
+CrystalSpot.check -0.095 0.0225 -0.095 0.0225 False
+CrystalSpot.check True= -0.095 0.0225
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.105, 0.0225, 26.0)
+[(-0.105, 0.0225, 26.0)]
+ -0.0850   0.0375 10.00
+ -0.0950   0.0375 10.00
+ -0.0950   0.0225 25.00
+ -0.1050   0.0225 26.00
+### All of them will be investigated ########
+[(-0.105, 0.0225, 26.0)]
+##################
+Searching  -0.105 0.0225  grids
+CrystalSpot.check -0.085 0.0375 -0.105 0.0225 True
+CrystalSpot.check -0.095 0.0375 -0.105 0.0225 True
+CrystalSpot.check -0.095 0.0225 -0.105 0.0225 True
+CrystalSpot.check -0.105 0.0225 -0.105 0.0225 False
+CrystalSpot.check True= -0.105 0.0225
+Atta!
+Unchecked list loop!(Top of while)
+[]
+ -0.0850   0.0375 10.00
+ -0.0950   0.0375 10.00
+ -0.0950   0.0225 25.00
+ -0.1050   0.0225 26.00
+### All of them will be investigated ########
+[]
+##################
+Adding the code!
+2
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.145, -0.0075, 10.0)
+[(-0.145, -0.0075, 10.0)]
+ -0.1550  -0.0075 12.00
+ -0.1450  -0.0075 10.00
+### All of them will be investigated ########
+[(-0.145, -0.0075, 10.0)]
+##################
+Searching  -0.145 -0.0075  grids
+Adding the code!
+3
+Adding the code!
+4
+CrystalSpot.check -0.155 -0.0075 -0.145 -0.0075 True
+CrystalSpot.check -0.145 -0.0075 -0.145 -0.0075 False
+CrystalSpot.check True= -0.145 -0.0075
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.135, -0.0075, 14.0)
+UNUNUNUN (-0.145, -0.0225, 14.0)
+[(-0.135, -0.0075, 14.0), (-0.145, -0.0225, 14.0)]
+ -0.1550  -0.0075 12.00
+ -0.1450  -0.0075 10.00
+ -0.1350  -0.0075 14.00
+ -0.1450  -0.0225 14.00
+### All of them will be investigated ########
+[(-0.135, -0.0075, 14.0), (-0.145, -0.0225, 14.0)]
+##################
+Searching  -0.135 -0.0075  grids
+Adding the code!
+5
+Adding the code!
+6
+CrystalSpot.check -0.155 -0.0075 -0.135 -0.0075 True
+CrystalSpot.check -0.145 -0.0075 -0.135 -0.0075 True
+CrystalSpot.check -0.135 -0.0075 -0.135 -0.0075 False
+CrystalSpot.check True= -0.135 -0.0075
+Atta!
+Searching  -0.145 -0.0225  grids
+CrystalSpot.check -0.155 -0.0075 -0.145 -0.0225 True
+CrystalSpot.check -0.145 -0.0075 -0.145 -0.0225 True
+CrystalSpot.check -0.135 -0.0075 -0.145 -0.0225 True
+CrystalSpot.check -0.145 -0.0225 -0.145 -0.0225 False
+CrystalSpot.check True= -0.145 -0.0225
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.125, -0.0075, 30.0)
+UNUNUNUN (-0.135, -0.0225, 10.0)
+[(-0.125, -0.0075, 30.0), (-0.135, -0.0225, 10.0)]
+ -0.1550  -0.0075 12.00
+ -0.1450  -0.0075 10.00
+ -0.1350  -0.0075 14.00
+ -0.1450  -0.0225 14.00
+ -0.1250  -0.0075 30.00
+ -0.1350  -0.0225 10.00
+### All of them will be investigated ########
+[(-0.125, -0.0075, 30.0), (-0.135, -0.0225, 10.0)]
+##################
+Searching  -0.125 -0.0075  grids
+Adding the code!
+7
+CrystalSpot.check -0.155 -0.0075 -0.125 -0.0075 True
+CrystalSpot.check -0.145 -0.0075 -0.125 -0.0075 True
+CrystalSpot.check -0.135 -0.0075 -0.125 -0.0075 True
+CrystalSpot.check -0.145 -0.0225 -0.125 -0.0075 True
+CrystalSpot.check -0.125 -0.0075 -0.125 -0.0075 False
+CrystalSpot.check True= -0.125 -0.0075
+Atta!
+Searching  -0.135 -0.0225  grids
+CrystalSpot.check -0.155 -0.0075 -0.135 -0.0225 True
+CrystalSpot.check -0.145 -0.0075 -0.135 -0.0225 True
+CrystalSpot.check -0.135 -0.0075 -0.135 -0.0225 True
+CrystalSpot.check -0.145 -0.0225 -0.135 -0.0225 True
+CrystalSpot.check -0.125 -0.0075 -0.135 -0.0225 True
+CrystalSpot.check -0.135 -0.0225 -0.135 -0.0225 False
+CrystalSpot.check True= -0.135 -0.0225
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.115, -0.0075, 19.0)
+[(-0.115, -0.0075, 19.0)]
+ -0.1550  -0.0075 12.00
+ -0.1450  -0.0075 10.00
+ -0.1350  -0.0075 14.00
+ -0.1450  -0.0225 14.00
+ -0.1250  -0.0075 30.00
+ -0.1350  -0.0225 10.00
+ -0.1150  -0.0075 19.00
+### All of them will be investigated ########
+[(-0.115, -0.0075, 19.0)]
+##################
+Searching  -0.115 -0.0075  grids
+CrystalSpot.check -0.155 -0.0075 -0.115 -0.0075 True
+CrystalSpot.check -0.145 -0.0075 -0.115 -0.0075 True
+CrystalSpot.check -0.135 -0.0075 -0.115 -0.0075 True
+CrystalSpot.check -0.145 -0.0225 -0.115 -0.0075 True
+CrystalSpot.check -0.125 -0.0075 -0.115 -0.0075 True
+CrystalSpot.check -0.135 -0.0225 -0.115 -0.0075 True
+CrystalSpot.check -0.115 -0.0075 -0.115 -0.0075 False
+CrystalSpot.check True= -0.115 -0.0075
+Atta!
+Unchecked list loop!(Top of while)
+[]
+ -0.1550  -0.0075 12.00
+ -0.1450  -0.0075 10.00
+ -0.1350  -0.0075 14.00
+ -0.1450  -0.0225 14.00
+ -0.1250  -0.0075 30.00
+ -0.1350  -0.0225 10.00
+ -0.1150  -0.0075 19.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.0150  -0.0075 12.00
+### All of them will be investigated ########
+[]
+##################
+Adding the code!
+2
+Adding the code!
+3
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.175, -0.0375, 11.0)
+UNUNUNUN (-0.185, -0.0525, 23.0)
+[(-0.175, -0.0375, 11.0), (-0.185, -0.0525, 23.0)]
+ -0.1850  -0.0375 11.00
+ -0.1750  -0.0375 11.00
+ -0.1850  -0.0525 23.00
+### All of them will be investigated ########
+[(-0.175, -0.0375, 11.0), (-0.185, -0.0525, 23.0)]
+##################
+Searching  -0.175 -0.0375  grids
+Adding the code!
+4
+CrystalSpot.check -0.185 -0.0375 -0.175 -0.0375 True
+CrystalSpot.check -0.175 -0.0375 -0.175 -0.0375 False
+CrystalSpot.check True= -0.175 -0.0375
+Atta!
+Searching  -0.185 -0.0525  grids
+Adding the code!
+5
+CrystalSpot.check -0.185 -0.0375 -0.185 -0.0525 True
+CrystalSpot.check -0.175 -0.0375 -0.185 -0.0525 True
+CrystalSpot.check -0.185 -0.0525 -0.185 -0.0525 False
+CrystalSpot.check True= -0.185 -0.0525
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.175, -0.0525, 24.0)
+UNUNUNUN (-0.195, -0.0525, 21.0)
+[(-0.175, -0.0525, 24.0), (-0.195, -0.0525, 21.0)]
+ -0.1850  -0.0375 11.00
+ -0.1750  -0.0375 11.00
+ -0.1850  -0.0525 23.00
+ -0.1750  -0.0525 24.00
+ -0.1950  -0.0525 21.00
+### All of them will be investigated ########
+[(-0.175, -0.0525, 24.0), (-0.195, -0.0525, 21.0)]
+##################
+Searching  -0.175 -0.0525  grids
+CrystalSpot.check -0.185 -0.0375 -0.175 -0.0525 True
+CrystalSpot.check -0.175 -0.0375 -0.175 -0.0525 True
+CrystalSpot.check -0.185 -0.0525 -0.175 -0.0525 True
+CrystalSpot.check -0.175 -0.0525 -0.175 -0.0525 False
+CrystalSpot.check True= -0.175 -0.0525
+Atta!
+Searching  -0.195 -0.0525  grids
+Adding the code!
+6
+CrystalSpot.check -0.185 -0.0375 -0.195 -0.0525 True
+CrystalSpot.check -0.175 -0.0375 -0.195 -0.0525 True
+CrystalSpot.check -0.185 -0.0525 -0.195 -0.0525 True
+CrystalSpot.check -0.175 -0.0525 -0.195 -0.0525 True
+CrystalSpot.check -0.195 -0.0525 -0.195 -0.0525 False
+CrystalSpot.check True= -0.195 -0.0525
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.205, -0.0525, 12.0)
+[(-0.205, -0.0525, 12.0)]
+ -0.1850  -0.0375 11.00
+ -0.1750  -0.0375 11.00
+ -0.1850  -0.0525 23.00
+ -0.1750  -0.0525 24.00
+ -0.1950  -0.0525 21.00
+ -0.2050  -0.0525 12.00
+### All of them will be investigated ########
+[(-0.205, -0.0525, 12.0)]
+##################
+Searching  -0.205 -0.0525  grids
+CrystalSpot.check -0.185 -0.0375 -0.205 -0.0525 True
+CrystalSpot.check -0.175 -0.0375 -0.205 -0.0525 True
+CrystalSpot.check -0.185 -0.0525 -0.205 -0.0525 True
+CrystalSpot.check -0.175 -0.0525 -0.205 -0.0525 True
+CrystalSpot.check -0.195 -0.0525 -0.205 -0.0525 True
+CrystalSpot.check -0.205 -0.0525 -0.205 -0.0525 False
+CrystalSpot.check True= -0.205 -0.0525
+Atta!
+Unchecked list loop!(Top of while)
+[]
+ -0.1850  -0.0375 11.00
+ -0.1750  -0.0375 11.00
+ -0.1850  -0.0525 23.00
+ -0.1750  -0.0525 24.00
+ -0.1950  -0.0525 21.00
+ -0.2050  -0.0525 12.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.0550  -0.0375 14.00
+### All of them will be investigated ########
+[]
+##################
+Adding the code!
+2
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.115, -0.0525, 27.0)
+[(-0.115, -0.0525, 27.0)]
+ -0.1050  -0.0525 26.00
+ -0.1150  -0.0525 27.00
+### All of them will be investigated ########
+[(-0.115, -0.0525, 27.0)]
+##################
+Searching  -0.115 -0.0525  grids
+Adding the code!
+3
+CrystalSpot.check -0.105 -0.0525 -0.115 -0.0525 True
+CrystalSpot.check -0.115 -0.0525 -0.115 -0.0525 False
+CrystalSpot.check True= -0.115 -0.0525
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.115, -0.0675, 11.0)
+[(-0.115, -0.0675, 11.0)]
+ -0.1050  -0.0525 26.00
+ -0.1150  -0.0525 27.00
+ -0.1150  -0.0675 11.00
+### All of them will be investigated ########
+[(-0.115, -0.0675, 11.0)]
+##################
+Searching  -0.115 -0.0675  grids
+CrystalSpot.check -0.105 -0.0525 -0.115 -0.0675 True
+CrystalSpot.check -0.115 -0.0525 -0.115 -0.0675 True
+CrystalSpot.check -0.115 -0.0675 -0.115 -0.0675 False
+CrystalSpot.check True= -0.115 -0.0675
+Atta!
+Unchecked list loop!(Top of while)
+[]
+ -0.1050  -0.0525 26.00
+ -0.1150  -0.0525 27.00
+ -0.1150  -0.0675 11.00
+### All of them will be investigated ########
+[]
+##################
+Adding the code!
+2
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.055, -0.0825, 24.0)
+[(-0.055, -0.0825, 24.0)]
+ -0.0450  -0.0825 13.00
+ -0.0550  -0.0825 24.00
+### All of them will be investigated ########
+[(-0.055, -0.0825, 24.0)]
+##################
+Searching  -0.055 -0.0825  grids
+Adding the code!
+3
+CrystalSpot.check -0.045 -0.0825 -0.055 -0.0825 True
+CrystalSpot.check -0.055 -0.0825 -0.055 -0.0825 False
+CrystalSpot.check True= -0.055 -0.0825
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.065, -0.0825, 22.0)
+[(-0.065, -0.0825, 22.0)]
+ -0.0450  -0.0825 13.00
+ -0.0550  -0.0825 24.00
+ -0.0650  -0.0825 22.00
+### All of them will be investigated ########
+[(-0.065, -0.0825, 22.0)]
+##################
+Searching  -0.065 -0.0825  grids
+Adding the code!
+4
+CrystalSpot.check -0.045 -0.0825 -0.065 -0.0825 True
+CrystalSpot.check -0.055 -0.0825 -0.065 -0.0825 True
+CrystalSpot.check -0.065 -0.0825 -0.065 -0.0825 False
+CrystalSpot.check True= -0.065 -0.0825
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.075, -0.0825, 17.0)
+[(-0.075, -0.0825, 17.0)]
+ -0.0450  -0.0825 13.00
+ -0.0550  -0.0825 24.00
+ -0.0650  -0.0825 22.00
+ -0.0750  -0.0825 17.00
+### All of them will be investigated ########
+[(-0.075, -0.0825, 17.0)]
+##################
+Searching  -0.075 -0.0825  grids
+CrystalSpot.check -0.045 -0.0825 -0.075 -0.0825 True
+CrystalSpot.check -0.055 -0.0825 -0.075 -0.0825 True
+CrystalSpot.check -0.065 -0.0825 -0.075 -0.0825 True
+CrystalSpot.check -0.075 -0.0825 -0.075 -0.0825 False
+CrystalSpot.check True= -0.075 -0.0825
+Atta!
+Unchecked list loop!(Top of while)
+[]
+ -0.0450  -0.0825 13.00
+ -0.0550  -0.0825 24.00
+ -0.0650  -0.0825 22.00
+ -0.0750  -0.0825 17.00
+### All of them will be investigated ########
+[]
+##################
+Adding the code!
+2
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.155, -0.0975, 23.0)
+[(-0.155, -0.0975, 23.0)]
+ -0.1650  -0.0975 20.00
+ -0.1550  -0.0975 23.00
+### All of them will be investigated ########
+[(-0.155, -0.0975, 23.0)]
+##################
+Searching  -0.155 -0.0975  grids
+Adding the code!
+3
+Adding the code!
+4
+CrystalSpot.check -0.165 -0.0975 -0.155 -0.0975 True
+CrystalSpot.check -0.155 -0.0975 -0.155 -0.0975 False
+CrystalSpot.check True= -0.155 -0.0975
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.145, -0.0975, 14.0)
+UNUNUNUN (-0.155, -0.1125, 22.0)
+[(-0.145, -0.0975, 14.0), (-0.155, -0.1125, 22.0)]
+ -0.1650  -0.0975 20.00
+ -0.1550  -0.0975 23.00
+ -0.1450  -0.0975 14.00
+ -0.1550  -0.1125 22.00
+### All of them will be investigated ########
+[(-0.145, -0.0975, 14.0), (-0.155, -0.1125, 22.0)]
+##################
+Searching  -0.145 -0.0975  grids
+Adding the code!
+5
+Adding the code!
+6
+CrystalSpot.check -0.165 -0.0975 -0.145 -0.0975 True
+CrystalSpot.check -0.155 -0.0975 -0.145 -0.0975 True
+CrystalSpot.check -0.145 -0.0975 -0.145 -0.0975 False
+CrystalSpot.check True= -0.145 -0.0975
+Atta!
+Searching  -0.155 -0.1125  grids
+CrystalSpot.check -0.165 -0.0975 -0.155 -0.1125 True
+CrystalSpot.check -0.155 -0.0975 -0.155 -0.1125 True
+CrystalSpot.check -0.145 -0.0975 -0.155 -0.1125 True
+CrystalSpot.check -0.155 -0.1125 -0.155 -0.1125 False
+CrystalSpot.check True= -0.155 -0.1125
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.135, -0.0975, 14.0)
+UNUNUNUN (-0.145, -0.1125, 19.0)
+[(-0.135, -0.0975, 14.0), (-0.145, -0.1125, 19.0)]
+ -0.1650  -0.0975 20.00
+ -0.1550  -0.0975 23.00
+ -0.1450  -0.0975 14.00
+ -0.1550  -0.1125 22.00
+ -0.1350  -0.0975 14.00
+ -0.1450  -0.1125 19.00
+### All of them will be investigated ########
+[(-0.135, -0.0975, 14.0), (-0.145, -0.1125, 19.0)]
+##################
+Searching  -0.135 -0.0975  grids
+Adding the code!
+7
+CrystalSpot.check -0.165 -0.0975 -0.135 -0.0975 True
+CrystalSpot.check -0.155 -0.0975 -0.135 -0.0975 True
+CrystalSpot.check -0.145 -0.0975 -0.135 -0.0975 True
+CrystalSpot.check -0.155 -0.1125 -0.135 -0.0975 True
+CrystalSpot.check -0.135 -0.0975 -0.135 -0.0975 False
+CrystalSpot.check True= -0.135 -0.0975
+Atta!
+Searching  -0.145 -0.1125  grids
+CrystalSpot.check -0.165 -0.0975 -0.145 -0.1125 True
+CrystalSpot.check -0.155 -0.0975 -0.145 -0.1125 True
+CrystalSpot.check -0.145 -0.0975 -0.145 -0.1125 True
+CrystalSpot.check -0.155 -0.1125 -0.145 -0.1125 True
+CrystalSpot.check -0.135 -0.0975 -0.145 -0.1125 True
+CrystalSpot.check -0.145 -0.1125 -0.145 -0.1125 False
+CrystalSpot.check True= -0.145 -0.1125
+Atta!
+Unchecked list loop!(Top of while)
+UNUNUNUN (-0.135, -0.1125, 10.0)
+[(-0.135, -0.1125, 10.0)]
+ -0.1650  -0.0975 20.00
+ -0.1550  -0.0975 23.00
+ -0.1450  -0.0975 14.00
+ -0.1550  -0.1125 22.00
+ -0.1350  -0.0975 14.00
+ -0.1450  -0.1125 19.00
+ -0.1350  -0.1125 10.00
+### All of them will be investigated ########
+[(-0.135, -0.1125, 10.0)]
+##################
+Searching  -0.135 -0.1125  grids
+CrystalSpot.check -0.165 -0.0975 -0.135 -0.1125 True
+CrystalSpot.check -0.155 -0.0975 -0.135 -0.1125 True
+CrystalSpot.check -0.145 -0.0975 -0.135 -0.1125 True
+CrystalSpot.check -0.155 -0.1125 -0.135 -0.1125 True
+CrystalSpot.check -0.135 -0.0975 -0.135 -0.1125 True
+CrystalSpot.check -0.145 -0.1125 -0.135 -0.1125 True
+CrystalSpot.check -0.135 -0.1125 -0.135 -0.1125 False
+CrystalSpot.check True= -0.135 -0.1125
+Atta!
+Unchecked list loop!(Top of while)
+[]
+ -0.1650  -0.0975 20.00
+ -0.1550  -0.0975 23.00
+ -0.1450  -0.0975 14.00
+ -0.1550  -0.1125 22.00
+ -0.1350  -0.0975 14.00
+ -0.1450  -0.1125 19.00
+ -0.1350  -0.1125 10.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.1150  -0.1425 10.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.0150  -0.1575 16.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+  0.0050  -0.1575 11.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.1250  -0.1875 11.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.0450  -0.1875 19.00
+### All of them will be investigated ########
+[]
+##################
+Adding the code!
+2
+Unchecked list loop!(Top of while)
+UNUNUNUN (0.015, -0.2025, 11.0)
+[(0.015, -0.2025, 11.0)]
+  0.0150  -0.1875 12.00
+  0.0150  -0.2025 11.00
+### All of them will be investigated ########
+[(0.015, -0.2025, 11.0)]
+##################
+Searching  0.015 -0.2025  grids
+CrystalSpot.check 0.015 -0.1875 0.015 -0.2025 True
+CrystalSpot.check 0.015 -0.2025 0.015 -0.2025 False
+CrystalSpot.check True= 0.015 -0.2025
+Atta!
+Unchecked list loop!(Top of while)
+[]
+  0.0150  -0.1875 12.00
+  0.0150  -0.2025 11.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.0950  -0.2025 10.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+ -0.0550  -0.2175 11.00
+### All of them will be investigated ########
+[]
+##################
+Unchecked list loop!(Top of while)
+[]
+  0.0550  -0.2175 10.00
+### All of them will be investigated ########
+[]
+##################
+#####################################
+ -0.0450   0.1575 15.00
+
+
+
+ -0.1150   0.1425 13.00
+
+
+
+ -0.0550   0.1125 13.00
+
+
+
+  0.0850   0.0975 11.00
+
+
+
+ -0.1650   0.0825 20.00
+
+
+
+ -0.1550   0.0525 12.00
+
+
+
+ -0.0350   0.0525 10.00
+
+
+
+ -0.0050   0.0375 10.00
+ -0.0150   0.0375 16.00
+ -0.0250   0.0375 10.00
+ -0.0150   0.0225 10.00
+ -0.0250   0.0225 10.00
+
+
+
+ -0.0850   0.0375 10.00
+ -0.0950   0.0375 10.00
+ -0.0950   0.0225 25.00
+ -0.1050   0.0225 26.00
+
+
+
+ -0.1550  -0.0075 12.00
+ -0.1450  -0.0075 10.00
+ -0.1350  -0.0075 14.00
+ -0.1450  -0.0225 14.00
+ -0.1250  -0.0075 30.00
+ -0.1350  -0.0225 10.00
+ -0.1150  -0.0075 19.00
+
+
+
+ -0.0150  -0.0075 12.00
+
+
+
+ -0.1850  -0.0375 11.00
+ -0.1750  -0.0375 11.00
+ -0.1850  -0.0525 23.00
+ -0.1750  -0.0525 24.00
+ -0.1950  -0.0525 21.00
+ -0.2050  -0.0525 12.00
+
+
+
+ -0.0550  -0.0375 14.00
+
+
+
+ -0.1050  -0.0525 26.00
+ -0.1150  -0.0525 27.00
+ -0.1150  -0.0675 11.00
+
+
+
+ -0.0450  -0.0825 13.00
+ -0.0550  -0.0825 24.00
+ -0.0650  -0.0825 22.00
+ -0.0750  -0.0825 17.00
+
+
+
+ -0.1650  -0.0975 20.00
+ -0.1550  -0.0975 23.00
+ -0.1450  -0.0975 14.00
+ -0.1550  -0.1125 22.00
+ -0.1350  -0.0975 14.00
+ -0.1450  -0.1125 19.00
+ -0.1350  -0.1125 10.00
+
+
+
+ -0.1150  -0.1425 10.00
+
+
+
+ -0.0150  -0.1575 16.00
+
+
+
+  0.0050  -0.1575 11.00
+
+
+
+ -0.1250  -0.1875 11.00
+
+
+
+ -0.0450  -0.1875 19.00
+
+
+
+  0.0150  -0.1875 12.00
+  0.0150  -0.2025 11.00
+
+
+
+ -0.0950  -0.2025 10.00
+
+
+
+ -0.0550  -0.2175 11.00
+
+
+
+  0.0550  -0.2175 10.00
+
+
+
+#####################################
+Horizontal_edges: -0.045 0.1575
+Horizontal_edges: -0.045 0.1575
+GRAV: -0.045 0.1575
+PEAK: -0.045 0.1575
+Horizontal_edges: -0.115 0.1425
+Horizontal_edges: -0.115 0.1425
+GRAV: -0.115 0.1425
+PEAK: -0.115 0.1425
+Horizontal_edges: -0.055 0.1125
+Horizontal_edges: -0.055 0.1125
+GRAV: -0.055 0.1125
+PEAK: -0.055 0.1125
+Horizontal_edges: 0.085 0.0975
+Horizontal_edges: 0.085 0.0975
+GRAV: 0.085 0.0975
+PEAK: 0.085 0.0975
+Horizontal_edges: -0.165 0.0825
+Horizontal_edges: -0.165 0.0825
+GRAV: -0.165 0.0825
+PEAK: -0.165 0.0825
+Horizontal_edges: -0.155 0.0525
+Horizontal_edges: -0.155 0.0525
+GRAV: -0.155 0.0525
+PEAK: -0.155 0.0525
+Horizontal_edges: -0.035 0.0525
+Horizontal_edges: -0.035 0.0525
+GRAV: -0.035 0.0525
+PEAK: -0.035 0.0525
+Horizontal_edges: -0.005 0.0375
+Horizontal_edges: -0.025 0.0375
+GRAV: -0.0167857142857 0.0321428571429
+PEAK: -0.015 0.0375
+Horizontal_edges: -0.085 0.0375
+Horizontal_edges: -0.105 0.0225
+GRAV: -0.0972535211268 0.0267253521127
+PEAK: -0.105 0.0225
+Horizontal_edges: -0.115 -0.0075
+Horizontal_edges: -0.155 -0.0075
+GRAV: -0.133165137615 -0.0108027522936
+PEAK: -0.125 -0.0075
+Horizontal_edges: -0.015 -0.0075
+Horizontal_edges: -0.015 -0.0075
+GRAV: -0.015 -0.0075
+PEAK: -0.015 -0.0075
+Horizontal_edges: -0.175 -0.0375
+Horizontal_edges: -0.205 -0.0525
+GRAV: -0.185980392157 -0.0492647058824
+PEAK: -0.175 -0.0525
+Horizontal_edges: -0.055 -0.0375
+Horizontal_edges: -0.055 -0.0375
+GRAV: -0.055 -0.0375
+PEAK: -0.055 -0.0375
+Horizontal_edges: -0.105 -0.0525
+Horizontal_edges: -0.115 -0.0525
+GRAV: -0.1109375 -0.055078125
+PEAK: -0.115 -0.0525
+Horizontal_edges: -0.045 -0.0825
+Horizontal_edges: -0.075 -0.0825
+GRAV: -0.0606578947368 -0.0825
+PEAK: -0.055 -0.0825
+Horizontal_edges: -0.135 -0.0975
+Horizontal_edges: -0.165 -0.0975
+GRAV: -0.15 -0.103770491803
+PEAK: -0.155 -0.0975
+Horizontal_edges: -0.115 -0.1425
+Horizontal_edges: -0.115 -0.1425
+GRAV: -0.115 -0.1425
+PEAK: -0.115 -0.1425
+Horizontal_edges: -0.015 -0.1575
+Horizontal_edges: -0.015 -0.1575
+GRAV: -0.015 -0.1575
+PEAK: -0.015 -0.1575
+Horizontal_edges: 0.005 -0.1575
+Horizontal_edges: 0.005 -0.1575
+GRAV: 0.005 -0.1575
+PEAK: 0.005 -0.1575
+Horizontal_edges: -0.125 -0.1875
+Horizontal_edges: -0.125 -0.1875
+GRAV: -0.125 -0.1875
+PEAK: -0.125 -0.1875
+Horizontal_edges: -0.045 -0.1875
+Horizontal_edges: -0.045 -0.1875
+GRAV: -0.045 -0.1875
+PEAK: -0.045 -0.1875
+Horizontal_edges: 0.015 -0.1875
+Horizontal_edges: 0.015 -0.1875
+GRAV: 0.015 -0.194673913043
+PEAK: 0.015 -0.1875
+Horizontal_edges: -0.095 -0.2025
+Horizontal_edges: -0.095 -0.2025
+GRAV: -0.095 -0.2025
+PEAK: -0.095 -0.2025
+Horizontal_edges: -0.055 -0.2175
+Horizontal_edges: -0.055 -0.2175
+GRAV: -0.055 -0.2175
+PEAK: -0.055 -0.2175
+Horizontal_edges: 0.055 -0.2175
+Horizontal_edges: 0.055 -0.2175
+GRAV: 0.055 -0.2175
+PEAK: 0.055 -0.2175

@@ -1,0 +1,14 @@
+/oys/xtal/cctbx/snapshots/upstream/build/bin/kamo.auto_multi_merge \
+csv=./170725-hirata.blend.csv \
+workdir=$PWD \
+prefix=merge_ \
+datadir=/isilon/users/target/target/AutoUsers/170723/hirata/_kamoproc \
+postrefine=False \
+merge.max_clusters=10 \
+merge.d_min_start=1.300000 \
+merge.clustering=blend \
+merge.blend.min_acmpl=90 \
+merge.blend.min_aredun=2 \
+batch.engine=sge \
+merge.batch.engine=sge \
+merge.batch.par_run=merging \

@@ -1,0 +1,22 @@
+>>> HEBI.mainLoop.getSortedCryList
+# of found crystals: 00009
+# of Max crystals: 00001
+Right position 2D scan:    1.1287  -10.0106   -1.3163
+Left  position 2D scan:    1.1353   -9.8506   -1.2871
+HEBI.mainLoop: Precise scan is skipped.
+Rough crystal size   = 160.00 [um]
+Defined crystal size = 300.00 [um]
+HEBI.mainLoop: 160.00 [um] crystal is smaller than 300.00 [um] limit.
+HEBI.mainLoop: Data collection is switched to 'single' irradiation mode.
+HEBI.mainLoop: Center of the coordinate (  1.1320  -9.9306  -1.3017) was chosen
+HEBI.mainLoop: Vertical scan started.
+HEBI.mainLoop: Left vertical scan started.
+Left Left scan is started at    1.1320   -9.9306   -1.3017
+HEBI.doVscan: starts
+HEBI.doVscan: beamsize  10.0(H) x  15.0(V) [um]
+Initial exposure time:    0.010[sec]
+HEBI.doVscan: exposure time is replaced by    0.016 [sec]
+The final hebi_att(ratio)=   0.0640
+3D Left position :    1.1247   -9.9306   -1.2999
+Multi: Exposure time limit for dose  0.50 MGy =    0.01754 Multi: Utilized flux = 1.00e+13 MultiSchedule class was used to generate the schedule file.
+Data collection will be started by using /isilon/users/target/target/AutoUsers/190704-test/9M//helitest/data02//multi.sch.

@@ -1,0 +1,299 @@
+import sys,os,math,numpy
+import scipy.spatial
+
+class CrystalSpot:
+	# 2D coordinates and score
+	def __init__(self,cx,cy,cz,phi):
+		self.cenx=cx
+		self.ceny=cy
+		self.cenz=cz
+		self.phi=phi
+
+		self.x_list=[]
+		self.y_list=[]
+		self.score_list=[]
+
+	def addXY(self,x,y,score):
+		self.x_list.append(x)
+		self.y_list.append(y)
+		self.score_list.append(score)
+		return len(self.x_list)
+
+	def isThere(self,x,y):
+		for rx,ry in zip(self.x_list,self.y_list):
+			if x==rx and y==ry:
+				return True
+		return False
+
+class AnaShika:
+	def __init__(self,summary_dat_path):
+		self.path=summary_dat_path
+		self.thresh=10.0
+		self.isRead=False
+		self.isKind=False
+		self.isList=False
+		self.isScoreAbove=False
+
+	def readSummary(self):
+		summ_file="%s/summary.dat"%self.path
+		self.lines=open(summ_file,"r").readlines()
+		self.isRead=True
+
+	def extractKind(self,kind="n_spots"):
+		if self.isRead==False:
+			self.readSummary()
+		# score_lines:
+		# lines including targeted "kind"
+		# kind: scores on SHIKA
+		self.score_lines=[]
+		for line in self.lines:
+			if line.rfind(kind)!=-1:
+				self.score_lines.append(line)
+		print self.score_lines
+		self.isKind=True
+
+	def makeList(self,prefix,kind="n_spots"):
+		# self.score_lines should be obtained
+		if self.isKind==False:
+			self.extractKind(kind)
+		#print self.score_lines
+		self.x=[]
+		self.y=[]
+		self.v=[]
+		for line in self.score_lines:
+			cols=line.split()
+			tmp_prefix=cols[0]
+			#print tmp_prefix,prefix
+			if tmp_prefix!=prefix:
+				print "skip"
+				continue
+			tmp_x=float(cols[1])
+			tmp_y=float(cols[2])
+			tmp_score=float(cols[4])
+			self.x.append(tmp_x)
+			self.y.append(tmp_y)
+			self.v.append(tmp_score)
+		#for x,y,z in zip(self.x,self.y,self.v):
+			#print x,y,z
+		self.isList=True
+
+	def make2Dmap(self):
+		# step x
+		self.step_x=self.x[0]-self.x[1]
+		# step y
+		for tmpy in self.y:
+			print tmpy
+		print self.step_x
+		nx=numpy.array(self.x)
+		minx=nx.min()
+		maxx=nx.max()
+		stepx=maxx-minx
+		print minx,maxx
+
+		ny=numpy.array(self.y)
+		miny=ny.min()
+		maxy=ny.max()
+		stepy=maxy-miny
+		print miny,maxy
+
+		print stepx,stepy
+
+	def listScoreAbove(self,prefix,kind="n_spots"):
+		if self.isList==False:
+			self.makeList(prefix,kind)
+
+		#print self.x,self.y,self.v
+		self.zero_pad_list=[]
+
+		self.score_good=[]
+		for x,y,score in zip(self.x,self.y,self.v):
+			if score >= self.thresh:
+				xyzs=x,y,score
+				self.score_good.append(xyzs)
+				self.zero_pad_list.append(xyzs)
+			else:
+				score=0
+				xyzs=x,y,score
+				self.zero_pad_list.append(xyzs)
+				
+		self.isScoreAbove=True
+
+	def calcDist(self,x1,y1,x2,y2):
+		dx=numpy.fabs(x1-x2)
+		dy=numpy.fabs(y1-y2)
+		dist=numpy.sqrt(dx*dx+dy*dy)
+		return dist
+
+	def analyzeDistance(self,prefix,kind="n_spots",dist_thresh=0.010):
+		if self.isScoreAbove==False:
+			self.listScoreAbove(prefix,kind)
+		i=0
+		llll=len(self.score_good)
+		for s in self.score_good:
+			for j in numpy.arange(0,llll):
+				x1,y1,score1=s
+				x2,y2,score2=self.score_good[j]
+				dist=self.calcDist(x1,y1,x2,y2)
+
+				if 0 < dist and dist < dist_thresh:
+					print "GOOD",x1,y1,x2,y2
+			i+=1
+
+	def search(self,rx,ry):
+		for c1 in self.score_good:
+			cx,cy,cs=c1
+			dist=self.calcDist(x1,y1,x2,y2)
+
+			if 0 < dist and dist < dist_thresh:
+				if crycodes.isThere(x2,y2)==False:
+					crycodes.addXY(x2,y2,score2)
+
+        def analFromOneGrid(self,x1,y1,score1,dist_thresh):
+		crycodes=CrystalSpot(0.0,0.0,0.0,90.0)
+
+                # This is the first grid of this crystal
+                crycodes.addXY(x1,y1,score1)
+
+                # Good score list : self.score_good
+                # x1,y1,score1=each_compo_of_score_good
+		nscore_good=len(self.score_good)
+
+                new_list=[]
+
+                for i in numpy.arange(0,nscore_good):
+                    x2,y2,score2=self.score_good[i]
+                    if score2==0.0:
+                        continue
+                    else:
+                        tmp_dist=self.calcDist(x1,y1,x2,y2)
+                        if tmp_dist!=0 and tmp_dist < dist_thresh:
+                            print "Adding the code!"
+                            print crycodes.addXY(x2,y2,score2)
+                            new_list.append((x2,y2))
+                            self.score_good[i]=x2,y2,0
+
+                # If no additional grids are found...
+                if len(new_list)=0:
+                    return 0
+
+                # Case when another grids are found.
+                else:
+                    x1=y1=0.0
+                    for newmen in new_list:
+                        x1,y1=newmen
+                        for i in numpy.arange(0,nscore_good):
+                            x2,y2,score2=self.score_good[i]
+                            if score2==0.0:
+                                continue
+                            else:
+                                tmp_dist=self.calcDist(x1,y1,x2,y2)
+                                if tmp_dist!=0 and tmp_dist < dist_thresh:
+                                    print "Adding the code!"
+                                    print crycodes.addXY(x2,y2,score2)
+                                    new_list.append((x2,y2))
+                                    self.score_good[i]=x2,y2,0
+
+	def tttt(self,prefix,kind="n_spots",dist_thresh=0.01001):
+		# Crystal list
+		crystals=[]
+
+		if self.isScoreAbove==False:
+			self.listScoreAbove(prefix,kind)
+
+		cnt=0
+		llll=len(self.score_good)
+
+		for r1 in self.score_good:
+			x1,y1,score1=r1
+                        crystal=self.analFromOneGrid(x1,y1,score1,dist_thresh)
+                        crystals.append(crystal)
+
+	def anadis(self,prefix,kind="n_spots",dist_thresh=0.01001):
+		# Crystal list
+		crystals=[]
+
+		if self.isScoreAbove==False:
+			self.listScoreAbove(prefix,kind)
+
+		cnt=0
+		llll=len(self.score_good)
+		for r1 in self.score_good:
+			cnt+=1
+			x1,y1,score1=r1
+			if cnt==1:
+				# New crystal
+				crycodes=CrystalSpot(0.0,0.0,0.0,90.0)
+				crycodes.addXY(x1,y1,score1)
+
+			for r2 in self.score_good:
+				x2,y2,score2=r2
+				dist=self.calcDist(x1,y1,x2,y2)
+
+				if 0 < dist and dist < dist_thresh:
+					if crycodes.isThere(x2,y2)==False:
+						crycodes.addXY(x2,y2,score2)
+
+	def trees(self):
+		xy_array=[]
+		for data in self.score_good:
+			x,y,s=data
+			xy_array.append((x,y))
+
+                rlp3d=numpy.array(xy_array)
+
+                # Making the tree for all RLPs
+                self.tree=scipy.spatial.cKDTree(rlp3d)
+
+                tlist=[]
+                # Grouping near reflection list
+                for rlp in rlp3d: # For all of independent reflections
+                        proclist=[]
+                        dist,idx=self.tree.query(
+                                rlp,k=300,p=1,distance_upper_bound=0.011)
+                        # Bunch of processing
+			print rlp,dist,idx
+
+                        for (d,i) in zip(dist,idx):
+                                if d==float('inf'):
+                                        break
+                                else:
+                                        proclist.append(i)
+                        tlist.append(proclist)
+
+		for t in tlist:
+			for i in t:
+				print rlp3d[i]
+			print "END"
+
+	def aroundTargetPix(self):
+		tmp_list=[]
+		for j in self.score_good:
+			x1,y1,score1=j
+			print x1,y1
+
+	def test(self,prefix,kind="n_spots"):
+		if self.isScoreAbove==False:
+			self.listScoreAbove(prefix,kind)
+		i=0
+		nsize=len(self.zero_pad_list)
+		for s in self.zero_pad_list:
+			x1,y1,score1=s
+			print x1,y1,score1
+
+	def setThresh(self,threshold):
+		self.thresh=threshold
+
+if __name__=="__main__":
+	#asss=AnaShika("/isilon/users/target/target/Staff/kuntaro/Brian/150920/xi-KLaT012-16/scan/_spotfinder")
+
+	asss=AnaShika("./")
+	prefix="toyoda-1010-05_"
+
+	#asss.makeList(prefix,kind="n_spots")
+	#asss.listScoreAbove(prefix,kind="n_spots")
+	#asss.anadis(prefix)
+	asss.tttt(prefix)
+	#asss.make2Dmap()
+	#asss.test("toyoda-1010-05_")
+	#asss.anadis(prefix)
+	#asss.trees()

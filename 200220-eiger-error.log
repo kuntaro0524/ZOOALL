@@ -1,0 +1,52 @@
+####################################################
+CLIENT->EIGER: Set stream image appenix. 2020/02/20 [Thu] 05:57:25:223
+* About to connect() to 192.168.163.204 port 80 (#0)
+*   Trying 192.168.163.204... * connected
+* Connected to 192.168.163.204 (192.168.163.204) port 80 (#0)
+> PUT /stream/api/1.5.0/config/image_appendix HTTP/1.1
+Host: 192.168.163.204
+Accept: application/json;
+User-Agent: SPring-8/BSS; 
+Content-type: application/json; charset = utf-8;
+Content-Length: 543
+
+< HTTP/1.1 200 OK
+< Access-Control-Allow-Origin: *
+< Content-Type: text/plain; charset=utf-8
+< Content-Length: 0
+< Date: Wed, 19 Feb 2020 20:57:24 GMT
+< Server: lighttpd/1.4.39
+< 
+* Connection #0 to host 192.168.163.204 left intact
+* Closing connection #0
+
+Set stream image appendix finished.  2020/02/20 [Thu] 05:57:25:225
+
+####################################################
+CLIENT->EIGER: Arm detector 2020/02/20 [Thu] 05:57:25:225
+* About to connect() to 192.168.163.204 port 80 (#0)
+*   Trying 192.168.163.204... * connected
+* Connected to 192.168.163.204 (192.168.163.204) port 80 (#0)
+> PUT /detector/api/1.5.0/command/arm HTTP/1.1
+Host: 192.168.163.204
+Accept: application/json;
+User-Agent: SPring-8/BSS; 
+Content-type: application/json; charset = utf-8;
+Content-Length: 0
+
+-
+< HTTP/1.1 400 Bad Request
+< Access-Control-Allow-Origin: *
+< content-type: text/plain; charset=utf-8
+< content-length: 25
+< date: Wed, 19 Feb 2020 20:57:25 GMT
+< Server: lighttpd/1.4.39
+< 
+* Connection #0 to host 192.168.163.204 left intact
+EIGER->CLIENT returned body: Error running command arm
+json decode failed: '[' or '{' expected near 'Error'
+./zoo.sh: line 111:  8684 Done                    echo "\n\n"
+      8685 Segmentation fault      (core dumped) | /usr/local/bss/bss --server --console
+[2020/02/20 [Thu] 05:57:27:136] child->parent: get/measurement/query
+./zoo.sh: line 119: END:: command not found
+

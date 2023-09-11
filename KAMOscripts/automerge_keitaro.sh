@@ -1,0 +1,16 @@
+#/oys/xtal/cctbx/snapshots/dials-v1-8-3-dev/build/bin2/kamo.auto_multi_merge \
+kamo.auto_multi_merge \
+  filtering.choice=cell \
+  csv=../native_merge.csv \
+  workdir=$PWD \
+  prefix=merge_cc_ \
+  cell_method=reindex \
+  merge.max_clusters=30 \
+  merge.d_min_start=4.0 \
+  merge.clustering=cc \
+  merge.cc_clustering.min_acmpl=95 \
+  merge.cc_clustering.min_aredun=8 \
+  xscale.degrees_per_batch=1.0 \
+  batch.engine=sge \
+  merge.batch.engine=sge \
+  merge.batch.par_run=merging  \

@@ -1,0 +1,102 @@
+[beamline]
+beamline = BL32XU
+[server]
+bss_server = 192.168.163.2
+bss_port = 5555
+blanc_address = 172.24.242.41
+
+[dirs]
+zooroot = /staff/bl32xu/BLsoft/NewZoo/
+logdir = ${dirs:zooroot}/Logs/
+zoologdir= ${dirs:zooroot}/ZooLogs/
+bssconfig_dir=/staff/config/bl32xu/
+backimage_dir = ${dirs:zooroot}/BackImages/
+
+[files]
+bssconfig_file=${dirs:bssconfig_dir}/bss/bss.config
+camera_inf=${dirs:bssconfig_dir}/video/camera.inf
+beamsize_conf_file=${dirs:bssconfig_dir}/bss/beamsize.config
+inocc_image=/staff/config/bl32xu/bss/test.ppm
+logging_conf=/staff/bl32xu/BLsoft/NewZoo/Libs/logging.conf
+dose_csv=${dirs:zooroot}/Libs/en_dose_lys.csv
+# Just a default background image file.
+backimg = ${dirs:zooroot}/BackImages/back.ppm
+
+[capture]
+bright_default=4300
+gain_default=1200
+contrast_default=18000
+# Dark mode
+bright_default_dark=5000
+gain_default_dark=5000
+
+[special_setting]
+# True: Dark mode, False: Normal mode
+isDark=False
+
+[coaximage]
+width=612.0
+height=480.0
+image_size=881295
+pix_size = 3.2578
+
+[inocc]
+# 上下左右このピクセル分は削ってから解析をする
+delete_pix=5
+# 中央のROIを切る→センタリングのときに先端が入っているかどうかを見る
+# 上下左右、どのくらい隙間をとるかを決定している
+roi_len_um = 200.0
+# cv2で filteringするときのしきい値（経験的に決めた）
+filter_thresh_min=15
+filter_thresh_max=20
+# ２値化のときのしきい値
+bin_thresh=20
+# zoom value
+zoom=3.77
+# BL32XU specific (ignored at other beamlines)
+zoom_pintx=20558
+
+# Used in UserESA to generate ZOO csv file.
+[experiment]
+score_min = 10
+score_max = 100
+raster_dose = 0.1
+dose_ds = 10.0
+raster_roi = 1
+exp_raster = 0.01
+att_raster = 20
+hebi_att = 20
+cover_flag = 1
+exp_ds=0.02
+# Rasterのときの端分解能
+resol_raster=2.5
+# "" are not required to define 'character variable'
+gonio_direction =FROM_RIGHT
+
+[detector]
+# カメラ長最短 [mm]
+min_camera_len=125.0
+# カメラの長さ（短て方向） [mm]
+min_camera_dim = 233.0
+
+[axes]
+# beam stopper axis
+bs_y_name = st2_bs_1_y
+bs_z_name = st2_bs_1_z
+bs_evacinfo = beam stop
+# gonio meter axes
+gonio_x_name = st2_gonio_1_x
+gonio_y_name = st2_gonio_1_y
+gonio_z_name = st2_gonio_1_z
+gonio_zz_name = st2_gonio_1_zz
+gonio_rot_name = st2_gonio_1_phi
+# Cryo Z axis
+cryo_z_name = st2_cryo_1_z
+# Cryo evac info  to extract 'evacuation' information
+cryo_evacinfo = cryo
+# Collimator 
+col_y_name = st2_collimator_1_y
+col_z_name = st2_collimator_1_z
+col_evacinfo = collimator
+# Camera distance
+ccdlen = st2_detector_1_x

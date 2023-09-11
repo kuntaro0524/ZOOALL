@@ -1,0 +1,15 @@
+/oys/xtal/cctbx/snapshots/upstream/build/bin/kamo.auto_multi_merge \
+csv=./171115-naku.csv \
+workdir=$PWD \
+prefix=merge_ \
+datadir=/isilon/users/target/target/AutoUsers/171114/naku/_kamoproc \
+merge.max_clusters=10 \
+merge.d_min_start=3.500000 \
+merge.clustering=blend \
+merge.blend.min_acmpl=30 \
+merge.blend.min_aredun=1 \
+merge.blend.min_cmpl=30 \
+merge.blend.min_redun=1 \
+batch.engine=sge \
+merge.batch.engine=sge \
+merge.batch.par_run=merging \

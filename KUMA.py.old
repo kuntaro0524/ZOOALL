@@ -1,0 +1,24 @@
+import sys,os,math,numpy
+
+class KUMA:
+	def __init__(self):
+		# Around 10 MGy
+		self.limit_dens=1E10 # phs/um^2 this is for 1A wavelength
+
+	def setPhotonDensityLimit(self,value):
+		self.limit_dens=value
+
+	def estimateAttFactor(self,exp_per_frame,tot_phi,osc,crylen,phosec,vbeam_um):
+		attfactor=self.limit_dens*(crylen*vbeam_um*osc)/(phosec*exp_per_frame*tot_phi)
+		return attfactor
+
+if __name__ == "__main__":
+	kuma=KUMA()
+	#print kuma.estimateAttFactor(0.1,100,0.1,25,1E12,15.0)
+
+	# 10 x 18 um beam 12.3984 keV 
+	# Photon flux = 1.2E13 phs/s
+	exptime=1/30.0
+	att=kuma.estimateAttFactor(exptime,1.0,1.0,100,1.2E13,18.0)
+	
+	print att

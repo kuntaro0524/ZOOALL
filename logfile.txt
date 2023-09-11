@@ -1,0 +1,260 @@
+2020-11-01 22:54:13 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=  50.00000 
+2020-11-01 22:54:13 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:54:13 - ExposureConditioner - INFO - balanceExposure - 28 - Thickness is over than transmission.
+2020-11-01 22:54:13 - ExposureConditioner - INFO - balanceExposure - 30 - Elongation factor : 81.07848 
+2020-11-01 22:54:13 - ExposureConditioner - INFO - balanceExposure - 32 - Elongation of exposure time: 81.07848 [sec]
+2020-11-01 22:54:45 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=   0.50000 
+2020-11-01 22:54:45 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:54:45 - ExposureConditioner - INFO - balanceExposure - 34 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 22:54:54 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=   0.70000 
+2020-11-01 22:54:54 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:54:54 - ExposureConditioner - INFO - balanceExposure - 28 - Thickness is over than transmission.
+2020-11-01 22:54:54 - ExposureConditioner - INFO - balanceExposure - 30 - Elongation factor :  1.13510 
+2020-11-01 22:54:54 - ExposureConditioner - INFO - balanceExposure - 32 - Elongation of exposure time:  1.13510 [sec]
+2020-11-01 22:55:13 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=   0.70000 
+2020-11-01 22:55:13 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:55:13 - ExposureConditioner - INFO - balanceExposure - 28 - Thickness is over than transmission.
+2020-11-01 22:55:13 - ExposureConditioner - INFO - balanceExposure - 30 - Elongation factor :  1.13510 
+2020-11-01 22:55:13 - ExposureConditioner - INFO - balanceExposure - 32 - Elongated exposure time:  1.13510 [sec]
+2020-11-01 22:55:58 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=   0.70000 
+2020-11-01 22:55:58 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:55:58 - ExposureConditioner - INFO - balanceExposure - 28 - Thickness is over than transmission.
+2020-11-01 22:55:58 - ExposureConditioner - INFO - balanceExposure - 30 - Elongation factor :  1.13510 
+2020-11-01 22:55:58 - ExposureConditioner - INFO - balanceExposure - 32 - Elongated exposure time:  1.13510 [sec] (original  1.00000[sec]
+2020-11-01 22:56:04 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=   0.70000 
+2020-11-01 22:56:04 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:56:04 - ExposureConditioner - INFO - balanceExposure - 28 - Thickness is over than transmission.
+2020-11-01 22:56:04 - ExposureConditioner - INFO - balanceExposure - 30 - Elongation factor :  1.13510 
+2020-11-01 22:56:04 - ExposureConditioner - INFO - balanceExposure - 32 - Elongated exposure time:  1.13510 [sec] (original  1.00000[sec]
+2020-11-01 22:56:48 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=   0.70000 
+2020-11-01 22:56:48 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:56:48 - ExposureConditioner - INFO - balanceExposure - 28 - Thickness is over than transmission.
+2020-11-01 22:56:48 - ExposureConditioner - INFO - balanceExposure - 30 - Elongation factor :  1.13510 
+2020-11-01 22:56:59 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=   0.70000 
+2020-11-01 22:56:59 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:56:59 - ExposureConditioner - INFO - balanceExposure - 28 - Thickness is over than transmission.
+2020-11-01 22:56:59 - ExposureConditioner - INFO - balanceExposure - 30 - Elongation factor :  1.13510 
+2020-11-01 22:56:59 - ExposureConditioner - INFO - balanceExposure - 34 - Elongated exposure time:  1.13510 [sec] (original  1.00000[sec]
+2020-11-01 22:57:09 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=   0.90000 
+2020-11-01 22:57:09 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:57:09 - ExposureConditioner - INFO - balanceExposure - 28 - Thickness is over than transmission.
+2020-11-01 22:57:09 - ExposureConditioner - INFO - balanceExposure - 30 - Elongation factor :  1.45941 
+2020-11-01 22:57:09 - ExposureConditioner - INFO - balanceExposure - 34 - Elongated exposure time:  1.45941 [sec] (original  1.00000[sec]
+2020-11-01 22:57:15 - ExposureConditioner - INFO - balanceExposure - 23 - Input    transmission=   2.50000 
+2020-11-01 22:57:15 - ExposureConditioner - INFO - balanceExposure - 24 - Thinnest transmission=   0.61669 
+2020-11-01 22:57:15 - ExposureConditioner - INFO - balanceExposure - 28 - Thickness is over than transmission.
+2020-11-01 22:57:15 - ExposureConditioner - INFO - balanceExposure - 30 - Elongation factor :  4.05392 
+2020-11-01 22:57:15 - ExposureConditioner - INFO - balanceExposure - 32 - Situation is not so good.
+2020-11-01 22:57:15 - ExposureConditioner - INFO - balanceExposure - 34 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 22:59:50 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 22:59:50 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 22:59:50 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 22:59:50 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 22:59:50 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 22:59:50 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 22:59:58 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 22:59:58 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 22:59:58 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 22:59:58 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 22:59:58 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 22:59:58 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:00:07 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 23:00:07 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:00:07 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 23:00:07 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 23:00:07 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 23:00:07 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:00:14 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 23:00:14 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:00:14 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 23:00:14 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 23:00:14 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 23:00:14 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:04:35 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 23:04:35 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:04:35 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 23:04:35 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 23:04:35 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 23:04:35 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:04:45 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 23:04:45 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:04:45 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 23:04:45 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 23:04:45 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 23:04:45 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:05:20 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 23:05:20 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:05:20 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 23:05:20 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 23:05:20 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 23:05:20 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:05:27 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 23:05:27 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:05:27 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 23:05:27 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 23:05:27 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 23:05:27 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:05:32 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 23:05:32 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:05:32 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 23:05:32 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 23:05:32 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 23:05:32 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:06:00 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 23:06:00 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:06:00 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 23:06:00 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 23:06:00 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 23:06:00 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:06:20 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   2.50000 
+2020-11-01 23:06:20 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:06:20 - ExposureConditioner - INFO - balanceExposure - 29 - Thickness is over than transmission.
+2020-11-01 23:06:20 - ExposureConditioner - INFO - balanceExposure - 31 - Elongation factor :  4.05392 
+2020-11-01 23:06:20 - ExposureConditioner - INFO - balanceExposure - 33 - Situation is not so good.
+2020-11-01 23:06:20 - ExposureConditioner - INFO - balanceExposure - 35 - Elongated exposure time:  4.05392 [sec] (original  1.00000[sec]
+2020-11-01 23:06:31 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:06:31 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:06:31 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:06:45 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:06:45 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:06:45 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:06:50 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:06:50 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:06:50 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:06:59 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:06:59 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:06:59 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:07:10 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:07:10 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:07:10 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:07:29 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:07:29 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:07:29 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:07:34 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:07:34 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:07:34 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:07:44 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:07:44 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:07:44 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:08:07 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:08:07 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:08:07 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:08:38 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:08:38 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:08:38 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:08:45 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:08:45 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:08:45 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:09:18 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:09:18 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:09:18 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:09:29 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:09:29 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:09:29 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:09:46 - ExposureConditioner - INFO - balanceExposure - 24 - Input    transmission=   0.10000 
+2020-11-01 23:09:46 - ExposureConditioner - INFO - balanceExposure - 25 - Thinnest transmission=   0.61669 
+2020-11-01 23:09:46 - ExposureConditioner - INFO - balanceExposure - 37 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:26:13 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   0.10000 
+2020-11-01 23:26:13 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:26:13 - ExposureConditioner - INFO - balanceExposure - 44 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:26:26 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   0.10000 
+2020-11-01 23:26:26 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:26:26 - ExposureConditioner - INFO - balanceExposure - 44 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:26:39 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   0.10000 
+2020-11-01 23:26:39 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:26:39 - ExposureConditioner - INFO - balanceExposure - 44 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:26:47 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   0.10000 
+2020-11-01 23:26:47 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:26:47 - ExposureConditioner - INFO - balanceExposure - 44 - No modifications are required by considering 'thinnest thickness of attenuator'
+2020-11-01 23:26:57 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   0.70000 
+2020-11-01 23:26:57 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:26:57 - ExposureConditioner - INFO - balanceExposure - 30 - Thickness is over than transmission.
+2020-11-01 23:26:57 - ExposureConditioner - INFO - balanceExposure - 32 - Elongation factor :  1.13510 
+2020-11-01 23:26:57 - ExposureConditioner - INFO - balanceExposure - 36 - Elongated exposure time:  0.13863 [sec] (original  0.12213[sec]
+2020-11-01 23:27:23 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   0.70000 
+2020-11-01 23:27:23 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:27:23 - ExposureConditioner - INFO - balanceExposure - 30 - Thickness is over than transmission.
+2020-11-01 23:27:23 - ExposureConditioner - INFO - balanceExposure - 32 - Elongation factor :  1.13510 
+2020-11-01 23:27:23 - ExposureConditioner - INFO - balanceExposure - 36 - Elongated exposure time:  0.13863 [sec] (original  0.12213[sec]
+2020-11-01 23:27:23 - ExposureConditioner - INFO - balanceExposure - 41 - The final exposure time and transmission  0.142857 sec /  0.59844[percent]
+2020-11-01 23:36:40 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   0.70000 
+2020-11-01 23:36:40 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:36:40 - ExposureConditioner - INFO - balanceExposure - 30 - Thickness is over than transmission.
+2020-11-01 23:36:40 - ExposureConditioner - INFO - balanceExposure - 32 - Elongation factor :  1.13510 
+2020-11-01 23:36:40 - ExposureConditioner - INFO - balanceExposure - 36 - Elongated exposure time:  0.13863 [sec] (original  0.12213[sec]
+2020-11-01 23:36:40 - ExposureConditioner - INFO - calculateGoodExpTime - 69 - The integer frequency for input     7
+2020-11-01 23:36:40 - ExposureConditioner - INFO - balanceExposure - 41 - The final exposure time and transmission  0.142857 sec /  0.59844[percent]
+2020-11-01 23:36:40 - ExposureConditioner - INFO - calculateGoodExpTime - 69 - The integer frequency for input    89
+2020-11-01 23:37:37 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   0.70000 
+2020-11-01 23:37:37 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:37:37 - ExposureConditioner - INFO - balanceExposure - 30 - Thickness is over than transmission.
+2020-11-01 23:37:37 - ExposureConditioner - INFO - balanceExposure - 32 - Elongation factor :  1.13510 
+2020-11-01 23:37:37 - ExposureConditioner - INFO - balanceExposure - 36 - Elongated exposure time:  0.13863 [sec] (original  0.12213[sec]
+2020-11-01 23:37:37 - ExposureConditioner - INFO - calculateGoodExpTime - 69 - The integer frequency for input     7
+2020-11-01 23:37:37 - ExposureConditioner - INFO - balanceExposure - 41 - The final exposure time and transmission  0.142857 sec(freq.     7) /  0.59844[percent]
+2020-11-01 23:37:37 - ExposureConditioner - INFO - calculateGoodExpTime - 69 - The integer frequency for input    89
+2020-11-01 23:37:54 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   1.00000 
+2020-11-01 23:37:54 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:37:54 - ExposureConditioner - INFO - balanceExposure - 30 - Thickness is over than transmission.
+2020-11-01 23:37:54 - ExposureConditioner - INFO - balanceExposure - 32 - Elongation factor :  1.62157 
+2020-11-01 23:37:54 - ExposureConditioner - INFO - balanceExposure - 36 - Elongated exposure time:  0.19804 [sec] (original  0.12213[sec]
+2020-11-01 23:37:54 - ExposureConditioner - INFO - calculateGoodExpTime - 69 - The integer frequency for input     5
+2020-11-01 23:37:54 - ExposureConditioner - INFO - balanceExposure - 41 - The final exposure time and transmission  0.200000 sec(freq.     5) /  0.61065[percent]
+2020-11-01 23:37:54 - ExposureConditioner - INFO - calculateGoodExpTime - 69 - The integer frequency for input    89
+2020-11-01 23:38:04 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   1.00000 
+2020-11-01 23:38:04 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:38:04 - ExposureConditioner - INFO - balanceExposure - 30 - Thickness is over than transmission.
+2020-11-01 23:38:04 - ExposureConditioner - INFO - balanceExposure - 32 - Elongation factor :  1.62157 
+2020-11-01 23:38:04 - ExposureConditioner - INFO - balanceExposure - 36 - Elongated exposure time:  0.19804 [sec] (original  0.12213[sec]
+2020-11-01 23:38:04 - ExposureConditioner - INFO - calculateGoodExpTime - 69 - The integer frequency for input     5
+2020-11-01 23:38:04 - ExposureConditioner - INFO - balanceExposure - 41 - The final exposure time and transmission  0.200000 sec(freq.     5) /  0.61065[percent]
+2020-11-01 23:38:20 - ExposureConditioner - INFO - balanceExposure - 25 - Input    transmission=   1.00000 
+2020-11-01 23:38:20 - ExposureConditioner - INFO - balanceExposure - 26 - Thinnest transmission=   0.61669 
+2020-11-01 23:38:20 - ExposureConditioner - INFO - balanceExposure - 30 - Thickness is over than transmission.
+2020-11-01 23:38:20 - ExposureConditioner - INFO - balanceExposure - 32 - Elongation factor :  1.62157 
+2020-11-01 23:38:20 - ExposureConditioner - INFO - balanceExposure - 36 - Elongated exposure time:  0.19804 [sec] (original  0.12213[sec]
+2020-11-01 23:38:20 - ExposureConditioner - INFO - calculateGoodExpTime - 69 - The integer frequency for input     5
+2020-11-01 23:38:20 - ExposureConditioner - INFO - balanceExposure - 41 - The final exposure time and transmission  0.200000 sec(freq.     5) /  0.61065[percent]
+2020-11-01 23:40:14 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:42:49 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:43:06 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:44:17 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:44:24 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:45:08 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:45:08 - ExposureConditioner - INFO - calculateGoodExpTime - 75 - The integer frequency for input     8
+2020-11-01 23:45:08 - ExposureConditioner - INFO - balanceExposure - 52 - The final exposure time and transmission  0.125000 sec(freq.     8) /  0.97704[percent]
+2020-11-01 23:45:50 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:45:50 - ExposureConditioner - INFO - calculateGoodExpTime - 75 - The integer frequency for input     9
+2020-11-01 23:45:50 - ExposureConditioner - INFO - balanceExposure - 52 - The final exposure time and transmission  0.125000 sec(freq.     9) /  0.97704[percent]
+2020-11-01 23:45:58 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:45:58 - ExposureConditioner - INFO - calculateGoodExpTime - 75 - The integer frequency for input     8
+2020-11-01 23:45:58 - ExposureConditioner - INFO - balanceExposure - 52 - The final exposure time and transmission  0.125000 sec(freq.     8) /  0.97704[percent]
+2020-11-01 23:46:08 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:46:08 - ExposureConditioner - INFO - calculateGoodExpTime - 75 - The integer frequency for input     9
+2020-11-01 23:46:08 - ExposureConditioner - INFO - balanceExposure - 52 - The final exposure time and transmission  0.111111 sec(freq.     9) /  1.09917[percent]
+2020-11-01 23:53:43 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:53:43 - ExposureConditioner - INFO - calculateGoodExpTime - 76 - The integer frequency for input     9
+2020-11-01 23:53:43 - ExposureConditioner - INFO - balanceExposure - 51 - The final exposure time and transmission  0.111111 sec(freq.     9) /  1.09917[percent]
+2020-11-01 23:53:43 - ExposureConditioner - INFO - balanceExposure - 53 - Change ratio=   1.00000
+2020-11-01 23:54:22 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:54:22 - ExposureConditioner - INFO - calculateGoodExpTime - 76 - The integer frequency for input     9
+2020-11-01 23:54:22 - ExposureConditioner - INFO - balanceExposure - 51 - The final exposure time and transmission  0.111111 sec(freq.     9) /  1.09917[percent]
+2020-11-01 23:54:22 - ExposureConditioner - INFO - balanceExposure - 53 - Change ratio=   1.00000
+2020-11-01 23:55:49 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:55:49 - ExposureConditioner - INFO - calculateGoodExpTime - 80 - The integer frequency for input     9
+2020-11-01 23:55:49 - ExposureConditioner - INFO - balanceExposure - 54 - Change ratio=   0.90978
+2020-11-01 23:55:49 - ExposureConditioner - INFO - balanceExposure - 56 - The final exposure time and transmission  0.111111 sec(freq.     9) /  1.00000[percent]
+2020-11-01 23:58:04 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:58:04 - ExposureConditioner - INFO - calculateGoodExpTime - 82 - The integer frequency for input     9
+2020-11-01 23:58:21 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:58:21 - ExposureConditioner - INFO - calculateGoodExpTime - 82 - The integer frequency for input     9
+2020-11-01 23:58:21 - ExposureConditioner - INFO - balanceExposure - 56 - Change ratio=  -0.09022
+2020-11-01 23:58:21 - ExposureConditioner - INFO - balanceExposure - 58 - The final exposure time and transmission  0.111111 sec(freq.     9) /  1.00000[percent]
+2020-11-01 23:58:36 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:58:36 - ExposureConditioner - INFO - calculateGoodExpTime - 82 - The integer frequency for input     9
+2020-11-01 23:58:36 - ExposureConditioner - INFO - balanceExposure - 56 - Change ratio=  -9.02226
+2020-11-01 23:58:36 - ExposureConditioner - INFO - balanceExposure - 58 - The final exposure time and transmission  0.111111 sec(freq.     9) /  1.00000[percent]
+2020-11-01 23:58:46 - ExposureConditioner - INFO - balanceExposure - 21 - No need to modify the exposure condition!
+2020-11-01 23:58:46 - ExposureConditioner - INFO - calculateGoodExpTime - 82 - The integer frequency for input     9
+2020-11-01 23:58:46 - ExposureConditioner - INFO - balanceExposure - 56 - Change ratio=  -9.02226 perc.
+2020-11-01 23:58:46 - ExposureConditioner - INFO - balanceExposure - 58 - The final exposure time and transmission  0.111111 sec(freq.     9) /  1.00000[percent]

@@ -1,0 +1,281 @@
+
+
+*******************************************************************************
+Mon Jan 20 22:58:55 2020
+
+
+FIT:    data read from "./gonio_h.dat" u 1:2
+        #datapoints = 20
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+
+
+*******************************************************************************
+Mon Jan 20 22:58:59 2020
+
+
+FIT:    data read from "./gonio_h.dat" u 1:2
+        #datapoints = 20
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+fitted parameters initialized with current variable values
+
+
+
+ Iteration 0
+ WSSR        : 3.17701e+06       delta(WSSR)/WSSR   : 0
+ delta(WSSR) : 0                 limit for stopping : 1e-05
+ lambda	  : 0.71146
+
+initial set of free parameter values
+
+a               = 1
+b               = 1
+
+After 5 iterations the fit converged.
+final sum of squares of residuals : 1.51278
+rel. change during last iteration : -5.26937e-14
+
+degrees of freedom    (FIT_NDF)                        : 18
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.289902
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.0840434
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+
+a               = 397.293          +/- 1.124        (0.283%)
+b               = 361.257          +/- 0.1249       (0.03458%)
+
+
+correlation matrix of the fit parameters:
+
+               a      b      
+a               1.000 
+b              -0.855  1.000 
+
+
+*******************************************************************************
+Tue Jan 21 02:00:04 2020
+
+
+FIT:    data read from "gonio.dat" u 4:6
+        #datapoints = 20
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+fitted parameters initialized with current variable values
+
+
+
+ Iteration 0
+ WSSR        : 572080            delta(WSSR)/WSSR   : 0
+ delta(WSSR) : 0                 limit for stopping : 1e-05
+ lambda	  : 169.412
+
+initial set of free parameter values
+
+a               = 1
+b               = 1
+
+After 6 iterations the fit converged.
+final sum of squares of residuals : 12.2211
+rel. change during last iteration : -5.16768e-10
+
+degrees of freedom    (FIT_NDF)                        : 18
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.823983
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.678947
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+
+a               = -0.422105        +/- 0.001598     (0.3785%)
+b               = 258.342          +/- 0.3828       (0.1482%)
+
+
+correlation matrix of the fit parameters:
+
+               a      b      
+a               1.000 
+b              -0.877  1.000 
+
+
+*******************************************************************************
+Tue Jan 21 02:06:24 2020
+
+
+FIT:    data read from "gonio.dat" u 1:2
+        #datapoints = 20
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+fitted parameters initialized with current variable values
+
+
+
+ Iteration 0
+ WSSR        : 1.86507e+06       delta(WSSR)/WSSR   : 0
+ delta(WSSR) : 0                 limit for stopping : 1e-05
+ lambda	  : 0.71146
+
+initial set of free parameter values
+
+a               = 1
+b               = 1
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 8.14962
+rel. change during last iteration : -2.78961e-06
+
+degrees of freedom    (FIT_NDF)                        : 18
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.672872
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.452757
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+
+a               = 411.504          +/- 2.609        (0.6341%)
+b               = 266.457          +/- 0.29         (0.1088%)
+
+
+correlation matrix of the fit parameters:
+
+               a      b      
+a               1.000 
+b              -0.855  1.000 
+
+
+*******************************************************************************
+Fri Oct  2 14:03:58 2020
+
+
+FIT:    data read from "gonio.dat" u 2:6
+        format = x:z
+        #datapoints = 19
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) = a*x + b
+BREAK: Need via and either parameter list or file
+
+*******************************************************************************
+Fri Oct  2 14:04:09 2020
+
+
+FIT:    data read from "gonio.dat" u 2:6
+        format = x:z
+        #datapoints = 19
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) = a*x + b
+BREAK: Need via and either parameter list or file
+
+*******************************************************************************
+Fri Oct  2 14:04:15 2020
+
+
+FIT:    data read from "gonio.dat" u 2:6
+        format = x:z
+        #datapoints = 19
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) = a*x + b
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b            
+   0 5.1976900000e+05   0.00e+00  1.61e+02    1.000000e+00   1.000000e+00
+   5 1.0817035088e+03  -3.77e-01  1.61e-03    2.216667e-01   1.514035e+01
+
+After 5 iterations the fit converged.
+final sum of squares of residuals : 1081.7
+rel. change during last iteration : -3.77486e-06
+
+degrees of freedom    (FIT_NDF)                        : 17
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 7.97682
+variance of residuals (reduced chisquare) = WSSR/ndf   : 63.6296
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 0.221667         +/- 0.01671      (7.536%)
+b               = 15.1403          +/- 3.809        (25.16%)
+
+correlation matrix of the fit parameters:
+                a      b      
+a               1.000 
+b              -0.877  1.000 
+
+
+*******************************************************************************
+Fri Oct  2 14:06:17 2020
+
+
+FIT:    data read from "gonio.dat" u 2:6
+        format = x:z
+        x range restricted to [0.00000 : 400.000]
+        #datapoints = 18
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) = a*x + b
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b            
+   0 1.7559500000e+05   0.00e+00  1.57e+02    1.000000e+00   1.000000e+00
+   6 2.6517999308e+01  -9.91e-07  1.57e-04    2.393562e-01   1.042646e+02
+
+After 6 iterations the fit converged.
+final sum of squares of residuals : 26.518
+rel. change during last iteration : -9.91499e-12
+
+degrees of freedom    (FIT_NDF)                        : 16
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 1.28739
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1.65737
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 0.239356         +/- 0.00254      (1.061%)
+b               = 104.265          +/- 0.563        (0.54%)
+
+correlation matrix of the fit parameters:
+                a      b      
+a               1.000 
+b              -0.842  1.000 
+
+
+*******************************************************************************
+Fri Oct  2 15:31:09 2020
+
+
+FIT:    data read from "gonio.dat" u 2:6
+        format = x:z
+        #datapoints = 12
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) = a*x + b
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b            
+   0 5.6702900000e+05   0.00e+00  9.18e+01    1.000000e+00   1.000000e+00
+   6 7.4463869464e+00  -1.93e-08  9.18e-05    2.264161e+00   6.102564e+01
+
+After 6 iterations the fit converged.
+final sum of squares of residuals : 7.44639
+rel. change during last iteration : -1.93109e-13
+
+degrees of freedom    (FIT_NDF)                        : 10
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.862925
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.744639
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 2.26416          +/- 0.003608     (0.1594%)
+b               = 61.0256          +/- 0.4686       (0.7679%)
+
+correlation matrix of the fit parameters:
+                a      b      
+a               1.000 
+b              -0.847  1.000 

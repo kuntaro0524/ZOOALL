@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#export PYTHONPATH="/staff/bl32xu/BLsoft/NewZoo/:/staff/bl32xu/BLsoft/NewZoo/Libs/"
+#export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/NewZoo/Libs/"
+export PYTHONPATH="/home/kuntaro/kundev/zoo32xu-honki/:/home/kuntaro/kundev/zoo32xu-honki/Libs/"
+export ZOOCONFIGPATH="/home/kuntaro/kundev/zoo32xu-honki/Libs"
+
+args=("$*")
+echo $args
+
+python3.8 $args
