@@ -54,6 +54,14 @@ class Zoo:
                 time.sleep(20.0)
         return False
 
+    # BL44XU goniometer code.
+    def getBSSr(self):
+        if self.isConnect == False:
+            print("Connection first!")
+            return False
+        else:
+            return self.bssr
+
     def disconnect(self):
         time.sleep(3.0)
         if self.isConnect:

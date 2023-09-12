@@ -23,8 +23,8 @@ dose_csv=${dirs:zooroot}/Libs/en_dose_lys.csv
 backimg = ${dirs:zooroot}/BackImages/back.ppm
 
 [capture]
-bright_default=4300
-gain_default=1200
+bright_default=2333
+gain_default=25000
 contrast_default=18000
 # Dark mode
 bright_default_dark=5000
@@ -81,7 +81,6 @@ min_camera_dim = 233.0
 
 [axes]
 # beam stopper axis
-bs_y_name = st1_bs_1_y
 bs_z_name = st1_bs_1_z
 bs_evacinfo = beam stop
 # gonio meter axes
@@ -91,7 +90,7 @@ gonio_z_name = st1_gonio_1_z
 gonio_zz_name = st1_gonio_1_zz
 gonio_rot_name = st1_gonio_1_phi
 # Cryo Z axis
-cryo_z_name = st1_cryo_1_z
+cryo_z_name = st1_cryo_1_x
 # Cryo evac info  to extract 'evacuation' information
 cryo_evacinfo = cryo
 # Collimator 

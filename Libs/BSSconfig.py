@@ -21,7 +21,7 @@ class BSSconfig:
 
         self.isRead = False
         self.isPrep = False
-        self.debug = False
+        self.debug = True
 
     def storeLines(self):
         ifile = open(self.confile, "r")
@@ -278,9 +278,10 @@ class BSSconfig:
             self.storeAxesBlocks()
 
         for dict in self.all_dicts:
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!1")
-            print(dict)
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!1")
+            if self.debug:
+                print("!!!!!!!!!!!!!!!!!!!!!!!!!1")
+                print(dict)
+                print("!!!!!!!!!!!!!!!!!!!!!!!!!1")
             if "_axis_comment" in dict:
                 axis_comment = dict['_axis_comment']
                 if type_axis in axis_comment:
@@ -294,7 +295,8 @@ class BSSconfig:
 
         for on_off_line in self.on_off_list:
             axis_string=on_off_line['axis_name'].lower().replace("_"," ")
-            print("axis_string=",axis_string)
+            if self.debug:
+                print("axis_string=",axis_string)
             if axis_string.rfind(type_axis)!=-1:
                 on_mm = float(on_off_line['on'])
                 off_mm = float(on_off_line['off'])

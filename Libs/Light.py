@@ -8,6 +8,7 @@ from Received import *
 from Motor import *
 
 import BSSconfig
+from configparser import ConfigParser, ExtendedInterpolation
 
 # information of collision between BM and Gonio
 class Light:
@@ -32,7 +33,7 @@ class Light:
         print(self.light_name)
         self.light_z = Motor(self.s, self.light_name, "pulse")
         # 軸のパルス分解能を取得する
-        self.v2p_z, self.sense_z = self.bssconf.getPulseInfo(self.light_z_name)
+        self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.light_z_name)
         print(self.v2p_z, self.sense_z)
 
     def getEvacuate(self):

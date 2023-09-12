@@ -9,7 +9,6 @@ from numpy import *
 # My library
 import Singleton
 import File
-import TCS
 import BM
 import Capture
 import Count
@@ -77,20 +76,17 @@ class Device(Singleton.Singleton):
         # settings
         print("Initialization starts")
         self.mono=Mono.Mono(self.s)
-        self.tcs=TCS.TCS(self.s)
         self.bm=BM.BM(self.s)
         self.f=File.File("./")
         self.capture=Capture.Capture()
-        self.slit1=ExSlit1.ExSlit1(self.s)
         self.att=Att.Att(self.s)
-        self.stage=Stage.Stage(self.s)
         self.zoom=Zoom.Zoom(self.s)
         self.bs=BS.BS(self.s)
         self.cryo=Cryo.Cryo(self.s)
         self.id=ID.ID(self.s)
         self.light=Light.Light(self.s)
+        print("GONIO")
         self.gonio=Gonio.Gonio(self.s)
-        #self.gonio.prepprep()
         self.colli=Colli.Colli(self.s)
         self.coax_pint=CoaxPint.CoaxPint(self.s)
         self.clen=CCDlen.CCDlen(self.s)
@@ -311,13 +307,19 @@ class Device(Singleton.Singleton):
             return False
 
 if __name__=="__main__":
-    host = '172.24.242.41'
+    from configparser import ConfigParser, ExtendedInterpolation
+    # read IP address for BSS connection from beamline.config 
+    config = ConfigParser(interpolation=ExtendedInterpolation())
+    config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    config.read(config_path)
+    host = config.get("server", "blanc_address")
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host,port))
+    s.connect((host, port))
 
     dev=Device(s)
     dev.init()
 
-    logpath="/isilon/users/target/target/Staff/2016B/161003/03.Test/"
-    dev.prepCentering()
+    dev.bs.on()
+
+    # dev.prepCentering()
