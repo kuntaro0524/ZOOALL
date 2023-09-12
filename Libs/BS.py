@@ -24,21 +24,39 @@ class BS:
         config_path="%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
         self.config.read(config_path)
 
-        # beam stopper axis definition
-        # beam stopper axis name > section: axes, option: bs_y_name
-        self.bs_y_name = self.config.get("axes", "bs_y_name")
-        # beam stopper axis name > section: axes, option: bs_z_name
-        self.bs_z_name = self.config.get("axes", "bs_z_name")
+        # 初期値を入れておく（軸が定義されているかされていないかわからない）
+        self.bs_y_name = ""
+        self.bs_z_name = ""
 
-        print(self.bs_y_name)
+        try:
+            # beam stopper axis definition
+            # beam stopper axis name > section: axes, option: bs_y_name
+            self.bs_y_name = self.config.get("axes", "bs_y_name")
+        except:
+            # 軸情報が取得できないのでWargningを出す
+            print("Warning: cannot get axis information from beamline.ini")
+
+        try: 
+            # beam stopper axis name > section: axes, option: bs_z_name
+            self.bs_z_name = self.config.get("axes", "bs_z_name")
+        except:
+            # 軸情報が取得できないのでWarningを出す
+            print("Error: cannot get axis information from beamline.ini")
+
+        # Motor objectを作成する
+        # どちらの名前も空の場合はエラーで終了する
+        if self.bs_y_name == "" and self.bs_z_name == "":
+            print("Error: cannot get axis information from beamline.ini")
+            sys.exit(1) 
         
-        self.bs_y = Motor(self.s, f"bl_{self.bl_object}_{self.bs_y_name}", "pulse")
-        self.bs_z = Motor(self.s, f"bl_{self.bl_object}_{self.bs_z_name}", "pulse")
+        if self.bs_y_name != "":
+            self.bs_y = Motor(self.s, f"bl_{self.bl_object}_{self.bs_y_name}", "pulse")
+            self.bs_y_v2p, self.bs_y_sense, self.bs_y_home = self.bssconf.getPulseInfo(self.bs_y_name)
+        if self.bs_z_name != "":
+            self.bs_z = Motor(self.s, f"bl_{self.bl_object}_{self.bs_z_name}", "pulse")
+            self.bs_z_v2p, self.bs_z_sense, self.bs_z_home = self.bssconf.getPulseInfo(self.bs_z_name)
 
         # Read configure file and get parameters
-        self.bs_y_v2p, self.bs_y_sense = self.bssconf.getPulseInfo(self.bs_y_name)
-        self.bs_z_v2p, self.bs_z_sense = self.bssconf.getPulseInfo(self.bs_z_name)
-
         self.isInit = False
 
     # 退避する軸はビームラインごとに違っているのでそれを取得する必要がある。
@@ -81,9 +99,6 @@ class BS:
             of.write("\n")
         of.close()
 
-    def go(self, pvalue):
-        self.bs_z.nageppa(pvalue)
-
     def evacLargeHolder(self):
         self.bs_z.nageppa(self.evac_large_holder)
 
@@ -100,16 +115,6 @@ class BS:
             self.getEvacuate()
         self.bs_z.move(self.off_pulse)
 
-    def goOn(self):
-        if self.isInit == False:
-            self.getEvacuate()
-        self.go(self.on_pos)
-
-    def goOff(self):
-        if self.isInit == False:
-            self.getEvacuate()
-        self.go(self.off_pos)
-
     def isMoved(self):
         isY = self.bs_y.isMoved()
         isZ = self.bs_z.isMoved()
@@ -121,19 +126,21 @@ class BS:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.41'
+    from configparser import ConfigParser, ExtendedInterpolation
+    # read IP address for BSS connection from beamline.config 
+    config = ConfigParser(interpolation=ExtendedInterpolation())
+    config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    config.read(config_path)
+    host = config.get("server", "blanc_address")
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
-    # print "Moving BS"
-    # print "type on/off:"
-    # option=raw_input()
     bs = BS(s)
+    bs.getEvacuate()
 
     print(bs.getZ())
-    bs.getEvacuate()
     bs.on()
     bs.off()
-    bs.on()
+
     s.close()

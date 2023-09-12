@@ -164,6 +164,7 @@ class BSSconfig:
         sense = 1
         isGotPulseResol = False
         isGotSense = False
+        isGotHomeValue = False
         # pulse resolution
         if '_val2pulse' in dddd.keys():
             val2pulse = float(dddd['_val2pulse'])
@@ -171,9 +172,13 @@ class BSSconfig:
         if '_sense' in dddd.keys():
             sense = int(dddd['_sense'])
             isGotSense = True
+
+        if '_home_value' in dddd.keys():
+            homevalue = float(dddd['_home_value'])
+            isGotHomeValue = True
         
-        if isGotPulseResol and isGotSense:
-            return val2pulse, sense
+        if isGotPulseResol and isGotSense and isGotHomeValue:
+            return val2pulse, sense, homevalue
         else:
             print("Fatal errors.")
             sys.exit()
@@ -259,7 +264,6 @@ class BSSconfig:
         # [{'on': 70.0, 'axis_name': 'Light_1', 'off': -50.0}, {'on': 80.0, 'axis_name': 'Ssd_1', 'off': -9.0}, {'on': -18.974, 'axis_name': 'Beam_Stop_1', 'off': 24.375}, {'on': 22.447, 'axis_name': 'Collimator_1', 'off': 9.3}, {'on': 58.0, 'axis_name': 'Beam_Monitor', 'off': -39.0}, {'on': 43.0, 'axis_name': 'Intensity_Monitor', 'off': -39.0}, {'on': 5.2, 'axis_name': 'Cryostream_1', 'off': 14.8}]
         return self.on_off_list
 
-
     # 退避軸の定義は非常に難しい@bss.config
     # ここでは type_axis というのを指定して bss.config を読んで
     # 0. _axis_commentに "evacuate"　& 'type_axis' が含まれている軸を探し
@@ -274,13 +278,16 @@ class BSSconfig:
             self.storeAxesBlocks()
 
         for dict in self.all_dicts:
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!1")
+            print(dict)
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!1")
             if "_axis_comment" in dict:
                 axis_comment = dict['_axis_comment']
                 if type_axis in axis_comment:
                     if axis_comment.rfind("evacuate") != -1:
                         print(type_axis, dict['_axis_name'])
                         evac_axis = dict['_axis_name']
-                        val2pulse, sense = self.getPulseInfo(dict['_axis_name'])
+                        val2pulse, sense, home_value = self.getPulseInfo(dict['_axis_name'])
                         break
 
         self.makeListOnOff()
@@ -291,18 +298,19 @@ class BSSconfig:
             if axis_string.rfind(type_axis)!=-1:
                 on_mm = float(on_off_line['on'])
                 off_mm = float(on_off_line['off'])
-                on_pulse = int(on_mm * val2pulse) * sense
-                off_pulse = int(off_mm * val2pulse) * sense
-                print("###############################")
+                # Include home value to estimate the pulse position On/Off
+                on_pulse = int(val2pulse * (on_mm * sense + home_value))
+                off_pulse = int(val2pulse * (off_mm * sense + home_value))
                 return evac_axis, on_pulse, off_pulse
 
     def getLightEvacuateInfo(self, axis_name):
 
         light_dic = self.getDictOf(axis_name)
         on_off_list = self.makeListOnOff()
-        val2pulse, sense = self.getPulseInfo(axis_name)
+        val2pulse, sense, homevalue = self.getPulseInfo(axis_name)
 
-        print(on_off_list)
+        if self.debug:
+            print(on_off_list)
 
         for on_off_line in on_off_list:
             tmp_axis_name = on_off_line['axis_name']
@@ -321,7 +329,7 @@ class BSSconfig:
     def getEvacInfo(self, axis_name):
         target_dic = self.getDictOf(axis_name)
         on_off_list = self.makeListOnOff()
-        val2pulse, sense = self.getPulseInfo(axis_name)
+        val2pulse, sense, homevalue = self.getPulseInfo(axis_name)
 
         for on_off_line in on_off_list:
             tmp_axis_name = on_off_line['axis_name']
