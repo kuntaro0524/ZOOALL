@@ -7,45 +7,27 @@ import math
 
 # My library
 from Motor import *
-from BSSconfig import *
+import BSSconfig
 import datetime
-
-sys.path.append("/isilon/BL44XU/BLsoft/PPPP/10.Zoo/")
 import Zoo
+from configparser import ConfigParser, ExtendedInterpolation
 
 # This is very special code for BL44XU
 
-class Gonio:
+class Gonio44:
     def __init__(self, server, bl=""):
         self.s = server
-        if bl!="BL44XU":
-            self.goniox = Motor(self.s, "bl_44in_st1_gonio_1_x", "pulse")
-            self.gonioy = Motor(self.s, "bl_44in_st1_gonio_1_y", "pulse")
-            self.gonioz = Motor(self.s, "bl_44in_st1_gonio_1_z", "pulse")
-            self.goniozz = Motor(self.s, "bl_44in_st1_gonio_1_zz", "pulse")
-            self.phi = Motor(self.s, "bl_44in_st1_gonio_1_omega", "pulse")
-            # self.enc=Enc()
-            # self.enc.openPort()
-
-            # Translation distance
-            self.transconv_xz = 100000.0
-            self.transconv_y = 100000.0
-            self.zzconv = 100000
-
-            # Sense
-            self.x_sense = -1
-            self.y_sense = 1
-            self.z_sense = 1
-
-            # 180411
-            self.phi_val2pulse = 6667
-            self.base = 119.0
-
-        else:
-            pass
-
         self.debug = False
         self.isConnect=False
+
+        self.bssconf = BSSconfig.BSSconfig()
+        self.bl_object = self.bssconf.getBLobject()
+
+        # beamline name is extracted from beamline.ini
+        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        # section: beamline, option: beamline
+        self.beamline = self.config.get("beamline", "beamline")
 
     # BL44XU goniometer control via BSS
     def setBSSport(self, bss_port):
@@ -225,18 +207,6 @@ class Gonio:
 
         return True
 
-    def moveXYZmm_bug_in_bss(self,movex,movey,movez):
-        command="put/gonio_xyz/abs_%fmm_%fmm_%fmm" % (movex, movey, movez)
-        # print(command)
-        self.s.sendall(command)
-        recstr=self.s.recv(8000)
-        query_command = "get/measurement/query"
-        start_time = datetime.datetime.now()
-        self.waitTillReady()
-        end_time = datetime.datetime.now()
-        time_diff = end_time - start_time
-        return True
-
     def movePint(self, value_um):
         curr_phi=self.getPhi()
         #print "PHI:%12.5f" % curr_phi
@@ -370,7 +340,7 @@ if __name__ == "__main__":
     zoo_port = zoo.getBSSr()
 
     s=""
-    gonio = Gonio(s, bl="BL44XU")
+    gonio = Gonio44(s, bl="BL44XU")
     gonio.setBSSport(zoo_port)
 
     phi=gonio.getPhi()
