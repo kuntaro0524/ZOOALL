@@ -21,7 +21,7 @@ class BSSconfig:
 
         self.isRead = False
         self.isPrep = False
-        self.debug = True
+        self.debug = False
 
     def storeLines(self):
         ifile = open(self.confile, "r")
@@ -137,7 +137,8 @@ class BSSconfig:
         if self.isPrepDict==False:
             self.storeAxesBlocks()
 
-        print(self.all_dicts)
+        if self.debug:
+            print(self.all_dicts)
         
         for ddiicc in self.all_dicts:
             if self.debug:
@@ -211,12 +212,18 @@ class BSSconfig:
             if "On_Position" in line:
                 tmp_str=line.replace("_On_Position","")
                 axis_name, param= (tmp_str.split(":"))
+                # param に "#" ｂが含まれて場合はそれ以降はコメントとして扱う   
+                if param.rfind("#") != -1:
+                    param = param[:param.rfind("#") - 1]
                 tmp_dic = {"axis_name":axis_name, "param":param, "on-off":"on"}
                 initial_dicts.append(tmp_dic)
                 continue
             if "Off_Position" in line:
                 tmp_str=line.replace("_Off_Position","")
                 axis_name, param= (tmp_str.split(":"))
+                # param に "#" ｂが含まれて場合はそれ以降はコメントとして扱う   
+                if param.rfind("#") != -1:
+                    param = param[:param.rfind("#") - 1]
                 tmp_dic = {"axis_name":axis_name, "param":param, "on-off":"off"}
                 initial_dicts.append(tmp_dic)
                 continue
@@ -252,6 +259,7 @@ class BSSconfig:
         # [{'on': 70.0, 'axis_name': 'Light_1', 'off': -50.0}, {'on': 80.0, 'axis_name': 'Ssd_1', 'off': -9.0}, {'on': -18.974, 'axis_name': 'Beam_Stop_1', 'off': 24.375}, {'on': 22.447, 'axis_name': 'Collimator_1', 'off': 9.3}, {'on': 58.0, 'axis_name': 'Beam_Monitor', 'off': -39.0}, {'on': 43.0, 'axis_name': 'Intensity_Monitor', 'off': -39.0}, {'on': 5.2, 'axis_name': 'Cryostream_1', 'off': 14.8}]
         return self.on_off_list
 
+
     # 退避軸の定義は非常に難しい@bss.config
     # ここでは type_axis というのを指定して bss.config を読んで
     # 0. _axis_commentに "evacuate"　& 'type_axis' が含まれている軸を探し
@@ -275,8 +283,6 @@ class BSSconfig:
                         val2pulse, sense = self.getPulseInfo(dict['_axis_name'])
                         break
 
-        print(evac_axis, val2pulse, sense)
-        
         self.makeListOnOff()
 
         for on_off_line in self.on_off_list:
@@ -295,6 +301,8 @@ class BSSconfig:
         light_dic = self.getDictOf(axis_name)
         on_off_list = self.makeListOnOff()
         val2pulse, sense = self.getPulseInfo(axis_name)
+
+        print(on_off_list)
 
         for on_off_line in on_off_list:
             tmp_axis_name = on_off_line['axis_name']
@@ -435,12 +443,13 @@ if __name__ == "__main__":
     #bssconf.getThinnestAtt()
     axis_name="st1_col_1_z"
     print(bssconf.getPulseInfo(axis_name))
+    e,a,b=bssconf.getEvacuateInfo("collimator")
+    print(e,a,b)
 
     """
     # collimator evacuation parameters
     print("#####################3")
     e,a,b=bssconf.getEvacuateInfo("collimator")
-    print(e,a,b)
 
     # Beam stopper evacuation parameters
     print("#####################3")

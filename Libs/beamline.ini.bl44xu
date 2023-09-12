@@ -3,7 +3,7 @@ beamline = BL44XU
 [server]
 bss_server = 192.168.223.21
 bss_port = 5555
-blanc_address = 172.24.24.57
+blanc_address = 172.24.242.57
 
 [dirs]
 zooroot = /staff/bl44xu/BLsoft/ZOO44XU/
@@ -65,7 +65,7 @@ dose_ds = 10.0
 raster_roi = 1
 exp_raster = 0.01
 att_raster = 20
-hebi_att = 20
+hebi_att = 20s
 cover_flag = 1
 exp_ds=0.02
 # Rasterのときの端分解能
@@ -95,7 +95,9 @@ cryo_z_name = st1_cryo_1_z
 # Cryo evac info  to extract 'evacuation' information
 cryo_evacinfo = cryo
 # Collimator 
-col_z_name = st1_col_1_z
+col_z_name = st1_col_2_x
 col_evacinfo = collimator
 # Camera distance
 ccdlen = st1_detector_1_x
+# Light 
+light_z_name = st1_light_1_z

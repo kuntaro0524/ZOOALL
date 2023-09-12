@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/bin/env python 
 import sys
 import socket
@@ -45,7 +46,7 @@ class Colli:
             self.v2p_y, self.sense_y = self.bssconf.getPulseInfo(self.coly_axis)
         if self.colz_axis != "":
             self.colz = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.colz_axis), "pulse")
-            print("Serching %s" % self.colz_axis)
+            print("Searching %s" % self.colz_axis)
             # print("bl_%s_%s" %(self.bl_object, self.colz_axis))
             # pulse information of each axis
             self.v2p_z, self.sense_z = self.bssconf.getPulseInfo(self.colz_axis)
@@ -59,9 +60,11 @@ class Colli:
     def getEvacuate(self):
         evacinfo = self.config.get("axes", "col_evacinfo")
         self.evac_axis_name, self.on_pulse, self.off_pulse = self.bssconf.getEvacuateInfo(evacinfo)
+        print("Evac axis:",self.evac_axis_name)
         print("ON (VME value):",self.on_pulse)
         print("OFF(VME value):",self.off_pulse)
         # 退避軸を自動認識してそれをオブジェクトとして設定してしまう
+        print("BLO=bl_%s_%s" % (self.bl_object, self.evac_axis_name))
         self.evac_axis = Motor(self.s, "bl_%s_%s" % (self.bl_object, self.evac_axis_name), "pulse")
         self.isInit = True
 
@@ -73,9 +76,16 @@ class Colli:
         tmp = int(self.colz.getPosition()[0])
         return tmp
 
+    def getEvacZ(self):
+        tmp = self.evac_axis.getPosition()[0]
+        return tmp
+
     def on(self):
         if self.isInit == False:
             self.getEvacuate()
+        # sense 
+        # pulse_to_move = self.on_pulse * self.sense_z
+        # print(pulse_to_move)
         self.evac_axis.move(self.on_pulse)
 
     def off(self):
@@ -86,7 +96,6 @@ class Colli:
     # 2023/04/12 Temp mod.
     def offY(self):
         self.coly.move(self.evac_y_axis_off)
-        #self.coly.move(-4000)
 
     def onY(self):
         self.coly.move(self.evac_y_axis_on)
@@ -476,7 +485,8 @@ if __name__ == "__main__":
     config = ConfigParser(interpolation=ExtendedInterpolation())
     config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
     config.read(config_path)
-    host = config.get("server", "bss_server")
+    # host = config.get("server", "bss_server")
+    host = config.get("server", "blanc_address")
     port = 10101
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -484,16 +494,12 @@ if __name__ == "__main__":
 
     coli = Colli(s)
     coli.getEvacuate()
+    # print((coli.getZ()))
+    # print((coli.getEvacZ()))
     coli.off()
     coli.on()
     # coli.scan("colllli",0)
 
-    # print coli.getY()
-    # coli.moveZ(1000)
-    # coli.moveZ(0)
-    # coli.scan2D()
-    # coli.scanCore("test",3)
-    print((coli.getY()))
     # coli.on()
     # coli.off()
     # def scan2D(self,prefix,startz,endz,stepz,starty,endy,stepy):
