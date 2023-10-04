@@ -1,9 +1,6 @@
 import sys, os, math, cv2, socket
 import datetime
 import numpy as np
-
-beamline = "BL32XU"
-
 from File import *
 import matplotlib
 import matplotlib.pyplot as plt

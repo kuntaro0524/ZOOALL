@@ -7,6 +7,7 @@ import Gonio
 import Zoom
 import CoaxPint
 import logging
+import Gonio44
 from configparser import ConfigParser, ExtendedInterpolation
 
 def read_camera_inf(infin):
@@ -80,7 +81,12 @@ class CoaxImage:
         self.coax_pintx_pulse = self.config.getint("inocc", "zoom_pintx")
 
         self.coax_pint = CoaxPint.CoaxPint(self.ms)
-        self.gonio = Gonio.Gonio(ms)
+        # BL44XU special setting
+        if self.beamline == "BL44XU":
+            self.gonio = Gonio44.Gonio44(self.ms) 
+        # Normal beamlines
+        else:
+            self.gonio = Gonio.Gonio(ms)
         self.capture = Capture.Capture()
 
         # Dark experiment

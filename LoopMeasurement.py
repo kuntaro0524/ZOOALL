@@ -25,8 +25,8 @@ beamline = "BL32XU"
 # version 2.0.0 modified on 2019/07/04 K.Hirata
 
 class LoopMeasurement:
-    def __init__(self, ms, root_dir, prefix):
-        self.ms = ms
+    def __init__(self, dev, root_dir, prefix):
+        self.dev = dev
         self.root_dir = root_dir
         self.prefix = prefix
         self.inocc = INOCC.INOCC(ms, root_dir, sample_name=prefix)
@@ -45,9 +45,6 @@ class LoopMeasurement:
         # Back light
         self.raster_n_height = 10
         self.raster_n_width = 10
-
-        self.light = Light.Light(self.ms)
-        self.colli = Colli.Colli(self.ms)
 
         self.beamsizeconf = BeamsizeConfig.BeamsizeConfig()
         self.multi_dir = "/foo/bar"
@@ -84,10 +81,6 @@ class LoopMeasurement:
     def setWavelength(self, wavelength):
         self.wavelength = wavelength
 
-    def prepCentering(self):
-        self.colli.off()
-        self.light.on()
-
     def saveGXYZphi(self):
         return self.inocc.getGXYZphi()
 
@@ -95,7 +88,7 @@ class LoopMeasurement:
         return self.inocc.moveGXYZphi(x, y, z, phi)
 
     def captureImage(self, capture_name):
-        self.prepCentering()
+        self.dev.prepCentering()
         filename_abs = "%s/%s/%s" % (self.root_dir, self.prefix, capture_name)
         self.inocc.capture(filename_abs)
 
@@ -144,7 +137,7 @@ class LoopMeasurement:
     # 2016/10/08 height_add was added. unit [um]
     def centering(self, backimg, loop_size="small", offset_angle=0.0, height_add=0.0, largest_movement=5.0):
         # Prep centering
-        self.prepCentering()
+        self.dev.prepCentering()
         # setting background image
         self.logger.info("LM:centering background file is replaced by %s" % backimg)
         self.inocc.setBack(backimg)
@@ -179,7 +172,7 @@ class LoopMeasurement:
     # 2016/10/08 height_add was added. unit [um]
     def roughCentering(self, backimg, loop_size=600, offset_angle=0.0, height_add=0.0, largest_movement=5.0):
         # Prep centering
-        self.prepCentering()
+        self.dev.prepCentering()
         # setting background image
         self.logger.info("LM:centering background file is replaced by %s" % backimg)
         self.inocc.setBack(backimg)

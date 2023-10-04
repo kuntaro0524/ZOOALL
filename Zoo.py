@@ -54,6 +54,14 @@ class Zoo:
                 time.sleep(20.0)
         return False
 
+    # BL44XU goniometer code.
+    def getBSSr(self):
+        if self.isConnect == False:
+            print("Connection first!")
+            return False
+        else:
+            return self.bssr
+
     def disconnect(self):
         time.sleep(3.0)
         if self.isConnect:
@@ -473,11 +481,15 @@ class Zoo:
 
 if __name__ == "__main__":
     # Logging setting
-
-    logname = "./temp.log"
-    beamline = "BL32XU"
-    logging.config.fileConfig('/isilon/%s/BLsoft/PPPP/10.Zoo/Libs/logging.conf' % beamline,
-                              defaults={'logfile_name': logname})
+    # open configure file
+    config = ConfigParser(interpolation=ExtendedInterpolation())
+    config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    print(config_path)
+    config.read(config_path)
+    logging_conf_file = config.get("files", "logging_conf")
+    logname = os.path.join(config.get("dirs","zoologdir"), "Zoo.log")
+     
+    logging.config.fileConfig(logging_conf_file,defaults={'logfile_name': logname})
     logger = logging.getLogger('ZOO')
 
     zoo = Zoo()

@@ -21,7 +21,7 @@ class BSSconfig:
 
         self.isRead = False
         self.isPrep = False
-        self.debug = False
+        self.debug = True
 
     def storeLines(self):
         ifile = open(self.confile, "r")
@@ -100,7 +100,6 @@ class BSSconfig:
             
         self.all_dicts=[]
         for block in axesBlocks:
-            #print("############################3")
             tmp_dict={}
             for each_line in block:
                 # print("LINE %s" % each_line)
@@ -122,8 +121,9 @@ class BSSconfig:
                         print("Integer dehanaiyo")
                     """
                     tmp_dict[key] = svalue
-            #print(tmp_dict)
-            self.all_dicts.append(tmp_dict)
+            # if 'tmp_dict' has values
+            if tmp_dict:
+                self.all_dicts.append(tmp_dict)
         
         #for ddd in self.all_dicts:
             #print(ddd)
@@ -136,6 +136,9 @@ class BSSconfig:
     def getDictOf(self, axis_name):
         if self.isPrepDict==False:
             self.storeAxesBlocks()
+
+        if self.debug:
+            print(self.all_dicts)
         
         for ddiicc in self.all_dicts:
             if self.debug:
@@ -161,6 +164,7 @@ class BSSconfig:
         sense = 1
         isGotPulseResol = False
         isGotSense = False
+        isGotHomeValue = False
         # pulse resolution
         if '_val2pulse' in dddd.keys():
             val2pulse = float(dddd['_val2pulse'])
@@ -168,9 +172,13 @@ class BSSconfig:
         if '_sense' in dddd.keys():
             sense = int(dddd['_sense'])
             isGotSense = True
+
+        if '_home_value' in dddd.keys():
+            homevalue = float(dddd['_home_value'])
+            isGotHomeValue = True
         
-        if isGotPulseResol and isGotSense:
-            return val2pulse, sense
+        if isGotPulseResol and isGotSense and isGotHomeValue:
+            return val2pulse, sense, homevalue
         else:
             print("Fatal errors.")
             sys.exit()
@@ -209,12 +217,18 @@ class BSSconfig:
             if "On_Position" in line:
                 tmp_str=line.replace("_On_Position","")
                 axis_name, param= (tmp_str.split(":"))
+                # param に "#" ｂが含まれて場合はそれ以降はコメントとして扱う   
+                if param.rfind("#") != -1:
+                    param = param[:param.rfind("#") - 1]
                 tmp_dic = {"axis_name":axis_name, "param":param, "on-off":"on"}
                 initial_dicts.append(tmp_dic)
                 continue
             if "Off_Position" in line:
                 tmp_str=line.replace("_Off_Position","")
                 axis_name, param= (tmp_str.split(":"))
+                # param に "#" ｂが含まれて場合はそれ以降はコメントとして扱う   
+                if param.rfind("#") != -1:
+                    param = param[:param.rfind("#") - 1]
                 tmp_dic = {"axis_name":axis_name, "param":param, "on-off":"off"}
                 initial_dicts.append(tmp_dic)
                 continue
@@ -264,35 +278,41 @@ class BSSconfig:
             self.storeAxesBlocks()
 
         for dict in self.all_dicts:
+            if self.debug:
+                print("!!!!!!!!!!!!!!!!!!!!!!!!!1")
+                print(dict)
+                print("!!!!!!!!!!!!!!!!!!!!!!!!!1")
             if "_axis_comment" in dict:
                 axis_comment = dict['_axis_comment']
                 if type_axis in axis_comment:
                     if axis_comment.rfind("evacuate") != -1:
                         print(type_axis, dict['_axis_name'])
                         evac_axis = dict['_axis_name']
-                        val2pulse, sense = self.getPulseInfo(dict['_axis_name'])
+                        val2pulse, sense, home_value = self.getPulseInfo(dict['_axis_name'])
                         break
 
-        print(evac_axis, val2pulse, sense)
-        
         self.makeListOnOff()
 
         for on_off_line in self.on_off_list:
             axis_string=on_off_line['axis_name'].lower().replace("_"," ")
-            print("axis_string=",axis_string)
+            if self.debug:
+                print("axis_string=",axis_string)
             if axis_string.rfind(type_axis)!=-1:
                 on_mm = float(on_off_line['on'])
                 off_mm = float(on_off_line['off'])
-                on_pulse = int(on_mm * val2pulse) * sense
-                off_pulse = int(off_mm * val2pulse) * sense
-                print("###############################")
+                # Include home value to estimate the pulse position On/Off
+                on_pulse = int(val2pulse * (on_mm * sense + home_value))
+                off_pulse = int(val2pulse * (off_mm * sense + home_value))
                 return evac_axis, on_pulse, off_pulse
 
     def getLightEvacuateInfo(self, axis_name):
 
         light_dic = self.getDictOf(axis_name)
         on_off_list = self.makeListOnOff()
-        val2pulse, sense = self.getPulseInfo(axis_name)
+        val2pulse, sense, homevalue = self.getPulseInfo(axis_name)
+
+        if self.debug:
+            print(on_off_list)
 
         for on_off_line in on_off_list:
             tmp_axis_name = on_off_line['axis_name']
@@ -311,7 +331,7 @@ class BSSconfig:
     def getEvacInfo(self, axis_name):
         target_dic = self.getDictOf(axis_name)
         on_off_list = self.makeListOnOff()
-        val2pulse, sense = self.getPulseInfo(axis_name)
+        val2pulse, sense, homevalue = self.getPulseInfo(axis_name)
 
         for on_off_line in on_off_list:
             tmp_axis_name = on_off_line['axis_name']
@@ -431,11 +451,15 @@ class BSSconfig:
 if __name__ == "__main__":
     bssconf = BSSconfig()
     #bssconf.getThinnestAtt()
-    axis_name="st2_gonio_1_z"
+    axis_name="st1_col_1_z"
+    print(bssconf.getPulseInfo(axis_name))
+    e,a,b=bssconf.getEvacuateInfo("collimator")
+    print(e,a,b)
+
+    """
     # collimator evacuation parameters
     print("#####################3")
     e,a,b=bssconf.getEvacuateInfo("collimator")
-    print(e,a,b)
 
     # Beam stopper evacuation parameters
     print("#####################3")
@@ -451,5 +475,6 @@ if __name__ == "__main__":
 
     print("################################")
     print(bssconf.getLimit("st2_detector_1_x"))
-    print(bssconf.getPulseInfo("st2_detector_1_x"))
     print(bssconf.getHomeValue("st2_detector_1_x"))
+
+    """

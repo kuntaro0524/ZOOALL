@@ -1,4 +1,4 @@
-import sys, os, math, cv2, socket, time, copy
+
 import traceback
 import logging
 import numpy as np
@@ -378,9 +378,6 @@ class ZooNavigator():
         # priority index 
         o_index = cond['o_index']
 
-        # self.html_maker = ZooHtmlLog(root_dir, name, online=True)
-        # open(os.path.join(os.environ["HOME"], ".zoo_current"), "w").write("%s %s\n"%(name,root_dir))
-
         # For data processing
         dp_file_name = "%s/data_proc.csv" % root_dir
         if self.isOpenDPfile == False:
@@ -492,7 +489,7 @@ class ZooNavigator():
         self.logger.info("Processing pin named %s" % prefix)
 
         # Loop measurement class initialization
-        self.lm = LoopMeasurement.LoopMeasurement(self.ms, root_dir, prefix)
+        self.lm = LoopMeasurement.LoopMeasurement(self.dev, root_dir, prefix)
         self.logger.info("Constructore finished.")
 
         # Making directories

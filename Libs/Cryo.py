@@ -26,8 +26,7 @@ class Cryo:
         self.isInit = False
 
         # pulse information of each axis
-        self.v2p_z, self.sense_z = self.bssconfig.getPulseInfo(self.axis_name)
-        print(self.sense_z)
+        self.v2p_z, self.sense_z, self.home_z= self.bssconfig.getPulseInfo(self.axis_name)
 
     # 退避する軸はビームラインごとに違っているのでそれを取得する必要がある。
     # 現時点では１軸しか取得できないのでそうでないビームライン（ビームストッパーをYZどちらも退避）が出てくると修正する必要がある

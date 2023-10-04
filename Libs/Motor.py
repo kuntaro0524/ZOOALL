@@ -41,7 +41,6 @@ class Motor(ScanAxis):
         strvalue = str(tmpvalue) + self.unit
         # print "Moving %s to %s" % (self.motor,strvalue)
         command = "put/" + self.motor + "/" + strvalue
-        # print "COMMAND:"+command
 
         ######	sending move command
         tmpstr = self.communicate(command)
@@ -86,7 +85,7 @@ class Motor(ScanAxis):
 
         # print position
         if position.find("mm") != -1:
-            value = float(position.replace("mm", ""))
+            value = float(positioreplace("mm", ""))
             return (value, "mm")
         elif position.find("pulse") != -1:
             value = int(position.replace("pulse", ""))
@@ -122,7 +121,7 @@ class Motor(ScanAxis):
             value = float(position.replace("um", ""))
             return (value, "um")
         else:
-            print("Unknown value")
+            print("Undefined unit.")
             return (0, 0)
 
     def findMax(self, cnt_ch, cnt_time, sense=1):
