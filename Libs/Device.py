@@ -25,7 +25,6 @@ import ID
 import ExSlit1
 import Light
 import AnalyzePeak
-import Gonio
 import Colli
 import Cover
 import CCDlen
@@ -37,8 +36,9 @@ import Flux
 from configparser import ConfigParser, ExtendedInterpolation
 
 class Device(Singleton.Singleton):
-    def __init__(self,server):
-        self.s=server
+    def __init__(self, ms_port):
+        # ms_port is 'a instance of an opened port for Message server'
+        self.s=ms_port
         # beamline.ini is a configure file.
         # reading config file.
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
@@ -47,6 +47,9 @@ class Device(Singleton.Singleton):
         # coax x pulse is read from 'beamline.ini'
         # section: inocc, option: zoom_pintx
         self.coax_pintx_pulse = int(self.config.get("inocc", "zoom_pintx"))
+    
+    def setGonio(self, instance_of_gonio):
+        self.gonio = instance_of_gonio
 
     def readConfig(self):
         conf=ConfigFile.ConfigFile()
@@ -85,8 +88,6 @@ class Device(Singleton.Singleton):
         self.cryo=Cryo.Cryo(self.s)
         self.id=ID.ID(self.s)
         self.light=Light.Light(self.s)
-        print("GONIO")
-        self.gonio=Gonio.Gonio(self.s)
         self.colli=Colli.Colli(self.s)
         self.coax_pint=CoaxPint.CoaxPint(self.s)
         self.clen=CCDlen.CCDlen(self.s)
@@ -236,9 +237,6 @@ class Device(Singleton.Singleton):
         self.closeShutters()
         self.light.on()
     
-    def moveGonioXYZ(self,x,y,z):
-        self.gonio.moveXYZmm(x,y,z)
-
 ################################
 # Last modified 120607
 # for XYZ stage implemtented to the monitor

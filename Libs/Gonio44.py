@@ -15,24 +15,17 @@ from configparser import ConfigParser, ExtendedInterpolation
 # This is very special code for BL44XU
 
 class Gonio44:
-    def __init__(self, server, bl=""):
-        self.s = server
+    def __init__(self, bss_server_port):
+        # This is BSS server port
+        self.s = bss_server_port
         self.debug = False
         self.isConnect=False
-
-        self.bssconf = BSSconfig.BSSconfig()
-        self.bl_object = self.bssconf.getBLobject()
 
         # beamline name is extracted from beamline.ini
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
         # section: beamline, option: beamline
         self.beamline = self.config.get("beamline", "beamline")
-
-    # BL44XU goniometer control via BSS
-    def setBSSport(self, bss_port):
-        self.s = bss_port
-        self.isConnect=True
 
     def communicate(self, comstr):
         sending_command = comstr.encode()
