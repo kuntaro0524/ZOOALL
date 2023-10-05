@@ -1,13 +1,8 @@
 import sys, os, math, numpy, socket, time, cv2
 import re
 
-import MyException
 import Capture
-import Gonio
-import Zoom
-import CoaxPint
 import logging
-import Gonio44
 from configparser import ConfigParser, ExtendedInterpolation
 
 def read_camera_inf(infin):
@@ -287,18 +282,6 @@ class CoaxImage:
         return gx, gy, gz
 
     # calc_gxyz_of_pix_at()
-
-    def rotatePhi(self, phi):
-        self.gonio.rotatePhi(phi)
-
-    def getGXYZphi(self):
-        x, y, z = self.gonio.getXYZmm()
-        phi = self.gonio.getPhi()
-        return x, y, z, phi
-
-    def moveGXYZphi(self, x, y, z, phi):
-        self.gonio.moveXYZmm(x, y, z)
-        self.gonio.rotatePhi(phi)
 
     def calc_gxyz_diff_mm(self, ph, pv):
         if ph < 0 or pv < 0:

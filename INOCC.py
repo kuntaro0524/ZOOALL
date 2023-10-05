@@ -145,12 +145,6 @@ class INOCC:
     def closeCapture(self):
         self.coi.closeCapture()
 
-    def getGXYZphi(self):
-        return self.coi.getGXYZphi()
-
-    def moveGXYZphi(self, x, y, z, phi):
-        self.coi.moveGXYZphi(x, y, z, phi)
-
     # 190514 coded by K.Hirata
     def fitAndFace(self, phi_area_list):
         fit_log = open("%s/fit_face.log" % self.loop_dir, "w")
@@ -175,7 +169,7 @@ class INOCC:
         cip = CryImageProc.CryImageProc()
         cip.setImages(self.fname, self.backimg)
 
-        cx, cy, cz, phi = self.coi.getGXYZphi()
+        cx, cy, cz, phi = self.gonio.getXYZPhi()
         if self.isInit == False:
             self.init()
 
@@ -202,10 +196,7 @@ class INOCC:
             # Calculate vertical movement at this centering step
             dx = x - cx
             dz = z - cz
-            # print "DX, DZ = ", dx,dz
-            ## self.cenx,self.ceny=self.coi.get_cross_pix()
             d_vertpix = top_xy[1] - self.ceny
-            print("DDDDDDDDDDD", d_vertpix)
 
             if d_vertpix > 0:
                 move_direction = 1.0
@@ -214,7 +205,8 @@ class INOCC:
 
             # movement distance [um]
             vmove = move_direction * math.sqrt((dx * dx + dz * dz)) * 1000.0  # [um]
-            self.coi.moveGXYZphi(x, y, z, phi)
+            self.gonio.moveXYZPhi(x, y, z, phi)
+
             if self.debug == True:
                 cip.drawContourTop(cont, (xedge, yedge), "./cccc.png")
 
@@ -242,7 +234,7 @@ class INOCC:
     def rotatePhiAndGetArea(self, phi, loop_size):
         new_idx = self.ff.getNewIdx3()
         self.fname = "%s/%03d_area.ppm" % (self.loop_dir, new_idx)
-        self.coi.rotatePhi(phi)
+        self.gonio.rotatePhi(phi)
         cip = CryImageProc.CryImageProc(logdir=self.loop_dir)
         self.coi.get_coax_image(self.fname)
         cip.setImages(self.fname, self.backimg)
@@ -279,7 +271,7 @@ class INOCC:
         self.area_list = []  # includes (angle, area) list
 
         for phi in [0, 45, 90, 135]:
-            self.coi.rotatePhi(phi)
+            self.gonio.rotatePhi(phi)
             vmove, area, isFound, isArea, edge_flags = self.capture_and_center(option="roi", roi_len=roi_len)
             if isFound == False:
                 self.logfile.write("No loop was detected. Next phi...\n")
@@ -295,7 +287,7 @@ class INOCC:
             # which direction does the loop move to if it is rotated by 10deg
             if len(self.area_list) == 1:
                 phi += 10.0
-                self.coi.rotatePhi(phi)
+                self.gonio.rotatePhi(phi)
                 vmove, area, isFound, isArea, edge_flags = self.capture_and_center(option="roi", roi_len=roi_len)
                 print("VMOOOOOOOOOOOOOOOOVE=", vmove)
                 if vmove > 0.0:
@@ -305,14 +297,14 @@ class INOCC:
 
         if ok_flag == False:
             self.logger.info("Moving Y 2mm")
-            gx, gy, gz, phi = self.coi.getGXYZphi()
+            gx, gy, gz, phi = self.gonio.getXYZPhi()
             newgy = gy + self.cip.calcYdistAgainstGoniometer(2.0)
 
             # Check a distance from mount position
             if self.isYamagiwaSafe(gx, newgy, gz) == False:
                 raise MyException("Movement was larger than limited value (Yamagiwa safety)")
             else:
-                self.coi.moveGXYZphi(gx, newgy, gz, phi)
+                self.gonio.moveXYZPhi(gx, newgy, gz, phi)
             return False
         else:
             return True
@@ -323,10 +315,10 @@ class INOCC:
         ok_flag = False
         ofile = open("step30deg_centering.dat", "w")
         for phi in range(-720, 720, 30):
-            self.coi.rotatePhi(phi)
+            self.gonio.rotatePhi(phi)
             vmove, area = self.capture_and_center(option="roi", roi_len=300)
             # when the loop was found
-            gx, gy, gz, phi = self.coi.getGXYZphi()
+            gx, gy, gz, phi = self.gonio.getXYZPhi()
             ofile.write("%5.2f deg %9.4f %9.4f %9.4f\n" % (phi, gx, gy, gz))
 
     def simpleCenter(self, phi, loop_size=600.0, option='top'):
@@ -334,8 +326,8 @@ class INOCC:
         self.fname = "%s/%03d_center.ppm" % (self.loop_dir, new_idx)
         self.logger.info("##################### TOP CENTERING %5.2f deg.\n" % phi)
         self.logger.info("INOCC.coreCentering captures %s\n" % self.fname)
-        self.coi.rotatePhi(phi)
-        cx, cy, cz, phi = self.coi.getGXYZphi()
+        self.gonio.rotatePhi(phi)
+        cx, cy, cz, phi = self.gonio.getXYZPhi()
         self.coi.get_coax_image(self.fname)
         # This instance is for this centering process only
         cip = CryImageProc.CryImageProc(logdir=self.loop_dir)
@@ -348,8 +340,8 @@ class INOCC:
         self.logger.info("PHI: %5.2f deg Option=%s Centering: (Xtarget, Ytarget) = (%5d, %5d) HAMIDASHI = %s\n"
                          % (phi, option, xtarget, ytarget, hamidashi_flag))
         x, y, z = self.coi.calc_gxyz_of_pix_at(xtarget, ytarget, cx, cy, cz, phi)
-        self.coi.moveGXYZphi(x, y, z, phi)
 
+        self.gonio.moveXYZPhi(x, y, z, phi)
         self.logger.info(">>>>>> FILE=%s Area=%8.3f at %8.3f" % (self.fname, area, phi))
 
         return area, hamidashi_flag
@@ -437,7 +429,7 @@ class INOCC:
         n_good = 0
         # Loop for rough centering
         for phi in phi_list:
-            self.coi.rotatePhi(phi)
+            self.gonio.rotatePhi(phi)
             # Gonio current coordinate
             # Try centering
             if isRoughCenter == False:
@@ -515,12 +507,13 @@ class INOCC:
                     break
             except MyException as tttt:
                 self.logger.info("INOCC.edgeCentering moves Y 2000um")
-                gx, gy, gz, phi = self.coi.getGXYZphi()
+                gx, gy, gz, phi = self.gonio.getXYZPhi()
                 move_ymm = self.cip.calcYdistAgainstGoniometer(2.0)
                 newgy = gy + move_ymm
                 if self.isYamagiwaSafe(gx, newgy, gz) == False:
                     raise MyException("Movement was larger than threshold (Yamagiwa safety)")
-                self.coi.moveGXYZphi(gx, newgy, gz, phi)
+                
+                self.gonio.moveXYZPhi(gx, newgy, gz, phi)
         if n_good == 0:
             raise MyException("edgeCentering failed")
 
@@ -533,13 +526,13 @@ class INOCC:
         n_good = 0
         min_area = 9999999999.0
         for phi in phi_list:
-            self.coi.rotatePhi(phi)
-            ## self.coi.get_coax_image(self.fname, 200)
+            self.gonio.rotatePhi(phi)
+
             new_idx = self.ff.getNewIdx3()
             self.fname = "%s/%03d_facing.ppm" % (self.loop_dir, new_idx)
             self.coi.get_coax_image(self.fname, 40)  # for DFK72 YK@190315
             # Gonio current coordinate
-            cx, cy, cz, phi = self.coi.getGXYZphi()
+            cx, cy, cz, phi = self.gonio.getXYZPhi()
             # This background captured with speed=200 for ARTRAY
             # This background captured with speed=40 for DFK72 YK@190315
             # 4x4 binning zoom -48000pls
@@ -554,7 +547,7 @@ class INOCC:
                 min_area = area
                 saved_phi = phi
         phi_face = saved_phi + 90.0
-        self.coi.rotatePhi(phi_face)
+        self.gonio.rotatePhi(phi_face)
         return phi_face
 
     # Largely modified on 190514 by K.Hirata
@@ -594,7 +587,7 @@ class INOCC:
         phi_face = 0.0
 
         # Initial goniometer coordinate
-        ix, iy, iz, iphi = self.coi.getGXYZphi()
+        ix, iy, iz, iphi = self.gonio.getXYZPhi()
 
         # Main loop
         if skip == False:
@@ -632,7 +625,7 @@ class INOCC:
                 self.simpleCenter(phi_face, loop_size, option="gravity")
 
         # Final centering
-        cx, cy, cz, phi = self.coi.getGXYZphi()
+        cx, cy, cz, phi = self.gonio.getXYZPhi()
         # Raster area definition
         xwidth, ywidth, r_cenx, r_ceny = self.cap4width(loop_size)
 

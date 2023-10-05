@@ -1,9 +1,7 @@
-
+import os
 import traceback
 import logging
 import numpy as np
-
-beamline = "BL32XU"
 
 from MyException import *
 import Zoo
@@ -21,6 +19,7 @@ import KUMA
 import CrystalList
 import Date
 import DiffscanMaster
+import BSSconfig
 from html_log_maker import ZooHtmlLog
 
 import logging
@@ -507,9 +506,10 @@ class ZooNavigator():
         self.lm.setWavelength(cond['wavelength'])
 
         # Mount position of SPACE (copy from Loopmeasurement.INOCC)
-        self.mx = self.lm.inocc.mx
-        self.my = self.lm.inocc.my
-        self.mz = self.lm.inocc.mz
+        # mount position is read from bssconfig
+        self.bssconfig = BSSconfig.BSSconfig()
+        # Read Cmount position from configure file
+        self.mx, self.my, self.mz = self.bssconfig.getCmount()
 
         self.logger.info("[PROCESS] Mounting sample starts.")
         self.esa.addEventTimeAt(o_index, "mount_start")
@@ -614,7 +614,8 @@ class ZooNavigator():
 
         # The goniometer moves to the saved position
         self.logger.info("move to the save point (%9.4f %9.4f %9.4f)" % (self.sx, self.sy, self.sz))
-        self.lm.moveGXYZphi(self.sx, self.sy, self.sz, 0.0)
+        self.dev.gonio.moveXYZphi(self.sx, self.sy, self.sz, 0.0)
+        # self.lm.moveGXYZphi(self.sx, self.sy, self.sz, 0.0)
 
         # Waiting warming up the pin
         if cond['warm_time'] > 0.0:
@@ -680,7 +681,7 @@ class ZooNavigator():
         self.esa.addEventTimeAt(o_index, "center_end")
 
         # Save Gonio XYZ to the previous pins
-        self.sx, self.sy, self.sz, sphi = self.lm.saveGXYZphi()
+        self.sx, self.sy, self.sz, sphi = self.gonio.getXYZPhi()
 
         # Capture the crystal image before experiment
         self.logger.info("ZooNavigator is capturing the 'before.ppm'")

@@ -28,7 +28,7 @@ class LoopMeasurement:
         self.dev = self.blf.device
         self.root_dir = root_dir
         self.prefix = prefix
-        self.inocc = INOCC.INOCC(ms, root_dir, sample_name=prefix)
+        self.inocc = INOCC.INOCC(blf, root_dir, sample_name=prefix)
         self.inocc.init()
 
         self.h_beam = 10.0  # [um]
@@ -82,9 +82,6 @@ class LoopMeasurement:
 
     def setWavelength(self, wavelength):
         self.wavelength = wavelength
-
-    def moveGXYZphi(self, x, y, z, phi):
-        return self.inocc.moveGXYZphi(x, y, z, phi)
 
     def captureImage(self, capture_name):
         self.dev.prepCentering()
