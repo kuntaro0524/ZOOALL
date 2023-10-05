@@ -15,27 +15,26 @@ import logging.config
 from configparser import ConfigParser, ExtendedInterpolation
 
 class INOCC:
-    def __init__(self, ms, root_dir, sample_name="sample"):
-        self.coi = CoaxImage.CoaxImage(ms)
+    def __init__(self, blf, root_dir, sample_name="sample"):
+        self.blf = blf
+        self.coi = CoaxImage.CoaxImage(blf)
+        self.gonio = blf.getGoniometer()
         self.isInit = False
         self.debug = True
+        beamline = self.blf.beamline
 
-        # Get information from beamline.ini file.
-        config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path="%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        config.read(config_path)
+        # Get information from BLFactory instance
+        self.config = self.blf.config
 
-        # beamline name is read from 'beamline.ini'
-        beamline = config.get("beamline", "beamline")
         # zoom ratio is read from 'beamline.ini'
         # section: inocc, option: zoom
-        self.zoom = config.getfloat("inocc", "zoom")
+        self.zoom = self.config.getfloat("inocc", "zoom")
 
         # back ground image
-        self.backimg = config.get("files", "backimg")
+        self.backimg = self.config.get("files", "backimg")
 
-        self.logdir=config.get("dirs", "logdir")
-        self.fname = config.get("files", "inocc_image")
+        self.logdir=self.config.get("dirs", "logdir")
+        self.fname = self.config.get("files", "inocc_image")
 
         # Directory for saving the INOCC result for each data
         self.sample_name = sample_name
@@ -61,7 +60,7 @@ class INOCC:
         # beamline.ini has a flag for dark experiment
         # If it is True, the default bright and gain values are changed
         # section: "special_setting", option: "isDark", value type: boolean
-        self.isDark = config.getboolean("special_setting", "isDark")
+        self.isDark = self.config.getboolean("special_setting", "isDark")
 
     # INOCC is called from Loopmeasurement
     # Basically each loop has an instance of LoopMeasurement

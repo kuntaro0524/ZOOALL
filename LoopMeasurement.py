@@ -20,13 +20,12 @@ import DirectoryProc
 import logging
 import logging.config
 
-beamline = "BL32XU"
-
 # version 2.0.0 modified on 2019/07/04 K.Hirata
 
 class LoopMeasurement:
-    def __init__(self, dev, root_dir, prefix):
-        self.dev = dev
+    def __init__(self, blf, root_dir, prefix):
+        self.blf = blf
+        self.dev = self.blf.device
         self.root_dir = root_dir
         self.prefix = prefix
         self.inocc = INOCC.INOCC(ms, root_dir, sample_name=prefix)
@@ -54,6 +53,9 @@ class LoopMeasurement:
         # True for including beamsize index in 'schedule file'
         self.isBeamsizeIndexOnScheduleFile = True
 
+        # beamline name 
+        self.beamline = self.blf.beamline
+
         # Kuntaro Log file
         self.logger = logging.getLogger('ZOO').getChild("LoopMeasurement")
 
@@ -80,9 +82,6 @@ class LoopMeasurement:
 
     def setWavelength(self, wavelength):
         self.wavelength = wavelength
-
-    def saveGXYZphi(self):
-        return self.inocc.getGXYZphi()
 
     def moveGXYZphi(self, x, y, z, phi):
         return self.inocc.moveGXYZphi(x, y, z, phi)
@@ -305,7 +304,7 @@ class LoopMeasurement:
         rss.setPrefix(scan_id)
 
         # Attenuator raster is set by 'best_transmission' (0<= value<=1.0)
-        if beamline == "BL32XU" or beamline == "BL41XU" or beamline=="BL45XU":
+        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline=="BL45XU":
             rss.setTrans(best_transmission)
         else:
             # Attenuator index is calculated
@@ -377,7 +376,7 @@ class LoopMeasurement:
         # Move to the defined goniometer coordinate and phi angle.
         sx, sy, sz = gxyz
         self.moveGXYZphi(sx, sy, sz, phi)
-        tx, ty, tz, tphi = self.saveGXYZphi()
+        tx, ty, tz, tphi = self.gonio.getXYZPhi()
 
         dist_raster = cond['dist_raster']
         exp_raster = cond['exp_raster']
@@ -404,7 +403,7 @@ class LoopMeasurement:
 
         # Attenuator index from 'att_fac' for BL32XU/BL45XU
         # Attenuator should be set in 'an index of attenuator defined in bss.config'
-        if beamline == "BL32XU" or beamline == "BL41XU" or beamline == "BL45XU":
+        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline == "BL45XU":
             # if you need to activate 'attenuator modification', put 'flag_mod_exptime' on at the top of this function
             if flag_mod_exptime:
                 # Check transmission with 'thinnest attenuator'
@@ -479,7 +478,7 @@ class LoopMeasurement:
         rss.setPrefix(scan_id)
         rss.setCL(dist_raster)
         # 2019/10/26 Detector cover scan for salt screening
-        if beamline.lower() == "bl45xu" and cond['cover_scan_flag'] == 1:
+        if self.beamline.lower() == "bl45xu" and cond['cover_scan_flag'] == 1:
             rss.setCoverScan()
         rss.setImgDire(raster_path)
         rss.setStartPhi(phi)
@@ -508,7 +507,7 @@ class LoopMeasurement:
         print("DEBUG")
         sx, sy, sz = gxyz
         self.moveGXYZphi(sx, sy, sz, phi)
-        tx, ty, tz, tphi = self.saveGXYZphi()
+        tx, ty, tz, tphi = self.getXYZPhi()
 
         print("DEBUG2")
         print("Target position:", sx, sy, sz, phi)
@@ -769,7 +768,7 @@ class LoopMeasurement:
         kuma = KUMA.KUMA()
         exp_time, best_transmission = kuma.getBestCondsMulti(cond, flux)
 
-        if beamline == "BL32XU" or beamline == "BL41XU" or beamline=="BL45XU":
+        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline=="BL45XU":
             # Check transmission with 'thinnest attenuator'
             attfac = AttFactor.AttFactor()
             mod_exp, mod_trans = attfac.checkThinnestAtt(cond['wavelength'], exp_time, best_transmission)
@@ -832,7 +831,7 @@ class LoopMeasurement:
         kuma = KUMA.KUMA()
         exp_time, best_transmission = kuma.getBestCondsMulti(cond, flux)
 
-        if beamline == "BL32XU" or beamline == "BL41XU" or beamline == "BL45XU":
+        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline == "BL45XU":
             # Check transmission with 'thinnest attenuator'
             attfac = AttFactor.AttFactor()
             mod_exp, mod_trans = attfac.checkThinnestAtt(cond['wavelength'], exp_time, best_transmission)
@@ -1220,7 +1219,7 @@ class LoopMeasurement:
         # Beam size setting : extracting beamsize index from beamsize.config
         beamsize_index = self.beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
 
-        if beamline == "BL32XU" or beamline == "BL41XU" or beamline == "BL45XU":
+        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline == "BL45XU":
             # Check transmission with 'thinnest attenuator'
             attfac = AttFactor.AttFactor()
             mod_exp, mod_trans = attfac.checkThinnestAtt(cond['wavelength'], exp_time, best_transmission)

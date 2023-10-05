@@ -36,18 +36,19 @@ if __name__ == "__main__":
     logger = logging.getLogger('ZOO')
     os.chmod(logname, 0o666)
 
-    zoo=Zoo.Zoo()
-    zoo.connect()
+    # Initialize BLFactory
+    blf = BLFactory.BLFactory()
+    blf.initDevice()
 
     total_pins = 0
     for input_file in sys.argv[1:]:
         logger.info("Start processing %s" % input_file)
         if input_file.rfind("csv") != -1:
-            navi = ZooNavigator.ZooNavigator(zoo, ms, input_file, is_renew_db=True)
+            navi = ZooNavigator.ZooNavigator(self.blf, input_file, is_renew_db=True)
             num_pins = navi.goAround()
         elif input_file.rfind("db") != -1:
             esa_csv = "dummy.csv"
-            navi=ZooNavigator.ZooNavigator(zoo,ms,esa_csv,is_renew_db=False)
+            navi=ZooNavigator.ZooNavigator(self.blf, esa_csv, is_renew_db=False)
             num_pins = navi.goAround(input_file)
         total_pins += num_pins
 

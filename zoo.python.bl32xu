@@ -6,8 +6,12 @@
 # export PYTHONPATH="/staff/bl32xu/BLsoft/NewZoo/:/staff/bl32xu/BLsoft/NewZoo/Libs/"
 # export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/NewZoo/Libs"
 #BL44XU
-export PYTHONPATH="/staff/bl44xu/BLsoft/ZOO44XU/:/staff/bl44xu/BLsoft/ZOO44XU/Libs/"
-export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/Libs"
+#export PYTHONPATH="/staff/bl44xu/BLsoft/ZOO44XU/:/staff/bl44xu/BLsoft/ZOO44XU/Libs/"
+#export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/Libs"
+
+# BL32XU test
+export PYTHONPATH="/staff/bl32xu/BLsoft/TestZoo/:/staff/bl32xu/BLsoft/TestZoo/Libs/"
+export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/TestZoo/Libs"
 
 args=("$*")
 echo $args

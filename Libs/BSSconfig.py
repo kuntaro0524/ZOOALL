@@ -21,7 +21,7 @@ class BSSconfig:
 
         self.isRead = False
         self.isPrep = False
-        self.debug = True
+        self.debug = False
 
     def storeLines(self):
         ifile = open(self.confile, "r")
@@ -54,9 +54,8 @@ class BSSconfig:
             line=line.strip()
             if "Microscope_Zoom_Options:" in line and line.startswith("#")==False:
                 value_bunch = line.split(":")[1]
-                print("VALUE_BUNCH")
-                print(value_bunch)
-                print("VALUE_BUNCH")
+                if self.debug:
+                    print(value_bunch)
                 for column in value_bunch.split():
                     value = float(column)
                     self.zoom_pulses.append(value)
@@ -142,9 +141,7 @@ class BSSconfig:
         
         for ddiicc in self.all_dicts:
             if self.debug:
-                print("DICT")
                 print(ddiicc['_axis_name'],axis_name)
-                print("DICT")
             if ddiicc['_axis_name'] == axis_name:
                 # print("FOUND!")
                 return ddiicc

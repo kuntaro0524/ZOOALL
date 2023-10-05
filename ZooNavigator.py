@@ -39,15 +39,17 @@ def check_abort(lm):
 # Version 2.1.2 modified on 2019/10/26 K.Hirata at BL45XU
 
 class ZooNavigator():
-    def __init__(self, zoo, ms, esa_csv, is_renew_db=False):
+    def __init__(self, blf, esa_csv, is_renew_db=False):
         # From arguments
-        self.zoo = zoo
+        # BLFactory containing zoo, ms, device already initialized in calling function.
+        self.blf = blf
+        self.zoo = self.blf.zoo
         self.esa_csv = esa_csv
-        self.ms = ms
+        self.ms = self.blf.ms
 
         # Device settings
-        self.dev = Device.Device(ms)
-        self.dev.init()
+        # this has a gonio instance already for BL44XU and others.
+        self.dev = self.blf.device
 
         # Beam dump treatment
         self.dump_recov = DumpRecover.DumpRecover(self.dev)
@@ -489,7 +491,7 @@ class ZooNavigator():
         self.logger.info("Processing pin named %s" % prefix)
 
         # Loop measurement class initialization
-        self.lm = LoopMeasurement.LoopMeasurement(self.dev, root_dir, prefix)
+        self.lm = LoopMeasurement.LoopMeasurement(self.blf, root_dir, prefix)
         self.logger.info("Constructore finished.")
 
         # Making directories

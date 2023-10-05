@@ -50,7 +50,8 @@ roi_len_um = 200.0
 filter_thresh_min=15
 filter_thresh_max=20
 # ２値化のときのしきい値
-bin_thresh=20
+#bin_thresh=20
+bin_thresh=8
 # zoom value
 zoom=3.77
 # BL32XU specific (ignored at other beamlines)

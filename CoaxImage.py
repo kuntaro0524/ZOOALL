@@ -39,15 +39,22 @@ def read_bss_config(cfgin):
     return ret
 
 class CoaxImage:
-    def __init__(self, ms):
+    def __init__(self, blf):
+        # BLFactory instance is passed from the caller
+        self.blf = blf
+
+        # Message server port is already opened in BLFactory
+        self.ms = self.blf.ms
+
         self.thread = None
-        self.ms = ms
+        # Device instance is already initialized in BLFactory
+        self.dev = self.blf.device
 
         self.logger = logging.getLogger('ZOO').getChild("CoaxImage")
 
         # configure file を読む
         # Get information from beamline.ini file.
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        self.config = self.blf.config
         self.config.read(os.path.join(os.environ["ZOOCONFIGPATH"], "beamline.ini"))
 
         # camera.inf パスは beamline.ini から取得
@@ -80,13 +87,13 @@ class CoaxImage:
         # section: inocc, option: zoom_pintx
         self.coax_pintx_pulse = self.config.getint("inocc", "zoom_pintx")
 
-        self.coax_pint = CoaxPint.CoaxPint(self.ms)
-        # BL44XU special setting
-        if self.beamline == "BL44XU":
-            self.gonio = Gonio44.Gonio44(self.ms) 
-        # Normal beamlines
-        else:
-            self.gonio = Gonio.Gonio(ms)
+        # Coaxial pint axis is derived from 'device' instance
+        self.coax_pint = self.dev.coax_pint
+        # Gonio is derived from 'device' instance
+        self.gonio = self.dev.gonio
+        # Zoom is derived from 'device' instance
+        zoomaxis = self.dev.zoom
+
         self.capture = Capture.Capture()
 
         # Dark experiment
@@ -165,14 +172,12 @@ class CoaxImage:
             print("Possible zoom:", list(self.coax_zoom2pulse.keys()))
             return
 
-        zoomaxis = Zoom.Zoom(self.ms)
         zoom_pulse = self.coax_zoom2pulse[zoom]
-        zoomaxis.move(zoom_pulse)
+        self.zoomaxis.move(zoom_pulse)
 
         # Beamline BL32XU specific code to adjust pint position
         if self.beamline == "BL32XU":
-            pintaxis = CoaxPint.CoaxPint(self.ms)
-            pintaxis.move(self.coax_pintx_pulse)
+            self.coax_pint.move(self.coax_pintx_pulse)
 
     # set_zoom()
 
@@ -218,16 +223,6 @@ class CoaxImage:
 
         dx, dy = -(sx - cen_x), (sy - cen_y)
 
-        """
-        if self.gonio_direction == "FROM_RIGHT":
-        # For BL32XU
-            dx, dy = -(sx-cen_x), (sy-cen_y)
-        ## For BL45XU
-        else:
-            dx, dy = (sx-cen_x), -(sy-cen_y)
-            print "DX,DY=",dx,dy
-        """
-
         ret = []
         for unit in units:
             if sx < 0 or sy < 0:
@@ -260,7 +255,6 @@ class CoaxImage:
         self.move(dx, dy)
 
     # move_by_img_px()
-
     # Calculation goniometer coordinate from given pixel coordinate
     # gcenx, gceny, gcenz should be given in unit of "mm"
     # ph: pixel coordinate of horizontal axis

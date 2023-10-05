@@ -18,7 +18,7 @@ class Gonio44:
     def __init__(self, bss_server_port):
         # This is BSS server port
         self.s = bss_server_port
-        self.debug = False
+        self.debug = True
         self.isConnect=False
 
         # beamline name is extracted from beamline.ini
@@ -30,7 +30,7 @@ class Gonio44:
     def communicate(self, comstr):
         sending_command = comstr.encode()
         if self.isConnect == False:
-            print("Connection first!")
+            print("!Connection first!")
             return False
         else:
             self.s.sendall(sending_command)
@@ -93,6 +93,7 @@ class Gonio44:
         return value
 
     def getSVOC_C(self,recmes):
+        print(recmes)
         cols=recmes.split("/")
         return cols[3]
 

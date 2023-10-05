@@ -52,11 +52,11 @@ class Gonio:
             self.sense_phi_bl32xu = 1.0
 
         # Read bss.config 
-        self.v2p_x, self.sense_x = self.bssconf.getPulseInfo(self.x_name)
-        self.v2p_y, self.sense_y = self.bssconf.getPulseInfo(self.y_name)
-        self.v2p_z, self.sense_z = self.bssconf.getPulseInfo(self.z_name)
-        self.v2p_zz, self.sense_zz = self.bssconf.getPulseInfo(self.zz_name)
-        self.v2p_rot, self.sense_phi = self.bssconf.getPulseInfo(self.rot_name)
+        self.v2p_x, self.sense_x, self.home_x = self.bssconf.getPulseInfo(self.x_name)
+        self.v2p_y, self.sense_y, self.home_y = self.bssconf.getPulseInfo(self.y_name)
+        self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.z_name)
+        self.v2p_zz, self.sense_zz, self.home_zz = self.bssconf.getPulseInfo(self.zz_name)
+        self.v2p_rot, self.sense_phi, self.home_phi = self.bssconf.getPulseInfo(self.rot_name)
         self.isPrep = True
 
     def goMountPosition(self):
@@ -337,15 +337,30 @@ class Gonio:
 
         return x,y,z
 
+    def getXYZPhi(self):
+        x=self.getXmm()
+        y=self.getYmm()
+        z=self.getZmm()
+        phi=self.getPhi()
+
+        return x,y,z,phi
+
     def moveXYZmm(self,movex,movey,movez):
+        # UNIT: [pulse]
+        self.goniox.move(movex)
+        self.gonioy.move(movey)
+        self.gonioz.move(movez)
+
+    def moveXYZPhi(self,movex,movey,movez,phi):
         # convertion
         xpulse=self.sense_x*movex*self.v2p_x
         ypulse=self.sense_y*movey*self.v2p_y
         zpulse=self.sense_z*movez*self.v2p_z
+        self.goniox.nageppa(xpulse)
+        self.gonioy.nageppa(ypulse)
+        self.gonioz.nageppa(zpulse)
         # UNIT: [pulse]
-        self.goniox.move(xpulse)
-        self.gonioy.move(ypulse)
-        self.gonioz.move(zpulse)
+        self.rotatePhi(phi)
 
     def goXYZmm(self,movex,movey,movez):
         # convertion

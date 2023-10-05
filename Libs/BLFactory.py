@@ -3,6 +3,7 @@ import Device
 import socket
 import Gonio44
 import Gonio
+import os
 
 from configparser import ConfigParser, ExtendedInterpolation
 
@@ -25,7 +26,7 @@ class BLFactory:
         self.ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ms.connect((self.blanc_address, 10101))
         # Zoo をインスタンス化して利用する
-        self.zoo = Zoo()
+        self.zoo = Zoo.Zoo()
         self.zoo.connect()
         # Device をインスタンス化
         # この時点では gonio は未定義
@@ -49,7 +50,7 @@ class BLFactory:
         if self.isInit==False:
             self.initDevice()
         else:
-            return self.dev.gonio
+            return self.device.gonio
 
 # mainが実装されていない場合は、以下のコードが実行される
 if __name__=="__main__":
