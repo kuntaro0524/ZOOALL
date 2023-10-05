@@ -44,6 +44,7 @@ class CoaxImage:
         self.thread = None
         # Device instance is already initialized in BLFactory
         self.dev = self.blf.device
+        print(self.dev.isInit)
 
         self.logger = logging.getLogger('ZOO').getChild("CoaxImage")
 

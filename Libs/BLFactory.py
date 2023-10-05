@@ -31,6 +31,7 @@ class BLFactory:
         # Device をインスタンス化
         # この時点では gonio は未定義
         self.device = Device.Device(self.ms)
+        self.device.init()
         # beamline に応じて Gonioインスタンスを生成する
         if self.beamline == "BL44XU":
             # BSS server port を取得

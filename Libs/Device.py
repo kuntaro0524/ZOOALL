@@ -79,6 +79,7 @@ class Device(Singleton.Singleton):
         # settings
         print("Initialization starts")
         self.mono=Mono.Mono(self.s)
+        print("KKKKK")
         self.bm=BM.BM(self.s)
         self.f=File.File("./")
         self.capture=Capture.Capture()
@@ -88,6 +89,7 @@ class Device(Singleton.Singleton):
         self.cryo=Cryo.Cryo(self.s)
         self.id=ID.ID(self.s)
         self.light=Light.Light(self.s)
+        print("TTTTT")
         self.colli=Colli.Colli(self.s)
         self.coax_pint=CoaxPint.CoaxPint(self.s)
         self.clen=CCDlen.CCDlen(self.s)

@@ -1,9 +1,6 @@
 import sys,os,math,socket
 import datetime
 import numpy as np
-sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
-from MyException import *
-
 from File import *
 import Capture
 import Device

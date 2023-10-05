@@ -587,7 +587,7 @@ class INOCC:
         phi_face = 0.0
 
         # Initial goniometer coordinate
-        ix, iy, iz, iphi = self.gonio.getXYZPhi()
+        ix, iy, iz, iphi = self.coi.getGXYZphi()
 
         # Main loop
         if skip == False:
@@ -625,7 +625,7 @@ class INOCC:
                 self.simpleCenter(phi_face, loop_size, option="gravity")
 
         # Final centering
-        cx, cy, cz, phi = self.gonio.getXYZPhi()
+        cx, cy, cz, phi = self.coi.getGXYZphi()
         # Raster area definition
         xwidth, ywidth, r_cenx, r_ceny = self.cap4width(loop_size)
 
@@ -640,10 +640,11 @@ class INOCC:
 
         return raster_width, raster_height, phi_face, gonio_info
 
-
 if __name__ == "__main__":
-    ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ms.connect(("172.24.242.41", 10101))
+    import BLFactory
+
+    blf = BLFactory.BLFactory()
+    blf.initDevice()
 
     # read configure file(beamline.init)
     config = ConfigParser(interpolation=ExtendedInterpolation())
@@ -656,9 +657,9 @@ if __name__ == "__main__":
     logger = logging.getLogger('ZOO')
     os.chmod(logname, 0o666)
 
-    test_dir = "/staff/bl32xu/BLsoft/NewZoo/BackImages/"
+    test_dir = "/staff/bl32xu/BLsoft/TestZoo/"
 
-    inocc = INOCC(ms, test_dir)
+    inocc = INOCC(blf, test_dir)
     phi_face = 90
 
     start_time = datetime.datetime.now()
