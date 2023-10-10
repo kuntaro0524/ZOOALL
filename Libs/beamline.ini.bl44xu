@@ -23,8 +23,8 @@ dose_csv=${dirs:zooroot}/Libs/en_dose_lys.csv
 backimg = ${dirs:zooroot}/BackImages/back.ppm
 
 [capture]
-bright_default=2333
-gain_default=25000
+bright_default=2500
+gain_default=4000
 contrast_default=18000
 # Dark mode
 bright_default_dark=5000
