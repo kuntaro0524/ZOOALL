@@ -28,8 +28,7 @@ class CCDlen:
         self.ccdlen = Motor(self.s, f"bl_{self.bl_object}_{self.ccdlen_name}", "pulse")
 
         # Pulse, home and limit parameters
-        self.ccdlen_v2p, self.ccdlen_sense = self.bssconf.getPulseInfo(self.ccdlen_name)
-        self.ccdlen_home = self.bssconf.getHomeValue(self.ccdlen_name)
+        self.ccdlen_v2p, self.ccdlen_sense,self.ccdlen_home = self.bssconf.getPulseInfo(self.ccdlen_name)
         self.low_limit, self.upper_limit = self.bssconf.getLimit(self.ccdlen_name)
 
         self.isInit = False

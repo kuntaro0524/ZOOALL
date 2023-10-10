@@ -587,7 +587,7 @@ class INOCC:
         phi_face = 0.0
 
         # Initial goniometer coordinate
-        ix, iy, iz, iphi = self.coi.getGXYZphi()
+        ix, iy, iz, iphi = self.gonio.getXYZPhi()
 
         # Main loop
         if skip == False:
@@ -625,7 +625,7 @@ class INOCC:
                 self.simpleCenter(phi_face, loop_size, option="gravity")
 
         # Final centering
-        cx, cy, cz, phi = self.coi.getGXYZphi()
+        cx, cy, cz, phi = self.gonio.getXYZPhi()
         # Raster area definition
         xwidth, ywidth, r_cenx, r_ceny = self.cap4width(loop_size)
 
@@ -676,4 +676,4 @@ if __name__ == "__main__":
 
     print(("Loop width/height=", rwidth, rheight))
 
-    ms.close()
+    # ms.close()

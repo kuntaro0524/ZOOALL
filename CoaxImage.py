@@ -88,7 +88,7 @@ class CoaxImage:
         # Gonio is derived from 'device' instance
         self.gonio = self.dev.gonio
         # Zoom is derived from 'device' instance
-        zoomaxis = self.dev.zoom
+        self.zoomaxis = self.dev.zoom
 
         self.capture = Capture.Capture()
 

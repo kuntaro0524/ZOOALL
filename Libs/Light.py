@@ -36,6 +36,9 @@ class Light:
         self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.light_z_name)
         print(self.v2p_z, self.sense_z)
 
+        # initialization flag
+        self.isInit = False
+
     def getEvacuate(self):
         self.on_pulse, self.off_pulse = self.bssconf.getLightEvacuateInfo(self.light_z_name)
         print("ON (VME value):",self.on_pulse)
@@ -49,10 +52,14 @@ class Light:
         return self.light_z.getPosition()
 
     def on(self):
+        if self.isInit == False: 
+            self.getEvacuate()
         print("Moving to %s" % self.on_pulse)
         self.light_z.move(self.on_pulse)
 
     def off(self):
+        if self.isInit == False: 
+           self.getEvacuate()
         print("Moving to %s" % self.off_pulse)
         self.light_z.move(self.off_pulse)
 

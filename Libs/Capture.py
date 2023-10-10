@@ -236,14 +236,8 @@ class Capture:
 
 if __name__ == "__main__":
     cap = Capture()
-    # cappath = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/"
-    cappath = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/BackImages"
-    # cappath = "/isilon/users/target/target/"
+    cappath = "/staff/bl32xu/BLsoft/TestZoo/BackImages"
 
     print("START-connect from main")
-    # print cap.checkRunning()
-
-    # cap.setGain(1500)
-    # print "END  -connect from main"
     filename = os.path.join(cappath, "%s.ppm" % (sys.argv[1]))
     cap.capture(filename)

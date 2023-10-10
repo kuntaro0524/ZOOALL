@@ -43,13 +43,13 @@ class Colli:
         if self.coly_axis != "":
             self.coly = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.coly_axis), "pulse")
             # pulse information of each axis
-            self.v2p_y, self.sense_y = self.bssconf.getPulseInfo(self.coly_axis)
+            self.v2p_y, self.sense_y, self.home_y = self.bssconf.getPulseInfo(self.coly_axis)
         if self.colz_axis != "":
             self.colz = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.colz_axis), "pulse")
             print("Searching %s" % self.colz_axis)
             # print("bl_%s_%s" %(self.bl_object, self.colz_axis))
             # pulse information of each axis
-            self.v2p_z, self.sense_z = self.bssconf.getPulseInfo(self.colz_axis)
+            self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.colz_axis)
 
         # print(self.v2p_y, self.sense_y, self.v2p_z, self.sense_z)
 
