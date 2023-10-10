@@ -31,6 +31,10 @@ bright_default_dark=5000
 gain_default_dark=5000
 # Beam stopper position during centering
 beamstopper_off=True
+# Pre collimator position at BL44XU
+# To lower the background on the coax image. But the values are TEKITOU defined 10th Oct. 2023
+precol_y_off=-20000
+precol_z_off=-64046
 
 [special_setting]
 # True: Dark mode, False: Normal mode
@@ -91,6 +95,9 @@ gonio_y_name = st1_gonio_1_y
 gonio_z_name = st1_gonio_1_z
 gonio_zz_name = st1_gonio_1_zz
 gonio_rot_name = st1_gonio_1_phi
+# Pre-Collimator specific at BL44XU
+precol_y_name = st1_col_2_y
+precol_z_name = st1_col_2_z
 # Cryo Z axis
 cryo_z_name = st1_cryo_1_x
 # Cryo evac info  to extract 'evacuation' information
