@@ -2706,3 +2706,248 @@
 2023-10-10 10:05:19 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0008_sample/016_center.ppm Area=34236.500 at  180.000
 2023-10-10 10:05:19 - INOCC - INFO - doAll - 621 - Hamidashi_flag = False
 2023-10-10 10:05:19 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0008_sample/cap4width_018.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:17:51 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:17:51 - INOCC - DEBUG - doAll - 599 - The first edge centering..
+2023-10-10 10:17:51 - INOCC - INFO - edgeCentering - 497 - ################### EDGE CENTERING ######################
+2023-10-10 10:17:53 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING  0.00 deg.
+
+2023-10-10 10:17:53 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/001_center.ppm
+
+2023-10-10 10:17:53 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/001_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:17:54 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 45.00 deg.
+
+2023-10-10 10:17:54 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/002_center.ppm
+
+2023-10-10 10:17:54 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/002_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:17:55 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 90.00 deg.
+
+2023-10-10 10:17:55 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/003_center.ppm
+
+2023-10-10 10:17:56 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/003_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:17:57 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 135.00 deg.
+
+2023-10-10 10:17:57 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/004_center.ppm
+
+2023-10-10 10:17:57 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/004_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:17:57 - INOCC - INFO - edgeCentering - 509 - INOCC.edgeCentering moves Y 2000um
+2023-10-10 10:17:58 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING  0.00 deg.
+
+2023-10-10 10:17:58 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/005_center.ppm
+
+2023-10-10 10:17:58 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/005_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:17:59 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI:  435.000
+2023-10-10 10:17:59 - INOCC - INFO - simpleCenter - 340 - PHI:  0.00 deg Option=top Centering: (Xtarget, Ytarget) = (  368,     7) HAMIDASHI = True
+
+2023-10-10 10:17:59 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:17:59 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:17:59 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/005_center.ppm Area= 435.000 at    0.000
+2023-10-10 10:17:59 - INOCC - INFO - suribachiCentering - 350 - OOOOOOOOOOOOOOOOOO  SURIBACHI STARTS center:  0.00 OOOOOOOOOOOOOO
+
+2023-10-10 10:17:59 - INOCC - INFO - suribachiCentering - 364 - Around minimum angle
+
+2023-10-10 10:17:59 - INOCC - INFO - suribachiCentering - 366 - move to simpleCenter function.
+2023-10-10 10:17:59 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING -45.00 deg.
+
+2023-10-10 10:17:59 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/007_center.ppm
+
+2023-10-10 10:18:00 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/007_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:00 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 24582.500
+2023-10-10 10:18:00 - INOCC - INFO - simpleCenter - 340 - PHI: -45.00 deg Option=top Centering: (Xtarget, Ytarget) = (  188,   118) HAMIDASHI = False
+
+2023-10-10 10:18:00 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:00 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:18:00 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/007_center.ppm Area=24582.500 at  -45.000
+2023-10-10 10:18:00 - INOCC - INFO - suribachiCentering - 368 - if this line does not appear if the simpleCenter fails
+2023-10-10 10:18:00 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 45.00 deg.
+
+2023-10-10 10:18:00 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/009_center.ppm
+
+2023-10-10 10:18:01 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/009_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:01 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 27389.500
+2023-10-10 10:18:01 - INOCC - INFO - simpleCenter - 340 - PHI: 45.00 deg Option=top Centering: (Xtarget, Ytarget) = (  313,   119) HAMIDASHI = False
+
+2023-10-10 10:18:01 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:01 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:18:01 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/009_center.ppm Area=27389.500 at   45.000
+2023-10-10 10:18:02 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING  0.00 deg.
+
+2023-10-10 10:18:02 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/011_center.ppm
+
+2023-10-10 10:18:03 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/011_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:03 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 35103.000
+2023-10-10 10:18:03 - INOCC - INFO - simpleCenter - 340 - PHI:  0.00 deg Option=top Centering: (Xtarget, Ytarget) = (  311,   262) HAMIDASHI = False
+
+2023-10-10 10:18:03 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:03 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:18:03 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/011_center.ppm Area=35103.000 at    0.000
+2023-10-10 10:18:03 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 90.00 deg.
+
+2023-10-10 10:18:03 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/013_center.ppm
+
+2023-10-10 10:18:04 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/013_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:04 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 5180.000
+2023-10-10 10:18:04 - INOCC - INFO - simpleCenter - 340 - PHI: 90.00 deg Option=top Centering: (Xtarget, Ytarget) = (  312,   230) HAMIDASHI = False
+
+2023-10-10 10:18:04 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:04 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:18:04 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/013_center.ppm Area=5180.000 at   90.000
+2023-10-10 10:18:05 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/015_area.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:07 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/016_area.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:08 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/017_area.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:09 - INOCC - INFO - doAll - 612 - face_angle = 180.0deg
+2023-10-10 10:18:09 - INOCC - INFO - doAll - 615 - >>>> offset angle setting <<<<<
+2023-10-10 10:18:09 - INOCC - INFO - doAll - 618 - >>>> Simple centering <<<<<
+2023-10-10 10:18:09 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 270.00 deg.
+
+2023-10-10 10:18:09 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/018_center.ppm
+
+2023-10-10 10:18:10 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/018_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:10 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 4647.000
+2023-10-10 10:18:10 - CryImageProc - INFO - isTouchedToEdge - 633 - Touched: L:False R:True LOWER:False UPPER:False
+2023-10-10 10:18:10 - INOCC - INFO - simpleCenter - 340 - PHI: 270.00 deg Option=gravity Centering: (Xtarget, Ytarget) = (  401,   230) HAMIDASHI = False
+
+2023-10-10 10:18:10 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:10 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:18:10 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/018_center.ppm Area=4647.000 at  270.000
+2023-10-10 10:18:10 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 180.00 deg.
+
+2023-10-10 10:18:10 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/020_center.ppm
+
+2023-10-10 10:18:12 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/020_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:12 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 34203.500
+2023-10-10 10:18:12 - CryImageProc - INFO - isTouchedToEdge - 633 - Touched: L:False R:True LOWER:False UPPER:False
+2023-10-10 10:18:12 - INOCC - INFO - simpleCenter - 340 - PHI: 180.00 deg Option=gravity Centering: (Xtarget, Ytarget) = (  288,   270) HAMIDASHI = False
+
+2023-10-10 10:18:12 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:12 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:18:12 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/020_center.ppm Area=34203.500 at  180.000
+2023-10-10 10:18:12 - INOCC - INFO - doAll - 621 - Hamidashi_flag = False
+2023-10-10 10:18:12 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0009_sample/cap4width_022.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:49 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:49 - INOCC - DEBUG - doAll - 599 - The first edge centering..
+2023-10-10 10:18:49 - INOCC - INFO - edgeCentering - 497 - ################### EDGE CENTERING ######################
+2023-10-10 10:18:51 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING  0.00 deg.
+
+2023-10-10 10:18:51 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/001_center.ppm
+
+2023-10-10 10:18:51 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/001_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:52 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 45.00 deg.
+
+2023-10-10 10:18:52 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/002_center.ppm
+
+2023-10-10 10:18:53 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/002_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:54 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 90.00 deg.
+
+2023-10-10 10:18:54 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/003_center.ppm
+
+2023-10-10 10:18:54 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/003_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:55 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 135.00 deg.
+
+2023-10-10 10:18:55 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/004_center.ppm
+
+2023-10-10 10:18:55 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/004_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:55 - INOCC - INFO - edgeCentering - 509 - INOCC.edgeCentering moves Y 2000um
+2023-10-10 10:18:57 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING  0.00 deg.
+
+2023-10-10 10:18:57 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/005_center.ppm
+
+2023-10-10 10:18:57 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/005_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:57 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 4171.500
+2023-10-10 10:18:57 - INOCC - INFO - simpleCenter - 340 - PHI:  0.00 deg Option=top Centering: (Xtarget, Ytarget) = (  324,    13) HAMIDASHI = True
+
+2023-10-10 10:18:57 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:57 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:18:57 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/005_center.ppm Area=4171.500 at    0.000
+2023-10-10 10:18:57 - INOCC - INFO - suribachiCentering - 350 - OOOOOOOOOOOOOOOOOO  SURIBACHI STARTS center:  0.00 OOOOOOOOOOOOOO
+
+2023-10-10 10:18:57 - INOCC - INFO - suribachiCentering - 364 - Around minimum angle
+
+2023-10-10 10:18:57 - INOCC - INFO - suribachiCentering - 366 - move to simpleCenter function.
+2023-10-10 10:18:57 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING -45.00 deg.
+
+2023-10-10 10:18:57 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/007_center.ppm
+
+2023-10-10 10:18:58 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/007_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:58 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 18546.000
+2023-10-10 10:18:58 - INOCC - INFO - simpleCenter - 340 - PHI: -45.00 deg Option=top Centering: (Xtarget, Ytarget) = (    7,    27) HAMIDASHI = True
+
+2023-10-10 10:18:58 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:58 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:18:58 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/007_center.ppm Area=18546.000 at  -45.000
+2023-10-10 10:18:58 - INOCC - INFO - suribachiCentering - 368 - if this line does not appear if the simpleCenter fails
+2023-10-10 10:18:58 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING -45.00 deg.
+
+2023-10-10 10:18:58 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/009_center.ppm
+
+2023-10-10 10:18:58 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/009_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:18:58 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 17823.500
+2023-10-10 10:18:58 - INOCC - INFO - simpleCenter - 340 - PHI: -45.00 deg Option=top Centering: (Xtarget, Ytarget) = (    7,    60) HAMIDASHI = True
+
+2023-10-10 10:18:58 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:18:58 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:18:58 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/009_center.ppm Area=17823.500 at  -45.000
+2023-10-10 10:18:58 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 45.00 deg.
+
+2023-10-10 10:18:58 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/011_center.ppm
+
+2023-10-10 10:19:00 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/011_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:19:00 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 27144.500
+2023-10-10 10:19:00 - INOCC - INFO - simpleCenter - 340 - PHI: 45.00 deg Option=top Centering: (Xtarget, Ytarget) = (  233,   170) HAMIDASHI = False
+
+2023-10-10 10:19:00 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:19:00 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:19:00 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/011_center.ppm Area=27144.500 at   45.000
+2023-10-10 10:19:00 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING  0.00 deg.
+
+2023-10-10 10:19:00 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/013_center.ppm
+
+2023-10-10 10:19:01 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/013_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:19:01 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 34554.500
+2023-10-10 10:19:01 - INOCC - INFO - simpleCenter - 340 - PHI:  0.00 deg Option=top Centering: (Xtarget, Ytarget) = (  308,   310) HAMIDASHI = False
+
+2023-10-10 10:19:01 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:19:01 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:19:01 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/013_center.ppm Area=34554.500 at    0.000
+2023-10-10 10:19:01 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 90.00 deg.
+
+2023-10-10 10:19:01 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/015_center.ppm
+
+2023-10-10 10:19:03 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/015_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:19:03 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 6185.500
+2023-10-10 10:19:03 - INOCC - INFO - simpleCenter - 340 - PHI: 90.00 deg Option=top Centering: (Xtarget, Ytarget) = (  310,   141) HAMIDASHI = False
+
+2023-10-10 10:19:03 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:19:03 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:19:03 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/015_center.ppm Area=6185.500 at   90.000
+2023-10-10 10:19:04 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/017_area.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:19:05 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/018_area.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:19:06 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/019_area.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:19:07 - INOCC - INFO - doAll - 612 - face_angle = 180.0deg
+2023-10-10 10:19:07 - INOCC - INFO - doAll - 615 - >>>> offset angle setting <<<<<
+2023-10-10 10:19:07 - INOCC - INFO - doAll - 618 - >>>> Simple centering <<<<<
+2023-10-10 10:19:07 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 270.00 deg.
+
+2023-10-10 10:19:07 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/020_center.ppm
+
+2023-10-10 10:19:08 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/020_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:19:08 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 4792.000
+2023-10-10 10:19:08 - CryImageProc - INFO - isTouchedToEdge - 633 - Touched: L:False R:True LOWER:False UPPER:False
+2023-10-10 10:19:08 - INOCC - INFO - simpleCenter - 340 - PHI: 270.00 deg Option=gravity Centering: (Xtarget, Ytarget) = (  403,   218) HAMIDASHI = False
+
+2023-10-10 10:19:08 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:19:08 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:19:08 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/020_center.ppm Area=4792.000 at  270.000
+2023-10-10 10:19:08 - INOCC - INFO - simpleCenter - 327 - ##################### TOP CENTERING 180.00 deg.
+
+2023-10-10 10:19:08 - INOCC - INFO - simpleCenter - 328 - INOCC.coreCentering captures /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/022_center.ppm
+
+2023-10-10 10:19:10 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/022_center.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm
+2023-10-10 10:19:10 - CryImageProc - INFO - getCenterInfo - 394 - area of ROI: 34381.500
+2023-10-10 10:19:10 - CryImageProc - INFO - isTouchedToEdge - 633 - Touched: L:False R:True LOWER:False UPPER:False
+2023-10-10 10:19:10 - INOCC - INFO - simpleCenter - 340 - PHI: 180.00 deg Option=gravity Centering: (Xtarget, Ytarget) = (  289,   263) HAMIDASHI = False
+
+2023-10-10 10:19:10 - CoaxImage - INFO - get_coax_center - 145 - Origin shift = 0.006948 0.010422
+2023-10-10 10:19:10 - CoaxImage - DEBUG - calc_shift_by_img_px - 218 - cen_x, cen_y = (  308.13,   236.80)
+2023-10-10 10:19:10 - INOCC - INFO - simpleCenter - 345 - >>>>>> FILE=/staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/022_center.ppm Area=34381.500 at  180.000
+2023-10-10 10:19:10 - INOCC - INFO - doAll - 621 - Hamidashi_flag = False
+2023-10-10 10:19:10 - CryImageProc - INFO - setImages - 132 - CIP.setImages: T: /staff/bl32xu/BLsoft/TestZoo//Logs//231010/0010_sample/cap4width_024.ppm, B: /staff/bl32xu/BLsoft/TestZoo//BackImages/back.ppm

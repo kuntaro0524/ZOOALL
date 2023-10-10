@@ -51,6 +51,9 @@ class NOU():
         # Data collection time for this pin
         self.time_limit = 60.0  # [min]
 
+        # Centering repetition number
+        self.max_repeat = 5
+
     def setTimeLimit(self, limit_minutes):
         self.time_limit = limit_minutes
 
@@ -156,19 +159,21 @@ class NOU():
         prefix = "helfull_%02d" % dc_index
         vscan_length = 1000.0  # [um]
         # Left centering
+        # max_repeat でセンタリングができなかった場合には例外になる→これは問題ない
         try:
             left_phi = self.face_angle - 90.0  # [deg.]
             left_xyz = self.vertCentering(cond, left_phi, left_face_xyz, vscan_length, option="Left", dc_index=dc_index,
-                                          max_repeat=1)
+                                          max_repeat=self.max_repeat)
         except Exception as e:
             self.logger.info("Left centering failed.")
             self.logger.info(self.commentException(e.args))
             raise MyException.MyException("Left centering failed.")
         # Right centering
+        # max_repeat でセンタリングができなかった場合には例外になる→これは問題ない
         try:
             right_phi = self.face_angle + 90.0  # [deg.]
             right_xyz = self.vertCentering(cond, right_phi, right_face_xyz, vscan_length, option="Right", dc_index=dc_index,
-                                           max_repeat=1)
+                                           max_repeat=self.max_repeat)
         except Exception as e:
             self.logger.info("Right centering failed.")
             self.logger.info(self.commentException(e.args))
@@ -194,7 +199,7 @@ class NOU():
         # Left centering
         try:
             left_xyz = self.vertCentering(cond, osc_start, left_face_xyz, vscan_length, option="Left", dc_index=dc_index,
-                                          max_repeat=1)
+                                          max_repeat=self.max_repeat)
         except Exception as e:
             self.logger.info("Left centering failed.")
             self.logger.info(self.commentException(e.args))
@@ -202,7 +207,7 @@ class NOU():
         # Right centering
         try:
             right_xyz = self.vertCentering(cond, osc_end, right_face_xyz, vscan_length, option="Right", dc_index=dc_index,
-                                           max_repeat=1)
+                                           max_repeat=self.max_repeat)
         except Exception as e:
             self.logger.info("Right centering failed.")
             self.logger.info(self.commentException(e.args))
@@ -247,7 +252,7 @@ class NOU():
         try:
             centering_phi = self.face_angle + 90.0
             center_xyz = self.vertCentering(cond, centering_phi, center_face_xyz, vscan_length, option="center",
-                                            dc_index=dc_index, max_repeat=1)
+                                            dc_index=dc_index, max_repeat=self.max_repeat)
         except Exception as e:
             self.logger.info("Side view centering failed.")
             self.logger.info(self.commentException(e.args))
@@ -276,7 +281,7 @@ class NOU():
         # Left centering
         try:
             center_xyz = self.vertCentering(cond, osc_end, center_face_xyz, vscan_length, option="center",
-                                            dc_index=dc_index, max_repeat=1)
+                                            dc_index=dc_index, max_repeat=self.max_repeat)
         except Exception as e:
             self.logger.info("Side view centering failed.")
             self.logger.info(self.commentException(e.args))
@@ -468,17 +473,19 @@ class NOU():
     # left_xyz = self.vertCentering(cond, osc_start, left_face_xyz, option="Left", cry_index=cry_index, max_repeat=1)
     # Crystal edge: Left/Right vertical scan to define crystal position in 3D
     # option: "Left", "Right", "Center"
-    def vertCentering(self, cond, phi_scan, init_xyz, scan_length, option="Left", dc_index=0, max_repeat=0):
-        index_of_this_scan = 0
+    def vertCentering(self, cond, phi_scan, init_xyz, scan_length, option="Left", dc_index=0, max_repeat=1):
+        nscan = 0
         prefix = "%s_%02d" % (option.lower(), dc_index)
         # No need to do 'searching crystal edge'
         if option.lower() == "center":
-            max_repeat = 0
+            max_repeat = 1
         initial_y = init_xyz[1]
 
         # Final XYZ for the answer
         isFoundGoodPoint = False
-        for scan_index in range(0, max_repeat + 1):
+        for scan_index in range(0, max_repeat):
+            # increment of nscan
+            nscan += 1
             self.logger.info("%s vertical scan started." % option)
             # Vertical scan: This block conducts 'translation' of Y-axis to catch 'edge of crystal'.
             scan_prefix = "%s_%02d" % (prefix, scan_index)
@@ -493,7 +500,6 @@ class NOU():
             except Exception as e:
                 self.logger.info("Exception occurred.")
                 self.commentException(e.args)
-                # raise MyException.MyException("doVscan failed.")
             # Analysis of raster scan
             try:
                 new_xyz = self.anaVscan(scan_vert_path, scan_prefix, phi_scan, method="peak_xyz", isWeakScan=False)
@@ -502,15 +508,13 @@ class NOU():
                 isFoundGoodPoint = True
                 break
             except Exception as e:
-                print("Vertical scan analysis failed.\n")
-                self.logger.info("%s scan analysis failed." % option)
+                self.logger.info("Current %s scan failed: num of scans = %5d" % (option, nscan))
                 self.commentException(e.args)
-                raise Exception("vertCentering: analysis failed.")
 
         if isFoundGoodPoint == True:
             return new_xyz
         else:
-            raise MyException.MyException("%s vertical scan finally failed." % option.lower())
+            raise MyException.MyException("%s vertical scan finally failed after %5d scans." % (option.lower(), nscan))
 
     # Sort the data collection blocks according to wedge sizes.
     def sortDCblocks(self, dc_blocks):
