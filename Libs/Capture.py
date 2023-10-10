@@ -10,7 +10,6 @@ from socket import error as socket_error
 from MyException import *
 from configparser import ConfigParser, ExtendedInterpolation
 
-
 class Capture:
     def __init__(self):
         self.host = '127.0.0.1'
@@ -141,6 +140,7 @@ class Capture:
             self.s.close()
 
     def setBright(self, bright=40000):
+        if self.isPrep == False: self.prep()
         # set brightness
         com_bright = "put/video_brightness/%d" % bright
         recbuf = self.communicate(com_bright)
@@ -156,11 +156,13 @@ class Capture:
         print(recbuf)
 
     def setContrast(self, contrast):
+        if self.isPrep == False: self.prep()
         com1 = "put/video_contrast/%d" % contrast
         recbuf = self.communicate(com1)
         print("setContrast:", recbuf)
 
     def setGain(self, gain):
+        if self.isPrep == False: self.prep()
         com1 = "put/video_color/%d" % gain
         recbuf = self.communicate(com1)
         print("setGain:", recbuf)
@@ -236,8 +238,8 @@ class Capture:
 
 if __name__ == "__main__":
     cap = Capture()
-    cappath = "/staff/bl32xu/BLsoft/TestZoo/BackImages"
+    cappath = "/staff/bl44xu/BLsoft/TestZOO/"
 
     print("START-connect from main")
     filename = os.path.join(cappath, "%s.ppm" % (sys.argv[1]))
-    cap.capture(filename)
+    cap.capture(filename,cross=False)

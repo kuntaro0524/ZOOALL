@@ -9,4 +9,5 @@ if __name__ == "__main__":
     gonio = blf.getGoniometer()
     rot_angle = float(sys.argv[1])
     gonio.rotatePhi(rot_angle)
+    print(gonio.getXYZmm())
     #blf.device.prepCentering(zoom_out=False)

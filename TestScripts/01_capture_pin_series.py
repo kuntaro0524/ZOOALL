@@ -1,35 +1,21 @@
 import sys,os,math,socket
-import datetime
 import numpy as np
-sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
-from MyException import *
-
-from File import *
-import Capture
-import Device
+import BLFactory
+import time
 
 if __name__ == "__main__":
-    ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ms.connect(("172.24.242.41", 10101))
+    blf = BLFactory.BLFactory()
+    blf.initDevice()
 
-    dev = Device.Device(ms)
-    dev.init()
-    dev.prepCentering()
+    fileroot = os.environ['PWD']
 
-    bright=[5000,10000,20000,30000,40000,50000]
-    gain=[500,1000,1500,2000]
+    # brightness pattern
+    # bright_list: 1000, 2000, 3000, 4000
+    bright_list = np.arange(500, 4000, 200)
 
-    cap = Capture.Capture()
-    cap.prep()
-    cappath = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/TestImages/"
-
-    # prefix should be 'back' or 'loop'
-    prefix = "loop"
-
-    for br in bright:
-        for ga in gain:
-            filename="%s/%s_%d-%d.ppm"%(cappath,prefix,br,ga)
-            print("Captureing..",filename)
-            cap.setBright(br)
-            cap.setGain(ga)
-            cap.capture(filename)
+    for brightness in bright_list:
+        blf.device.capture.setBright(brightness)
+        # make a filename with 'brightness'
+        filename = fileroot + '/pin_' + str(brightness) + '.ppm'
+        blf.device.capture.capture(filename)
+        time.sleep(0.5)
