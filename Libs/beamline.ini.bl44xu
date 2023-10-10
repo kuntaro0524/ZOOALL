@@ -30,7 +30,7 @@ contrast_default=18000
 bright_default_dark=5000
 gain_default_dark=5000
 # Beam stopper position during centering
-beamstopper_off=True
+beamstopper_off=False
 # Pre collimator position at BL44XU
 # To lower the background on the coax image. But the values are TEKITOU defined 10th Oct. 2023
 precol_y_off=-20000

@@ -18,8 +18,7 @@ class Gonio44:
     def __init__(self, bss_server_port):
         # This is BSS server port
         self.s = bss_server_port
-        self.debug = True
-        self.isConnect=False
+        self.debug = False
 
         # beamline name is extracted from beamline.ini
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
@@ -29,13 +28,9 @@ class Gonio44:
 
     def communicate(self, comstr):
         sending_command = comstr.encode()
-        if self.isConnect == False:
-            print("!Connection first!")
-            return False
-        else:
-            self.s.sendall(sending_command)
-            recstr = self.s.recv(8000)
-            return repr(recstr)
+        self.s.sendall(sending_command)
+        recstr = self.s.recv(8000)
+        return repr(recstr)
 
     def waitTillFinish(self):
         query_command = "get/measurement/query"
@@ -93,7 +88,6 @@ class Gonio44:
         return value
 
     def getSVOC_C(self,recmes):
-        print("TEST",recmes)
         cols=recmes.split("/")
         return cols[3]
 
@@ -339,7 +333,7 @@ if __name__ == "__main__":
 
     phi=gonio.getPhi()
     print("Current phi=", phi)
-    gonio.rotatePhi(0.0)
+    # gonio.rotatePhi(0.0)
     # print("GOGOGOGOGO")
     # phi=gonio.getPhi()
     # print("Current phi=", phi)
@@ -350,14 +344,14 @@ if __name__ == "__main__":
     xyz=gonio.getXYZmm()
     print(xyz)
 
-    xyz=gonio.moveXYZmm(-0.091,5.679,-0.161)
+    # xyz=gonio.moveXYZmm(-0.091,5.679,-0.161)
 
     # gonio.moveZmm(0.1)
     # xyz=gonio.getXYZmm()
 
     # gonio.moveTrans(0.1)
     # xyz=gonio.getXYZmm()
+    # gonio.moveUpDown(100)
 
-    gonio.moveUpDown(100)
-    xyz=gonio.getXYZmm()
-    print(xyz)
+    # xyz=gonio.getXYZmm()
+    # print(xyz)

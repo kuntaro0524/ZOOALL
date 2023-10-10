@@ -34,6 +34,7 @@ class BLFactory:
         self.device.init()
         # beamline に応じて Gonioインスタンスを生成する
         if self.beamline == "BL44XU":
+            print("BL44XU!")
             # BSS server port を取得
             bss_server_port = self.zoo.getBSSr()
             # gonio44 をインスタンス化

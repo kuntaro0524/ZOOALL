@@ -33,6 +33,7 @@ import MBS
 import DSS
 import BeamsizeConfig
 import Flux
+import PreColli
 from configparser import ConfigParser, ExtendedInterpolation
 
 class Device(Singleton.Singleton):
@@ -47,6 +48,8 @@ class Device(Singleton.Singleton):
         # coax x pulse is read from 'beamline.ini'
         # section: inocc, option: zoom_pintx
         self.coax_pintx_pulse = int(self.config.get("inocc", "zoom_pintx"))
+        # beamline name
+        self.beamline = self.config.get("beamline", "beamline")
     
     def setGonio(self, instance_of_gonio):
         self.gonio = instance_of_gonio
@@ -96,6 +99,9 @@ class Device(Singleton.Singleton):
         # Optics
         self.mbs=MBS.MBS(self.s)
         self.dss=DSS.DSS(self.s)
+        # BL44XU specific
+        if self.beamline.lower() == "bl44xu":
+            self.precolli = PreColli.PreColli(self.s)
 
         print("Device. initialization finished")
         self.isInit=True

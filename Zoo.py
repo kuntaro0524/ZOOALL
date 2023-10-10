@@ -60,6 +60,7 @@ class Zoo:
             print("Connection first!")
             return False
         else:
+            print("OKAY CONNECTIONS")
             return self.bssr
 
     def disconnect(self):
@@ -238,7 +239,6 @@ class Zoo:
             recstr = self.communicate(command)
             svoc_c = self.getSVOC_C(recstr)
             if svoc_c.rfind("ready") != -1:
-                print("isBusy:RECBUF=", recstr)
                 return False
             elif svoc_c.rfind("fail") != -1:
                 raise MyException("Something failed.")
@@ -378,7 +378,6 @@ class Zoo:
 
         while (1):
             recstr = self.communicate(query_command)
-            # print "Received buffer in isBusy: %s"%recstr
             svoc_c = self.getSVOC_C(recstr)
             if svoc_c.rfind("ready") != -1:
                 # print "waitTillFinish:RECBUF=",recstr
