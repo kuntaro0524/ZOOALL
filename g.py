@@ -6,4 +6,6 @@ if __name__ == "__main__":
     blf = BLFactory.BLFactory()
     blf.initDevice()
 
-    blf.device.prepCentering(zoom_out=False)
+    gonio = blf.getGoniometer()
+    gonio.rotatePhi(180.0)
+    #blf.device.prepCentering(zoom_out=False)

@@ -87,9 +87,7 @@ class Device(Singleton.Singleton):
         self.bs=BS.BS(self.s)
         self.cryo=Cryo.Cryo(self.s)
         self.id=ID.ID(self.s)
-        print("KKKK")
         self.light=Light.Light(self.s)
-        print("TTTTT")
         self.colli=Colli.Colli(self.s)
         self.coax_pint=CoaxPint.CoaxPint(self.s)
         self.clen=CCDlen.CCDlen(self.s)
@@ -151,7 +149,10 @@ class Device(Singleton.Singleton):
             # Currently, the value is read from 'beamline.ini'
             # Finally, it should be read from 'bss.config'
             self.coax_pint.move(self.coax_pintx_pulse)
-        self.bs.on()
+        if self.config.getboolean("capture", "beamstopper_off"):
+            self.bs.off()
+        else:
+            self.bs.on()
         self.colli.off()
         self.light.on()
 

@@ -93,7 +93,7 @@ class Gonio44:
         return value
 
     def getSVOC_C(self,recmes):
-        print(recmes)
+        print("TEST",recmes)
         cols=recmes.split("/")
         return cols[3]
 
