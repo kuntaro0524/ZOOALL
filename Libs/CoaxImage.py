@@ -149,10 +149,10 @@ class CoaxImage:
     # get_coax_center()
 
     def get_zoom(self):
-        command = "get/bl_32in_st2_coax_1_zoom/query"
-        recbuf = self.communicate(command)
-        #print("RRRRRRRRRRRRRRRR%s"%recbuf)
+        zoom_pulse = self.dev.zoom.getPosition()
+        return self.coax_pulse2zoom[int(zoom_pulse)]
 
+    """
         sp = recbuf.split("/")
         if len(sp) == 5:
             ret = sp[-2]
@@ -160,6 +160,7 @@ class CoaxImage:
             if r:
                 assert r.group(1) == "inactive"
                 return self.coax_pulse2zoom[int(r.group(2))]
+    """
 
     # get_zoom()
 
@@ -298,6 +299,7 @@ class CoaxImage:
 
     # 2016/04/13 Videoserv unstable
     def get_coax_image(self, imgout):
+        print("####################################")
         print("%s size check" % imgout)
         for i in range(0, 10):
             try:
@@ -319,41 +321,9 @@ class CoaxImage:
 
 
 if __name__ == "__main__":
-    ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # ms.connect(("192.168.163.1", 10101))
-    ms.connect(("172.24.242.41", 10101))
-    coax = CoaxImage(ms)
-    print("pix_size=", coax.get_pixel_size())
-    print(coax.get_cross_pix())
-    # def get_cross_pix(self):
+    import BLFactory
+    blf = BLFactory.BLFactory()
+    blf.initDevice()
+    coi = CoaxImage(blf)
+    coi.get_coax_image("/staff/bl44xu/BLsoft/TestZOO/testing.ppm")
 
-    """
-    coax.set_zoom(-48000)
-    #coax.set_binning(2)
-    filename="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/test001.ppm"
-    coax.get_coax_image(filename, 200)
-
-    cip=CIP.CryImageProc(filename)
-    edge_codes=cip.get_edge_after_bin(filename)
-    grav_x,grav_y,ywmax,xedge,area=cip.getGravWidthArea(edge_codes)
-    print grav_x,grav_y,ywmax,xedge,area
-
-    im = cv2.imread(filename)
-    cv2.circle(im,(grav_x,grav_y),2,(0,0,255),2)
-    cv2.circle(im,(xedge,grav_y),2,(0,0,255),2)
-    center_x=int((grav_x+xedge)/2.0)
-    cv2.circle(im,(center_x,grav_y),2,(0,0,255),2)
-
-    start_x=xedge
-    dist_cenx_edgex=np.fabs(center_x-xedge)
-    end_x=int(xedge+2*dist_cenx_edgex)
-
-    start_y=int(grav_y-int(ywmax/2.0))
-    end_y=int(grav_y+int(ywmax/2.0))
-
-    cv2.rectangle(im,(start_x,start_y),(end_x,end_y),(0,255,0),1)
-
-    cv2.imshow("Show Image",im)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    """

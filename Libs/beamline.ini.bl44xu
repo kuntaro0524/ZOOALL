@@ -6,7 +6,7 @@ bss_port = 5555
 blanc_address = 172.24.242.57
 
 [dirs]
-zooroot = /staff/bl44xu/BLsoft/BLsoft/TestZOO/
+zooroot = /staff/bl44xu/BLsoft/TestZOO/
 logdir = ${dirs:zooroot}/Logs/
 zoologdir= ${dirs:zooroot}/ZooLogs/
 bssconfig_dir=/staff/config/bl44xu/
@@ -17,15 +17,15 @@ bssconfig_file=${dirs:bssconfig_dir}/bss/bss.config
 camera_inf=${dirs:bssconfig_dir}/video/camera.inf
 beamsize_conf_file=${dirs:bssconfig_dir}/bss/beamsize.config
 inocc_image=/staff/config/bl32xu/bss/test.ppm
-logging_conf=/staff/bl32xu/BLsoft/NewZoo/Libs/logging.conf
+logging_conf=${dirs:zooroot}/Libs//logging.conf
 dose_csv=${dirs:zooroot}/Libs/en_dose_lys.csv
 # Just a default background image file.
 backimg = ${dirs:zooroot}/BackImages/back.ppm
 
 [capture]
-bright_default=2500
-gain_default=4000
-contrast_default=18000
+bright_default=3500
+gain_default=10000
+contrast_default=10000
 # Dark mode
 bright_default_dark=5000
 gain_default_dark=5000
@@ -44,7 +44,7 @@ isDark=False
 width=612.0
 height=480.0
 image_size=881295
-pix_size = 3.2578
+pix_size = 4.275
 
 [inocc]
 # 上下左右このピクセル分は削ってから解析をする
@@ -77,7 +77,7 @@ exp_ds=0.02
 # Rasterのときの端分解能
 resol_raster=2.5
 # "" are not required to define 'character variable'
-gonio_direction =FROM_RIGHT
+gonio_direction =FROM_LEFT
 
 [detector]
 # カメラ長最短 [mm]
@@ -109,3 +109,5 @@ col_evacinfo = collimator
 ccdlen = st1_ccd_1_x
 # Light 
 light_z_name = st1_light_1_z
+# Zoom
+zoom_x_axis = st1_video_2_zoom

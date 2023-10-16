@@ -59,9 +59,12 @@ ZooConfig/
 ZooDB/
 ZooLogs/
 test/
+TestScripts/*png
+TestScripts/*ppm
 .git_old/
 .git_180201/
 *.pyc
 *.ppm
+*.png
 ZooConfig/
 LargeHolder/

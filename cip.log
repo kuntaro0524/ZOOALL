@@ -10377,3 +10377,16 @@ Acquired contour dimensions =     2
 Processing /isilon/BL32XU/BLsoft/PPPP/10.Zoo/TestImages//loop_50000-2000.ppm back = /isilon/BL32XU/BLsoft/PPPP/10.Zoo/TestImages//back_50000-2000.ppm 
 Number of found contours. Len =     1
 Acquired contour dimensions =     2
+Processing ./testing.ppm back = /staff/bl44xu/BLsoft/TestZOO/BackImages/back.ppm 
+Number of found contours. Len =     1
+Acquired contour dimensions =     2
+Processing ./tttt.ppm back = /staff/bl44xu/BLsoft/TestZOO/BackImages/back.ppm 
+Number of found contours. Len =     2
+A contour is being chosen from     2 contours
+Acquired contour dimensions =     2
+Processing ./test.ppm back = /staff/bl44xu/BLsoft/TestZOO/BackImages/back.ppm 
+Number of found contours. Len =     1
+Acquired contour dimensions =     2
+Processing ./test.ppm back = /staff/bl44xu/BLsoft/TestZOO/BackImages/back.ppm 
+Number of found contours. Len =     1
+Acquired contour dimensions =     2

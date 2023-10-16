@@ -2,22 +2,33 @@
 import sys
 import socket
 import time
+import BSSconfig
+from configparser import ConfigParser, ExtendedInterpolation
 
 from Motor import *
 
-
 class Zoom:
     def __init__(self, server):
+        self.bssconf = BSSconfig.BSSconfig()
+        self.bl_object = self.bssconf.getBLobject()
+
+        # beamline.ini 
+        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH']) 
+
         self.s = server
         self.axis = "bl_44in_st1_video_2_zoom"
-        self.zoom = Motor(self.s, self.axis, "pulse")
+        zoom_name = self.config.get("axes", "zoom_x_axis")
+        zoom_vme_name = "bl_%s_%s" % (self.bl_object, zoom_name)
+        self.zoom = Motor(self.s, zoom_vme_name, "pulse")
 
         self.qcommand = "get/" + self.axis + "/" + "query"
 
+        # Minimum zoom ratio
+        self.pulse_minzoom = self.bssconf.getPulse4MinZoomRatio()
+
         self.in_lim = "0"  # pulse
-        # self.out_lim="-48000" # pulse
-        # self.out_lim="-45000" # pulse  YK@210302
-        self.out_lim = "-38000"  # pulse  230217 Image was deteriorated by the contamination
+        # self.out_lim = "-38000"  # pulse  230217 Image was deteriorated by the contamination
 
     def go(self, pvalue):
         self.zoom.nageppa(pvalue)
@@ -32,7 +43,7 @@ class Zoom:
         return self.zoom.getPosition()[0]
 
     def zoomOut(self):
-        self.zoom.move(self.out_lim)
+        self.zoom.move(self.pulse_minzoom)
 
     def isMoved(self):
         isZoom = self.zoom.isMoved()
@@ -59,6 +70,8 @@ if __name__ == "__main__":
 
     start = zoom.getPosition()
     print(start)
+
+    zoom.zoomOut()
 
     s.close()
 

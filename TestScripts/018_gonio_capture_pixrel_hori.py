@@ -2,31 +2,40 @@ import cv2,sys, time, os, socket
 import matplotlib.pyplot as plt
 import numpy as np
 import copy, glob
-sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
-import Device
 import CryImageProc
-import Capture
-import DirectoryProc
-import INOCC
-import Gonio
+import BLFactory
+from configparser import ConfigParser, ExtendedInterpolation
+import logging
 
 if __name__=="__main__":
-    ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ms.connect(("172.24.242.41", 10101))
+    blf = BLFactory.BLFactory()
+    blf.initDevice()
 
-    root_dir = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/TestImages2/"
-    bfile = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/back_201002.ppm"
+    # read configure file(beamline.init)
+    config = ConfigParser(interpolation=ExtendedInterpolation())
+    ini_file = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    config.read(ini_file)
+    zooroot = config.get('dirs', 'zooroot')
+
+    logname = "./inocc.log"
+    logging_conf = config.get('files', 'logging_conf')
+    logging.config.fileConfig(logging_conf, defaults={'logfile_name': logname})
+    logger = logging.getLogger('ZOO')
+    os.chmod(logname, 0o666)
+
+    test_dir = os.path.join(zooroot, "TestScripts")
+    bfile = config.get('files', 'backimg')
 
     loop_size = 600.0
     option = "gravity"
 
     outfile = open("gonio.dat", "w")
 
-    dev = Device.Device(ms)
+    dev = blf.device
     dev.init()
 
     s=0
-    gonio = Gonio.Gonio(ms)
+    gonio = blf.getGoniometer()
     x,y,z = gonio.getXYZmm()
     print(("current_xyz=",x,y,z))
 
@@ -43,16 +52,16 @@ if __name__=="__main__":
         gonio.moveXYZmm(x, y_mod, z)
 
         time.sleep(1.0)
-        filename = "%s/cap_%f.ppm"%(root_dir, d_hori_mm)
-        logdir = "%s/%04d/" % (root_dir, i)
+        filename = "%s/cap_%f.ppm"%(test_dir, d_hori_mm)
+        logdir = "%s/%04d/" % (test_dir, i)
 
         dev.capture.capture(filename)
-        cip = CryImageProc.CryImageProc(logdir = root_dir)
+        cip = CryImageProc.CryImageProc(logdir = test_dir)
         cip.setImages(filename, bfile)
         cont = cip.getContour()
         xtarget, ytarget, area, hamidashi_flag = cip.getCenterInfo(loop_size = loop_size, option = "top")
         outimg = "top_%f.png" % d_hori_mm
-        outimg_abs = os.path.join(root_dir, outimg)
+        outimg_abs = os.path.join(test_dir, outimg)
         cip.drawTopOnTarget((xtarget, ytarget), outimg_abs)
 
         outfile.write("%s %6.3f TARGET X,Y = %5.1f %5.1f\n" % (filename, d_hori_um, xtarget, ytarget))

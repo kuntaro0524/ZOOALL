@@ -279,3 +279,39 @@ correlation matrix of the fit parameters:
                 a      b      
 a               1.000 
 b              -0.847  1.000 
+
+
+*******************************************************************************
+Mon Oct 16 15:42:08 2023
+
+
+FIT:    data read from "gonio.dat" u 2:6
+        format = x:z
+        #datapoints = 20
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) = a*x+b
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b            
+   0 1.7190800000e+05   0.00e+00  1.57e+02    1.000000e+00   1.000000e+00
+   6 1.9338345865e+00  -1.60e-05  1.57e-04    2.339098e-01   1.184571e+02
+
+After 6 iterations the fit converged.
+final sum of squares of residuals : 1.93383
+rel. change during last iteration : -1.59582e-10
+
+degrees of freedom    (FIT_NDF)                        : 18
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.327773
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.107435
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 0.23391          +/- 0.0006355    (0.2717%)
+b               = 118.457          +/- 0.1413       (0.1192%)
+
+correlation matrix of the fit parameters:
+                a      b      
+a               1.000 
+b              -0.855  1.000 

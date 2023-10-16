@@ -173,7 +173,7 @@ class Gonio44:
         z=self.getZmm()
         return x,y,z
 
-    def getXYZphi(self):
+    def getXYZPhi(self):
         x=self.getXmm()
         y=self.getYmm()
         z=self.getZmm()
@@ -187,7 +187,7 @@ class Gonio44:
 
         return True
 
-    def moveXYZphi(self,movex,movey,movez,phi):
+    def moveXYZPhi(self,movex,movey,movez,phi):
         self.moveXmm(movex)
         self.moveYmm(movey)
         self.moveZmm(movez)

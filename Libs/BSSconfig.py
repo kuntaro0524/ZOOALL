@@ -14,10 +14,12 @@ class BSSconfig:
         # beamline.ini から bssconfig_file のパスを読む
         # section: files, option: bssconfig_file
         self.inifile_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        print(self.inifile_path)
-        self.confile = ConfigParser(interpolation=ExtendedInterpolation())
-        self.confile.read(self.inifile_path)
-        self.confile = self.confile.get("files", "bssconfig_file")
+        self.blini = ConfigParser(interpolation=ExtendedInterpolation())
+        self.blini.read(self.inifile_path)
+        self.confile = self.blini.get("files", "bssconfig_file")
+
+        # camera.inf
+        self.camerainf_path = self.blini.get("files", "camera_inf")
 
         self.isRead = False
         self.isPrep = False
@@ -37,6 +39,24 @@ class BSSconfig:
             return False
         else:
             return float(number).is_integer()
+
+    def getPulse4MinZoomRatio(self):
+        self.zoom_info = self.readZoomOption()
+
+        # zoom_info は [(zoom1, pulse1), (zoom2, pulse2), ...] という形式
+        # zoom? は float, pulse? は int
+        # This function finds the minimum zoom ratio and return the pulse value
+        # for the minimum zoom ratio
+        min_zoom = 9999999.999999
+        return_pulse = 9999999
+        for zoom, pulse in self.zoom_info:
+            if zoom < min_zoom:
+                min_zoom = zoom
+                return_pulse = pulse
+
+        print("Minimum zoom ratio is %s" % min_zoom)
+        
+        return return_pulse
 
     def readZoomOption(self):
         if self.isRead == False: self.storeLines();
@@ -376,8 +396,8 @@ class BSSconfig:
         return float(strvalue)
 
     def getCmount(self):
-        self.mx = self.getValue("Cmount_Gonio_X:")
-        self.mz = self.getValue("Cmount_Gonio_Z:")
+        self.mx = self.getValue("Cmount_Gonio_X_Magnet")
+        self.mz = self.getValue("Cmount_Gonio_Z_Magnet")
         self.my = self.getValue("Cmount_Gonio_Y_Magnet")
         return self.mx, self.my, self.mz
 
@@ -448,10 +468,12 @@ class BSSconfig:
 if __name__ == "__main__":
     bssconf = BSSconfig()
     #bssconf.getThinnestAtt()
-    axis_name="st1_col_1_z"
-    print(bssconf.getPulseInfo(axis_name))
-    e,a,b=bssconf.getEvacuateInfo("collimator")
-    print(e,a,b)
+    # axis_name="st1_col_1_z"
+    # print(bssconf.getPulseInfo(axis_name))
+    # e,a,b=bssconf.getEvacuateInfo("collimator")
+    # print(e,a,b)
+
+    print(bssconf.getPulse4MinZoomRatio())
 
     """
     # collimator evacuation parameters

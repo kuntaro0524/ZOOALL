@@ -928,17 +928,10 @@ if __name__=="__main__":
     #testimage = "Data/test03.ppm" # upper hamideteru
     testimage = sys.argv[1]
     #testimage = "../test.ppm"
-    cip.setImages(testimage,"/isilon/users/target/target/PPPP/10.Zoo/BackImages/back-2004082221.ppm")
+    cip.setImages(testimage,"/staff/bl44xu/BLsoft/TestZOO/BackImages/back.ppm")
 
-    prefix = "ono_ke"
     cont = cip.getContour()
-    #cip.printROI(roi_xy)
-
-    #roi_len_pix = cip.setRegionFromTop(300.0)
-
     top_xy = cip.find_top_x(cont)
-    #xmax = xtop + roi_len_pix
-    #print "XTOP = ",xtop
     roi_len_um = 200.0
     roi_xy = cip.selectHoriROI(cont, top_xy, roi_len_um)
 

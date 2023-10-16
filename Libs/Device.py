@@ -152,9 +152,10 @@ class Device(Singleton.Singleton):
     def prepCentering(self,zoom_out=False):
         if zoom_out==True:
             self.zoom.zoomOut()
-            # Currently, the value is read from 'beamline.ini'
-            # Finally, it should be read from 'bss.config'
-            self.coax_pint.move(self.coax_pintx_pulse)
+            if self.beamline == "BL32XU":
+                # Currently, the value is read from 'beamline.ini'
+                # Finally, it should be read from 'bss.config'
+                self.coax_pint.move(self.coax_pintx_pulse)
         if self.config.getboolean("capture", "beamstopper_off"):
             self.bs.off()
         else:

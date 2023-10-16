@@ -6,7 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from MyException import *
 import CryImageProc
-import CoaxImage
+import Libs.CoaxImage as CoaxImage
 import BSSconfig
 import DirectoryProc
 import FittingForFacing
@@ -328,6 +328,7 @@ class INOCC:
         self.logger.info("INOCC.coreCentering captures %s\n" % self.fname)
         self.gonio.rotatePhi(phi)
         cx, cy, cz, phi = self.gonio.getXYZPhi()
+        print("Capturing....")
         self.coi.get_coax_image(self.fname)
         # This instance is for this centering process only
         cip = CryImageProc.CryImageProc(logdir=self.loop_dir)
@@ -651,13 +652,16 @@ if __name__ == "__main__":
     ini_file = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
     config.read(ini_file)
     zooroot = config.get('dirs', 'zooroot')
+    print(zooroot)
 
     logname = "./inocc.log"
-    logging.config.fileConfig('%s/Libs/logging.conf' % (zooroot), defaults={'logfile_name': logname})
+    logging_conf = config.get('files', 'logging_conf')
+    print(logging_conf)
+    logging.config.fileConfig(logging_conf, defaults={'logfile_name': logname})
     logger = logging.getLogger('ZOO')
     os.chmod(logname, 0o666)
 
-    test_dir = "/staff/bl32xu/BLsoft/TestZoo/"
+    test_dir = "/staff/bl44xu/BLsoft/TestZoo/TMP/"
 
     inocc = INOCC(blf, test_dir)
     phi_face = 90
