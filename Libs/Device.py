@@ -45,6 +45,8 @@ class Device(Singleton.Singleton):
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
         self.config.read(config_path)
+        # PIN diode channel
+        self.pin_channel = self.config.getint("experiment", "pin_channel")
         # coax x pulse is read from 'beamline.ini'
         # section: inocc, option: zoom_pintx
         self.coax_pintx_pulse = int(self.config.get("inocc", "zoom_pintx"))
@@ -128,7 +130,7 @@ class Device(Singleton.Singleton):
         # Prep scan
         self.prepScan()
         # Measurement
-        ipin,iic=self.countPin(pin_ch=3)
+        ipin,iic=self.countPin(pin_ch=self.pin_channel)
         pin_uA=ipin/100.0
         iic_nA=iic/100.0
         # Photon flux estimation
@@ -328,6 +330,8 @@ if __name__=="__main__":
     dev=Device(s)
     dev.init()
 
-    dev.bs.on()
+    # dev.bs.on()
+    dev.measureFlux()
+
 
     # dev.prepCentering()

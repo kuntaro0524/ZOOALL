@@ -8,6 +8,8 @@ import timeit
 from Received import *
 from File import *
 from AnalyzePeak import *
+import BSSconfig
+from configparser import ConfigParser, ExtendedInterpolation    
 
 class Count:
     def __init__(self,server,ch1,ch2):
@@ -16,6 +18,17 @@ class Count:
         self.ch2=ch2+1
         self.is_count=0
 
+        # configure file "beamline.ini"
+        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        axisname = self.config.get("axes", "counter_pin")
+
+        self.bssconf = BSSconfig.BSSconfig()
+        self.bl_object = self.bssconf.getBLobject()
+
+        # axis name of 'counter' on VME
+        self.ax_name = f"bl_{self.bl_object}_{axisname}"
+
     # String/Bytes communication via a socket
     def communicate(self, comstr):
         sending_command = comstr.encode()
@@ -23,38 +36,11 @@ class Count:
         recstr = self.s.recv(8000)
         return repr(recstr)
 
-    def testing(self,cnttime):
-        strtime=str(cnttime)+"sec"
-        #print strtime
-        com0="put/bl_32in_st2_counter_1/init"
-        com1="put/bl_32in_st2_counter_1/clear"
-        com2="put/bl_32in_st2_counter_1/30sec"
-        com3="get/bl_32in_st2_counter_1/query"
-
-        # counter set
-        recbuf=self.communicate(com0)
-
-        # counter clear
-        recbuf=self.communicate(com1)
-
-        # set integration time 
-        recbuf=self.communicate(com2)
-
-        while(1):
-            recbuf = self.communicate(com3)
-            cnt_buf=Received(recbuf).get(3)
-            info_list=cnt_buf.split('_')
-            value=int(info_list[2].replace("count",""))
-            print(value)
-            time.sleep(0.05) # wait
-
-        return True
-
     def setCountSec(self,cnttime):
         strtime=str(cnttime)+"sec"
         #print strtime
-        com1="put/bl_32in_st2_counter_1/clear"
-        com2="put/bl_32in_st2_counter_1/"+strtime
+        com1="put/%s/clear" % self.ax_name
+        com2="put/%s/"+strtime
 
         # counter clear
         recbuf=self.s.communicate(com1)
@@ -66,8 +52,8 @@ class Count:
     def setCountMsec(self,cnttime):
         strtime=str(cnttime)+"msec"
         #print strtime
-        com1="put/bl_32in_st2_counter_1/clear"
-        com2="put/bl_32in_st2_counter_1/"+strtime
+        com1="put/%s/clear" % self.ax_name
+        com2="put/%s/"+strtime
 
         # counter clear
         recbuf=self.communicate(com1)
@@ -80,7 +66,7 @@ class Count:
         return True
 
     def getStoredCount(self,time_msec):
-        com3="get/bl_32in_st2_counter_1/query"
+        com3="get/%s/query" % self.ax_name
         time.sleep(time_msec) # wait
         recbuf=self.communicate(com3)
 
@@ -94,9 +80,9 @@ class Count:
     def __storeCountMsec(self,cnttime):
         strtime=str(cnttime)+"msec"
         #print strtime
-        com1="put/bl_32in_st2_counter_1/clear"
-        com2="put/bl_32in_st2_counter_1/"+strtime
-        com3="get/bl_32in_st2_counter_1/query"
+        com1="put/%s/clear" % self.ax_name
+        com2="put/%s/" % self.ax_name+strtime
+        com3="get/%s/query" % self.ax_name
 
         # counter clear
         recbuf=self.communicate(com1)
@@ -115,17 +101,23 @@ class Count:
 
     def __storeCount(self,cnttime):
         strtime=str(cnttime)+"sec"
-        com1="put/bl_32in_st2_counter_1/clear"
-        com2="put/bl_32in_st2_counter_1/"+strtime
-        com3="get/bl_32in_st2_counter_1/query"
+        com1="put/%s/clear" % self.ax_name
+        com2="put/%s/" % self.ax_name +strtime
+        com3="get/%s/query" % self.ax_name
 
         # counter clear
+        # print(com1)
         recbuf=self.communicate(com1)
+        # print(recbuf)
 
         # get counter value
+        # print(com2)
         recbuf=self.communicate(com2)
+        # print(recbuf)
         time.sleep(cnttime) # wait
+        # print(com3)
         recbuf=self.communicate(com3)
+        # print(recbuf)
 
         # obtain the 3rd column in the returned buffer
         cnt_buf=Received(recbuf).get(3)
@@ -134,7 +126,6 @@ class Count:
 
     def getCount(self,time):
         retinfo=self.__storeCount(time)
-        #print retinfo
         info_list=retinfo.split('_')
 
         ch1_value=int(info_list[self.ch1].replace("count",""))
@@ -245,23 +236,12 @@ class Count:
         #flux=(3.6/energy)*(1/(1-exp(absorption)*2.33*0.03)*(currennt/1.602E-19)
 
 if __name__=="__main__":
-        host = '172.24.242.41'
+        host = '172.24.242.57'
         port = 10101
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((host,port))
         
-        counter=Count(s,0,3)
+        # BL44XU: counter0 = IC
+        # BL44XU: counter2 = Pinphoto diode
+        counter=Count(s,0,2)
         print(counter.getCount(1.0))
-
-        f=File("./")
-
-        ofile=open("intensity.dat","w")
-        while(1):
-                ti=datetime.datetime.now()
-                ch1,ch2=counter.getCount(1.0)
-                ofile.write("%10s%10d%10d\n"%(ti,ch1, ch2))
-                ofile.flush()
-                #print "%s %12d" %(ti,ch2)
-                time.sleep(1.0)
-
-        s.close()

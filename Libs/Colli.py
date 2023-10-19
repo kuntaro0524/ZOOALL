@@ -496,8 +496,8 @@ if __name__ == "__main__":
     coli.getEvacuate()
     # print((coli.getZ()))
     # print((coli.getEvacZ()))
-    coli.off()
-    # coli.on()
+    # coli.off()
+    coli.on()
     # coli.scan("colllli",0)
 
     # coli.on()

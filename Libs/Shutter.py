@@ -1,20 +1,44 @@
 #!/bin/env python 
-import sys
+import sys,os
 import socket
 import time
 import datetime
 
+from configparser import ConfigParser, ExtendedInterpolation
+import BSSconfig
 
 # from Count import *
-
 # My library
 
 class Shutter:
     def __init__(self, server):
         self.s = server
-        self.openmsg = "put/bl_32in_st2_shutter_1/on"
-        self.clsmsg = "put/bl_32in_st2_shutter_1/off"
-        self.qmsg = "get/bl_32in_st2_shutter_1/status"
+
+        # configure file "beamline.ini"
+        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        # axis name of shutter on VME
+        axisname = self.config.get("axes", "shutter")
+
+        self.bssconf = BSSconfig.BSSconfig()
+        self.bl_object = self.bssconf.getBLobject()
+
+        # axis name of 'counter' on VME
+        self.ax_name = f"bl_{self.bl_object}_{axisname}"
+        self.beamline = self.config.get("beamline", "beamline")
+
+        # The 1st shutter for every beamline
+        shutter1_axname = "%s_1" % self.ax_name
+        self.openmsg1 = "put/%s/on" % shutter1_axname
+        self.clsmsg1 = "put/%s/off" % shutter1_axname
+        self.qmsg1 = "get/%s/status" % shutter1_axname
+
+        # The 2nd shutter at BL44XU
+        if self.beamline =="BL44XU":
+            shutter2_axname = "%s_2" % self.ax_name
+            self.openmsg2 = "put/%s/on" % shutter2_axname
+            self.clsmsg2 = "put/%s/off" % shutter2_axname
+            self.qmsg2 = "get/%s/status" % shutter2_axname
 
     # String/Bytes communication via a socket
     def communicate(self, comstr):
@@ -24,11 +48,16 @@ class Shutter:
         return repr(recstr)
 
     def open(self):
-        recbuf=self.communicate(self.openmsg)
+        recbuf1=self.communicate(self.openmsg1)
+        # print(recbuf1)
+        if self.beamline == "BL44XU":
+            recbuf2=self.communicate(self.openmsg2)
+            # print(recbuf2)
 
     def close(self):
-        # self.s.sendall(self.clsmsg)
-        recbuf=self.communicate(self.clsmsg)
+        recbuf1=self.communicate(self.clsmsg1)
+        if self.beamline == "BL44XU":
+            recbuf2=self.communicate(self.clsmsg2)
 
     # self.query()
     def query(self):
@@ -47,7 +76,7 @@ class Shutter:
 
 if __name__ == "__main__":
     # host = '192.168.163.1'
-    host = '172.24.242.41'
+    host = '172.24.242.57'
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
@@ -56,10 +85,12 @@ if __name__ == "__main__":
 
     shutter = Shutter(s)
     # print shutter.isOpen()
-    # shutter.open()
+    shutter.close()
+    shutter.open()
+    time.sleep(5.0)
+    shutter.close()
     # print shutter.isOpen()
     # time.sleep(10.0)
     # shutter.open()
-    shutter.close()
-    # time.sleep(10.0)
+    # shutter.close()
     s.close()

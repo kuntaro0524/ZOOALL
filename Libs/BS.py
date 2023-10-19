@@ -139,8 +139,8 @@ if __name__ == "__main__":
     bs = BS(s)
     bs.getEvacuate()
 
-    print(bs.getZ())
-    bs.on()
+    # print(bs.getZ())
+    # bs.on()
     bs.off()
 
     s.close()

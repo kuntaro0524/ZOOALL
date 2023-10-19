@@ -78,6 +78,8 @@ exp_ds=0.02
 resol_raster=2.5
 # "" are not required to define 'character variable'
 gonio_direction =FROM_LEFT
+# Pin photo diode channel
+pin_channel = 2
 
 [detector]
 # カメラ長最短 [mm]
@@ -111,3 +113,7 @@ ccdlen = st1_ccd_1_x
 light_z_name = st1_light_1_z
 # Zoom
 zoom_x_axis = st1_video_2_zoom
+# counter
+counter_pin = st1_counter_1
+# Shutter
+shutter = st1_shutter
