@@ -67,7 +67,7 @@ class CCDlen:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.41'
+    host = '172.24.242.57'
     port = 10101
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -75,8 +75,8 @@ if __name__ == "__main__":
 
     clen = CCDlen(s)
     print(clen.getLen())
-    clen.moveCL(400.0)
-    clen.moveCL(300.0)
+    # clen.moveCL(400.0)
+    clen.moveCL(350.0)
     # clen.evac()
 
     s.close()

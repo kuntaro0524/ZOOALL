@@ -12,18 +12,22 @@ from ConfigFile import *
 from TCS import *
 from MyException import *
 
+import BSSconfig
+from configparser import ConfigParser, ExtendedInterpolation
 
 class Mono:
-
     def __init__(self, srv):
-        self.m_dtheta1 = Motor(srv, "bl_32in_tc1_stmono_1_dtheta1", "pulse")
-        self.m_theta = Motor(srv, "bl_32in_tc1_stmono_1", "pulse")
-        self.m_thetay1 = Motor(srv, "bl_32in_tc1_stmono_1_thetay1", "pulse")
-        self.m_zt = Motor(srv, "bl_32in_tc1_stmono_1_zt", "pulse")
-        self.m_z2 = Motor(srv, "bl_32in_tc1_stmono_1_z2", "pulse")
+        self.bssconf = BSSconfig.BSSconfig()
+        self.bl_object = self.bssconf.getBLobject()
 
-        self.m_energy = Motor(srv, "bl_32in_tc1_stmono_1", "kev")
-        self.m_wave = Motor(srv, "bl_32in_tc1_stmono_1", "angstrom")
+        self.m_dtheta1 = Motor(srv, "bl_%s_tc1_stmono_1_dtheta1" % self.bl_object, "pulse")
+        self.m_theta = Motor(srv, "bl_%s_tc1_stmono_1" % self.bl_object, "pulse")
+        self.m_thetay1 = Motor(srv, "bl_%s_tc1_stmono_1_thetay1" % self.bl_object, "pulse")
+        self.m_zt = Motor(srv, "bl_%s_tc1_stmono_1_zt" % self.bl_object, "pulse")
+        self.m_z2 = Motor(srv, "bl_%s_tc1_stmono_1_z2" % self.bl_object, "pulse")
+
+        self.m_energy = Motor(srv, "bl_%s_tc1_stmono_1" % self.bl_object, "kev")
+        self.m_wave = Motor(srv, "bl_%s_tc1_stmono_1" % self.bl_object, "angstrom")
         self.s = srv
 
     def getE(self):
@@ -366,11 +370,12 @@ class Mono:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.41'
+    host = '172.24.242.57'
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
     mono = Mono(s)
-    mono.moveZ2(1627)
+    print(mono.getE())
+    # mono.moveZ2(1627)
     s.close()

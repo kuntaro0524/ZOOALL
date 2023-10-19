@@ -203,26 +203,30 @@ class Device(Singleton.Singleton):
         # Prep scan
         self.clen.evac()
         ## Cover on
-        self.covz.on()
-        time.sleep(2.0)
+        if self.beamline=="BL32XU":
+            self.covz.on()
+            time.sleep(2.0)
         ## Cover check
-        self.covz.isCover()
+        if self.beamline=="BL32XU":
+            self.covz.isCover()
         self.light.off()
         self.shutter.open()
-        self.slit1.openV()
+        if self.beamline == "BL32XU":
+            self.slit1.openV()
         ## Attenuator
-        self.att.setAttThick(0)
+        self.att.setNoAtt()
         # collimator on
         self.colli.on()
         # Beamstopper on
         self.bs.off()
 
     def finishScan(self,cover_off=True):
-        self.slit1.closeV()
+        if self.beamline=="BL32XU":
+            self.slit1.closeV()
         self.shutter.close()
         # collimator on
         self.colli.off()
-        if cover_off==True:
+        if self.beamline=="BL32XU" and cover_off==True:
             ## Cover off
             self.covz.off()
 

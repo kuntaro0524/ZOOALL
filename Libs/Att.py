@@ -6,15 +6,27 @@ from numpy import *
 
 # My library
 from Motor import *
-
+import BSSconfig
 
 class Att:
     def __init__(self, server):
+        # BSS config file
+        self.bssconfig = BSSconfig.BSSconfig()
+        self.blo = self.bssconfig.getBLobject()
+        # beamline.ini file
+        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+
+        # axis definition is read from 'beamline.ini' file
+        # section: axes, option: ccdlen
+        self.att_ax_name = self.config.get('axes', 'att')
+
+        # Attenuator 0 um thickness: pulse
+        self.pulse_for_noatt = self.config.getint('experiment', 'pulse_for_noatt')
+
         self.s = server
-        self.att = Motor(self.s, "bl_32in_st2_att_1_rx", "pulse")
-        self.bssconfig = "/blconfig/bss/bss.config"
+        self.att = Motor(self.s, "bl_%s_%s" % (self.blo,self.att_ax_name), "pulse")
         self.isInit = False
-        self.pulse_noatt = 3500
         self.isDebug = False
 
     # 140611 read configure file from BSS.CONFIG
@@ -31,7 +43,7 @@ class Att:
         # For no attenuator
         self.att_idx.append(0)
         self.att_thick.append(0.0)
-        self.att_pulse.append(self.pulse_noatt)
+        self.att_pulse.append(self.pulse_for_noatt)
 
         for line in lines:
             if line.find("Attenuator_Menu_Label") != -1:
@@ -79,6 +91,9 @@ class Att:
                 return True
         print("No attenuator in the list")
         return False
+
+    def setNoAtt(self):
+        self.move(self.pulse_for_noatt)
 
     def getAttList(self):
         if self.isInit == False:
@@ -147,6 +162,9 @@ class Att:
         self.setAtt(best_att)
         return best_att
 
+    def getPosition(self):
+        return int(self.att.getPosition()[0])
+
     def move(self, pls_bss):
         self.att.move(-pls_bss)
 
@@ -201,13 +219,13 @@ class Att:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.41'
+    host = '172.24.242.57'
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
     att = Att(s)
-    att.init()
+    # att.init()
     # att.setAttThick(0)
     # att.move(3500)
     # print att.setAttTrans(1.0,0.5)
@@ -222,8 +240,12 @@ if __name__ == "__main__":
     # att.att1000um()
     # att.att0um()
     # att.att200um()
-    att.setAttThick(1000)
+    # att.setAttThick(1000)
     # att.readBSSconfig()
     # print att.getAttIndexConfig(5000)
+
+    print(att.getPosition())
+    att.setNoAtt()
+    print(att.getPosition())
 
     s.close()

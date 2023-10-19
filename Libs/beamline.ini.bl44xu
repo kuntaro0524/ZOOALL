@@ -80,6 +80,8 @@ resol_raster=2.5
 gonio_direction =FROM_LEFT
 # Pin photo diode channel
 pin_channel = 2
+# 0 Attenuator pulse : attenuator
+pulse_for_noatt = 0
 
 [detector]
 # カメラ長最短 [mm]
@@ -117,3 +119,5 @@ zoom_x_axis = st1_video_2_zoom
 counter_pin = st1_counter_1
 # Shutter
 shutter = st1_shutter
+# Attenuator
+att = st1_att_1_rx
