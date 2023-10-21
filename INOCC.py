@@ -661,7 +661,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('ZOO')
     os.chmod(logname, 0o666)
 
-    test_dir = "/staff/bl44xu/BLsoft/TestZoo/TMP/"
+    test_dir = os.environ['ZOOROOT']
 
     inocc = INOCC(blf, test_dir)
     phi_face = 90

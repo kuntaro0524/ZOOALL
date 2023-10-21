@@ -31,6 +31,8 @@ contrast_default=18000
 # Dark mode
 bright_default_dark=5000
 gain_default_dark=5000
+# Beam stopper position during centering
+beamstopper_off=False
 
 [special_setting]
 # True: Dark mode, False: Normal mode
@@ -76,6 +78,10 @@ exp_ds=0.02
 resol_raster=2.5
 # "" are not required to define 'character variable'
 gonio_direction =FROM_RIGHT
+# Pin photo diode channel
+pin_channel = 3
+# 0 Attenuator pulse : attenuator
+pulse_for_noatt = 3500
 
 [detector]
 # カメラ長最短 [mm]
@@ -106,3 +112,9 @@ col_evacinfo = collimator
 ccdlen = st2_detector_1_x
 # Light
 light_z_name = st2_light_1_z
+# Attenuator
+att = st2_att_1_rx
+# shutter : no need "_1" at the end of the name
+shutter = st2_shutter
+# Zoom
+zoom_x_axis = st2_coax_1_zoom

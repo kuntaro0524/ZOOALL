@@ -5,4 +5,4 @@ import BLFactory
 if __name__ == "__main__":
     blf = BLFactory.BLFactory()
     blf.initDevice()
-    blf.device.prepCentering(zoom_out=True)
+    blf.device.prepCentering(zoom_out=False)
