@@ -112,9 +112,6 @@ fi
 
 # 171114 changed
 echo "\n\n" | /usr/local/bss/bss --server --console  --admin
-#echo "\n\n" | /usr/local/bss/bss --server --console
-
-
 # After BSS shutdown
 sleep 1
 ##ssh 192.168.163.6 "killall $VIDEOSRV"    # for ARTRAY

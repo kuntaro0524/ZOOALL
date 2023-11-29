@@ -421,6 +421,7 @@ class LoopMeasurement:
                 rss.setTrans(transmission)
 
         # case for the beamline with discrete attenuator thickness
+        # only for BL44XU (2023/11/29 K.Hirata memo.)
         else:
             att_fact = AttFactor.AttFactor()
             trans = transmission / 100.0  # convertion to 'ratio'

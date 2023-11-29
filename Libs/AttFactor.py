@@ -18,7 +18,6 @@ class AttFactor:
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         self.config.read(conf_file_path)
         self.bssconfig_path = self.config.get("files", "bssconfig_file")
-        # self.bssconfig="./bss.config"
 
     def cnFactor(self, wl):
         cnfac = 0.028 * math.pow(wl, 5) - 0.188 * math.pow(wl, 4) + 0.493 * math.pow(wl, 3) - 0.633 * math.pow(wl, 2) + 0.416 * math.pow( wl, 1) + 0.268
@@ -201,29 +200,31 @@ class AttFactor:
         lines = confile.readlines()
         confile.close()
 
+        self.att_material=[]
         self.att_idx = []
         self.att_thick = []
 
         for line in lines:
-            print(line)
-            if line.find("Attenuator_Menu_Label") != -1:
+            if line.find("Attenuator_Menu_Label") != -1 and line.find("#") == -1:
+                print(line)
                 line = line.replace("[", "").replace("]", "").replace("{", "").replace("}", "")
                 cols = line.split()
                 ncols = len(cols)
                 if ncols == 4:
-                    if cols[2].find("um") != -1:
-                        tmp_thick = float(cols[2].replace("um", ""))
+                    # Attenuator material type
+                    material = cols[1]
+                    if cols[2].find("mm") != -1:
+                        # Unit [um]
+                        tmp_thick = float(cols[2].replace("mm", "")) * 1000.0
                         tmp_attidx = int(cols[3])
                         # storage
+                        self.att_material.append(material)
                         self.att_idx.append(tmp_attidx)
                         self.att_thick.append(tmp_thick)
 
+        self.att_material = array(self.att_material)
         self.att_idx = array(self.att_idx)
         self.att_thick = array(self.att_thick)
-
-        # DEBUG
-        # for i,thick in zip(self.att_idx,self.att_thick):
-        # print i,thick
 
         # flag on
         self.isInit = True
@@ -278,8 +279,12 @@ class AttFactor:
 
 if __name__ == "__main__":
     att = AttFactor()
-    exptime = 0.05
-    transmission = 1.5
-    transmission,newExptime = att.checkThinnestAtt(1.0, exptime, transmission)
-    print(("New exposure time=", newExptime))
-    print(("New transmission time=", transmission))
+    att.readAttConfig()
+
+    thick=att.getBestAtt(1.0, 0.015)
+    print(thick)
+    # exptime = 0.05
+    # transmission = 1.5
+    # transmission,newExptime = att.checkThinnestAtt(1.0, exptime, transmission)
+    # print(("New exposure time=", newExptime))
+    # print(("New transmission time=", transmission))

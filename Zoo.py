@@ -493,17 +493,20 @@ if __name__ == "__main__":
 
     zoo = Zoo()
     zoo.connect()
-    print(zoo.getSampleInformation())
+    #print(zoo.getSampleInformation())
+    #zoo.getBeamsizeQuery()
+    # print(zoo.getBeamsize())
     # print zoo.getWavelength()
     # print zoo.getBeamsize()
-
-    print(zoo.getCurrentPin())
+    # print(zoo.getCurrentPin())
+    # print(zoo.getBeamsize())
+    # zoo.setBeamsize(1)
 
     # while(1):
-    zoo.skipSample()
+    # zoo.skipSample()
     # zoo.dismountCurrPin()
     # zoo.sampleQuery()
-    # zoo.stop()
+    #zoo.stop()
     # time.sleep(10.0)
     # zoo.disconnectServers()
     # time.sleep(5.0)
@@ -525,7 +528,7 @@ if __name__ == "__main__":
 
     # time.sleep(60)
     # zoo.dismountCurrentPin()
-    zoo.waitTillReady()
+    # zoo.waitTillReady()
     # try:
     # zoo.mountSample("CPS0294",1)
     # zoo.waitTillReady()
@@ -548,12 +551,12 @@ if __name__ == "__main__":
     # schfile_hirata="/isilon/users/target/target/Staff/ZooTest/Schedule/test.sch"
     # schfile_yaruzo="/isilon/users/target/target/Staff/ZooTest/Schedule/yaruzo.sch"
     # time.sleep(10.0)
-    # zoo.doRaster(sys.argv[1])
+    zoo.doRaster(sys.argv[1])
     # zoo.doRaster(sys.argv[1])
     # zoo.doRaster("/isilon/users/target/target/AutoUsers/160509/Xiangyu/Xi-KLaT005-01/scan/Xi-KLaT005-01.sch")
     # zoo.doDataCollection(sys.argv[1])
     # zoo.doDataCollection("/isilon/users/target/target/Staff/kuntaro/160715/Auto/KUN10-CPS1013-07/data/cry01.sch")
     # zoo.doDataCollection(schfile)
     # zoo.doDataCollection("/isilon/users/target/target/AutoUsers/kuntaro/161218/RR-test//mbeam09-CPS1716-02/data//multi.sch")
-    # zoo.waitTillReady()
+    zoo.waitTillReady()
     zoo.disconnect()

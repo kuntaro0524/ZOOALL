@@ -6,14 +6,14 @@ Tray ID: Not Used
 Well ID: 0 # 0:Not Used
 Cleaning after mount: 0 # 0:no clean, 1:clean
 Not dismount: 0 # 0:dismount, 1:not dismount
-Data Directory: /isilon/users/target/target/AutoUsers/200706/kuntaro/TEST2/
+Data Directory: /user/users44/2023B/ZOOTEST/231129/lys01/scan02/
 Sample Name: 2d
 File Name Suffix: h5
 Serial Offset: 0
 Beam Size: 11
 Number of Wavelengths: 1
 Shutterless measurement: 1 # 0:no, 1:yes
-Exposure Time:  0.01000 4.000000 4.000000 4.000000 # [sec]
+Exposure Time:  1.0 4.000000 4.000000 4.000000 # [sec]
 Linearly variable exposure: 0
 Number of pulses: 1
 Exposure Time2: 4.000000 4.000000 4.000000 4.000000 # [sec]
@@ -33,7 +33,7 @@ Camera Length: 300.00  # [mm]
 Beamstop position: 20.000000  # [mm]
 IP read mode: 1  # 0:Single  1:Twin
 DIP readout diameter: 400.000000  # [mm]
-CMOS frame rate: 100.00000 -1.000000 -1.000000 -1.000000 # [frame/s]
+CMOS frame rate: 10.00000 -1.000000 -1.000000 -1.000000 # [frame/s]
 CCD Binning: 1  # 1:1x1  2:2x2
 CCD Bin Type: 1  # 0:software 1:hardware
 CCD Adc: 0  # 0:Slow  1:Fast 
@@ -44,25 +44,22 @@ CCD Dezinger: 0  # 0:No  1:Yes
 CCD Subtract: 1  # 0:No  1:Yes
 CCD Thumbnail: 0  # 0:No  1:Yes
 CCD Data Format: 0  # 0:d*DTRK  1:RAXIS
-ROI Limitation Flag:1  # 0:9M  1:2M
+ROI Limitation Flag:0  # 0:9M  1:2M
 Oscillation delay: 100.000000  # [msec]
 Anomalous Nuclei: Mn  # Mn-K
 XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual
 Attenuator: 10  # None
-XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]
-XAFS Count time: 1.000000  # [sec]
-XAFS Wait time: 30  # [msec]
 Transfer HTPFDB: 0  # 0:No, 1:Yes
 Number of Save PPM: 0
 Number of Load PPM: 0
-PPM save directory: /isilon/BL26B2/
-PPM load directory: /isilon/BL26B2/
 Raster Scan Type: 2 # 0:vertical, 1:horizontal, 2: 2D
-Raster Vertical Points: 66
-Raster Horizontal Points: 100
-Raster Vertical Step:   0.015 # [mm]
+Raster Vertical Points: 10
+Raster Horizontal Points: 10
+Raster Vertical Step:   0.010 # [mm]
 Raster Horizontal Step:   0.0100 # [mm]
-Raster Rotation Flag: 0 # 0:not rotate, 1:rotate
-Raster Rotation Range:     0.00 # [deg] rotation range
+
+Raster Rotation Flag: 1 # 0:not rotate, 1:rotate
+Raster Rotation Range:     0.10 # [deg] rotation range
+
 Raster Zig-Zag Flag: 1 # 0: off, 1:on
 Comment:  

@@ -898,10 +898,10 @@ if __name__ == "__main__":
     s.connect((host, port))
 
     gonio = Gonio(s)
-    #print((gonio.getXYZmm()))
+    print((gonio.getXYZmm()))
     #gonio.moveXYZmm(-1.0,0.5,-0.3)
     #gonio.rotatePhi(135.0)
     #gonio.moveUpDown(100.0)
-    print(gonio.getPhi())
+    #print(gonio.getPhi())
 
     s.close()

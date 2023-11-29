@@ -327,12 +327,12 @@ if __name__ == "__main__":
 
     zoo_port = zoo.getBSSr()
 
-    s=""
-    gonio = Gonio44(s, bl="BL44XU")
-    gonio.setBSSport(zoo_port)
+    # s=""
+    # gonio = Gonio44(s, bl="BL44XU")
+    # gonio.setBSSport(zoo_port)
 
-    phi=gonio.getPhi()
-    print("Current phi=", phi)
+    # phi=gonio.getPhi()
+    # print("Current phi=", phi)
     # gonio.rotatePhi(0.0)
     # print("GOGOGOGOGO")
     # phi=gonio.getPhi()
@@ -341,8 +341,8 @@ if __name__ == "__main__":
     # phi=gonio.getPhi()
     # print("Current phi=", phi)
 
-    xyz=gonio.getXYZmm()
-    print(xyz)
+    # xyz=gonio.getXYZmm()
+    # print(xyz)
 
     # xyz=gonio.moveXYZmm(-0.091,5.679,-0.161)
 
