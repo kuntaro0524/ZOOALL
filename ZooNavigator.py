@@ -618,7 +618,6 @@ class ZooNavigator():
         # The goniometer moves to the saved position
         self.logger.info("move to the save point (%9.4f %9.4f %9.4f)" % (self.sx, self.sy, self.sz))
         self.dev.gonio.moveXYZPhi(self.sx, self.sy, self.sz, 0.0)
-        # self.lm.moveGXYZphi(self.sx, self.sy, self.sz, 0.0)
 
         # Waiting warming up the pin
         if cond['warm_time'] > 0.0:
@@ -684,7 +683,7 @@ class ZooNavigator():
         self.esa.addEventTimeAt(o_index, "center_end")
 
         # Save Gonio XYZ to the previous pins
-        self.sx, self.sy, self.sz, sphi = self.gonio.getXYZPhi()
+        self.sx, self.sy, self.sz, sphi = self.dev.gonio.getXYZPhi()
 
         # Capture the crystal image before experiment
         self.logger.info("ZooNavigator is capturing the 'before.ppm'")
