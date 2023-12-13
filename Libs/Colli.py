@@ -484,6 +484,7 @@ if __name__ == "__main__":
     # read IP address for BSS connection from beamline.config 
     config = ConfigParser(interpolation=ExtendedInterpolation())
     config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    print(config_path)
     config.read(config_path)
     # host = config.get("server", "bss_server")
     host = config.get("server", "blanc_address")
@@ -497,7 +498,7 @@ if __name__ == "__main__":
     # print((coli.getZ()))
     # print((coli.getEvacZ()))
     # coli.off()
-    coli.on()
+    coli.off()
     # coli.scan("colllli",0)
 
     # coli.on()

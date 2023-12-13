@@ -65,6 +65,7 @@ class BSSconfig:
         tlines = open(self.camerainf_path, "r").readlines()
         for line in tlines:
             if "ZoomOptions1:" in line and line.startswith("#")==False:
+                print(line)
                 value_bunch = line.split(":")[1]
                 for column in value_bunch.split(): 
                     value = float(column)
@@ -73,10 +74,14 @@ class BSSconfig:
         for line in self.lines:
             line=line.strip()
             if "Microscope_Zoom_Options:" in line and line.startswith("#")==False:
+                print(line)
                 value_bunch = line.split(":")[1]
                 if self.debug:
                     print(value_bunch)
                 for column in value_bunch.split():
+                    # confirm 'column' is integer or not
+                    if self.is_integer(column) == False:
+                        continue
                     value = float(column)
                     self.zoom_pulses.append(value)
 
