@@ -493,6 +493,8 @@ if __name__ == "__main__":
 
     zoo = Zoo()
     zoo.connect()
+    zoo.setBeamsize(0)
+    zoo.getBeamsize()
     #print(zoo.getSampleInformation())
     #zoo.getBeamsizeQuery()
     # print(zoo.getBeamsize())
@@ -551,7 +553,7 @@ if __name__ == "__main__":
     # schfile_hirata="/isilon/users/target/target/Staff/ZooTest/Schedule/test.sch"
     # schfile_yaruzo="/isilon/users/target/target/Staff/ZooTest/Schedule/yaruzo.sch"
     # time.sleep(10.0)
-    zoo.doRaster(sys.argv[1])
+    # zoo.doRaster(sys.argv[1])
     # zoo.doRaster(sys.argv[1])
     # zoo.doRaster("/isilon/users/target/target/AutoUsers/160509/Xiangyu/Xi-KLaT005-01/scan/Xi-KLaT005-01.sch")
     # zoo.doDataCollection(sys.argv[1])

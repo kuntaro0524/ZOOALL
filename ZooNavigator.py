@@ -267,13 +267,11 @@ class ZooNavigator():
             timg = cv2.imread(self.backimg)
             mean_value = timg.mean()
             self.logger.debug("Checking the file size and background level.")
-            if self.beamline.upper() == "BL32XU":
+            if self.beamline.upper() == "BL32XU" or self.beamline.upper()=="BL44XU":
                 # mean_thresh = 230
                 mean_thresh = 240  # 2021/01/21 HM temporary setting
             elif self.beamline.upper() == "BL45XU":
                 mean_thresh = 200
-            else:
-                mean_thresh = 180
 
             self.logger.debug("HERHERERERER")
             if self.isDark == False and mean_value < 100:
