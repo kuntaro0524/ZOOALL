@@ -1,36 +1,53 @@
-import numpy as np
-from scipy import interpolate
-import matplotlib.pyplot as plt
+import sys,os,math
+from scipy.interpolate import splrep,splev,interp1d,splprep
+import scipy,numpy
 
-fitting_wave_kn = ([0.20, 0.329],
-     [0.30, 0.350],
-     [0.40, 0.361],
-     [0.50, 0.368],
-     [0.60, 0.374],
-     [0.70, 0.378],
-     [0.80, 0.381],
-     [0.90, 0.383],
-     [1.00, 0.385],
-     [1.10, 0.386],
-     [1.20, 0.388],
-     [1.30, 0.389],
-     [1.40, 0.390],
-     [1.50, 0.391],
-     [1.60, 0.392],
-     [1.70, 0.393],
-     [1.80, 0.394],
-     [1.90, 0.394],
-     [2.00, 0.394],
-     [2.10, 0.395],
-     [2.20, 0.395],
-     [2.30, 0.395],
-     [2.40, 0.395],
-     [2.50, 0.396],
-     [2.60, 0.396],
-     [2.70, 0.396])
+#from scipy.interpolate import splrep,splev,interp1d,splprep
 
-npa=np.array(fitting_wave_kn)
 
-print(npa)
+sfile="/isilon/BL32XU/BLsoft/PPPP/07.IDparams/id32xu.tbl"
 
-plt(fitting_wave_kn[0],fitting_wave_kn[1])
+lines=open(sfile,"r").readlines()
+
+xd=[]
+yd=[]
+for line in lines:
+	cols=line.split()
+	xd.append(float(cols[0]))
+	yd.append(float(cols[1]))
+
+nxa=numpy.array(xd)
+nya=numpy.array(yd)
+
+## Min & Max value of arrays
+miny=nya.min()
+maxy=nya.max()
+minx=nxa.min()
+maxx=nxa.max()
+
+step_int=(maxx-minx)/0.1
+half=(maxy-miny)/2.0
+
+tck=scipy.splrep(px,py)
+newx=arange(minx,maxx,step_int)
+newy=splev(newx,tck,der=0)
+
+return newx,newy
+
+
+
+"""
+px,py=ana.prepData2(0,1)
+en_list,gap_list=ana.spline(px,py,100000)
+
+i=0
+for e in en_list:
+        if math.fabs(energy-e) < 0.0001:
+                rtn_gap=round(gap_list[i],3)
+                return rtn_gap
+        else :
+                i+=1
+
+
+
+"""

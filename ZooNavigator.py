@@ -20,6 +20,9 @@ import CrystalList
 import Date
 import DiffscanMaster
 import BSSconfig
+import cv2
+import time
+import math
 from html_log_maker import ZooHtmlLog
 
 import logging
@@ -264,10 +267,10 @@ class ZooNavigator():
             timg = cv2.imread(self.backimg)
             mean_value = timg.mean()
             self.logger.debug("Checking the file size and background level.")
-            if beamline.upper() == "BL32XU":
+            if self.beamline.upper() == "BL32XU" or self.beamline.upper()=="BL44XU":
                 # mean_thresh = 230
                 mean_thresh = 240  # 2021/01/21 HM temporary setting
-            elif beamline.upper() == "BL45XU":
+            elif self.beamline.upper() == "BL45XU":
                 mean_thresh = 200
 
             self.logger.debug("HERHERERERER")
@@ -424,7 +427,7 @@ class ZooNavigator():
             energy_change_flag = self.checkEnergy(cond)
             # When the energy was changed in checkEnergy function
             if energy_change_flag == True:
-                if beamline.upper() == "BL45XU":
+                if self.beamline.upper() == "BL45XU":
                     self.logger.info("Wavelength will be changed.")
                     self.zoo.setWavelength(cond['wavelength'])
                     self.logger.info("Wavelength has been changed. You should wait for 15 minutes")
@@ -451,7 +454,7 @@ class ZooNavigator():
             if current_beam_index != beamsize_index:
                 self.logger.info("Beamsize index = %5d" % beamsize_index)
                 self.zoo.setBeamsize(beamsize_index)
-                if beamline.upper() == "BL45XU":
+                if self.beamline.upper() == "BL45XU":
                     self.logger.info("Tuning a beam position starts....")
                     self.zoo.runScriptOnBSS("BLTune")
                     self.dev.zoom.zoomOut()
@@ -681,14 +684,14 @@ class ZooNavigator():
         self.esa.addEventTimeAt(o_index, "center_end")
 
         # Save Gonio XYZ to the previous pins
-        self.sx, self.sy, self.sz, sphi = self.gonio.getXYZPhi()
+        self.sx, self.sy, self.sz, sphi = self.dev.gonio.getXYZPhi()
 
         # Capture the crystal image before experiment
         self.logger.info("ZooNavigator is capturing the 'before.ppm'")
         capture_name = "before.ppm"
         self.lm.captureImage(capture_name)
 
-        if beamline.upper() == "BL45XU":
+        if self.beamline.upper() == "BL45XU":
             # LN2:ON -> ZoomCap:ON
             if cond['ln2_flag'] == 1:
                 self.dev.zoom.move(2000)

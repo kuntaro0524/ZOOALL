@@ -1,6 +1,5 @@
 import sys, os
-
-beamline = "BL32XU"
+from configparser import ConfigParser, ExtendedInterpolation
 
 # This was coded for PILATUS 3 6M at BL45XU
 # modified for versatile code
@@ -8,13 +7,21 @@ beamline = "BL32XU"
 
 class RasterSchedule:
     def __init__(self):
+        # beamline.ini is a configure file.
+        # reading config file.
+        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+        print(config_path)
+        self.config.read(config_path)
+        self.beamline = self.config.get("beamline", "beamline")
+
         print("Raster schedule class is called")
         self.beamsizeIndex = 0
-        self.imgdir = "/staff/bl32xu/Test/"
+        self.imgdir = "/staff/%s/Test/" % self.beamline
         self.prefix = "raster_test"
         self.exptime = 0.02
         self.wavelength = 1.0
-        self.distance = 300.0
+        self.distance = 500.0
         self.binning = 1  # For EIGER9M K.Hirata 160412
         self.att_idx = 10
         # Scan step in [mm]
@@ -35,17 +42,24 @@ class RasterSchedule:
         # Shutterless flag 1:Yes 0:No
         self.isShutteless = 1
         # Rotation raster flag
-        self.rot_flag = 0
-        self.rot_angle = 0.0
+        # BL44XU : trigger of the raster scan is the rotation of the goniometer
+        if self.beamline == "BL44XU":
+            self.rot_flag = 1
+            self.rot_angle = 0.01
+        # Any other beamlines
+        else:
+            self.rot_flag = 0
+            self.rot_angle = 0.0
         # ROI index
         # BL32XU/BL41XU 1: 4M mode
         # BL45XU 1: 2M mode
         self.roi_index = 1
 
         # for PILATUS BL45XU
-        if beamline == "BL45XU":
+        # This part should be moved to the 'configure.file'
+        if self.beamline == "BL45XU":
             self.img_suffix = "cbf"
-        if beamline == "BL41XU" or beamline == "BL32XU":
+        if self.beamline == "BL41XU" or self.beamline == "BL32XU" or self.beamline == "BL44XU":
             self.img_suffix = "h5"
 
         self.isSSROX = False
@@ -197,9 +211,9 @@ class RasterSchedule:
         schstr.append("Oscillation delay: 100.000000  # [msec]")
         schstr.append("Anomalous Nuclei: Mn  # Mn-K")
         schstr.append("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual")
-        if beamline == "BL41XU" or beamline == "BL32XU":
+        if self.beamline == "BL41XU" or self.beamline == "BL32XU":
             schstr.append("Attenuator transmission: %8.4f\n" % self.trans)
-        elif beamline == "BL45XU":
+        elif self.beamline == "BL45XU":
             schstr.append("Attenuator: %d  # None" % self.att_idx)
         schstr.append("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]")
         schstr.append("XAFS Count time: 1.000000  # [sec]")
@@ -257,6 +271,6 @@ if __name__ == "__main__":
     rs.setVertical()
     rs.setVstep(0.005)
     rs.setVpoints(10)
-    rs.setHpoints(1)
+    rs.setHpoints(10)
     rs.setExpTime(0.02)
     rs.makeSchedule(sc_name)

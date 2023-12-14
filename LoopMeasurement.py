@@ -330,7 +330,7 @@ class LoopMeasurement:
     # Swithced from prepRaster 2015/12/11
     def prepRaster2D(self, scan_id, gxyz, phi, dist=300.0, att_idx=10, exptime=0.02, crystal_id="unknown"):
         sx, sy, sz = gxyz
-        self.moveGXYZphi(sx, sy, sz, phi)
+        self.dev.gonio.moveXYZPhi(sx, sy, sz, phi)
         rss = RasterSchedule.RasterSchedule()
 
         # Set step size as same with the beam size
@@ -372,8 +372,8 @@ class LoopMeasurement:
 
         # Move to the defined goniometer coordinate and phi angle.
         sx, sy, sz = gxyz
-        self.moveGXYZphi(sx, sy, sz, phi)
-        tx, ty, tz, tphi = self.gonio.getXYZPhi()
+        self.dev.gonio.moveXYZPhi(sx, sy, sz, phi)
+        tx, ty, tz, tphi = self.dev.gonio.getXYZPhi()
 
         dist_raster = cond['dist_raster']
         exp_raster = cond['exp_raster']
@@ -421,6 +421,7 @@ class LoopMeasurement:
                 rss.setTrans(transmission)
 
         # case for the beamline with discrete attenuator thickness
+        # only for BL44XU (2023/11/29 K.Hirata memo.)
         else:
             att_fact = AttFactor.AttFactor()
             trans = transmission / 100.0  # convertion to 'ratio'

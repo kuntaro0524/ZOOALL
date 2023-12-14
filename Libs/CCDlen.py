@@ -67,16 +67,21 @@ class CCDlen:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.57'
-    port = 10101
+    import BLFactory
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
+    blf = BLFactory.BLFactory()
+    blf.initDevice()
 
-    clen = CCDlen(s)
-    print(clen.getLen())
+    # read configure file(beamline.init)
+    config = ConfigParser(interpolation=ExtendedInterpolation())
+    ini_file = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    config.read(ini_file)
+    zooroot = config.get('dirs', 'zooroot')
+
+    dev = blf.device
+    dev.init()
     # clen.moveCL(400.0)
-    clen.moveCL(350.0)
+    dev.clen.moveCL(800.0)
     # clen.evac()
 
     s.close()

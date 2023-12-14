@@ -20,6 +20,7 @@ import Date
 import logging
 import logging.config
 import subprocess
+import BLFactory
 
 if __name__ == "__main__":
     ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,11 +45,11 @@ if __name__ == "__main__":
     for input_file in sys.argv[1:]:
         logger.info("Start processing %s" % input_file)
         if input_file.rfind("csv") != -1:
-            navi = ZooNavigator.ZooNavigator(self.blf, input_file, is_renew_db=True)
+            navi = ZooNavigator.ZooNavigator(blf, input_file, is_renew_db=True)
             num_pins = navi.goAround()
         elif input_file.rfind("db") != -1:
             esa_csv = "dummy.csv"
-            navi=ZooNavigator.ZooNavigator(self.blf, esa_csv, is_renew_db=False)
+            navi=ZooNavigator.ZooNavigator(blf, esa_csv, is_renew_db=False)
             num_pins = navi.goAround(input_file)
         total_pins += num_pins
 

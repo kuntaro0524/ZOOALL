@@ -246,8 +246,7 @@ class BeamsizeConfig:
                 return b_idx + 1, ff, flux
 
 if __name__ == "__main__":
-    config_dir = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooConfig/"
-    bsc = BeamsizeConfig(config_dir)
+    bsc = BeamsizeConfig()
     # bsc.readConfig()
     tw, th, bs, ff = bsc.getBeamParamList()
     print("LEN=",len(bs))
@@ -259,8 +258,8 @@ if __name__ == "__main__":
         #print bsc.getBeamsizeAtIndex(0)
     #print "FLUX=",bsc.getFluxListForKUMA()
 
-    print("EEEEEEEEEEEEE")
-    print("%e"%bsc.getFluxAtWavelength(10,15,1.0))
+    # print("EEEEEEEEEEEEE")
+    print("%e"%bsc.getFluxAtWavelength(50,50,1.0))
 
 # tcs_hmm=0.1
 # tcs_vmm=0.1
