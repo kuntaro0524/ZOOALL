@@ -2,28 +2,20 @@ import sys,os,math,numpy,socket
 import Device
 import Flux
 
-host = '172.24.242.41'
+#host = '172.24.242.41'
+# BL44XU
+host = '172.24.242.57'
 port = 10101
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((host,port))
 
 dev=Device.Device(s)
 dev.init()
-
-dev.setAttThick(1000.0)
-
 energy = dev.mono.getE()
 
-if len(sys.argv) != 2:
-    print("Usage: input 'colli_on' or 'colli_off'")
-    sys.exit()
-
-if sys.argv[1] == "colli_on":
-    dev.colli.on()
-else:
-    dev.colli.off()
-
 ipin,iic=dev.countPin(pin_ch=3)
+
+print("IPIN",ipin)
 
 pin_uA=ipin/100.0
 iic_nA=iic/100.0

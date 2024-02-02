@@ -5,10 +5,13 @@
 # BL32XU
 # export PYTHONPATH="/staff/bl32xu/BLsoft/NewZoo/:/staff/bl32xu/BLsoft/NewZoo/Libs/"
 # export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/NewZoo/Libs"
+# BL32XU Test
+
+# export ZOOROOT=/staff/bl32xu/BLsoft/TestZoo
+# export PYTHONPATH=$ZOOROOT:$ZOOROOT/Libs/
+# export ZOOCONFIGPATH=$ZOOROOT/Libs/
+
 #BL44XU
-#export PYTHONPATH="/staff/bl44xu/BLsoft/ZOO44XU/:/staff/bl44xu/BLsoft/ZOO44XU/Libs/"
-#export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/Libs"
-#BL44XU test
 export PYTHONPATH="/staff/bl44xu/BLsoft/TestZOO/:/staff/bl44xu/BLsoft/TestZOO/Libs/"
 export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/TestZOO/Libs"
 

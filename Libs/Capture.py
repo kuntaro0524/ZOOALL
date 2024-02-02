@@ -238,7 +238,7 @@ class Capture:
 
 if __name__ == "__main__":
     cap = Capture()
-    cappath = "/staff/bl44xu/BLsoft/TestZOO/"
+    cappath = os.environ["ZOOROOT"]
 
     print("START-connect from main")
     filename = os.path.join(cappath, "%s.ppm" % (sys.argv[1]))

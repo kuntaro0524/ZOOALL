@@ -219,8 +219,14 @@ class Att:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.57'
-    port = 10101
+
+    from configparser import ConfigParser, ExtendedInterpolation
+    config = ConfigParser(interpolation=ExtendedInterpolation())
+    config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    config.read(config_path)
+    host = config.get("server", "blanc_address")
+    port = config.getint("server", "blanc_port")
+    
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
@@ -245,7 +251,7 @@ if __name__ == "__main__":
     # print att.getAttIndexConfig(5000)
 
     print(att.getPosition())
-    att.setNoAtt()
-    print(att.getPosition())
+    # att.setNoAtt()
+    # print(att.getPosition())
 
     s.close()

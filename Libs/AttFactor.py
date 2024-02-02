@@ -131,7 +131,7 @@ class AttFactor:
 
     def calcThickness(self, wl, transmission, material="Al"):
         # thickness [um]
-        print("Trans=", transmission)
+        # print("Trans=", transmission)
         if material == "Al":
             cnfac = self.cnFactor(wl)
             mu = self.calcMu(wl, cnfac)
@@ -206,7 +206,7 @@ class AttFactor:
 
         for line in lines:
             if line.find("Attenuator_Menu_Label") != -1 and line.find("#") == -1:
-                print(line)
+                # print(line)
                 line = line.replace("[", "").replace("]", "").replace("{", "").replace("}", "")
                 cols = line.split()
                 ncols = len(cols)

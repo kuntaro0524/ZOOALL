@@ -495,7 +495,7 @@ if __name__ == "__main__":
     zoo = Zoo()
     zoo.connect()
     # zoo.setBeamsize(0)
-    zoo.getBeamsize()
+    # zoo.getBeamsize()
     #print(zoo.getSampleInformation())
     #zoo.getBeamsizeQuery()
     # print(zoo.getBeamsize())
