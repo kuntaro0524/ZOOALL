@@ -293,6 +293,9 @@ class ZooNavigator():
         self.logger.info("New background file has been replaced to %s" % self.backimg)
         self.dev.capture.disconnect()
         self.isCaptured = True
+        # set beamsize index to the initial one : this is especially for BL44XU
+        self.zoo.setBeamsize(1)
+
         return self.backimg
 
     def prepAttCondition(self, cond):
@@ -596,6 +599,11 @@ class ZooNavigator():
         time.sleep(self.time_for_elongation)
 
         # Preparation for centering
+        # BL44XU : get beamsize index here
+        if self.beamline.upper() == "BL44XU":
+            current_beam_index = self.zoo.getBeamsize()
+            self.logger.info("Current beamsize index= %5d" % current_beam_index)
+
         self.dev.prepCentering()
 
         # Move Gonio XYZ to the previous pin
@@ -617,8 +625,7 @@ class ZooNavigator():
 
         # The goniometer moves to the saved position
         self.logger.info("move to the save point (%9.4f %9.4f %9.4f)" % (self.sx, self.sy, self.sz))
-        self.dev.gonio.moveXYZphi(self.sx, self.sy, self.sz, 0.0)
-        # self.lm.moveGXYZphi(self.sx, self.sy, self.sz, 0.0)
+        self.dev.gonio.moveXYZPhi(self.sx, self.sy, self.sz, 0.0)
 
         # Waiting warming up the pin
         if cond['warm_time'] > 0.0:
@@ -731,6 +738,11 @@ class ZooNavigator():
             self.logger.info("Disconnecting capture")
             self.lm.closeCapture()
             return
+
+        # BL44XU: recover beamsize
+        # DO NOT GET THE INFORMATION FROM BSS 
+        if self.beamline.upper() == "BL44XU":
+            self.zoo.setBeamsize(current_beam_index)
 
         self.logger.info("ZooNavigator starts MODE=%s" % (cond['mode']))
         if cond['mode'] == "multi":

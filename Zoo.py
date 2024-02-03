@@ -402,6 +402,7 @@ class Zoo:
             self.logger.info("received log: %s" % recstr)
 
             cols = recstr.split('/')
+            print(cols)
             if cols[3].isdigit() == True:
                 beamsize_index = int(cols[3])
                 return beamsize_index
@@ -494,7 +495,7 @@ if __name__ == "__main__":
     zoo = Zoo()
     zoo.connect()
     # zoo.setBeamsize(0)
-    zoo.getBeamsize()
+    # zoo.getBeamsize()
     #print(zoo.getSampleInformation())
     #zoo.getBeamsizeQuery()
     # print(zoo.getBeamsize())
@@ -530,7 +531,7 @@ if __name__ == "__main__":
 
     # time.sleep(60)
     # zoo.dismountCurrentPin()
-    zoo.waitTillReady()
+    # zoo.waitTillReady()
     # try:
     # zoo.mountSample("CPS0294",1)
     # zoo.waitTillReady()

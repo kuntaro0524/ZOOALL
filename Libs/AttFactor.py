@@ -131,7 +131,7 @@ class AttFactor:
 
     def calcThickness(self, wl, transmission, material="Al"):
         # thickness [um]
-        print("Trans=", transmission)
+        # print("Trans=", transmission)
         if material == "Al":
             cnfac = self.cnFactor(wl)
             mu = self.calcMu(wl, cnfac)

@@ -4,6 +4,7 @@ from configparser import ConfigParser, ExtendedInterpolation
 # Get information from beamline.ini file.
 config = ConfigParser(interpolation=ExtendedInterpolation())
 config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+print(config_path)
 config.read(config_path)
 
 zoologdir = config.get("dirs", "zoologdir")
@@ -46,10 +47,14 @@ if __name__ == "__main__":
         logger.info("Start processing %s" % input_file)
         if input_file.rfind("csv") != -1:
             navi = ZooNavigator.ZooNavigator(blf, input_file, is_renew_db=True)
+            # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
+            blf.zoo.setBeamsize(1)
             num_pins = navi.goAround()
         elif input_file.rfind("db") != -1:
             esa_csv = "dummy.csv"
             navi=ZooNavigator.ZooNavigator(blf, esa_csv, is_renew_db=False)
+            # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
+            blf.zoo.setBeamsize(1)
             num_pins = navi.goAround(input_file)
         total_pins += num_pins
 
@@ -57,8 +62,8 @@ if __name__ == "__main__":
         logger.info("ZOO did not process any pins")
     else:
         logger.info("Start cleaning after the measurements")
-        zoo.dismountCurrentPin()
-        zoo.cleaning()
+        blf.zoo.dismountCurrentPin()
+        # zoo.cleaning()
 
-    zoo.disconnect()
+    blf.zoo.disconnect()
     ms.close()

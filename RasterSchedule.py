@@ -56,7 +56,6 @@ class RasterSchedule:
         self.roi_index = 1
 
         # for PILATUS BL45XU
-        # This part should be moved to the 'configure.file'
         if self.beamline == "BL45XU":
             self.img_suffix = "cbf"
         if self.beamline == "BL41XU" or self.beamline == "BL32XU" or self.beamline == "BL44XU":

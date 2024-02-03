@@ -32,7 +32,7 @@ class BeamsizeConfig:
         # read from 'beamline.ini" section: files, option: beamsize_conf_file
         self.configfile = self.config.get("files", "beamsize_conf_file")
 
-        self.debug = False
+        self.debug = True
 
     def setConfigFile(self, configfile):
         self.configfile = configfile

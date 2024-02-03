@@ -131,6 +131,7 @@ class Device(Singleton.Singleton):
         self.prepScan()
         # Measurement
         ipin,iic=self.countPin(pin_ch=self.pin_channel)
+        print(ipin,iic)
         pin_uA=ipin/100.0
         iic_nA=iic/100.0
         # Photon flux estimation
@@ -163,6 +164,11 @@ class Device(Singleton.Singleton):
         else:
             self.bs.on()
         self.colli.off()
+
+        # BL44XU PreColli off
+        # PreColli: beam defining aperture related to 'beamsize.conf'
+        if self.beamline.lower() == "bl44xu":
+            self.precolli.setEvacuate()
         self.light.on()
 
     def prepCenteringBackCamera(self,zoom_out=True):

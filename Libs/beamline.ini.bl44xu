@@ -4,7 +4,7 @@ beamline = BL44XU
 bss_server = 192.168.223.21
 bss_port = 5555
 blanc_address = 172.24.242.57
-
+blanc_port = 10101
 [dirs]
 zooroot = /staff/bl44xu/BLsoft/TestZOO/
 logdir = ${dirs:zooroot}/Logs/
@@ -108,6 +108,7 @@ cryo_z_name = st1_cryo_1_x
 cryo_evacinfo = cryo
 # Collimator 
 col_z_name = st1_col_2_x
+col_y_name = st1_col_2_y
 col_evacinfo = collimator
 # Camera distance
 ccdlen = st1_ccd_1_x

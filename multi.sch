@@ -6,7 +6,7 @@ Tray ID: Not Used
 Well ID: 0 # 0:Not Used
 Cleaning after mount: 0 # 0:no clean, 1:clean
 Not dismount: 0 # 0:dismount, 1:not dismount
-Data Directory: /isilon/BL32XU/BLsoft/PPPP/10.Zoo/
+Data Directory: /user/users44/2023B/ZOOTEST/231129/lys01/scan02/
 Sample Name: multi
 Serial Offset:     0
 Number of Wavelengths: 1
@@ -26,7 +26,7 @@ Start Image Number: 1
 Goniometer: 0.00000 0.00000 0.00000 0.00000 0.00000 #Phi Kappa [deg], X Y Z [mm]
 CCD 2theta: 0.000000  # [deg]
 Detector offset: 0.0 0.0  # [mm] Ver. Hor.
-Camera Length:  130.000  # [mm]
+Camera Length:  800.000  # [mm]
 IP read mode: 1  # 0:Single  1:Twin
 CMOS frame rate: -1.000000  # [frame/s]
 Beam Size: 7
@@ -53,11 +53,14 @@ PPM save directory: /tmp
 PPM load directory: /tmp
 Comment:  
 Advanced mode: 3 # 0: none, 1: vector centering, 2: multiple centering, 3: multi-crystals
-Advanced npoint: 2 # [mm]
+Advanced npoint: 5 # [mm]
 Advanced step: 0.00000 # [mm]
 Advanced interval: 1 # [frames]
-Advanced gonio coordinates 1:      0.00000      0.00000      0.10000 # id, x, y, z
-Advanced gonio coordinates 2:      0.00000      0.10000      0.00000 # id, x, y, z
+Advanced gonio coordinates 1:  0.082  5.52  0.143
+Advanced gonio coordinates 2:  0.082  5.62  0.143
+Advanced gonio coordinates 3:  0.082  5.72  0.143
+Advanced gonio coordinates 4:  0.082  5.82  0.143
+Advanced gonio coordinates 5:  0.082  5.92  0.143
 Advanced shift: 0 # flag for shift
 Advanced shift speed: 0.000000 # [mm/sec]
 Raster Scan Type: 2 # 0:vertical, 1:horizontal, 2: 2D
