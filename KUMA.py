@@ -25,7 +25,7 @@ class KUMA:
         self.dose_limit_file = self.config.get("files", "dose_csv")
 
     # 2023/05/10 coded by K.Hirata
-    def getDoseLimitParams(self,target_dose=10.0, energy=12.3984):
+    def getDoseLimitParams(self, gy=12.3984):
         # CSVファイルを読んでdataframeにする
         df = pd.read_csv(self.dose_limit_file)
         # energy .vs. dose_mgy_per_photonのグラフについてスプライン補完を行い
