@@ -93,6 +93,7 @@ class Device(Singleton.Singleton):
         self.cryo=Cryo.Cryo(self.s)
         self.id=ID.ID(self.s)
         self.light=Light.Light(self.s)
+        print("DDDDD")
         self.colli=Colli.Colli(self.s)
         self.coax_pint=CoaxPint.CoaxPint(self.s)
         self.clen=CCDlen.CCDlen(self.s)
@@ -101,9 +102,12 @@ class Device(Singleton.Singleton):
         # Optics
         self.mbs=MBS.MBS(self.s)
         self.dss=DSS.DSS(self.s)
+        # BL32XU specific
         # BL44XU specific
         if self.beamline.lower() == "bl44xu":
             self.precolli = PreColli.PreColli(self.s)
+        elif self.beamline.lower()=="bl32xu":
+            self.slit1 = ExSlit1.ExSlit1(self.s)
 
         print("Device. initialization finished")
         self.isInit=True

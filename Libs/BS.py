@@ -34,6 +34,7 @@ class BS:
             self.bs_y_name = self.config.get("axes", "bs_y_name")
         except:
             # 軸情報が取得できないのでWargningを出す
+            print("beam stopper y")
             print("Warning: cannot get axis information from beamline.ini")
 
         try: 
@@ -46,6 +47,7 @@ class BS:
         # Motor objectを作成する
         # どちらの名前も空の場合はエラーで終了する
         if self.bs_y_name == "" and self.bs_z_name == "":
+            print("BS check")
             print("Error: cannot get axis information from beamline.ini")
             sys.exit(1) 
         

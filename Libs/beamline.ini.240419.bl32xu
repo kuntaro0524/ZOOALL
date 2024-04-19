@@ -6,7 +6,7 @@ bss_port = 5555
 blanc_address = 172.24.242.41
 
 [dirs]
-zooroot = /staff/bl32xu/BLsoft/TestZoo/
+zooroot = /staff/bl32xu/BLsoft/NewZoo/
 logdir = ${dirs:zooroot}/Logs/
 zoologdir= ${dirs:zooroot}/ZooLogs/
 bssconfig_dir=/staff/config/bl32xu/
@@ -17,22 +17,24 @@ bssconfig_file=${dirs:bssconfig_dir}/bss/bss.config
 camera_inf=${dirs:bssconfig_dir}/video/camera.inf
 beamsize_conf_file=${dirs:bssconfig_dir}/bss/beamsize.config
 inocc_image=/staff/config/bl32xu/bss/test.ppm
-logging_conf=/staff/bl32xu/BLsoft/TestZoo/Libs/logging.conf
+logging_conf=/staff/bl32xu/BLsoft/NewZoo/Libs/logging.conf
 dose_csv=${dirs:zooroot}/Libs/en_dose_lys.csv
 # Just a default background image file.
 backimg = ${dirs:zooroot}/BackImages/back.ppm
 
 [capture]
-#bright_default=4300
-#gain_default=1200
-bright_default=3500
-gain_default=1200
+#bright_default=3200
+#gain_default=3000
+#bright_default=3000
+#gain_default=2500
+bright_default=3000
+gain_default=2000
 contrast_default=18000
 # Dark mode
-bright_default_dark=5000
-gain_default_dark=5000
-# Beam stopper position during centering
+bright_default_dark=7700
+gain_default_dark=5400
 beamstopper_off=False
+
 
 [special_setting]
 # True: Dark mode, False: Normal mode
@@ -43,6 +45,7 @@ isDark=False
 width=612.0
 height=480.0
 image_size=881295
+#pix_size = 3.2578
 pix_size = 3.2578
 
 [inocc]
@@ -58,9 +61,11 @@ filter_thresh_max=20
 #bin_thresh=20
 bin_thresh=8
 # zoom value
-zoom=3.77
+#zoom=3.77
+# YK@240318
+zoom=2.34
 # BL32XU specific (ignored at other beamlines)
-zoom_pintx=20558
+zoom_pintx=20693
 
 # Used in UserESA to generate ZOO csv file.
 [experiment]
@@ -78,8 +83,8 @@ exp_ds=0.02
 resol_raster=2.5
 # "" are not required to define 'character variable'
 gonio_direction =FROM_RIGHT
-# Pin photo diode channel
 pin_channel = 3
+
 # 0 Attenuator pulse : attenuator
 pulse_for_noatt = 3500
 
@@ -108,13 +113,16 @@ cryo_evacinfo = cryo
 col_y_name = st2_collimator_1_y
 col_z_name = st2_collimator_1_z
 col_evacinfo = collimator
+# zoom x axis
+zoom_x_axis = st2_coax_1_zoom
 # Camera distance
 ccdlen = st2_detector_1_x
-# Light
-light_z_name = st2_light_1_z
 # Attenuator
 att = st2_att_1_rx
-# shutter : no need "_1" at the end of the name
+# Light 
+light_z_name = st2_light_1_z
+# Shutter
 shutter = st2_shutter
-# Zoom
-zoom_x_axis = st2_coax_1_zoom
+
+# counter
+counter_pin = st2_counter_1
