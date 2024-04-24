@@ -19,12 +19,11 @@ if __name__ == "__main__":
     config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
     config.read(config_path)
 
-
     zoo = Zoo.Zoo()
     zoo.connect()
 
-    previous_index=zoo.getBeamsize()
-    print("Current beamsize index: %d" % previous_index)
+    # previous_index=zoo.getBeamsize()
+    # print("Current beamsize index: %d" % previous_index)
 
     zoo.setBeamsize(beamsize_index)
     print("Set was completed")
