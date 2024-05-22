@@ -31,7 +31,7 @@ def get_access_token():
     else:
         raise Exception("Failed to login")
 
-def make_authenticated_request():
+def submit_csv_file(csv_file):
     global access_token, token_expiry
     # トークンの有効期限が切れているか確認
     if token_expiry is None or datetime.now() >= token_expiry:
@@ -40,48 +40,18 @@ def make_authenticated_request():
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    response = requests.get(DATA_REQUEST_URL, headers=headers, params={"zoo_id":5})
-    # response を pandas DataFrame に変換
-    # print(response.json())
-    df = pd.DataFrame(response.json())
 
-    # df の１行ずつのデータ取得
-    # この辞書をリストに追加していく
-    data_list = []
-    for i in range(len(df)):
-        # 'measure_id' を取得
-        meas_id=df.iloc[i]['measure_id']
-        target_url = f"{API_URL}/parameter_measure/"
-        response = requests.get(target_url, headers=headers, params={"measure_id":meas_id})
-        print(response.json())
-        each_df = pd.DataFrame(response.json())
-        print(each_df.columns)
-        dicts = {}
-        for j in range(len(each_df)):
-        # この each_df に含まれている１行のデータの 'parameter_name' と 'value' で dictionaryを作成
-            dicts[each_df.iloc[j]['parameter_name']] = each_df.iloc[j]['value']
+    # submit URL
+    submit_url = f"{API_URL}zoo/"
+    print("CSV submitted to ", submit_url)
+    print(csv_file)
+    response = requests.post(submit_url, headers=headers, files={'file': open(csv_file, 'rb')})
 
-        # dicts を Series に変換
-        each_pin_df = pd.Series(dicts)
-        # print(each_pin_df)
-        data_list.append(each_pin_df)
-
-    # data_list からpandas DataFrameを作成
-    conds_df = pd.DataFrame(data_list)
-    # print(conds_df)
-
-    return conds_df
+    print(response.json())
 
 # データを取得する関数を使用
 start_time = datetime.now()
-conds_df = make_authenticated_request()
-print("#####################")
-for each_cond in conds_df.iterrows():
-    print(each_cond)
-print("#####################")
-
-end_time = datetime.now()
-# 消費時間を計算 (sec)
-consumed_time = end_time - start_time
-print("Consumed Time: ", consumed_time)
-
+import sys,os
+csv_file = sys.argv[1]
+abs_path = os.path.abspath(csv_file)
+conds_df = submit_csv_file(abs_path)
