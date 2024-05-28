@@ -15,7 +15,7 @@ if __name__ == '__main__':
         measurement_csv.perform_measurement()
     elif switch == 'api':
         # Web APIを使用する場合
-        zoo_id = 2
+        zoo_id = 4
         api_loader = APIMeasurementConfigLoader(zoo_id)
         measurement_api = Measurement(api_loader)
         print("SDFSDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")

@@ -150,9 +150,9 @@ class ESAloader:
         # ゆくゆくは config fileで記述するようにしたい
         initial_params = {
             'isDone' : 0,
-            'isSkip' : 0,
-            'isMount' : 0,
-            'isLoopCenter' : 0,
+            'isSkip' : 1,
+            'isMount' : 1,
+            'isLoopCenter' : 1,
             'isRaster' : 0,
             'isDS' : 0,
             'scan_height' : 0.0,
@@ -193,7 +193,7 @@ class ESAloader:
         print("Consumed Time: ", consumed_time)
 
 # class をインスタンス化
-zoo_id = 2
+zoo_id = 5
 esa_loader = ESAloader("https://dcha-spx.spring8.or.jp/api1.0.2/",zoo_id=zoo_id)
 # ログイン
 esa_loader.make_authenticated_request()
