@@ -1,0 +1,9 @@
+#!/bin/bash
+
+export PYTHONPATH="/Users/kuntaro/kundev/zooall/Libs:/Users/kuntaro/kundev/zooall"
+export ZOOCONFIGPATH="/Users/kuntaro/kundev/zooall/Libs/"
+
+args=("$*")
+echo $args
+
+python3 $args

@@ -26,6 +26,7 @@ class ESA:
 
         # beamline.ini
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        print("Opeeningasdfasdf ")
         self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
 
     # For existing data base file
@@ -475,24 +476,20 @@ class ESA:
 
     # makeTable
 
-    def getEcha(self):
-        # Echa server address
-        # read from the configure
-        # section: server, option: conds_server
-        server_url = self.config.get('server', 'conds_server')
-        response = requests.get(server_url)
-
-        if response.status_code == 200:
-            data = response.json()
-            # convert JSON to pandas dataframe
-            df = pd.DataFrame(data)
-        else:
-            # リクエストが失敗した場合
-            print("Error code: %d" % response.status_code)
+    def getDataFrame(self):
+        # 現時点でDBにある情報をDataFrameにして返す
+        con = sqlite3.connect(self.dbname)
+        cur = con.cursor()
+        cur.execute("select * from ESA")
+        rows = cur.fetchall()
+        df = pd.DataFrame(rows)
+        # カラム名を取得
+        cur.execute("PRAGMA table_info(ESA)")
+        cols = [x[1] for x in cur.fetchall()]
+        # カラム名を設定
+        df.columns = cols
 
         return df
-
-    # def getEcha
 
     def makeDBlist(self, condition_list):
         # condition_list should have a same list of parameters
@@ -565,10 +562,15 @@ class ESA:
         # index of pin ID = 3
         condition_list = []
         with open(csvfile, 'r') as f:
+            # 新しい書式の場合には最初の２行を飛ばす
+            # やってみると next(f)を一回入れたら良かったのでこれを採用
+            # K. Hirata 2024/05/29
+            next(f)
+
             b = csv.reader(f)
             header = next(b)
             for t in b:
-                #print "PINID part=", t[4]
+                print("PINID part=", t[4])
                 pinid_list = self.analyzePinList(t[4])
 
                 for pinid in pinid_list:

@@ -3,6 +3,11 @@ import requests
 from .measurement_config_loader import MeasurementConfigLoader
 from .ESAloaderAPI import ESAloaderAPI
 
+# ２つ上のディレクトリの Libs/ にある ESA.py をインポートする
+import sys
+sys.path.append('../Libs/') 
+from ESA import ESA
+
 class APIMeasurementConfigLoader(MeasurementConfigLoader):
     def __init__(self, zoo_id):
         self.esa_loader = ESAloaderAPI(zoo_id)
