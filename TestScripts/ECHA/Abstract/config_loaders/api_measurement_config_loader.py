@@ -22,10 +22,15 @@ class APIMeasurementConfigLoader(MeasurementConfigLoader):
         if self.isRead == False:
             self.load_config()
 
-        print("######################<<<<<<<<<<<<<<<<<<<<<")
-        # self.conditions (pandas.DataFrame)を p_index でソートして、最初の行を取得
-        # ここで条件の取得方法を変更する
-        high_priority_condition = self.conditions.sort_values(by='p_index').iloc[0]
+        # self.conditions (pandas.DataFrame) を isDoneが０のもののみ取り出す
+        print(self.conditions.head())
+        self.conditions = self.conditions[self.conditions['isDone'] == 0]
+        print(self.conditions.head())
+        self.conditions = self.conditions.sort_values(by='p_index')
+        print("QQQQQQQQQQQWWWWWWWWWWWWWWWWWW")
+        print(self.conditions.head())
+        # isDoneが0のものの中で、p_indexが最も小さいものを取り出す
+        high_priority_condition = self.conditions.iloc[0]
         print(high_priority_condition)
         # measureIDを保持する
         self.measure_id = high_priority_condition['measure_id']
@@ -35,6 +40,7 @@ class APIMeasurementConfigLoader(MeasurementConfigLoader):
     def register_experiment_result(self, result):
         # result は　dict型　で、測定結果を表す 
         for key, value in result.items():
+            print("Changing !!!")
             print(key, value)
             self.esa_loader.putCond(self.measure_id, key, value)
 
