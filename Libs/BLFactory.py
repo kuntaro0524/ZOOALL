@@ -58,5 +58,13 @@ class BLFactory:
 if __name__=="__main__":
     blf = BLFactory()
     blf.initDevice()
-    gonio = blf.getGoniometer()
-    print(gonio.getXYZmm())
+    # gonio = blf.getGoniometer()
+    # print(gonio.getXYZmm())
+
+    print("OPEN")
+    import time
+    blf.device.shutter.open()
+    time.sleep(5)
+    print("CLOSE")
+    time.sleep(5)
+    blf.device.shutter.close()

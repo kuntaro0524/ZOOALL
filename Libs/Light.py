@@ -26,6 +26,7 @@ class Light:
             self.light_z_name = self.config.get("axes", "light_z_name")
         except:
             # 軸情報が取得できないのでエラーで終了すべき
+            print("Light")
             print("Error: cannot get axis information from beamline.ini")
             sys.exit(1)
         # 軸のインスタンスを作成する
