@@ -21,14 +21,7 @@ class Motor(ScanAxis):
         self.qcommand = "get/" + self.motor + "/" + "query"
         # unit
         self.unit = unit
-
-
-    # String/Bytes communication via a socket
-    def communicate(self, comstr):
-        sending_command = comstr.encode()
-        self.srv.sendall(sending_command)
-        recstr = self.srv.recv(8000)
-        return repr(recstr)
+        self.DEBUG = False
 
     #### Moving #####
     def move(self, value):
@@ -41,13 +34,17 @@ class Motor(ScanAxis):
         strvalue = str(tmpvalue) + self.unit
         # print "Moving %s to %s" % (self.motor,strvalue)
         command = "put/" + self.motor + "/" + strvalue
+        #print "COMMAND:" + command
 
         ######	sending move command
-        tmpstr = self.communicate(command)
+        # print "sending:" + command
+        self.srv.sendall(command)
+        tmpstr = self.srv.recv(8000)  # dummy acquisition
 
         while True:
             #### Get query information
-            recbuf = self.communicate(self.qcommand)
+            self.srv.sendall(self.qcommand)
+            recbuf = self.srv.recv(8000)
             rrrr = Received(recbuf)
             if rrrr.checkQuery():
                 # print "Finished: current status="+rrrr.readQuery()
@@ -63,8 +60,14 @@ class Motor(ScanAxis):
             tmpvalue = float(value)
         # making a sending command
         strvalue = str(tmpvalue) + self.unit
+        # print "Moving %s to %s" % (self.motor,strvalue)
         command = "put/" + self.motor + "/" + strvalue
-        tmpstr = self.communicate(command)  # dummy acquisition
+        # print "COMMAND:"+command
+
+        ######  sending move command
+        # print "sending:" + command
+        self.srv.sendall(command)
+        tmpstr = self.srv.recv(8000)  # dummy acquisition
 
     def relmove(self, value):
         curr_value = self.getPosition()[0]
@@ -74,18 +77,21 @@ class Motor(ScanAxis):
     def preset(self, value):
         # command
         com = "put/%s_preset/%d%s" % (self.motor, value, self.unit)
-        recbuf = self.communicate(com)
-        print(recbuf)
+        self.srv.sendall(com)
+        recbuf = self.srv.recv(8000)
+        print recbuf
 
     def getApert(self):
         com = "get/" + self.motor + "/aperture"
-        recbuf = self.communicate(com)
+        self.srv.sendall(com)
+        recbuf = self.srv.recv(8000)
+
         tmpf = Received(recbuf)
         position = tmpf.readQuery()
 
         # print position
         if position.find("mm") != -1:
-            value = float(positioreplace("mm", ""))
+            value = float(position.replace("mm", ""))
             return (value, "mm")
         elif position.find("pulse") != -1:
             value = int(position.replace("pulse", ""))
@@ -97,12 +103,19 @@ class Motor(ScanAxis):
             value = float(position.replace("um", ""))
             return (value, "um")
         else:
-            print("Unknown value")
+            print "Unknown value"
 
     ##  position ####
     def getPosition(self):
         com = "get/" + self.motor + "/position"
-        recbuf = self.communicate(com)
+        if self.DEBUG == True:
+            print com
+        self.srv.sendall(com)
+        recbuf = self.srv.recv(8000)
+
+        if self.DEBUG == True:
+            print recbuf
+
         tmpf = Received(recbuf)
         position = tmpf.readQuery()
         # print "debug::", position
@@ -121,7 +134,27 @@ class Motor(ScanAxis):
             value = float(position.replace("um", ""))
             return (value, "um")
         else:
-            print("Undefined unit.")
+            print "Unknown value"
+            return (0, 0)
+
+    ##  position ####
+    def getAngle(self):
+        com = "get/" + self.motor + "/angle"
+        print com
+        self.srv.sendall(com)
+        recbuf = self.srv.recv(8000)
+        print recbuf
+
+        tmpf = Received(recbuf)
+        position = tmpf.readQuery()
+        # print "debug::", position
+
+        # print position
+        if position.find("mrad") != -1:
+            value = float(position.replace("mrad", ""))
+            return (value, "mrad")
+        else:
+            print "Unknown value"
             return (0, 0)
 
     def findMax(self, cnt_ch, cnt_time, sense=1):
@@ -135,11 +168,10 @@ class Motor(ScanAxis):
         diff = self.scan_end - self.scan_start
         ndata = int(round(diff / self.scan_step) + 1)
 
-        # Exception 
+        # Exception
         try:
             self.checkScanCondition()
-        except MyException as ttt:
-            print(ttt)
+        except MyException, ttt:
             raise ttt
 
         # save current position
@@ -152,12 +184,12 @@ class Motor(ScanAxis):
             if (self.unit == "pulse"):
                 current_x = int(current_x)
 
-                # print current_x,cnt_time
-                self.move(current_x)
-                # Counter channel
-                value1, value2 = counter.getCount(cnt_time)
+            # print current_x,cnt_time
+            self.move(current_x)
+            # Counter channel
+            value1, value2 = counter.getCount(cnt_time)
 
-            print("%12.5f ch1: %12d, ch2:%12d" % (current_x, value1, value2))
+            print "%12.5f ch1: %12d, ch2:%12d" % (current_x, value1, value2)
             line = "12345 %12.5f %8d %8d\n" % (current_x, value1, value2)
 
             ## maximum count
@@ -165,8 +197,8 @@ class Motor(ScanAxis):
                 maxcnt[0] = value1
                 maxval[0] = current_x
 
-            ## set this axis to the initial position
-            self.move(saved_position[0])
+        ## set this axis to the initial position
+        self.move(saved_position[0])
         return maxcnt[0], maxval[0]
 
     def axisScan(self, ofile, cnt_ch, cnt_ch2, cnt_time, sense=1):
@@ -181,15 +213,19 @@ class Motor(ScanAxis):
         of = file(ofile, "w")
         diff = self.scan_end - self.scan_start
         ndata = int(round(diff / self.scan_step) + 1)
+        # print "data number = %5d" % ndata
 
-        # Exception 
+        # Exception
         try:
             self.checkScanCondition()
-        except MyException as ttt:
+        except MyException, ttt:
             raise ttt
 
+        # save current position
         saved_position = list()
         saved_position = self.getPosition()
+
+        # print "Saved current position:"+saved_position
 
         for x in range(0, ndata):
             current_x = self.scan_start + x * self.scan_step
@@ -197,41 +233,43 @@ class Motor(ScanAxis):
             if (self.unit == "pulse"):
                 current_x = int(current_x)
 
-                # print current_x,cnt_time
-                self.move(current_x)
-                # Counter channel
-                value1, value2 = counter.getCount(cnt_time)
+            # print current_x,cnt_time
+            self.move(current_x)
+            # Counter channel
+            value1, value2 = counter.getCount(cnt_time)
             # value1=1
             # value2=2
 
-            print("%12.5f ch1: %12d, ch2:%12d" % (current_x, value1, value2))
+            print "%12.5f ch1: %12d, ch2:%12d" % (current_x, value1, value2)
             line = "12345 %12.5f %8d %8d\n" % (current_x, value1, value2)
 
             ## maximum count
             if maxcnt[0] < value1:
                 maxcnt[0] = value1
                 maxval[0] = current_x
-                # print "1:FIND!!! MAXVALUE="+str(maxcnt[0])+" "+str(maxval[0])
+            # print "1:FIND!!! MAXVALUE="+str(maxcnt[0])+" "+str(maxval[0])
             if maxcnt[1] < value1:
                 maxcnt[1] = value1
                 maxval[1] = current_x
-                # print "2:FIND!!! MAXVALUE="+str(maxcnt[0])+" "+str(maxval[0])
+            # print "2:FIND!!! MAXVALUE="+str(maxcnt[0])+" "+str(maxval[0])
 
             of.write(line)
 
         of.close()
         ## set this axis to the initial position
-        print("%5d%s" % (saved_position[0], saved_position[1]))
+        print "%5d%s" % (saved_position[0], saved_position[1])
         self.move(saved_position[0])
         return maxval
 
     def query(self):
-        recbuf = self.communicate(self.qcommand)
+        self.srv.sendall(self.qcommand)
+        recbuf = self.srv.recv(8000)
         rrrr = Received(recbuf)
         return rrrr.readQuery()
 
     def isMoved(self):
-        recbuf = self.communicate(self.qcommand)
+        self.srv.sendall(self.qcommand)
+        recbuf = self.srv.recv(8000)
         rrrr = Received(recbuf)
         return rrrr.checkQuery()
 
@@ -250,24 +288,26 @@ class Motor(ScanAxis):
     ### For Monochromator only
 
     def getEnergy(self):
-        # recbuf = self.communicate(self.qcommand)
+        #print self.motor
         com = "get/" + self.motor + "/energy"
-        recbuf = self.communicate(com)
+        self.srv.sendall(com)
+        recbuf = self.srv.recv(8000)
 
-        rrrr = Received(recbuf)
-        position = rrrr.readQuery()
+        tmpf = Received(recbuf)
+        position = tmpf.readQuery()
 
         if position.find("kev") != -1:
             value = float(position.replace("kev", ""))
             return (value, "kev")
         else:
-            print("Unknown value")
-            print(position)
+            print "Unknown value"
             return (NULL, NULL)
 
     def getRamda(self):
         com = "get/" + self.motor + "/wavelength"
-        recbuf = self.communicate(self.qcommand)
+        self.srv.sendall(com)
+        recbuf = self.srv.recv(8000)
+
         tmpf = Received(recbuf)
         position = tmpf.readQuery()
 
@@ -275,22 +315,8 @@ class Motor(ScanAxis):
             value = float(position.replace("angstrome", ""))
             return (value, "angstrome")
         else:
-            print("Unknown value")
+            print "Unknown value"
             return (NULL, NULL)
-
-    def getAngle(self):
-        com = "get/" + self.motor + "/angle"
-        recbuf = self.communicate(com)
-        tmpf = Received(recbuf)
-        position = tmpf.readQuery()
-
-        if position.find("degree") != -1:
-            value = float(position.replace("degree", ""))
-            return (value, "degree")
-        else:
-            print("Unknown value")
-            return (NULL, NULL)
-
 
 if __name__ == "__main__":
     host = '172.24.242.41'
@@ -304,12 +330,12 @@ if __name__ == "__main__":
     test = Motor(s, axis, "pulse")
 
     time1 = datetime.datetime.now()
-    print(time1)
-    print(test.move(-89000))
-    print(test.move(-87000))
+    print time1
+    print test.move(-89000)
+    print test.move(-87000)
     time2 = datetime.datetime.now()
-    print(time2)
+    print time2
 
-    print("Time: %8.5f sec" % (time2 - time1).seconds)
+    print "Time: %8.5f sec" % (time2 - time1).seconds
 
-    print(test.move(-89000))
+    print test.move(-89000)

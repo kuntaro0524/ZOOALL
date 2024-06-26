@@ -7,29 +7,17 @@ import datetime
 # My library
 from Received import *
 from Motor import *
-from configparser import ConfigParser, ExtendedInterpolation
-import BSSconfig
+from BSSconfig import *
 
+#
 class CCDlen:
     def __init__(self, server):
         self.s = server
+        self.ccdlen = Motor(self.s, "bl_41in_st2_detector_1_x", "pulse")
 
-        # beamline.ini file
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
-
-        # axis definition is read from 'beamline.ini' file
-        # section: axes, option: ccdlen
-        self.ccdlen_name = self.config.get('axes', 'ccdlen')
-
-        # BSSconfig file
-        self.bssconf = BSSconfig.BSSconfig()
-        self.bl_object = self.bssconf.getBLobject()
-        self.ccdlen = Motor(self.s, f"bl_{self.bl_object}_{self.ccdlen_name}", "pulse")
-
-        # Pulse, home and limit parameters
-        self.ccdlen_v2p, self.ccdlen_sense,self.ccdlen_home = self.bssconf.getPulseInfo(self.ccdlen_name)
-        self.low_limit, self.upper_limit = self.bssconf.getLimit(self.ccdlen_name)
+        self.off_pos = 0  # pulse
+        self.on_pos = -245000  # pulse
+        self.homevalue = 692.290
 
         self.isInit = False
 
@@ -37,24 +25,29 @@ class CCDlen:
         return self.ccdlen.getPosition()[0]
 
     def getLen(self):
-        pls = self.ccdlen_sense*float(self.getPos())
-        len = pls / self.ccdlen_v2p + self.ccdlen_home
+        pls = -float(self.getPos())
+        len = pls / 5000.0 + self.homevalue
         return len
 
     def moveCL(self, len):
-        if len > self.upper_limit or len < self.low_limit:
-            print("Do nothing because CL should be in 110-600mm")
+        if len > 600.0 or len < 120.0:
+            print "Do nothing because CL should be in 110-600mm"
             return False
-        tmp = len - self.ccdlen_home
-        pls = int(tmp * self.ccdlen_v2p) * self.ccdlen_sense
-        self.move(pls)
-        print("Current Camera distance %8.2fmm" % self.getLen())
+        tmp = len - self.homevalue
+        pls = int(tmp * 5000.0)
+        sense_pls = -pls
+        # print sense_pls
+        # print self.getPos()
+        self.move(sense_pls)
+        print "Current Camera distance %8.2fmm" % self.getLen()
 
     def move(self, pls):
         self.ccdlen.move(pls)
 
     def evac(self):
         self.moveCL(300.0)
+
+    #		self.moveCL(500.0)
 
     def isMoved(self):
         isY = self.coly.isMoved()
@@ -67,21 +60,15 @@ class CCDlen:
 
 
 if __name__ == "__main__":
-    import BLFactory
+    host = '172.24.242.59'
+    port = 10101
 
-    blf = BLFactory.BLFactory()
-    blf.initDevice()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((host, port))
 
-    # read configure file(beamline.init)
-    config = ConfigParser(interpolation=ExtendedInterpolation())
-    ini_file = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-    config.read(ini_file)
-    zooroot = config.get('dirs', 'zooroot')
-
-    dev = blf.device
-    dev.init()
-    # clen.moveCL(400.0)
-    dev.clen.moveCL(800.0)
+    clen = CCDlen(s)
+    print clen.getLen()
+    # clen.moveCL(300.0)
     # clen.evac()
 
     s.close()

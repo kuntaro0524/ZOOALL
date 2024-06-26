@@ -6,7 +6,7 @@ port=920920
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-print("OKAY")
+print "OKAY"
 
 starttime=datetime.datetime.now()
 client=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -27,5 +27,5 @@ os.system(mv_command)
 
 endtime=datetime.datetime.now()
 
-print(starttime)
-print(endtime)
+print starttime
+print endtime

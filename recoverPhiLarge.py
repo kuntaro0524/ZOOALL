@@ -27,4 +27,4 @@ if __name__ == "__main__":
         endtime=datetime.datetime.now()
         time_sec= (endtime-starttime).seconds
 
-	print(time_sec,"sec")
+	print time_sec,"sec"

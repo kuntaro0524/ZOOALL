@@ -41,15 +41,15 @@ if __name__=="__main__":
 
         max_loc,max_value=tm.matchPosition(filename,back,template,gauss=5,prefix="pint")
 	
-	print("MAX=",max_value)
+	print "MAX=",max_value
 	hori=max_loc[0]
 	vert=max_loc[1]
-	print(hori,vert)
+	print hori,vert
 	dhori=hori-316
 	dvert=vert-143
 
 	move_um=dhori/0.0135
-	print(move_um)
+	print move_um
 	dev.gonio.movePint(-move_um)
 
 	#dev.gonio.moveXYZmm(ix,iy,iz)

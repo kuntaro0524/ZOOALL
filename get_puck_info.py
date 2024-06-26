@@ -5,4 +5,4 @@ if __name__ == "__main__":
     puck_list=zoo.getSampleInformation()
 
     for puck in puck_list:
-        print(puck, end=' ')
+        print puck,

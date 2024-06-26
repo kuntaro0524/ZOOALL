@@ -1,51 +1,45 @@
-# encoding: utf-8
-import cv2,sys
+import cv2,sys,datetime
+import matplotlib.pyplot as plt
 import numpy as np
 import copy
 from MyException import *
 import logging
 import logging.config
-import File, os
-from configparser import ConfigParser, ExtendedInterpolation
+
+beamline = "BL41XU"
 
 class CryImageProc():
     def __init__(self, logdir = "./"):
         self.debug = False
         # ROI definition 
-        # これらの変数は重要ではあるが、各ビームラインごとに画像の画素数などが異なるため
-        # ここでは適当な値を入れておく
-        self.xmin = 10
-        self.xmax = 600
+        # the values can be reloaded from the target image size
+        # by calling 'setImages"
+        self.xmin = 100
+        self.xmax = 500
         self.ymin = 10
-        self.ymax = 480
+        self.ymax = 470
+        self.roi_len_um = 200.0 #[um]
 
-        # beamlineのなまえ、gonio_direction, pix_size, bin_threshについては beamline.ini から読み込む
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read(os.environ['ZOOCONFIGPATH']+"/beamline.ini")
-        self.beamline = self.config.get("beamline", "beamline")
+        # Pixel resolution
+        print("Beamline is %s"%beamline)
+        if beamline == "BL32XU":
+            self.pix_size = 2.780 #[um]
+            self.gonio_direction = "FROM_RIGHT"
+            # threshold in binarization
+            self.bin_thresh = 10
+        if beamline == "BL41XU":
+            self.pix_size = 4.748 #[um]
+            self.gonio_direction = "FROM_RIGHT"
+            # threshold in binarization
+            self.bin_thresh = 30
+        if beamline == "BL45XU":
+            #self.pix_size = 3.2439 #[um]
+            self.pix_size = 6.087 #[um] # 2021/03/26 Ubutu
+            self.gonio_direction = "FROM_LEFT"
+            # threshold in binarization
+            self.bin_thresh = 10
 
-        # 最初に上下左右の一定ピクセルを解析から除外する→beamline.iniから読む
-        # section: inocc, option: delete_pix
-        self.delete_pix = self.config.getint("inocc", "delete_pix")
-
-        # Pixel size (section: coaximage, option: pix_size)
-        self.pix_size = self.config.getfloat("coaximage", "pix_size")
-        # gonio direction (section: experiment, option: gonio_direction)
-        self.gonio_direction = self.config.get("experiment", "gonio_direction")
-        # bin threshold for detecting the edge (section: inocc, option: bin_thresh)
-        self.bin_thresh = self.config.getint("inocc", "bin_thresh")
-        # filter threshold for detecting the edge (section: inocc, option: filter_thresh_min)
-        # filter threshold for detecting the edge (section: inocc, option: filter_thresh_max)
-        self.filter_thresh_min = self.config.getint("inocc", "filter_thresh_min")
-        self.filter_thresh_max = self.config.getint("inocc", "filter_thresh_max")
-
-        # ROI length [um]
-        # 上下左右の方向からこの距離オフセットした中央のROIを設定するためのパラメータ
-        # 通常は200umくらいだが beamline.iniから読むことにする
-        # section: inocc, option: roi_len_um
-        self.roi_len_um = self.config.getfloat("inocc", "roi_len_um")
-        # Edge margin to judge 'Hamidashi'
-        self.edge_margin_pix = int(self.roi_len_um / self.pix_size)
+        print (self.roi_len_um, self.pix_size)
         self.roi_len_pix = self.roi_len_um / self.pix_size
         
         # Flags 
@@ -53,24 +47,24 @@ class CryImageProc():
         self.isContourROI  = False
         self.isTopXY = True
 
+        # The top 5 lines should be removed at BL45XU
+        # Noisy 190514 K.Hirata
+        self.removeTop = 5
+        # Noise at the bottom 190607 K.Hirata
+        self.removeDown = 5
+
+        # Edge margin to judge 'Hamidashi'
+        edge_margin_um = 200.0 #[um]
+        self.edge_margin_pix = int(edge_margin_um / self.pix_size)
+
         # Log picture
         self.roi_pic = "roi.png"
 
         # Logging directory
         self.logdir = logdir
 
-        # File treatment
-        self.fileclass = File.File(self.logdir)
-
         # My logfile
         self.logger = logging.getLogger('ZOO').getChild("CryImageProc")
-
-        # Gamma correction (2021/01/21 coded by K.Hirata)
-        # Gamma correction was switched off on 2021/03/26 -> Magnification ratio is set to smaller value
-        self.isGamma=False
-
-        # New method without background image
-        self.isUseNew=False
 
     def setROIpic(self, roi_pic):
         self.roi_pic = roi_pic
@@ -78,9 +72,7 @@ class CryImageProc():
     def setDebugFlag(self, flag):
         self.debug = flag
 
-    # 長さを指定して、ROIのピクセル数を計算している
     def calcPixLen(self, length):
-        # loop size は、ROIの横幅の長さ
         self.roi_len_um = length
         self.roi_len_pix = self.roi_len_um / self.pix_size
         return int(self.roi_len_pix)
@@ -94,8 +86,8 @@ class CryImageProc():
         #print "Height, Width=", im_height, im_width
         for i in range(0, im_height):
             for j in range(0, im_width):
-                print(i,j,image[i,j])
-            print("\n")
+                print i,j,image[i,j]
+            print "\n"
 
     # Coax CCD camera sometimes include 'noise at edges'
     def trimEdges(self, cvimage, ntrim):
@@ -135,24 +127,13 @@ class CryImageProc():
         self.tgrey = self.trimEdges(self.tgrey, ntrim=7)
         self.bgrey = self.trimEdges(self.bgrey, ntrim=7)
 
-        # For binarization
-        if self.isGamma:
-            self.dimg = self.gammaCorrAndDiff(self.tgrey, self.bgrey)
-            # Median Blur
-            self.blur = cv2.bilateralFilter(self.dimg,self.filter_thresh_min,self.filter_thresh_max,self.filter_thresh_max)
-            self.bin_image = cv2.threshold(self.blur, self.bin_thresh, 150, 0)[1]
+        #print "TGREY"
+        #self.printImage(self.tgrey)
+        #print "BGREY"
+        #self.printImage(self.bgrey)
 
-        elif self.isUseNew:
-            self.dimg = self.tgrey
-            self.blur = cv2.medianBlur(self.tgrey, 5)
-            self.bin_image = cv2.adaptiveThreshold(self.blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, self.filter_thresh_min, 3)
-            cv2.imwrite("bin.png", self.bin_image)
-
-        else:
-            self.dimg=cv2.absdiff(self.tgrey,self.bgrey)
-            self.blur = cv2.bilateralFilter(self.dimg,self.filter_thresh_min,self.filter_thresh_max,self.filter_thresh_max)
-            # binirization1
-            self.bin_image = cv2.threshold(self.blur, self.bin_thresh, 150, 0)[1]
+        self.dimg=cv2.absdiff(self.tgrey,self.bgrey)
+        #cv2.imwrite("./original.png", self.dimg)
 
         self.im_width = self.dimg.shape[0]
         self.im_height = self.dimg.shape[1]
@@ -164,12 +145,12 @@ class CryImageProc():
         self.target_save = copy.deepcopy(self.timg)
 
         # min - max in XY directions
-        self.xmin = self.delete_pix 
-        self.xmax = self.im_width - self.delete_pix 
-        self.ymin = self.delete_pix 
-        self.ymax = self.im_height - self.delete_pix 
+        self.xmin = 10
+        self.xmax = self.im_width - 10
+        self.ymin = 10
+        self.ymax = self.im_height - 10
 
-        #print(self.im_width, self.im_height)
+        print self.im_width, self.im_height
 
         # Top centering edge
         self.xmin_top = self.edge_margin_pix
@@ -177,53 +158,9 @@ class CryImageProc():
         self.ymin_top = self.edge_margin_pix
         self.ymax_top = self.im_height - self.edge_margin_pix
 
-        #print(self.xmin_top, self.xmax_top, self.ymin_top, self.ymax_top)
-
         # Log file for centering
         self.logfile = open("%s/cip.log" % self.logdir, "a")
         self.logfile.write("Processing %s back = %s \n" % (target_file, back_file))
-
-    # Low pass fileter using FFT
-    def lowpass_filter(self, src, a=0.5):
-        src = np.fft.fft2(src)
-        h, w = src.shape
-        cy, cx = int(h / 2), int(w / 2)
-        rh, rw = int(a * cy), int(a * cx)
-        fsrc = np.fft.fftshift(src)
-        fdst = np.zeros(src.shape, dtype=complex)
-        fdst[cy - rh:cy + rh, cx - rw:cx + rw] = fsrc[cy - rh:cy + rh, cx - rw:cx + rw]
-        fdst = np.fft.fftshift(fdst)
-        dst = np.fft.ifft2(fdst)
-        return np.uint8(dst.real)
-
-    def create_gamma_img(self, gamma, img):
-        gamma_cvt = np.zeros((256, 1), dtype=np.uint8)
-        for i in range(256):
-            gamma_cvt[i][0] = 255 * (float(i) / 255) ** (1.0 / gamma)
-        return cv2.LUT(img, gamma_cvt)
-
-    def gammaCorrAndDiff(self, target_img, back_img):
-        # Gamma coefficient
-        gamma=1.1
-
-        gtarget = self.create_gamma_img(gamma, target_img)
-        ghikufile = self.create_gamma_img(gamma, back_img)
-
-        dimg = cv2.absdiff(gtarget, ghikufile)
-
-        """
-        th3 = cv2.threshold(blurimg, 9, 255, 0)[1]
-
-        contours, hierarchy = cv2.findContours(th3, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-        print(len(cv2.findContours(th3, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)))
-
-        cv2.drawContours(img, contours, -1, (0, 0, 255), 1)
-        cv2.imwrite("result.png", img)
-
-        th4 = lowpass_filter(th3, 4)
-        """
-        return (dimg)
-
 
     # 190514 coded by K.Hirata
     # ratio = 1.0 -> Full length of image width
@@ -237,33 +174,115 @@ class CryImageProc():
 
     def getImageHeight(self):
         return self.im_height_um
+    
+    def get_largest_contour(self, contours):
+        max_n_contour_codes = 0
+        largest_contour = None
+        for each_contour in contours:
+            tmp_n_contour = len(each_contour)
+            if tmp_n_contour > max_n_contour_codes:
+                max_n_contour_codes = tmp_n_contour
+                largest_contour = each_contour
+        return largest_contour
+    
+    def check_continousity(self, contours):
+        # Min/Max value for Y coordinate in pictures
+        minmax_y_list=[]
+        for contour in contours:
+            # Check the min/max y code 
+            miny=9999
+            maxy=-9999
+            for cont_code in contour:
+                curr_y = cont_code[0][0]
+                if curr_y < miny:
+                    miny = curr_y
+                if curr_y > maxy:
+                    maxy = curr_y
+            minmax_y_list.append((miny,maxy))
+        
+        # is continuous or not
+        continuous_flag = False
+        for idx1 in range(0,len(minmax_y_list)):
+            for idx2 in range(idx1,len(minmax_y_list)):
+                if idx1==idx2: continue
+                # distance from the neighbor
+                print(minmax_y_list[idx1])
+                print(minmax_y_list[idx2])
+                edge1 = np.fabs(minmax_y_list[idx1][0] - minmax_y_list[idx2][1])
+                edge2 = np.fabs(minmax_y_list[idx2][0] - minmax_y_list[idx1][1])
+
+                # Edge - Edge distance between contours -> within 10 pixels
+                # The left contours should be chosen
+                if edge1 < 10:
+                    self.logger.info("EDGE1 %5d"%edge1)
+                    if self.gonio_direction=="FROM_RIGHT":
+                        target_contour = contours[1]
+                    else:
+                        target_contour = contours[0]
+                    continuous_flag = True
+                if edge2 < 10:
+                    self.logger.info("EDGE2 %5d"%edge1)
+                    if self.gonio_direction=="FROM_RIGHT":
+                        target_contour = contours[0]
+                    else:
+                        target_contour = contours[1]
+                    continuous_flag = True
+        
+        if continuous_flag==False:
+            self.logger.info("The largest contour was chosen.")
+            self.logfile.write("The largest contour was chosen.\n")
+            target_contour = self.get_largest_contour(contours)
+        
+        return target_contour
 
     # This routine squeeze contours 
     # Reduce the dimensions
     def squeeze_contours(self, contours):
         new_array=[]
+
+        # Elimination of very small contours
+        good_contours=[]
+        for cont in contours:
+            contour_size = len(cont)
+            # contour_size < 50 -> this should be 'noise bunch'
+            if contour_size > 50:
+                good_contours.append(cont)
+            else:
+                self.logger.info("This contour should be noise!-> eliminated")
+
         # contours structure
         # found contours are included in 'contours'
         # This loop is a treatment for each 'found contour'.
-        self.logfile.write("Number of found contours. Len = %5d\n" % len(contours))
-        if len(contours)!=1:
+        self.logfile.write("Number of found contours. Len = %5d\n" % len(good_contours))
+        self.logger.info("Number of found contours. Len = %5d\n" % len(good_contours))
+        if len(good_contours)==2:
+            self.logfile.write("Now checking continuousity\n")
+            # Switch to use this function to *combine* 2 contours with neighbors.
+            target_contour = self.check_continousity(good_contours)
+        elif len(good_contours)>=3:
+            self.logfile.write("Number of contours exceeds 3\n")
             max_len = -9999
-            self.logfile.write("A contour is being chosen from %5d contours\n" % len(contours))
-            for i, cnt in enumerate(contours):
+            self.logfile.write("A contour is being chosen from %5d contours\n" % len(good_contours))
+            self.logger.info("A contour is being chosen from %5d contours\n" % len(good_contours))
+            for i, cnt in enumerate(good_contours):
                 if self.debug == True:
                     arclen = cv2.arcLength(cnt, True)
                     self.logfile.write("ARCLENGTH= %8d\n" % arclen)
+                    self.logger.info("ARCLENGTH= %8d\n" % arclen)
+                # Temporally avoid to use this codes.
                 tmplen = len(cnt)
+                print("tmplen=",tmplen)
                 if tmplen > max_len:
                     max_len = tmplen
                     target_contour = cnt
         else:
-            target_contour = contours[0]
-    
+            self.logfile.write("Contour is only 1\n")
+            target_contour = good_contours[0]
+
         # Delete non-required dimension
         single_contour = np.squeeze(target_contour)
         ndim_contour = single_contour.ndim
-        self.logfile.write("Acquired contour dimensions = %5d\n" % ndim_contour)
+        # self.logfile.write("Acquired contour dimensions = %5d\n" % ndim_contour)
 
         return single_contour
 
@@ -282,7 +301,7 @@ class CryImageProc():
         cv2.imwrite(outimage, baseimg)
 
     def drawContourTop(self, contour, top_xy, outimage):
-        print("drawContourTop")
+        print "drawContourTop"
         #baseimg = cv2.imread(self.target_file)
         baseimg = copy.deepcopy(self.timg)
 
@@ -293,7 +312,7 @@ class CryImageProc():
         #print topx, topy
         cv2.circle(baseimg,(topx,topy),3,(255,0,0),3)
         cv2.imwrite(outimage, baseimg)
-        print("drawContourTop")
+        print "drawContourTop"
 
     def drawRasterSquare(self, xmin, xmax, ymin, ymax, xcen, ycen, outimage):
         #baseimg = cv2.imread(self.target_file)
@@ -309,7 +328,6 @@ class CryImageProc():
     # 190514 coded by K.Hirata
     # New function for INOCC
     def getROIcontour(self, loop_size):
-        # loop size は、ROIの横幅の長さ
         self.roi_pix_len = self.calcPixLen(loop_size)
         self.full_contour = self.getContour()
         self.isContourFull = True
@@ -386,12 +404,11 @@ class CryImageProc():
         try:
             if self.isContourROI == False:
                 self.roi_cont = self.getROIcontour(loop_size)
-        except MyException as ttt:
+        except MyException, ttt:
             raise MyException(ttt)
 
         # Area of the ROI contour
         area = cv2.contourArea(self.roi_cont)
-        self.logger.info("area of ROI: %8.3f" % area)
 
         # Check if the loop is out of scene.
         if option == "top":
@@ -408,7 +425,7 @@ class CryImageProc():
         # Find centering point
         try:
             target_x, target_y = self.findCenteringPoint(self.roi_cont, self.roi_pix_len, self.top_xy)
-        except MyException as ttt:
+        except MyException,ttt:
             raise MyException("CIP.getCenterInfo could not find any centering target.")
 
         # Hamidashi flag
@@ -417,10 +434,19 @@ class CryImageProc():
 
         # All direction hamidashi
         left_flag, right_flag, lower_flag, upper_flag, n_true = self.isTouchedToEdge(self.roi_cont)
-        if n_true >= 2:
+        if n_true != 0:
             hamidashi_flag = True
         else:
             hamidashi_flag = False
+
+        """ # Old code : hamidashi Left or Right
+        if self.gonio_direction == "FROM_RIGHT" and top_x <= self.xmin:
+            print "HIDARI NI HAMIDASHITERU"
+            hamidashi_flag = True
+        elif self.gonio_direction != "FROM_RIGHT" and top_x >= self.xmax:
+            print "MIGI NI HAMIDASHITERU"
+            hamidashi_flag = True
+        """ 
 
         return target_x, target_y, area, hamidashi_flag
 
@@ -462,11 +488,15 @@ class CryImageProc():
         vert_um = h * self.pix_size
 
         # Writing raster square image
+        #timestr = datetime.datetime.now()
+        #log1 = "%s \n"%(rasterPic)
         log2 = "ROI square(H, V) = (%5.2f, %5.2f)[um]"%(hori_um, vert_um)
 
         cv2.rectangle(baseimg, (roi_xmin, roi_ymin), (roi_xmax, roi_ymax), (127, 255, 0), 2)
         cv2.circle(baseimg, (roi_cenx, roi_ceny),2, (255, 0, 0), 2)
+        #cv2.putText(baseimg, log1, (10, 100), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0), lineType=cv2.LINE_AA)
         cv2.putText(baseimg, log2, (10, 450), cv2.FONT_HERSHEY_COMPLEX, 0.4, (0, 0, 0), lineType=cv2.LINE_AA)
+        print rasterPic
         cv2.imwrite(rasterPic, baseimg)
 
         return roi_xmin, roi_xmax, roi_ymin, roi_ymax, roi_cenx, roi_ceny
@@ -477,17 +507,19 @@ class CryImageProc():
         else:
             return ymm
 
-    # 2021/01/21 Gamma correction and contour\
     def getContour(self):
+        filter_thresh = 10
         baseimg = cv2.imread(self.target_file)
+        # bluring to eliminate noise
+        blur = cv2.bilateralFilter(self.dimg,15,filter_thresh,filter_thresh)
         # debugging file
-        cv2.imwrite("%s/blur.png"%self.logdir, self.blur)
+        cv2.imwrite("%s/blur.png"%self.logdir, blur)
+        # binirization1
+        result1 = cv2.threshold(blur,self.bin_thresh,150,0)[1]
         # debugging file
-        bin_name = os.path.join(self.logdir, "bin.png")
-        cv2.imwrite(bin_name, self.bin_image)
-
+        cv2.imwrite("%s/bin.png" % self.logdir, result1)
         # Contour finding
-        cont1, hi1 = cv2.findContours(self.bin_image,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        cont1, hi1 = cv2.findContours(result1 ,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
         if len(cont1) == 0:
             self.logfile.write("No contour was found in getContour()\n")
@@ -502,9 +534,9 @@ class CryImageProc():
         cnt = self.squeeze_contours(cont1)
 
         if self.debug == True:
-            print("Hierarchy:",hi1)
-            print("Contour  :",cont1)
-            print("Contour type, length=",type(cont1),len(cont1))
+            print "Hierarchy:",hi1
+            print "Contour  :",cont1
+            print "Contour type, length=",type(cont1),len(cont1)
             #for c in cnt:
                 #print c
 
@@ -517,12 +549,12 @@ class CryImageProc():
     def ana_contours(contours):
         for contour in contours:
             if len(contour.shape) == 1:
-                print(contour)
+                print contour
                 continue
             else:
                 ndata,dummy=contour.shape
                 for i in range(0,ndata):
-                    print(contour[i])
+                    print contour[i]
 
     def find_top_x(self, contours):
         # Gonio from right 
@@ -630,15 +662,13 @@ class CryImageProc():
         if lower_flag == True: n_true += 1
         if upper_flag == True: n_true += 1
 
-        self.logger.info("Touched: L:%s R:%s LOWER:%s UPPER:%s"% (left_flag, right_flag, lower_flag, upper_flag))
-
         return left_flag, right_flag, lower_flag, upper_flag, n_true
 
     def checkExistence(self, contour):
         left_flag, right_flag, lower_flag, upper_flag = self.isTouchedToEdge(contour)
         if (left_flag == False and right_flag == False and 
                 lower_flag == False and upper_flag == False):
-            print("No loop was detected.")
+            print "No loop was detected."
             return False
         return True
 
@@ -723,7 +753,7 @@ class CryImageProc():
         #ywa = sorted(ywa, key=lambda x: x[1],reverse=False)
 
         for x,y in ywa:
-            print("DEDED:",x,y)
+            print "DEDED:",x,y
     
         return width_x_ywidth
     
@@ -799,7 +829,7 @@ class CryImageProc():
         # Linear arregression
         a,b=np.polyfit(xa,ya,1)
         ab = a,b
-        print("A,B = ",ab)
+        print "A,B = ",ab
         
         # scoring the fitting
         score=0.0
@@ -833,12 +863,12 @@ class CryImageProc():
         dya = np.array(dy_list)
         thick_mean = dya.mean()
         thick_std = dya.std()
-        print("Thick mean = ",thick_mean,thick_std)
+        print "Thick mean = ",thick_mean,thick_std
         return thick_mean, thick_std
     
     def printROI(self, roi_xy):
         for x,y in roi_xy:
-            print(x,y)
+            print x,y
 
     # Evaluate dekoboko of the line
     def calculateGradient(self, xy_data):
@@ -855,7 +885,7 @@ class CryImageProc():
         
         x_dy_array = []
         for x,y,dy in zip(xna,yna,dy):
-            print("GRAD:",x,y,dy)
+            print "GRAD:",x,y,dy
             x_dy_array.append((x,dy))
     
         return x_dy_array
@@ -870,13 +900,13 @@ class CryImageProc():
         xy_smooth_grad2, xy_smooth2 = self.calcSmoothGrad(xy_smooth_grad)
 
         for i in range(0, len(xy_smooth_grad)):
-            print(i)
+            print i
             x = xy_smooth_grad[i][0]
             yg = xy_smooth_grad[i][1]
             ys = xy_smooth[i][1]
             yss = xy_smooth2[i][1]
             ygg = xy_smooth_grad2[i][1]
-            print("SSSS:",x,ys,yg,yss,ygg)
+            print "SSSS:",x,ys,yg,yss,ygg
 
     def calcSmoothLine(self, xy_data, nsmooth = 15):
         # Calculate gradient of the line
@@ -890,7 +920,7 @@ class CryImageProc():
         y2a = np.convolve(ya, v, mode='same')
 
         for x,y in zip(xa, y2a):
-            print("SMOOTH:",x,y)
+            print "SMOOTH:",x,y
 
     #def calcYdistAgainstGoniometer
 
@@ -914,7 +944,7 @@ class CryImageProc():
         x_ysmooth_array = []
         x_ysmooth_grad_array = []
         for x,y,ysmooth,dy,dys in zip(xna,yna,y2a,dy,dys):
-            print("SMS:",x,y,ysmooth,dy,dys)
+            print "SMS:",x,y,ysmooth,dy,dys
             x_ysmooth_array.append((x,int(ysmooth)))
             x_ysmooth_grad_array.append((x,int(dys)))
         
@@ -925,18 +955,22 @@ if __name__=="__main__":
     cip = CryImageProc()
     
     # set Target/Back images
-    #testimage = "Data/test03.ppm" # upper hamideteru
     testimage = sys.argv[1]
-    #testimage = "../test.ppm"
-    cip.setImages(testimage,"/staff/bl44xu/BLsoft/TestZOO/BackImages/back.ppm")
+    cip.setImages(testimage,"/isilon/BL41XU/BLsoft/PPPP/10.Zoo/BackImages//back-2211102348.ppm")
 
+    print(cip.getCenterInfo(loop_size=600))
+
+    prefix = "tttt"
     cont = cip.getContour()
+
     top_xy = cip.find_top_x(cont)
+    #xmax = xtop + roi_len_pix
+    #print "XTOP = ",xtop
     roi_len_um = 200.0
     roi_xy = cip.selectHoriROI(cont, top_xy, roi_len_um)
 
-    print(type(roi_xy))
-    print(roi_xy)
+    print type(roi_xy)
+    print roi_xy
 
     outimage = "con_check.png"
     cip.drawContourOnTarget(roi_xy, outimage)
@@ -945,10 +979,10 @@ if __name__=="__main__":
 
     # ROI
     left_flag, right_flag, lower_flag, upper_flag, n_true = cip.isTouchedToEdge(roi_xy)
-    print("LEFT = ",left_flag)
-    print("RIGH = ",right_flag)
-    print("LOWE = ",lower_flag)
-    print("UPPE = ",upper_flag)
+    print "LEFT = ",left_flag
+    print "RIGH = ",right_flag
+    print "LOWE = ",lower_flag
+    print "UPPE = ",upper_flag
 
     # Defining raster area
     roi_xmin, roi_xmax, roi_ymin, roi_ymax, roi_cenx, roi_ceny = cip.getRasterArea(roi_xy)

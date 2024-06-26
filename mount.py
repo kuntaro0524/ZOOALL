@@ -3,23 +3,21 @@ import time
 import numpy as np
 import socket
 import Zoo
-import Date
-
-import logging, logging.config
+sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs/")
+from MyException import *
 
 if __name__ == "__main__":
     zoo=Zoo.Zoo()
     zoo.connect()
     zoo.getSampleInformation()
-    time.sleep(10.0)
-
-    # kuntaro_log
-    d = Date.Date()
-    time_str = d.getNowMyFormat(option="date")
-    logname = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooLogs/zoo_%s.log" % time_str
-    logging.config.fileConfig('/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/logging.conf', defaults={'logfile_name': logname})
-    logger = logging.getLogger('ZOO')
-
-    zoo.mountSample(sys.argv[1],sys.argv[2])
-    zoo.waitTillReady()
+    time.sleep(2.0)
+    #zoo.autoCentering()
+    #zoo.stop()
+    puckid = sys.argv[1]
+    pinid = sys.argv[2]
+    try:
+        zoo.mountSample(puckid, pinid)
+        zoo.waitTillReady()
+    except MyException, ttt:
+        print "Failed", ttt.args[0]
     zoo.disconnect()

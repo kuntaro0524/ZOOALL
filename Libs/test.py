@@ -1,9 +1,5 @@
-import sys,os,math
+import Env,sys
 
+env = Env.Env()
 
-lines=open(sys.argv[1],"r").readlines()
-
-for line in lines:
-    cols = line.split()
-    print("%s = cond['%s']"% (cols[0], cols[0]))
-
+print(env.bssconfig_path)

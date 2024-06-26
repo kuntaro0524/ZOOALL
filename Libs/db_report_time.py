@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     ofile.write(title)
 
-    print("Number of crystals processed", len(conds))
+    print "Number of crystals processed", len(conds)
     n_good = 0
     repfile = open("meas_time.csv","w")
     repfile.write("puckid,pinid,mount_min,center_min,raster_min,sukima_sec,ds_min,total_min,ras_height_um,ras_width_um,ras_height_grids,ras_width_grids,nds,comment")
@@ -81,20 +81,20 @@ if __name__ == "__main__":
             center_time = dbinfo.getCenterTime()
             height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster = dbinfo.getRasterConditions()
 
-            print("##### %10s - %2s ####" % (puckid, pinid))
-            print("MOUNT =%6.2f min" % mount_time, end=' ')
-            print("CENTER=%6.2f min" % center_time, end=' ')
-            print("RASTER=%6.2f min" % raster_time, end=' ')
-            print("DS    =%6.2f min" % ds_time, end=' ')
-            print("TOTAL =%6.2f min" % (mount_time + center_time + raster_time + ds_time), end=' ')
-            print("MEAS  =%6.2f min" % meas_time, end=' ')
+            print "##### %10s - %2s ####" % (puckid, pinid)
+            print "MOUNT =%6.2f min" % mount_time,
+            print "CENTER=%6.2f min" % center_time,
+            print "RASTER=%6.2f min" % raster_time,
+            print "DS    =%6.2f min" % ds_time,
+            print "TOTAL =%6.2f min" % (mount_time + center_time + raster_time + ds_time),
+            print "MEAS  =%6.2f min" % meas_time,
             nds = dbinfo.getNDS()
-            print("NDS   =%6d" % nds)
-            print("NMOUNT = %6d" % dbinfo.n_mount)
-            print("RASTER", height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster)
+            print "NDS   =%6d" % nds
+            print "NMOUNT = %6d" % dbinfo.n_mount
+            print "RASTER", height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster
 
             t_sukima_raster = (raster_time * 60.0 - nv_raster * exp_raster * nh_raster) / (nv_raster - 1)
-            print("SUKIMA = " , t_sukima_raster)
+            print "SUKIMA = " , t_sukima_raster
 
             dichtml = dict(puckid=puckid, pinid=pinid, mount_time=mount_time, center_time=center_time, raster_time=raster_time, ds_time=ds_time, total_time=meas_time, nds=nds,
                            raster_height=height, raster_width=width, nv_raster=nv_raster, nh_raster=nh_raster, raster_vbeam=raster_vbeam,
@@ -113,24 +113,24 @@ if __name__ == "__main__":
         # Not good pins
         else:
             puckid, pinid = dbinfo.getPinInfo()
-            print("##### %10s - %2s ####" % (puckid, pinid))
-            print("isDone code=", dbinfo.getIsDone())
+            print "##### %10s - %2s ####" % (puckid, pinid)
+            print "isDone code=", dbinfo.getIsDone()
             meas_time = dbinfo.getMeasTime()
             mount_time = dbinfo.getMountTime()
             raster_time = dbinfo.getRasterTime()
             center_time = dbinfo.getCenterTime()
             height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster = dbinfo.getRasterConditions()
 
-            print("##### %10s - %2s ####" % (puckid, pinid))
-            print("MOUNT =%6.2f min" % mount_time, end=' ')
-            print("CENTER=%6.2f min" % center_time, end=' ')
-            print("RASTER=%6.2f min" % raster_time, end=' ')
+            print "##### %10s - %2s ####" % (puckid, pinid)
+            print "MOUNT =%6.2f min" % mount_time,
+            print "CENTER=%6.2f min" % center_time,
+            print "RASTER=%6.2f min" % raster_time,
             ds_time = 0.0
-            print("MEAS  =%6.2f min" % meas_time, end=' ')
-            print("RASTER", height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster)
+            print "MEAS  =%6.2f min" % meas_time,
+            print "RASTER", height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster
 
             t_sukima_raster = (raster_time * 60.0 - nv_raster * exp_raster * nh_raster) / (nv_raster - 1)
-            print("SUKIMA = ", t_sukima_raster)
+            print "SUKIMA = ", t_sukima_raster
 
             dichtml = dict(puckid=puckid, pinid=pinid, mount_time=mount_time, center_time=center_time,
                            raster_time=raster_time, total_time=meas_time,
@@ -149,7 +149,7 @@ if __name__ == "__main__":
             repfile.write("%s"%bad_str_csv)
             ofile.write("%s\n" % bad_str)
 
-    print("NDS processed = ", n_good)
+    print "NDS processed = ", n_good
         #if flag == True:
         #    dpfile.write("%s/_kamoproc/%s/,%s,no\n" % (rootdir,prefix,sample_name))
 

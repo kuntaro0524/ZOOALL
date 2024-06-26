@@ -1,0 +1,1100 @@
+import sys, os, math, socket, time
+import numpy as np
+import datetime
+
+sys.path.append("/isilon/BL41XU/BLsoft/PPPP/10.Zoo/Libs/")
+from MyException import *
+import INOCC
+import RasterSchedule
+import Light
+import Colli
+import MultiCrystal
+import AttFactor
+import Beamsize
+import BeamsizeConfig
+import GonioVec
+import ScheduleBSS
+# import AnaShika
+import CrystalSpot
+import KUMA
+import DirectoryProc
+import logging
+import logging.config
+
+beamline = "BL41XU"
+
+# version 2.0.0 modified on 2019/07/04 K.Hirata
+
+class LoopMeasurement:
+    def __init__(self, ms, root_dir, prefix):
+        self.ms = ms
+        self.root_dir = root_dir
+        self.prefix = prefix
+        self.inocc = INOCC.INOCC(ms, root_dir, sample_name=prefix)
+        self.inocc.init()
+        self.h_beam = 10.0  # [um]
+        self.v_beam = 10.0  # [um]
+        self.max_framerate = 200.0  # [Hz]
+        # Gonio center for the loop centering
+        # for BL41XU
+        self.x = -0.69
+        self.y = 0.266
+        self.z = -1.78
+        # wavelength
+        self.wavelength = 1.0000  # [angstrome]
+        # Back light
+        self.raster_n_height = 10
+        self.raster_n_width = 10
+
+        self.light = Light.Light(self.ms)
+        self.colli = Colli.Colli(self.ms)
+
+        config_dir = "/isilon/blconfig/bl41xu/"
+        self.beamsizeconf = BeamsizeConfig.BeamsizeConfig(config_dir)
+        self.bss_config = "%s/bss/bss.config" % config_dir
+
+        self.multi_dir = "/isilon/users/admin41/admin41/AutoUsers/190420/"
+
+        # Raster scan setting: additional grids
+        self.raster_n_add = 3
+        # True for including beamsize index in 'schedule file'
+        self.isBeamsizeIndexOnScheduleFile = True
+
+        # Kuntaro Log file
+        self.logger = logging.getLogger('ZOO').getChild("LoopMeasurement")
+
+    # 2015/11/21 horizontal, vertical beamsize
+    def setPhotonDensityLimit(self, photon_density_limit):
+        self.photon_density_limit = photon_density_limit
+
+    # 2015/11/21 horizontal, vertical beamsize
+    # Penging 2019/04/20 at BL45XU K.Hirata
+    def setBeamsize(self, h_beam, v_beam):
+        # print h_beam, v_beam
+        # This is not required -> BSS can do that probablly.
+        # self.bsc.changeBeamsizeHV(h_beam,v_beam)
+        self.h_beam = h_beam
+        self.v_beam = v_beam
+
+    def setWavelength(self, wavelength):
+        self.wavelength = wavelength
+
+    def prepCentering(self):
+        self.colli.off()
+        self.light.on()
+
+    def saveGXYZphi(self):
+        return self.inocc.getGXYZphi()
+
+    def moveGXYZphi(self, x, y, z, phi):
+        return self.inocc.moveGXYZphi(x, y, z, phi)
+
+    def captureImage(self, capture_name):
+        self.prepCentering()
+        filename_abs = "%s/%s/%s" % (self.root_dir, self.prefix, capture_name)
+        self.inocc.capture(filename_abs)
+
+    def closeCapture(self):
+        self.inocc.closeCapture()
+
+    def prepDirectory(self, dirname):
+        if os.path.exists(dirname) == False:
+            os.mkdir(dirname)
+
+    # 2015/12/11 K.Hirata 
+    # Tests for one action to make directory tree
+    def prepPath(self, pathname):
+        if os.path.exists(pathname) == False:
+            os.makedirs(pathname)
+
+    # 2018/04/13 'n_mount' parameter was added 
+    # 2019/05/19 K. Hirata
+    def prepDataCollection(self):
+        # Image directory
+        self.sample_dir = "%s/%s" % (self.root_dir, self.prefix)
+
+        # Making a round directory
+        dp = DirectoryProc.DirectoryProc(self.sample_dir)
+        raster_prefix = "scan"
+        dir_for_this_time, dindex = dp.makeRoundDir(raster_prefix, isMake=False, ndigit=2)
+        self.raster_dir = "%s/scan%02d/" % (self.sample_dir, dindex)
+        self.multi_dir = "%s/data%02d/" % (self.sample_dir, dindex)
+
+        # Making directory Making
+        if os.path.exists(self.sample_dir) == False:
+            os.makedirs(self.sample_dir)
+        if os.path.exists(self.root_dir) == False:
+            os.makedirs(self.root_dir)
+        if os.path.exists(self.raster_dir) == False:
+            os.makedirs(self.raster_dir)
+        if os.path.exists(self.multi_dir) == False:
+            os.makedirs(self.multi_dir)
+        return dindex
+
+    # 2016/10/08 height_add was added. unit [um]
+    def centering(self, backimg, loop_size="small", offset_angle=0.0, height_add=0.0, largest_movement=5.0):
+        # Prep centering
+        self.prepCentering()
+        # setting background image
+        self.logger.info("LM:centering background file is replaced by %s" % backimg)
+        self.inocc.setBack(backimg)
+        # For raster scan area jpg is output for each data directory
+        raster_picpath = "%s/raster.jpg" % self.sample_dir
+        self.logger.info("Capturing %s" % raster_picpath)
+        self.inocc.setRasterPicture(raster_picpath)
+        # Centering Crystal
+        self.inocc.setYamagiwaSafety(largest_movement)
+        self.logger.info("LM:centering Start: centering.doAll")
+        rwidth, rheight, phi_face, gonio_info = self.inocc.doAll(skip=False, loop_size=loop_size,
+                                                                 offset_angle=offset_angle)
+        message = "%9.4f %9.4f %9.4f - (W,H) = (%8.2f, %8.2f)" % (gonio_info[0], gonio_info[1], gonio_info[2], rwidth, rheight)
+        self.logger.info(message)
+        self.logger.info("LM:centering Ends : centering.doAll")
+
+        # self.cen_x,y,z is the center coordinate of this centering
+        self.cen_x, self.cen_y, self.cen_z, self.raster_start_phi = gonio_info
+        # number of grids in raster scan
+        self.raster_n_width = int(rwidth / self.h_beam) + self.raster_n_add
+        self.raster_n_height = int(rheight / self.v_beam + height_add) + self.raster_n_add
+
+        return rwidth, rheight
+
+    # 2015/11/21 Exposure time can be set
+    # To be obsoleted 2015/12/11 
+    # New one is raster2D
+    def prepRaster(self, dist=300.0, att_idx=10, exptime=0.02, crystal_id="unknown"):
+        rss = RasterSchedule.RasterSchedule()
+        # Set step size as same with the beam size
+        rss.setVstep(self.v_beam / 1000.0)
+        rss.setHstep(self.h_beam / 1000.0)
+
+        raster_schedule = "%s/%s.sch" % (self.raster_dir, self.prefix)
+
+        rss.setCrystalID(crystal_id)
+        rss.setWL(self.wavelength)
+        rss.setExpTime(exptime)
+        rss.setPrefix(self.prefix)
+        rss.setAttIndex(att_idx)
+        rss.setStartPhi(self.raster_start_phi)
+        rss.setCL(dist)
+        rss.setVpoints(self.raster_n_height)
+        rss.setHpoints(self.raster_n_width)
+        rss.setImgDire(self.raster_dir)
+        rss.makeSchedule(raster_schedule)
+
+        # raster_path="%s/%s/"%(self.raster_dir,self.prefix)
+        return raster_schedule, self.raster_dir
+
+    # 2015/12/15 Rotation Raster 2D
+    # For quick data collection from multiple-tiny crystals
+    # 2016/05/16 Rotation Raster 2D on EIGER9M
+    # MX225HS : binning=4 for default
+    def prepRotRaster(self, scan_id, gxyz, phi, dist=150.0, att_idx=0, exptime=0.02, rot_per_frame=1.0, binning=1,
+                      crystal_id="unknown"):
+        sx, sy, sz = gxyz
+        self.moveGXYZphi(sx, sy, sz, phi)
+        rss = RasterSchedule.RasterSchedule()
+
+        # Set step size as same with the beam size
+        rss.setVstep(self.v_beam / 1000.0)
+        rss.setHstep(self.h_beam / 1000.0)
+
+        # Binning is set to 1 on EIGER
+        rss.setBinning(binning)
+
+        raster_path = "%s/%s/" % (self.raster_dir, scan_id)
+        raster_schedule = "%s/%s.sch" % (raster_path, scan_id)
+        self.prepPath(raster_path)
+
+        # Calculate total oscillation range for each raster line
+        total_osc = self.raster_n_width * rot_per_frame
+
+        rss.setCrystalID(crystal_id)
+        rss.setWL(self.wavelength)
+        rss.setExpTime(exptime)
+        rss.setPrefix(scan_id)
+        rss.setAttIndex(att_idx)
+        rss.setStartPhi(phi)
+        rss.setCL(dist)
+        rss.setVpoints(self.raster_n_height)
+        rss.setHpoints(self.raster_n_width)
+        rss.setImgDire(raster_path)
+        rss.enableRotation(rot=total_osc)
+        rss.makeSchedule(raster_schedule)
+
+        return raster_schedule, raster_path
+
+    # Swithced from prepRaster 2015/12/11
+    def prepRaster2D(self, scan_id, gxyz, phi, dist=300.0, att_idx=10, exptime=0.02, crystal_id="unknown"):
+        sx, sy, sz = gxyz
+        self.moveGXYZphi(sx, sy, sz, phi)
+        rss = RasterSchedule.RasterSchedule()
+
+        # Set step size as same with the beam size
+        rss.setVstep(self.v_beam / 1000.0)
+        rss.setHstep(self.h_beam / 1000.0)
+
+        raster_path = "%s/%s/" % (self.raster_dir, scan_id)
+        raster_schedule = "%s/%s.sch" % (raster_path, scan_id)
+        self.prepPath(raster_path)
+
+        rss.setCrystalID(crystal_id)
+        rss.setWL(self.wavelength)
+        rss.setExpTime(exptime)
+        rss.setPrefix(scan_id)
+        rss.setAttIndex(att_idx)
+        rss.setStartPhi(phi)
+        rss.setCL(dist)
+        rss.setVpoints(self.raster_n_height)
+        rss.setHpoints(self.raster_n_width)
+        rss.setImgDire(raster_path)
+        rss.makeSchedule(raster_schedule)
+
+        return raster_schedule, raster_path
+
+        def make_shika_direction(self, scandir, min_score, min_dist, max_hits=100):
+            ofs = open(os.path.join(scandir, "shika_auto.config"), "w")
+            ofs.write("min_score= %.3f\n" % min_score)
+            ofs.write("min_dist= %.3f\n" % min_dist)
+            ofs.write("max_hits= %.3f\n" % max_hits)
+            ofs.close()
+
+    # 2016/06/11 Raster scan should be called from the same function
+    # scan_mode="2D", "Vert", "Hori"
+    # 2019/06/02 Code was modified for all beamlines
+    def rasterMaster(self, scan_id, scan_mode, gxyz, vscan_um, hscan_um, vstep_um, hstep_um, phi, cond):
+        # Move to the defined goniometer coordinate and phi angle.
+        sx, sy, sz = gxyz
+        self.moveGXYZphi(sx, sy, sz, phi)
+        tx, ty, tz, tphi = self.saveGXYZphi()
+
+        # Experimental settings from 'cond'
+        raster_vbeam = cond['raster_vbeam']
+        raster_hbeam = cond['raster_hbeam']
+        dist_raster = cond['dist_raster']
+        exp_raster = cond['exp_raster']
+        # ROI index
+        roi_index = cond['raster_roi']
+
+        # Beam size index
+        beamsize_index = self.beamsizeconf.getBeamIndexHV(raster_hbeam, raster_vbeam)
+        print "Beamsize index in rasterMaster is %5d" % beamsize_index
+
+        # Prep class
+        rss = RasterSchedule.RasterSchedule()
+
+        # Attenuator index from 'att_fac' for BL32XU/BL45XU
+        # Attenuator should be set in 'an index of attenuator defined in bss.config'
+        if beamline == "BL32XU" or beamline == "BL45XU":
+            att_fact = AttFactor.AttFactor(self.bss_config)
+            trans = cond['att_raster'] / 100.0  # convertion to 'ratio'
+            best_thick = att_fact.getBestAtt(cond['wavelength'], trans)
+            self.att_idx = att_fact.getAttIndexConfig(best_thick)
+            # Schedule setting (attenuator index)
+            rss.setAttIndex(self.att_idx)
+
+        elif beamline == "BL41XU":
+            # Schedule setting (attenuator factor) [% is converted to ratio in RSS])
+            rss.setTrans(cond['att_raster'])  # this is unit of [%]
+
+        print "OKAY1"
+
+        # Scan points for vertical and horizontal
+        if scan_mode == "2D":
+            self.raster_n_height = int(vscan_um / vstep_um) + self.raster_n_add
+            self.raster_n_width = int(hscan_um / hstep_um) + self.raster_n_add
+        elif scan_mode == "Hori":
+            self.raster_n_width = int(hscan_um / hstep_um) + self.raster_n_add
+            self.raster_n_height = 1
+        elif scan_mode == "Vert":
+            self.raster_n_height = int(vscan_um / vstep_um) + self.raster_n_add
+            self.raster_n_width = 1
+        else:
+            raise MyException("rasterMaster: scan setting failed")
+
+        # Raster schedule file path
+        raster_path = "%s/%s/" % (self.raster_dir, scan_id)
+        print "Raster path=", raster_path
+        raster_schedule = "%s/%s.sch" % (raster_path, scan_id)
+        self.prepPath(raster_path)
+
+        # Schedule file
+        if self.isBeamsizeIndexOnScheduleFile == True:
+            rss.setBeamsizeIndex(beamsize_index)
+        rss.setWL(self.wavelength)
+        # ROI index setting for scan
+        rss.setROIindex(roi_index)
+        rss.setPrefix(scan_id)
+        rss.setCL(dist_raster)
+        rss.setImgDire(raster_path)
+        rss.setStartPhi(phi)
+        rss.setMode(scan_mode)
+        # Setting v step in [mm]
+        vstep_mm = vstep_um / 1000.0
+        rss.setVstep(vstep_mm)
+        # Setting h step in [mm]
+        hstep_mm = hstep_um / 1000.0
+        rss.setHstep(hstep_mm)
+        rss.setVpoints(self.raster_n_height)
+        rss.setHpoints(self.raster_n_width)
+
+        rss.setExpTime(exp_raster)
+        rss.makeSchedule(raster_schedule)
+
+        return raster_schedule, raster_path
+
+    # 2015/12/05 Precise setting for centering raster
+    # 2015/12/11 Precise setting for centering raster
+    # More easy to be read by K.Hirata
+    # scan_id: character buffer for making 'directory'
+    # beam_h, beam_v : raster beamsize 
+    def prepVrasterIn(self, scan_id, beam_h, beam_v, range_mm, step_mm, gxyz, phi, att_idx=10, distance=300.0,
+                      exptime=0.02):
+        print "DEBUG"
+        sx, sy, sz = gxyz
+        self.moveGXYZphi(sx, sy, sz, phi)
+        tx, ty, tz, tphi = self.saveGXYZphi()
+
+        print "DEBUG2"
+        print "Target position:", sx, sy, sz, phi
+        print "Current position:", tx, ty, tz, tphi
+
+        print "DEBUG3"
+        rss = RasterSchedule.RasterSchedule()
+        # Raster beam size (temporal code 151204)
+        self.setBeamsize(beam_h, beam_v)  # [um]
+
+        # vertical scan length
+        # (temporal code 151125)
+        # 2.5 is tekitou
+
+        # raster_vert_range=float(cond.shika_mindist)*2.5/1000.0 # [mm]
+        raster_npoints = int(range_mm / step_mm)
+
+        # Raster schedule file path
+        raster_path = "%s/%s/" % (self.raster_dir, scan_id)
+        raster_schedule = "%s/%s.sch" % (raster_path, scan_id)
+        self.prepPath(raster_path)
+
+        # Set SHIKA condition
+        min_score = 0.0  # pick up all of pixels
+        min_dist = 0.0  # [um] pick up all of pixels
+        self.make_shika_direction(raster_path, min_score, min_dist)
+
+        rss.setPrefix(scan_id)
+        rss.setCL(distance)
+        rss.setImgDire(raster_path)
+        rss.setStartPhi(phi)
+        rss.setVertical()
+        rss.setVstep(step_mm)
+        rss.setAttIndex(att_idx)
+        rss.setVpoints(raster_npoints)
+        rss.setHpoints(1)
+        rss.setExpTime(exptime)
+        rss.makeSchedule(raster_schedule)
+
+        return raster_schedule, raster_path
+
+    # 2015/12/05 Precise setting for centering raster
+    # scan_id: character buffer for making 'directory'
+    # beam_h, beam_v : raster beamsize 
+    def prepVraster(self, scan_id, beam_h, beam_v, range_mm, step_mm, gxyz, phi, att_idx=10, distance=300.0,
+                    exptime=0.02):
+        rss = RasterSchedule.RasterSchedule()
+        sx, sy, sz = gxyz
+        self.moveGXYZphi(sx, sy, sz, phi)
+
+        # Raster beam size (temporal code 151204)
+        self.setBeamsize(beam_h, beam_v)  # [um]
+
+        # vertical scan length
+        # (temporal code 151125)
+        # 2.5 is tekitou
+
+        # raster_vert_range=float(cond.shika_mindist)*2.5/1000.0 # [mm]
+        raster_npoints = int(range_mm / step_mm)
+
+        # Conditions for Shutterless vertical scan
+        this_directory = "%s/%s/" % (self.raster_dir, scan_id)
+        self.prepDirectory(this_directory)
+        this_schedule = "%s/vraster.sch" % (this_directory)
+
+        print "Raster for this crystal in %s" % this_schedule
+        print "Schedule file is %s.sch" % scan_id
+
+        rss.setPrefix("vraster")
+        rss.setCL(distance)
+        rss.setImgDire(this_directory)
+        rss.setStartPhi(phi)
+        rss.setVertical()
+        rss.setVstep(step_mm)
+        rss.setVpoints(raster_npoints)
+        rss.setHpoints(1)
+        rss.setExpTime(exptime)
+        rss.setAttIndex(att_idx)
+        rss.makeSchedule(this_schedule)
+
+        return this_schedule
+
+    # 2015/12/15 K.Hirata coded
+    # Notebook p.?? around 
+    # Target: SHIKA _selected.dat
+    # thresh_nspots = threshold to select 'existing crystal'
+    # Mode : "grav" = gravity center (2 or more 
+    def shikaEdges(self, raster_path, scan_id, thresh_nspots=30, margin=0.005):
+        # SHIKA results
+        sshika = SummarySHIKA.SummarySHIKA(raster_path, scan_id)
+        sshika.waitingForSummary()
+        try:
+            glist = sshika.readSummary()
+        except MyException, tttt:
+            raise MyException("SHIKA could not get any good crystasl")
+
+        left_xyz = [99.999, 99.999, 99.999]
+        right_xyz = [99.999, 99.999, 99.999]
+
+        xmin = 99.9999
+        ymin = 99.9999
+        zmin = 99.9999
+        xmax = -99.9999
+        ymax = -99.9999
+        zmax = -99.9999
+
+        for gxyz in glist:
+            # unzip gonio xyz list from data selected by SHIKA
+            x, y, z, phi, score = gxyz
+            if ymin > y:
+                xmin = x
+                ymin = y
+                zmin = z
+            if ymax < y:
+                xmax = x
+                ymax = y
+                zmax = z
+
+        # Margin addition
+        ymin = ymin + margin
+        ymax = ymax - margin
+
+        if xmin == 99.9999 or ymin == 99.9999 or zmin == 99.9999:
+            print "shikaEdges:XMIN"
+            raise MyException("Left edge of the crystal: Wrong")
+        elif xmax == 99.9999 or ymax == 99.9999 or zmax == 99.9999:
+            print "shikaEdges:XMAX"
+            raise MyException("Right edge of the crystal: Wrong")
+        else:
+            left_code = xmin, ymin, zmin
+            right_code = xmax, ymax, zmax
+            return left_code, right_code
+
+    # Relating to the summary.dat
+    def readSummaryDat(self, raster_path, scan_id, cxyz, phi, thresh_nspots=30):
+        # SHIKA analysis
+        shika_dir = "%s/_spotfinder/" % raster_path
+        ashika = AnaShika.AnaShika(shika_dir, cxyz, phi)
+        ashika.setSummaryFile("summary.dat")
+        # scan_id & prefix are different each other
+        prefix = "%s_" % scan_id
+        print "PREFIX=", prefix
+        print "SCAN_ID=", scan_id
+        # KUNIO setDiffscanLog(self,path):
+
+        # N grids on the 2D raster scan
+        ngrids = self.raster_n_height * self.raster_n_width
+        comp_thresh = 0.95
+
+        # SHIKA waiting for preaparation
+        # 5 minutes
+        try:
+            ashika.readSummary(prefix, ngrids, comp_thresh=comp_thresh, timeout=600)
+            print "LoopMeasurement.readSummaryDat succeeded."
+
+        except MyException, tttt:
+            raise MyException("shikaSumSkipStrong failed to wait summary.dat")
+
+        return ashika
+
+    # coded on 2017.01.15
+    # GXYZ is extracted from diffscan.log
+    # max_ncry : max number of crystals for data collection
+    # min_score : min spot number for picking up crystals
+    # max_score : max spot number for picking up crystals
+
+    def prepSmallWedge(self, cxyz, phi, raster_path, scan_id, min_score=10, max_score=1000, crysize=0.10, max_ncry=50,
+                       mode="grav"):
+        def compCryScore(x, y):
+            a = x.score_total
+            b = y.score_total
+            # print "SCORE COMPARE",a,b
+            if a == b: return 0
+            if a < b: return 1
+            return -1
+            print thresh_nspots, crysize
+
+        # Center of this scan
+        cx, cy, cz = cxyz
+        # SHIKA analysis
+        ashika = self.readSummaryDat(raster_path, scan_id, cxyz, phi)
+
+        # setting min/max values
+        ashika.setMinMax(min_score, max_score)
+
+        # Crystal finding
+        print "Crystal size = %8.5f" % crysize
+        crystals = ashika.findCrystals(scan_id, dist_thresh=crysize)
+        n_cry = len(crystals)
+        print "Crystals %5d\n" % n_cry
+
+        # Sorting better crystals
+        # The top of crystal is the best one
+        # The bottom is the worst one
+        crystals.sort(cmp=compCryScore)
+
+        # Crystal size check
+        gxyz_list = []
+        n_cry = 0
+        if mode == "grav":
+            for crystal in crystals:
+                n_cry += 1
+                crystal.setDiffscanLog(raster_path)
+                gx, gy, gz = crystal.getGrav()
+                gxyz_list.append((gx, gy, gz))
+                print n_cry, gx, gy, gz
+                if n_cry >= max_ncry:
+                    break
+        elif mode == "peak":
+            for crystal in crystals:
+                n_cry += 1
+                crystal.setDiffscanLog(raster_path)
+                gx, gy, gz = crystal.getPeakCode()
+                gxyz_list.append((gx, gy, gz))
+                print n_cry, gx, gy, gz
+                if n_cry >= max_ncry:
+                    break
+
+        return gxyz_list
+
+    def isAbort(self):
+        self.get_current_str = "get/bl_dbci_ringcurrent/present"
+        self.ms.sendall(self.get_current_str)
+        recbuf = self.ms.recv(8000)
+        strs = recbuf.split("/")
+        ring_current = float(strs[len(strs) - 2].replace("mA", ""))
+
+        if ring_current > 50.0:
+            print "Ring current %5.1f" % ring_current
+            return False
+        else:
+            print "Ring aborted."
+            print "Ring current %5.1f" % ring_current
+        return True
+
+    # 2019/05/21 test coding
+    # Recover original one (upper as _old)
+    # 2019/05/22 Largely modified to use KUMA as external function to estimate 
+    # exposure condition.
+    def genMultiSchedule(self, phi_mid, glist, cond, flux, logfile, prefix="multi"):
+
+        mc = MultiCrystal.MultiCrystal()
+        multi_sch = "%s/multi.sch" % self.multi_dir
+
+        # Multi conditions
+        half_width = cond['total_osc'] / 2.0
+        start_phi = phi_mid - half_width
+        end_phi = phi_mid + half_width
+
+        # Beam size setting
+        beamsize_index = self.beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
+        print "Beamsize index in rasterMaster is %5d" % beamsize_index
+
+        # Estimating dose and set suitable exposure condition
+        # Exposure time will sometimes be modified when
+        # an initial condition does not require any attenuation.
+        kuma = KUMA.KUMA(logfile)
+        exp_time, best_transmission = kuma.getBestCondsMulti(cond, flux)
+
+        if beamline == "BL32XU" or beamline == "BL45XU":
+            # Definition of attenuator index
+            attfac = AttFactor.AttFactor()
+            best_thick = attfac.getBestAtt(cond['wavelength'], best_transmission)
+            att_idx = attfac.getAttIndexConfig(best_thick)
+            mc.setAttIdx(att_idx)
+
+        elif beamline == "BL41XU":
+            tmp_trans = best_transmission * 100.0
+            mc.setTrans(tmp_trans)  # this is unit of [%]
+
+        # 160618 Added by K. Hirata
+        mc.setPrefix(prefix)
+        mc.setCrystalID(cond['sample_name'])
+        mc.setWL(self.wavelength)
+        if self.isBeamsizeIndexOnScheduleFile == True:
+            mc.setBeamsizeIndex(beamsize_index)
+        mc.setExpTime(exp_time)
+        mc.setCameraLength(cond['dist_ds'])
+        mc.setScanCondition(start_phi, end_phi, cond['osc_width'])
+        mc.setDir(self.multi_dir)
+        mc.setShutterlessOn()
+        mc.makeMultiDoseSlicing(multi_sch, glist, ntimes=cond['ntimes'])
+        # mc.makeMulti(multi_sch,glist)
+
+        return multi_sch
+
+    # calcExpConds1
+    # Important parameters: rot_speed, total_photons, flux_beam, exp_time
+    # rot_speed [deg./sec.]
+    # total_photons [phs] : total photons for data collection
+    # flux_beam [phs/sec.]: photon flux 
+    def calcExpConds1(self, wavelength, start_phi, end_phi, osc_width, rot_speed, total_photons, flux_beam):
+        attfac = AttFactor.AttFactor()
+        # total oscillation range
+        total_osc = end_phi - start_phi
+
+        # Multi conditions
+        n_frames = int(total_osc / osc_width)
+        print "Frame=", n_frames
+
+        # Total photons/frame
+        phs_per_frame = total_photons / float(n_frames)
+        print "Aimed flux(%5.2e)/frame: %5.2e" % (total_photons, phs_per_frame)
+
+        # Exposure time for full flux
+        ff_exptime = phs_per_frame / flux_beam
+        print "Full flux exposure time for aimed photons per frame=%13.8f sec/frame" % ff_exptime
+
+        # Suitable exposure time range
+        # 5 deg/frame FIXED
+        exp_time = osc_width / rot_speed
+        print "Exposure time = ", exp_time, "secs"
+        print "Attenuation factor for this exposure time/frame=", ff_exptime / exp_time
+
+        trans_ideal = ff_exptime / exp_time
+
+        # Suitable attenuation factor
+        att_thick = attfac.getBestAtt(wavelength, trans_ideal)
+        trans_real = attfac.calcAttFac(wavelength, att_thick)
+
+        print "%8.1f[um] trans=%12.8f (Aimed trans=%12.8f)" \
+              % (att_thick, trans_real, trans_ideal)
+
+        # Final calculation
+        exptime_final = ff_exptime / trans_real
+        att_idx = attfac.getAttIndexConfig(att_thick)
+        print "Initial exposure time = ", exp_time
+        print "Final   exposure time = ", exptime_final
+        print "round %8.5f sec" % (round(exptime_final, 3))
+        photons_real = exptime_final * trans_real * flux_beam * float(n_frames)
+        print "Photons/data=%8.3e" % photons_real
+
+        return att_idx, exptime_final
+
+        # calcExpConds2 2017/07/30 implemented
+
+    # 1A wavelength transmission : observed values should be used for RR experiments
+    # Important parameters: rot_speed, total_photons, flux_beam, exp_time
+    # rot_speed [deg./sec.]
+    # total_photons [phs] : total photons for data collection
+    # flux_beam [phs/sec.]: photon flux 
+    def calcExpConds2(self, wavelength, start_phi, end_phi, osc_width, rot_speed, total_photons, flux_beam):
+        attfac = AttFactor.AttFactor()
+        # total oscillation range
+        total_osc = end_phi - start_phi
+
+        # Multi conditions
+        n_frames = int(total_osc / osc_width)
+        print "Frame=", n_frames
+
+        # Total photons/frame
+        phs_per_frame = total_photons / float(n_frames)
+        print "Aimed flux(%5.2e)/frame: %5.2e" % (total_photons, phs_per_frame)
+
+        # Exposure time for full flux
+        ff_exptime = phs_per_frame / flux_beam
+        print "Full flux exposure time for aimed photons per frame=%13.8f sec/frame" % ff_exptime
+
+        # Suitable exposure time range
+        # 5 deg/frame FIXED
+        exp_time = osc_width / rot_speed
+        print "Exposure time = ", exp_time, "secs"
+        print "Attenuation factor for this exposure time/frame=", ff_exptime / exp_time
+
+        trans_ideal = ff_exptime / exp_time
+
+        # Suitable attenuation factor
+        att_thick = attfac.getBestAtt(wavelength, trans_ideal)
+        trans_real = attfac.getAttFacObs(wavelength, att_thick)
+
+        print "%8.1f[um] trans=%12.8f (Aimed trans=%12.8f)" \
+              % (att_thick, trans_real, trans_ideal)
+
+        # Final calculation
+        exptime_final = ff_exptime / trans_real
+        att_idx = attfac.getAttIndexConfig(att_thick)
+        print "Initial exposure time = ", exp_time
+        print "Final   exposure time = ", exptime_final
+        print "round %8.5f sec" % (round(exptime_final, 3))
+        photons_real = exptime_final * trans_real * flux_beam * float(n_frames)
+        print "Photons/data=%8.3e" % photons_real
+
+        return att_idx, exptime_final
+
+    # I would like to replace this function to calcExpConds series
+    def calcExpCondition(self, wavelength, start_phi, end_phi, osc_width, total_photons, flux_beam, exp_time):
+        attfac = AttFactor.AttFactor()
+        # total oscillation range
+        total_osc = end_phi - start_phi
+
+        # Multi conditions
+        n_frames = int(total_osc / osc_width)
+        print "Frame=", n_frames
+
+        # Total photons/frame
+        phs_per_frame = total_photons / float(n_frames)
+        print "Aimed flux/frame: %5.2e" % (phs_per_frame)
+
+        # Exposure time for full flux
+        ff_exptime = phs_per_frame / flux_beam
+        print "Full flux exposure time for aimed flux=%13.8f sec/frame" % ff_exptime
+
+        # Suitable exposure time range
+        # 5 deg/frame FIXED
+        # exptime=osc_width/5.0
+        print "Attenuation factor for 1sec exposure/frame", ff_exptime / exp_time
+        transmission = ff_exptime / exp_time
+
+        # Suitable attenuation factor
+        att_thick = attfac.getBestAtt(wavelength, transmission)
+        trans = attfac.calcAttFac(wavelength, att_thick)
+
+        print "%8.1f[um] Transmission=%12.8f" % (att_thick, trans)
+
+        # Final calculation
+        exptime = ff_exptime / trans
+        att_idx = attfac.getAttIndexConfig(att_thick)
+
+        return att_idx, exptime
+
+    # 2016/11/20 Single irradiation data collection
+    # 2016/12/09 Large modification(commit 68e817e6d9af462d7fb685ce23706fbfcf51dcb2)
+    # 2017/07/30 Observed transmission was utilized. This is quite temporal.
+    def genSamePhotons(self, wavelength, h_beam, v_beam, start_phi, end_phi, gxyz, osc_width, total_photons, distance,
+                       rot_speed=5.0, crystal_id="unknown", prefix="multi"):
+        mc = MultiCrystal.MultiCrystal()
+
+        # flux_factor: stored in 'beamsize.config'
+        # flux: estimated by flux factor and base-photon flux (TCS 0.1 mm sq beam at BL32XU)
+        beam_index, flux_factor, flux = self.beamsizeconf.getBeamParams(h_beam, v_beam)
+
+        # total oscillation range
+        total_osc = end_phi - start_phi
+        # Caclculate exposure condition 
+        # 2016/12/09 added the function: calcExpConds2
+        # exposure time is estimated from rotation speed.
+        att_idx, real_exptime = self.calcExpConds2(wavelength, start_phi, end_phi, osc_width, rot_speed, total_photons,
+                                                   flux)
+
+        # 160618 Added by K. Hirata
+        mc.setBeamsizeIndex(beam_index)
+        mc.setAttIdx(att_idx)
+        mc.setCrystalID(crystal_id)
+        mc.setWL(wavelength)
+        mc.setExpTime(real_exptime)
+        mc.setCameraLength(distance)
+        mc.setScanCondition(start_phi, end_phi, osc_width)
+        mc.setDir(self.multi_dir)
+        mc.setShutterlessOn()
+        sch_str = mc.makeSchStrEach(prefix, gxyz)
+
+        return sch_str
+
+    # Rotation speed should be fixed: only attenuator thickness can be modified
+    def calcExpCondWithoutModExpTime(self, wavelength, start_phi, end_phi, osc_width, total_photons, flux_beam,
+                                     exp_time):
+        attfac = AttFactor.AttFactor()
+        # total oscillation range
+        total_osc = end_phi - start_phi
+
+        # Multi conditions
+        n_frames = int(total_osc / osc_width)
+
+        # Total photons/frame
+        phs_per_frame = total_photons / float(n_frames)
+        print "Aimed flux/frame: %5.2e" % (phs_per_frame)
+
+        # Exposure time for full flux
+        ff_exptime = phs_per_frame / flux_beam
+        print "Full flux exposure time for aimed flux=%13.8f sec/frame" % ff_exptime
+
+        # Suitable exposure time range
+        print "Attenuation factor for 1sec exposure/frame", ff_exptime / exp_time
+        transmission = ff_exptime / exp_time
+
+        # Suitable attenuation factor
+        att_thick = attfac.getBestAtt(wavelength, transmission)
+        trans = attfac.calcAttFac(wavelength, att_thick)
+
+        # Final calculation
+        att_idx = attfac.getAttIndexConfig(att_thick)
+
+        return att_idx, exp_time
+
+    # 2016/12/04 Rotation speed change
+    def genRotSpeed(self, wavelength, h_beam, v_beam, start_phi, end_phi, gxyz, osc_width, total_photons, distance,
+                    rot_speed, crystal_id="unknown", prefix="multi"):
+        mc = MultiCrystal.MultiCrystal()
+        multi_sch = "%s/multi.sch" % self.multi_dir
+
+        beam_index, flux_factor, flux = self.beamsizeconf.getBeamParams(h_beam, v_beam)
+
+        # rotation speed [deg./s]
+        exp_time = osc_width / rot_speed
+        # EIGER readout time 
+        if 1.0 / exp_time > self.max_framerate:
+            print "genRotSpeed. Frame rate exceeds the maximum frame rate!!"
+            sys.exit(1)
+
+        # total oscillation range
+        total_osc = end_phi - start_phi
+
+        # calcExpCondRotSpeed(self,wavelength,start_phi,end_phi,osc_width,total_photons,flux_beam,exp_time):
+        att_idx, real_exptime = self.calcExpCondWithoutModExpTime(wavelength, start_phi, end_phi, osc_width,
+                                                                  total_photons, flux, exp_time)
+
+        # 160618 Added by K. Hirata
+        mc.setBeamsizeIndex(beam_index)
+        mc.setAttIdx(att_idx)
+        mc.setCrystalID(crystal_id)
+        mc.setWL(wavelength)
+        mc.setExpTime(real_exptime)
+        mc.setCameraLength(distance)
+        mc.setScanCondition(start_phi, end_phi, osc_width)
+        mc.setDir(self.multi_dir)
+        mc.setShutterlessOn()
+        sch_str = mc.makeSchStrEach(prefix, gxyz)
+
+        return sch_str
+
+    def genSchedule(self, sch_str):
+        mc = MultiCrystal.MultiCrystal()
+        multi_sch = "%s/multi.sch" % self.multi_dir
+
+        ofile = open(multi_sch, "w")
+        for each_sch in sch_str:
+            for line in each_sch:
+                ofile.write("%s" % line)
+        ofile.close()
+
+        return multi_sch
+
+    # 2016/09/26 Multiple various conditions
+    # From one loop: datasets with various conditions
+    def genMultiVarious(self, phi_mid, glist, osc_width, total_osc, add_conds,
+                        exp_time, distance, crystal_id="unknown", prefix="multi"):
+
+        mc = MultiCrystal.MultiCrystal()
+        multi_sch = "%s/multi.sch" % self.multi_dir
+
+        # Multi conditions
+        n_frames = int(total_osc / osc_width)
+        half_width = total_osc / 2.0
+        start_phi = phi_mid - half_width
+        end_phi = phi_mid + half_width
+
+        # Various conditions
+        # add_conds list of 'exposure time limit'
+        # add_conds=[0.0033,0.0066,0.0165,0.033,0.165] # [sec]
+
+        comstr = []
+        data_index = 1
+        for exp_limit in add_conds:
+            attfac = AttFactor.AttFactor()
+            best_transmission = exp_limit / float(n_frames) / exp_time
+            best_thick = attfac.getBestAtt(self.wavelength, best_transmission)
+            print "Suggested Al thickness = %8.1f[um]" % best_thick
+            att_idx = attfac.getAttIndexConfig(best_thick)
+            # 160618 Added by K. Hirata
+            this_prefix = "%s-%02d" % (prefix, data_index)
+            mc.setPrefix(this_prefix)
+            mc.setAttIdx(att_idx)
+            mc.setCrystalID(crystal_id)
+            mc.setWL(self.wavelength)
+            mc.setExpTime(exp_time)
+            mc.setCameraLength(distance)
+            mc.setScanCondition(start_phi, end_phi, osc_width)
+            mc.setDir(self.multi_dir)
+            mc.setShutterlessOn()
+            cstr = mc.makeSchStr(glist)
+            comstr.append(cstr)
+            data_index += 1
+
+        # print multi_sch
+        mf = open(multi_sch, "w")
+        for cstr in comstr:
+            for line in cstr:
+                print line
+                mf.write("%s" % line)
+        return multi_sch
+
+    # 2019/05/22 Largely modified to use KUMA
+    def genHelical(self, startphi, endphi, left_xyz, right_xyz, prefix, flux, cond, logfile):
+
+        schbss = ScheduleBSS.ScheduleBSS()
+        gv = GonioVec.GonioVec()
+        logfile.write("LoopMeasurement.genHelical starts\n")
+
+        # Total oscillation width
+        total_osc = endphi - startphi
+        # Number of frames
+        stepphi = cond['osc_width']
+        nframe = int(total_osc / stepphi)
+        ### From KUMA code 2015/12/18
+        scanvec = gv.makeLineVec(left_xyz, right_xyz)
+        # Distance of this vector [mm] along 'rotation axis'
+        dist_vec = np.fabs(scanvec[1])
+
+        if dist_vec < 0.005:
+            raise MyException("crystal size is too small for helical data collection")
+
+        nframes_per_point = 1
+        while (1):
+            # number of irradiation points
+            n_irrad = int(float(nframe) / float(nframes_per_point))
+            # Scan vector length is divided by number of frames
+            # [mm]
+            step_length = dist_vec / float(n_irrad)
+            # ideal_step_length < 0.5um
+            # increase number of frames per irradiation point
+            step_um = step_length * 1000.0
+            if step_um < 0.5:
+                nframes_per_point += 1
+            else:
+                break
+
+        logfile.write("Total oscillation range: %12.5f (%5.1f - %5.1f)\n" % (total_osc, startphi, endphi))
+        logfile.write("Scan vector length: %8.5f [um]\n" % (dist_vec * 1000.0))
+
+        # Dose estimation
+        kuma = KUMA.KUMA(logfile)
+        # the routine considers 'dose slicing' also
+        logfile.write("Estimate best conditions....\n")
+        exp_time, best_transmission = kuma.getBestCondsHelical(cond, flux, dist_vec)
+        logfile.write("Best transmission = %8.2f\n" % best_transmission)
+        logfile.write("Estimate best ends....\n")
+        ntimes = cond['ntimes']
+
+        # Beam size setting : extracting beamsize index from beamsize.config
+        beamsize_index = self.beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
+        print "Beamsize index in rasterMaster is %5d" % beamsize_index
+
+        if beamline == "BL32XU" or beamline == "BL45XU":
+            # Attenuation factor setting
+            print "Attenuator calculation"
+            attfac = AttFactor.AttFactor()
+            best_thick = attfac.getBestAtt(self.wavelength, best_transmission)
+            print "Attenuator calculation ends Best=", best_thick
+            print "Attenuator index searching"
+            logfile.write("Suggested Al thickness = %8.1f[um] at W.L.=%8.5f A\n" % (best_thick, self.wavelength))
+            att_idx = attfac.getAttIndexConfig(best_thick)
+            print "Att index is selected as %5d" % att_idx
+            schbss.setAttIdx(att_idx)
+        elif beamline == "BL41XU":
+            schbss.setTrans(best_transmission)
+
+        # Condition settings
+        # Data directory
+        img_dir = "%s/" % (self.multi_dir)
+        # print img_dir
+        schedule_file = "%s/%s.sch" % (img_dir, prefix)
+        self.prepPath(img_dir)
+        schbss.setDir(img_dir)
+        schbss.setDataName(prefix)
+        if self.isBeamsizeIndexOnScheduleFile == True:
+            schbss.setBeamsizeIndex(beamsize_index)
+        schbss.setOffset(0)
+        schbss.setWL(self.wavelength)
+        schbss.setExpTime(exp_time)
+        schbss.setCameraLength(cond['dist_ds'])
+        schbss.setAdvanced(n_irrad, step_length, nframes_per_point)
+        schbss.setAdvancedVector(left_xyz, right_xyz)
+        schbss.setScanCondition(startphi, endphi, stepphi)
+
+        # ntimes is the number of time of same data collection
+        if cond['ntimes'] == 1:
+            schbss.make(schedule_file)
+        # ntimes > 1
+        else:
+            schbss.makeMulti(schedule_file, ntimes)
+
+        print "OK"
+        return schedule_file
+
+    # 2015/11/26 AM5:15 K.Hirata wrote
+    # Vertical scan for each gonio position from 2D raster results
+    # phi_start: raster phi start
+    # glist: code lists from 2D scan results
+    # raster_step: Vertical scan step in [mm]
+    # raster_npoints: vertical scan points
+    # raster_exp: exposure time in [sec]
+    # distance: raster scan camera distance
+
+    # 2015/12/06 modified
+
+    def genVrasterMulti(self, cry_name, phi_start, glist, raster_step, raster_npoints, raster_exp, distance):
+        vraster_dir = "%s/%s/" % (self.raster_dir, cry_name)
+        multi_sch = "%s/vraster.sch" % (vraseter_dir)
+        image_outdir = vraster_dir
+
+        # Vertical scan prefix
+        rs = RasterSchedule.RasterSchedule()
+
+        # Conditions for Shutterless vertical scan
+        rs.setPrefix(prefix)
+        rs.setCL(cond.distance)
+        rs.setImgDire(self.raster_dir)
+        rs.setStartPhi(phi_start)
+        rs.setVertical()
+        rs.setVstep(raster_step)
+        rs.setVpoints(raster_npoints)
+        rs.setHpoints(1)
+        rs.setExpTime(raster_exp)
+        rs.makeMulti(sc_name, glist)
+
+
+if __name__ == "__main__":
+    import ESA
+
+    ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ms.connect(("172.24.242.59", 10101))
+
+    # ESA
+    esa = ESA.ESA("./zoo.db")
+    # esa.readCSV("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/41.Ohto/test5.csv")
+    esa.makeTable("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/41.Ohto/test5.csv")
+    ppp = esa.getDict()
+
+    root_dir = "/isilon/users/t_shimizu_4368/t_shimizu_4368/Junk/junk4/"
+
+    cxyz = [1.7601, -6.1756, 0.6280]
+    phi = 0.00
+    scan_id = "sample99"
+    trayid = 1
+    pinid = 1
+    beamsize = 10.0
+
+    lm = LoopMeasurement(ms, root_dir, scan_id)
+
+    wavelength = 0.9
+    startphi = 0.0
+    endphi = 90.0
+    osc_width = 0.1
+    flux = 1.3E13
+
+    left_xyz = [0.0, 0.0, 0.1]
+    right_xyz = [0.0, 0.1, 0.0]
+    print left_xyz, right_xyz
+    prefix = "TEST"
+
+    logfile = open("logfile.log", "w")
+    lm.genHelical(startphi, endphi, left_xyz, right_xyz, prefix, flux, ppp[0], logfile)
+
+    ms.close()

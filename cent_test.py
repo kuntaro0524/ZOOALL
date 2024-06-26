@@ -30,14 +30,14 @@ if __name__ == "__main__":
 			backfile="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/back_c1_z0_b4.ppm"
 			try:
 				grav_x,grav_y,xwidth,ywidth,area,xedge=cip.getCenterInfo(filename,debug=False)
-				print("EDGE",xedge)
-			except MyException as ttt:
+				print "EDGE",xedge
+			except MyException,ttt:
 				#print ttt.args[1]
 				continue
 	
 			if grav_x > cenx:
 				grav_x=cenx
-			print(grav_x,grav_y)
+			print grav_x,grav_y
 			x,y,z=coi.calc_gxyz_of_pix_at(grav_x,grav_y,cx,cy,cz,phi)
 			coi.moveGXYZphi(x,y,z,phi)
 			l=phi,area
@@ -59,8 +59,8 @@ if __name__ == "__main__":
 			backfile="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/back_c1_z0_b4.ppm"
 			try:
 				grav_x,grav_y,xwidth,ywidth,area,xedge=cip.getCenterInfo(filename,debug=False)
-				print("AREA",area)
-			except MyException as ttt:
+				print "AREA",area
+			except MyException,ttt:
 				#print ttt.args[1]
 				continue
 			if min_area > area:

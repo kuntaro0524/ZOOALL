@@ -10,38 +10,63 @@ from AnalyzePeak import *
 from AxesInfo import *
 
 class TCS:
-    def __init__(self,server):
-        self.s=server
-        self.tcs_height=Motor(self.s,"bl_32in_tc1_slit_1_height","mm")
-        self.tcs_width=Motor(self.s,"bl_32in_tc1_slit_1_width","mm")
-        self.tcs_vert=Motor(self.s,"bl_32in_tc1_slit_1_vertical","mm")
-        self.tcs_hori=Motor(self.s,"bl_32in_tc1_slit_1_horizontal","mm")
+    # tcslit in opt hutch
+    def __init__(self, server):
+        self.s = server
+        self.tcs_width = Motor(self.s, "bl_45in_tc1_slit_2_width", "mm")
+        self.tcs_hori = Motor(self.s, "bl_45in_tc1_slit_2_horizontal", "mm")
+        self.tcs_x = Motor(self.s, "bl_45in_tc1_slit_2_x", "pulse")
+
+        # each blade
+        self.tcs_ring = Motor(self.s, "bl_45in_tc1_slit_2_ring", "mm")
+        self.tcs_hall = Motor(self.s, "bl_45in_tc1_slit_2_hall", "mm")
+
+        # pulse2mm
+        self.p2mm_tcsx = 1000.0
 
     def saveInit(self):
         self.getApert()
         self.getPosition()
 
+    def getTest(self):
+        ring_pos = self.tcs_ring.getPosition()[0]
+        hall_pos = self.tcs_hall.getPosition()[0]
+
+        print ring_pos, hall_pos
+
+    def setTest2(self):
+        # RING BLADE
+        self.tcs_ring.move(-15000)
+        self.tcs_ring.move(-16000)
+
     def getApert(self):
         # get values
-        self.ini_height=self.tcs_height.getApert()
         self.ini_width=self.tcs_width.getApert()
-        return float(self.ini_height[0]),float(self.ini_width[0])
+        return float(self.ini_width[0])
 
     def getPosition(self):
         # get values
-        vert=self.tcs_vert.getPosition()[0]
-        hori=self.tcs_hori.getPosition()[0]
-        return vert,hori
+        hori = self.tcs_hori.getPosition()[0]
+        return hori
+
+    def getTrans(self):
+        x=self.tcs_x.getPosition()[0]/self.p2mm_tcsx
+        return x
+
+    def setTrans(self,abspos_mm):
+        abs_pulse = abspos_mm * self.p2mm_tcsx
+        self.tcs_x.move(abs_pulse)
+        self.getTrans()
+        return True
 
     def setPosition(self,vert,hori):
         # get values
-        self.tcs_vert.move(vert)
-        self.tcs_hori.move(hori)
+        self.tcs_hori.move(vert)
+        self.tcs_x.move(hori)
 
-    def setApert(self,height,width):
-        self.tcs_height.move(height)
+    def setApert(self,width):
         self.tcs_width.move(width)
-        print("current tcs aperture : %8.5f %8.5f\n" %(height,width))
+        print "current tcs aperture : %8.5f\n" %(width)
 
     def scanBoth(self,prefix,scan_width,another_width,start,end,step,cnt_ch1,cnt_ch2,time):
         vfwhm,vcenter=self.scanV(prefix,scan_width,another_width,start,end,step,cnt_ch1,cnt_ch2,time)
@@ -50,7 +75,7 @@ class TCS:
         return vcenter,hcenter
 
     def scanVrel(self,prefix,height,width,swidth,step,cnt_ch1,cnt_ch2,time):
-        curr_pos=self.tcs_vert.getPosition()[0]
+        curr_pos=self.tcs_hori.getPosition()[0]
         half_width=fabs(float(swidth))/2.0
 
         start=curr_pos-half_width
@@ -60,70 +85,46 @@ class TCS:
         return fwhm,center
 
     def scanHrel(self,prefix,height,width,swidth,step,cnt_ch1,cnt_ch2,time):
-        curr_pos=self.tcs_hori.getPosition()[0]
+        curr_pos=self.tcs_x.getPosition()[0]
         half_width=fabs(float(swidth))/2.0
 
         start=curr_pos-half_width
         end=curr_pos+half_width
         fwhm,center=self.scanH(prefix,height,width,start,end,step,cnt_ch1,cnt_ch2,time)
-        
-        return fwhm,center
 
-    def scanV(self,prefix,height,width,start,end,step,cnt_ch1,cnt_ch2,time):
-        # Vertical scan setting
-        ofile=prefix+"_tcs_vert.scn"
-    
-        # Aperture setting
-        self.setApert(height,width)
-
-        # Scan setting 
-        self.tcs_vert.setStart(start)
-        self.tcs_vert.setEnd(end)
-        self.tcs_vert.setStep(step)
-
-        self.tcs_vert.axisScan(ofile,cnt_ch1,cnt_ch2,time)
-
-        # AnalyzePeak
-        ana=AnalyzePeak(ofile)
-        outfig=prefix+"_tcs_vert.png"
-
-        comment=AxesInfo(self.s).getLeastInfo()
-        fwhm,center=ana.analyzeAll("TCS vert[mm]","Intensity",outfig,comment,"OBS")
-
-        self.tcs_vert.move(center)
-        print("Final position: %smm" % (center))
         return fwhm,center
 
     def scanH(self,prefix,height,width,start,end,step,cnt_ch1,cnt_ch2,time):
         # Horizontal scan setting
-        ofile=prefix+"_tcs_hori.scn"
+        ofile=prefix+"_tcs_x.scn"
 
         # Aperture setting
         self.setApert(height,width)
 
-        # Scan setting 
-        self.tcs_hori.setStart(start)
-        self.tcs_hori.setEnd(end)
-        self.tcs_hori.setStep(step)
-        
-        self.tcs_hori.axisScan(ofile,cnt_ch1,cnt_ch2,time)
+        # Scan setting
+        self.tcs_x.setStart(start)
+        self.tcs_x.setEnd(end)
+        self.tcs_x.setStep(step)
+
+        self.tcs_x.axisScan(ofile,cnt_ch1,cnt_ch2,time)
 
         # AnalyzePeak
         ana=AnalyzePeak(ofile)
-        outfig=prefix+"_tcs_hori.png"
+        outfig=prefix+"_tcs_x.png"
 
         comment=AxesInfo(self.s).getLeastInfo()
         fwhm,center=ana.analyzeAll("TCS hori[mm]","Intensity",outfig,comment,"OBS")
 
-        self.tcs_hori.move(center)
-
+        self.tcs_x.move(center)
         return fwhm,center
 
     def checkZeroV(self,prefix,start,end,step,cnt_ch1,cnt_ch2,time):
         # Counter
         counter=Count(self.s,cnt_ch1,cnt_ch2)
+
         # Setting aperture
         self.setApert(1.00,1.00)
+
         ofile=prefix+"_vert_zero.scn"
 
         scan_start=start
@@ -133,7 +134,7 @@ class TCS:
 
         ndata=int((scan_end-scan_start)/scan_step)+1
         if ndata <=0 :
-            print("Set correct scan step!!\n")
+            print "Set correct scan step!!\n"
             return 1
 
         outfile=open(ofile,"w")
@@ -154,7 +155,7 @@ class TCS:
         counter=Count(self.s,cnt_ch1,cnt_ch2)
 
         # Setting aperture
-        self.setApert(1.0,1.0)
+        self.setApert(1.0)
 
         ofile=prefix+"_hori_zero.scn"
 
@@ -166,29 +167,33 @@ class TCS:
 
         ndata=int((scan_end-scan_start)/scan_step)+1
         if ndata <=0 :
-            print("Something wrong")
+            print "Something wrong"
             return 1
 
         outfile=open(ofile,"w")
 
         for x in range(0,ndata):
             value=scan_start+x*scan_step
-            self.setApert(1.0,value)
+            self.setApert(value)
             count1,count2=counter.getCount(cnt_time)
             count1=float(count1)
             count2=float(count2)
             outfile.write("%12.5f %12.5f %12.5f\n"%(value,count1,count2))
 
-        self.setApert(1.0,1.0)
+        self.setApert(1.0)
         return 1
 
     def scan2d(self,prefix,width,step,cnt_ch1,cnt_ch2,time):
         # save current position
         self.saveCurr()
+        # Counter
         counter=Count(self.s,cnt_ch1,cnt_ch2)
+
         # Setting aperture
         self.setApert(0.05,0.05)
+
         ofile=prefix+"_test.scn"
+
         minus=-width/2.0
         plus=width/2.0
 
@@ -201,7 +206,7 @@ class TCS:
 
         ndata=int((scan_end-scan_start)/scan_step)+1
         if ndata <=0 :
-            print("Something wrong")
+            print "Something wrong"
             return 1
 
         outfile=open(ofile,"w")
@@ -218,32 +223,17 @@ class TCS:
         return 1
 
 if __name__=="__main__":
-    host = '172.24.242.41'
-    port = 10101
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host,port))
+        host = '172.24.242.59'
+        port = 10101
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((host,port))
 
-    tcs=TCS(s)
+        tcs=TCS(s)
+        apert= tcs.getApert()
+        hori = tcs.getPosition()
+        x= tcs.getTrans()
+        tcs.setApert(6.0)
+        #tcs.setTrans(10.0)
+        print hori,apert,x
 
-    #tcs.checkZeroV("TEST",1.0,0.5,-0.1,0.2,1)
-
-    #tcs.getApert()
-    #tcs.setApert(0.1,0.1)
-    #tcs.setPosition(1.000,-1.000)
-
-    #tcs.scanBoth("VVVV",0.05,0.50,-1.0,1.0,0.05,0,1,0.2)
-    #def scanVrel(self,prefix,height,width,swidth,cnt_ch1,cnt_ch2,time):
-    vsave,hsave=tcs.getPosition()
-    print(vsave,hsave)
-    #tcs.scanVrel("test",0.05,0.50,1.0,0.05,0,1,0.2)
-    tcs.scanHrel("test",0.50,0.05,1.0,0.05,0,1,0.2)
-
-    tcs.setPosition(vsave,hsave)
-
-    #tcs.setPosition(0.00052,0.00302)
-    #prefix=raw_input()
-        #tcs.checkZeroH("TEST",1.0,0.1,-0.1,1,2,0.2)
-        #tcs.checkZeroV("TEST",1.0,0.1,-0.1,1,2,0.2)
-    #def checkZeroH(self,prefix,start,end,step,time,cnt_ch1):
-
-    s.close()
+        s.close()

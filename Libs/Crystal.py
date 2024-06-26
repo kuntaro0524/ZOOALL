@@ -33,9 +33,9 @@ class Crystal:
     def printAll(self):
         index=0
         for x,y,z,h,v,score in self.code_list:
-            print("%5d %8.4f %8.4f %8.4f %5d %5d %5d Total=%5d"%(index,x,y,z,h,v,score,self.score_total))
+            print "%5d %8.4f %8.4f %8.4f %5d %5d %5d Total=%5d"%(index,x,y,z,h,v,score,self.score_total)
             index+=1
-        print("\n\n")
+        print "\n\n"
 
     def getTotalScore(self):
         if self.isPrep==False:
@@ -108,10 +108,10 @@ class Crystal:
                 self.xyz_minv=x,y,z
 
         if self.DEBUG==True:
-            print("Maxh=",self.xyz_maxh)
-            print("Minh=",self.xyz_minh)
-            print("Maxv=",self.xyz_maxv)
-            print("Minv=",self.xyz_minv)
+            print "Maxh=",self.xyz_maxh
+            print "Minh=",self.xyz_minh
+            print "Maxv=",self.xyz_maxv
+            print "Minv=",self.xyz_minv
 
         min_h_y=self.xyz_minh[1]
         max_h_y=self.xyz_maxh[1]
@@ -132,8 +132,8 @@ class Crystal:
         self.isPrep=True
         
         if self.DEBUG==True:
-            print("Score of this crystal=",self.score_total)
-            print("H crystal size=",self.cry_hsize,self.isSingle)
+            print "Score of this crystal=",self.score_total
+            print "H crystal size=",self.cry_hsize,self.isSingle
 
         return self.cry_hsize,self.isSingle,self.score_total,self.edges
 
@@ -173,7 +173,7 @@ class Crystal:
     def getRoughEdges(self):
         if self.isPrep==False:
             self.prepInfo()
-        print(self.cry_hsize,self.isSingle,self.score_total,self.edges)
+        print self.cry_hsize,self.isSingle,self.score_total,self.edges
         return self.edges
 
 if __name__=="__main__":
@@ -193,10 +193,10 @@ if __name__=="__main__":
     #crystal_list=m2c.searchMulti("CPS0298-01",min_score,max_score,cry_size)
 
     
-    print(len(crystal_list))
+    print len(crystal_list)
     index=0
     for cry in crystal_list:
         #x,y,z= cry.getPeakCode()
         #cry.printAll()
         cry_hsize,isSingle,score_total,edges = cry.prepInfo()
-        print(cry_hsize,isSingle,score_total,edges)
+        print cry_hsize,isSingle,score_total,edges

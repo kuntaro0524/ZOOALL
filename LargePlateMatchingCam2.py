@@ -1,7 +1,7 @@
 #from opencv.cv import LoadImageM
 #from opencv.highgui import *
 
-#import Image
+import Image
 import os,glob
 import sys
 import cv2
@@ -24,7 +24,7 @@ class LargePlateMatchingCam2:
                 pinimage=cv2.imread(target_pic,0)
                 back=cv2.imread(back_pic,0)
 
-		print(pinimage.shape)
+		print pinimage.shape
                 dimg=cv2.absdiff(pinimage,back)
                 cv2.imwrite("./diff.jpg",dimg)
 
@@ -57,12 +57,12 @@ class LargePlateMatchingCam2:
                         for i in d:
                                 hori=i[0]
                                 vert=i[1]
-                                print("CONT:",hori,vert)
+                                print "CONT:",hori,vert
                                 if hori >= max_hori:
-                                        print("MAX!",hori,vert)
+                                        print "MAX!",hori,vert
                                         max_hori=hori
                                         max_vert=vert
-                print(max_hori,max_vert)
+                print max_hori,max_vert
                 cv2.circle(self.roi,(max_hori,max_vert),3,(0,0,255),3)
                 cv2.imwrite("cont.jpg",self.roi)
 		return max_hori,max_vert
@@ -89,8 +89,8 @@ class LargePlateMatchingCam2:
                 top_left=max_loc
                 w,h=otehon.shape[::-1]
                 bottom_right=(top_left[0]+w,top_left[1]+h)
-                print("MAX_LOC=",max_loc)
-                print(top_left,bottom_right)
+                print "MAX_LOC=",max_loc
+                print top_left,bottom_right
                 cv2.rectangle(th,top_left,bottom_right,(255,0,0),2)
                 cv2.circle(th,top_left,2,(255,0,0),2)
                 cv2.imwrite("%s_result.jpg"%prefix,th)
@@ -168,7 +168,7 @@ class LargePlateMatchingCam2:
 		cv2.rectangle(result,top_left,bottom_right,(255,0,0),2)
 		cv2.imwrite("result.jpg",result)
 
-		print("MAX_LOC=",max_loc)
+		print "MAX_LOC=",max_loc
 		return max_loc
 
         def getPosition2(self,target_roi,phi=0.0):
@@ -186,9 +186,9 @@ class LargePlateMatchingCam2:
                 top_left=max_loc
                 w,h=template.shape[::-1]
                 bottom_right=(top_left[0]+w,top_left[1]+h)
-                print("MAX_LOC=",max_loc)
-		print(top_left,bottom_right)
-		print("ROI shape",target_roi.shape)
+                print "MAX_LOC=",max_loc
+		print top_left,bottom_right
+		print "ROI shape",target_roi.shape
                 cv2.rectangle(target_roi,top_left,bottom_right,(255,0,0),2)
                 cv2.imwrite("result.jpg",target_roi)
 
@@ -216,15 +216,15 @@ class LargePlateMatchingCam2:
 		#print self.template_list
 
 	def match(self,target_pic):
-		print("Matching")
+		print "Matching"
 		if self.isSeiri==False:
 			self.fileSeiri()
-		print(self.template_list)
+		print self.template_list
 		max_sim=0.0
 		ok_file=""
 		for f,phi in self.template_list:
 			max_val=self.getSimilarity(target_pic,f)
-			print(f,max_val)
+			print f,max_val
 			if max_val > max_sim:
 				max_sim=max_val
 				ok_file=f

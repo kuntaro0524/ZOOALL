@@ -18,12 +18,12 @@ class StopWatch:
     def setTime(self,key):
         nowtime=datetime.datetime.now()
         self.sw_dict[key]=nowtime
-        print(self.sw_dict[key])
+        print self.sw_dict[key]
 
     def getDsecBtw(self,begtime_tag,endtime_tag):
         begtime=self.sw_dict[begtime_tag]
         endtime=self.sw_dict[endtime_tag]
-        print(begtime,endtime)
+        print begtime,endtime
         t_delta=(endtime-begtime).seconds
         return t_delta
 
@@ -51,7 +51,7 @@ if __name__=="__main__":
     #sw.setTime("End")
     #time.sleep(5.0)
 
-    print(sw.calcTimeFrom("Start"))
+    print sw.calcTimeFrom("Start")
 
     #print sw.getNowStr()
 

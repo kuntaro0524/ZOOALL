@@ -23,7 +23,7 @@ class DBinfo():
 
     def str2time(self, esa_timestr):
         if esa_timestr == None:
-            print("No information")
+            print "No information"
             raise MyException("No information")
         #print "esa_timestr=",esa_timestr
         try:
@@ -37,9 +37,9 @@ class DBinfo():
             timestr = "%s-%s-%s %s:%s:%s" % (year, month, date, hour, mins, secs)
             ttime=datetime.datetime.strptime(timestr, '%Y-%m-%d %H:%M:%S')
             return ttime
-        except MyException as tttt:
+        except MyException,tttt:
             message = "Something wrong to read %s" % esa_timestr
-            print(message)
+            print message
             raise MyException(ttt)
 
     # Extract time information from timestr at the designated index
@@ -78,6 +78,7 @@ class DBinfo():
         #print "TIMESTR=", timestr
 
         # Estimating consumed time
+
         for info in rtn_array:
             exp_seq, start_or_end, time_str = info
             if exp_seq == "mount":
@@ -169,7 +170,6 @@ class DBinfo():
         self.root_dir = self.cond['root_dir']
         self.puck = self.cond['puckid']
         self.pin = self.cond['pinid']
-        self.puck_pin = "%s-%02d" % (self.puck, self.pin)
         self.isLoopCenter = self.cond['isLoopCenter']
         self.isDone = self.cond['isDone']
         self.n_mount = self.cond['n_mount']
@@ -192,7 +192,6 @@ class DBinfo():
         self.data_index = self.cond['data_index']
         self.raster_vbeam = self.cond['raster_vbeam']
         self.raster_hbeam = self.cond['raster_hbeam']
-        self.exp_ds = self.cond['exp_ds']
         self.exp_raster = self.cond['exp_raster']
         self.exp_ds = self.cond['exp_ds']
         self.ds_vbeam = self.cond['ds_vbeam']
@@ -202,23 +201,12 @@ class DBinfo():
         self.total_osc = self.cond['total_osc']
         self.osc_width = self.cond['osc_width']
         self.dose_ds = self.cond['dose_ds']
-        self.reduced_fact = self.cond['reduced_fact']
         self.ntimes = self.cond['ntimes']
+        self.reduced_fact = self.cond['reduced_fact']
 
         #print "ISDONE=",selEAf.isDone
 
         self.isRead = True
-
-    def store2dict(self):
-        if self.isRead == False: self.prepParams()
-
-        conds_dict = {}
-        for key, value in zip(list(self.__dict__.keys()), list(self.__dict__.values())):
-            if key == "conds_dict":
-                continue
-            conds_dict[key] = value
-
-        return conds_dict
 
     def getIsDone(self):
         if self.isRead == False:
@@ -279,7 +267,7 @@ class DBinfo():
         if self.mode == "single":
             return self.isDS
         else:
-            print("EEEEEEEEEEEEEEEEEEEEEEE")
+            print "EEEEEEEEEEEEEEEEEEEEEEE"
 
     def getPrefix(self):
         if self.isRead == False:
@@ -331,7 +319,7 @@ class DBinfo():
     def getPinStr(self):
         if self.isRead == False:
             self.prepParams()
-        return self.puck_pin
+        return "%s-%02d" % (self.puck, self.pin)
 
     def getKAMOinfo(self):
         if self.isRead == False:
@@ -387,7 +375,7 @@ class DBinfo():
                 self.isGood = True
 
         if log_error == "Unidentified errors.":
-            print("EEEEEEEEEEEEEEEEEEEEEEEEEE",self.isDone)
+            print "EEEEEEEEEEEEEEEEEEEEEEEEEE",self.isDone
 
         self.isJudged = True
         self.log_comment = log_error
@@ -434,7 +422,7 @@ if __name__ == "__main__":
             nds = dbinfo.getNDS()
             #print "%s GOOD. NDS(%8s) = %3d (%4.1f mins)" %(pinstr, mode, nds, constime)
         else:
-            print("%s ERROR=%s"%(pinstr,dbinfo.getErrorMessage()))
+            print "%s ERROR=%s"%(pinstr,dbinfo.getErrorMessage())
         #dbinfo.getGoodOrNot()
         #dbinfo.getKAMOinfo()
 
@@ -445,8 +433,8 @@ if __name__ == "__main__":
         if flag == True:
             dpfile.write("%s/_kamoproc/%s/,%s,no\n" % (rootdir,prefix,sample_name))
         wavelength = dbinfo.getWavelength()
-        print(p['puckid'], p['pinid'], "WAVEL=", wavelength)
+        print p['puckid'], p['pinid'], "WAVEL=", wavelength
 
-    print("Number of crystals processed", len(conds))
-    print("Number of datasets " ,n_good)
-    print("Failed crystals")
+    print "Number of crystals processed", len(conds)
+    print "Number of datasets " ,n_good
+    print "Failed crystals"

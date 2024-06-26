@@ -12,7 +12,7 @@ class DumpRecover(Singleton.Singleton):
         # MBS check
         status_mbs=self.dev.mbs.getStatus()
         status_dss=self.dev.dss.getStatus()
-        print(status_mbs,status_dss)
+        print status_mbs,status_dss
 
         if status_mbs!="open":
             return True
@@ -27,19 +27,15 @@ class DumpRecover(Singleton.Singleton):
         gap=self.dev.id.getE(en)
 
         status_id=self.dev.id.getGap()
-        # Waiting for the initial phase of dump sequence
-        wait_time = 15 * 60 # sec : 15 minutes
 
-        #time.sleep(wait_time)
-
-        if self.dev.mbs.openTillOpen(wait_interval=60,ntrial=10000)==False:
-            print("MBS failed")
+        if self.dev.mbs.openTillOpen(wait_interval=60,ntrial=1000)==False:
+            print "MBS failed"
             return False
-        if self.dev.id.moveTillMove(gap,wait_interval=60,ntrial=10000)==False:
-            print("ID change failed")
+        if self.dev.id.moveTillMove(gap,wait_interval=60,ntrial=1000)==False:
+            print "ID change failed"
             return False
-        if self.dev.dss.openTillOpen(wait_interval=60,ntrial=10000)==False:
-            print("DSS open failed")
+        if self.dev.dss.openTillOpen(wait_interval=60,ntrial=1000)==False:
+            print "DSS open failed"
             return False
 
         # Tune dtheta1
@@ -53,8 +49,8 @@ class DumpRecover(Singleton.Singleton):
             self.recover(wavelength)
             return False
         else:
-            print("Ring status might be normal.")
-            print("Data collection continues...")
+            print "Ring status might be normal."
+            print "Data collection continues..."
             return True
 
 if __name__=="__main__":
@@ -68,5 +64,4 @@ if __name__=="__main__":
 
     dr=DumpRecover(dev)
     if dr.isDump()==True:
-        print("OKAY")
         dr.recover(1.0)

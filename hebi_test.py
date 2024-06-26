@@ -35,3 +35,13 @@ if __name__ == "__main__":
     raspath="/isilon/users/target/target/Staff/kuntaro/181127-HEBITEST/HEL-01/scan00/2d/"
     scan_id="2d"
     h2.mainLoop(raspath,scan_id,face_angle,conds[0],precise_face_scan=True)
+
+    #scan_prefix_2dface="2d"
+    #h2.mainLoop(scan_path_2dface,scan_prefix_2dface,face_agnel)
+    #print h2.anaVscan("helical_test/lv-fin-00/","lv-fin-00",0.0)
+    #print h2.anaVscan("helical_test/lv-fin-00/","lv-fin-00",0.0)
+    #print h2.ana2Dscan("helical_test/rface-00/","rface-00",0.0,method="right_upper")
+    #print h2.ana2Dscan("helical_test/lface-00/","lface-00",0.0,method="left_lower")
+
+    # DEBUGGIN
+    

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import socket
 import time
@@ -6,94 +7,43 @@ from numpy import *
 
 # My library
 from Motor import *
-import BSSconfig
 
 class Att:
     def __init__(self, server):
-        # BSS config file
-        self.bssconfig = BSSconfig.BSSconfig()
-        self.blo = self.bssconfig.getBLobject()
-        # beamline.ini file
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
-
-        # axis definition is read from 'beamline.ini' file
-        # section: axes, option: ccdlen
-        self.att_ax_name = self.config.get('axes', 'att')
-
-        # Attenuator 0 um thickness: pulse
-        self.pulse_for_noatt = self.config.getint('experiment', 'pulse_for_noatt')
-
         self.s = server
-        self.att = Motor(self.s, "bl_%s_%s" % (self.blo,self.att_ax_name), "pulse")
-        self.isInit = False
-        self.isDebug = False
+        self.att1 = Motor(self.s, "bl_41in_st2_att_1_rx", "pulse")
+        self.att2 = Motor(self.s, "bl_41in_st2_att_2_rx", "pulse")
 
-    # 140611 read configure file from BSS.CONFIG
+        self.bssconfig = "/blconfig/bss/bss.config"
+        self.isInit = False
+        self.att1_noatt_pulse = -35
+        self.att2_noatt_pulse = 0
+
+    def setNoAtt(self):
+        self.att1.move(self.att1_noatt_pulse)
+        self.att2.move(self.att2_noatt_pulse)
+        pos1 = int(self.att1.getPosition()[0])
+        pos2 = int(self.att2.getPosition()[0])
+        print "Pos1/Pos2 =", pos1, pos2
+
+    # 220323 'init' function does not read 'bss.config' because 
+    # アッテネータを変更するのはBSSでやれば良いので
+    # フラックスを測定するときだけ 0 アッテネータを実現できれば良い
+    # というわけでこの関数の中身を変えてしまう
     # Get Thick - Index - Pulse
     def init(self):
         confile = open(self.bssconfig, "r")
         lines = confile.readlines()
         confile.close()
-
-        self.att_idx = []
-        self.att_thick = []
-        self.att_pulse = []
-
-        # For no attenuator
-        self.att_idx.append(0)
-        self.att_thick.append(0.0)
-        self.att_pulse.append(self.pulse_for_noatt)
-
-        for line in lines:
-            if line.find("Attenuator_Menu_Label") != -1:
-                line = line.replace("[", "").replace("]", "").replace("{", "").replace("}", "")
-                cols = line.split()
-                ncols = len(cols)
-                if ncols == 4:
-                    if cols[2].find("um") != -1:
-                        tmp_thick = float(cols[2].replace("um", ""))
-                        tmp_attidx = int(cols[3])
-                        # storage
-                        self.att_idx.append(tmp_attidx)
-                        self.att_thick.append(tmp_thick)
-
-        for line in lines:
-            if line.find("Attenuator1_") != -1:
-                cols = line.split()
-                ncols = len(cols)
-
-                # Attenuator thickness = 0.0
-                if line.rfind("_0") != -1:
-                    continue
-
-                elif (ncols == 4):
-                    tmp_pulse = int(cols[3])
-                    self.att_pulse.append(tmp_pulse)
-
-        self.att_idx = array(self.att_idx)
-        self.att_thick = array(self.att_thick)
-        self.att_pulse = array(self.att_pulse)
-
-        if self.isDebug:
-            for i, thick, pulse in zip(self.att_idx, self.att_thick, self.att_pulse):
-                print(i, thick, pulse)
-        # flag on
         self.isInit = True
 
+    # For BL41XU set 0 mm is only activated.
     def setAttThick(self, thick):
-        if self.isInit == False:
-            self.init()
-        for t_conf, p_conf in zip(self.att_thick, self.att_pulse):
-            if thick == t_conf:
-                print("Set thickness to %5d [um]" % thick)
-                self.move(p_conf)
-                return True
-        print("No attenuator in the list")
+        if thick == 0.0:
+            self.setNoAtt()
+        else:
+            print("Please do not modify attenuator thickness other than 0.0 mm")
         return False
-
-    def setNoAtt(self):
-        self.move(self.pulse_for_noatt)
 
     def getAttList(self):
         if self.isInit == False:
@@ -101,6 +51,7 @@ class Att:
         return self.att_thick
 
     def getBestAtt(self, wl, transmission):
+
         if not self.isInit:
             self.init()
         attlist = self.att_thick
@@ -108,7 +59,7 @@ class Att:
         mu = self.calcMu(wl, cnfac)
         thickness = (-1.0 * math.log(transmission) / mu) * 10000
 
-        print("IDEAL thickness: %8.1f[um]" % thickness)
+        print "IDEAL thickness: %8.1f[um]" % thickness
 
         idx = 0
         for att in attlist:
@@ -127,7 +78,7 @@ class Att:
         mu = self.calcMu(wl, cnfac)
         thickness = (-1.0 * math.log(transmission) / mu) * 10000
 
-        print("IDEAL thickness: %8.1f[um]" % thickness)
+        print "IDEAL thickness: %8.1f[um]" % thickness
 
         near_idx = 0
         for att in attlist:
@@ -142,7 +93,7 @@ class Att:
             curr_trans = self.calcAttFac(wl, attlist[i])
             exptime = transmission / curr_trans
             if exptime <= 1.5 and exptime > 0.2:
-                print(attlist[i], curr_trans, exptime)
+                print attlist[i], curr_trans, exptime
                 return attlist[i], exptime
 
     def getAttBefore(self, althick):
@@ -158,12 +109,9 @@ class Att:
 
     def setAttTrans(self, wl, trans):
         best_att = self.getBestAtt(wl, trans)
-        print("Set Al thickness to ", best_att, "[um]")
+        print "Set Al thickness to ", best_att, "[um]"
         self.setAtt(best_att)
         return best_att
-
-    def getPosition(self):
-        return int(self.att.getPosition()[0])
 
     def move(self, pls_bss):
         self.att.move(-pls_bss)
@@ -176,7 +124,7 @@ class Att:
         for i, thick in zip(self.att_idx, self.att_thick):
             if thick == t:
                 return i
-        print("Something wrong: No attenuator at this beamline")
+        print "Something wrong: No attenuator at this beamline"
         return -9999
 
     def cnFactor(self, wl):
@@ -219,39 +167,13 @@ class Att:
 
 
 if __name__ == "__main__":
-
-    from configparser import ConfigParser, ExtendedInterpolation
-    config = ConfigParser(interpolation=ExtendedInterpolation())
-    config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-    config.read(config_path)
-    host = config.get("server", "blanc_address")
-    port = config.getint("server", "blanc_port")
-    
+    host = '172.24.242.54'
+    port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
     att = Att(s)
-    # att.init()
-    # att.setAttThick(0)
-    # att.move(3500)
-    # print att.setAttTrans(1.0,0.5)
-    # print att.getBestAtt(1.0000,0.2127)
-    # print att.getBestExpCondition(1.0000,0.02)
-    # print att.getBestExpCondition(1.4586,0.02)
-    # print att.getBestExpCondition(0.6888,0.02)
-
-    # Attenuator
-    #print att.calcAttFac(1.2,1000)
-    # print att.calcThickness(1.0,0.01)
-    # att.att1000um()
-    # att.att0um()
-    # att.att200um()
-    # att.setAttThick(1000)
-    # att.readBSSconfig()
-    # print att.getAttIndexConfig(5000)
-
-    print(att.getPosition())
     # att.setNoAtt()
-    # print(att.getPosition())
+    att.setAttThick(0.0)
 
     s.close()

@@ -1,18 +1,11 @@
-# -*- coding: utf-8 -*-
 import sys, os
 import socket
 import numpy as np
 from scipy import interpolate
-from configparser import ConfigParser, ExtendedInterpolation
 
 class BeamsizeConfig:
-    def __init__(self):
-        # configure file : "beamline.ini" を読む
-        # section 'dirs'  bssconfig_dir
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        self.config.read(config_path)
-
+    def __init__(self, config_dir):
+        self.config_dir = config_dir
         self.beamsize = []
         self.tcs_width = []
         self.tcs_height = []
@@ -29,10 +22,9 @@ class BeamsizeConfig:
         self.flux_const = 7E11  # 2017/05/10 FY2017 TCS 0.1x0.1mm
 
         # Default configure file
-        # read from 'beamline.ini" section: files, option: beamsize_conf_file
-        self.configfile = self.config.get("files", "beamsize_conf_file")
+        self.configfile = "%s/bss/beamsize.config" % self.config_dir
 
-        self.debug = True
+        self.debug = False
 
     def setConfigFile(self, configfile):
         self.configfile = configfile
@@ -109,7 +101,7 @@ class BeamsizeConfig:
                     cols = defstr.split()
                     # print "SLIT-H",cols[2]
                     self.tcs_height.append(float(cols[2]))
-                    
+
                 if defstr.rfind("_flux_list") != -1:
                     #print "DEFSTR=",defstr
                     flux_cols = (defstr.strip().replace("_flux_list:", "")).split(",")
@@ -135,38 +127,30 @@ class BeamsizeConfig:
         if self.isInit == False:
             self.readConfig()
 
-        self.isDebug=True
-        if self.debug: print("LENG=",len(self.beamsize_flux_list))
+        #print len(self.beamsize_flux_list)
+        #print self.beamsize_flux_list
+        print("Assessing beamsize ", hsize, vsize)
         for (h_beam, v_beam), flux_wave_list in self.beamsize_flux_list:
-            #print h_beam, v_beam, flux_wave_list
+            print(h_beam,v_beam)
             if h_beam == hsize and v_beam == vsize:
                 flux_list = flux_wave_list
                 break
+
+        print(flux_list)
         x = np.array(self.wl_list)
         y = np.array(flux_list)
+
         f = interpolate.interp1d(x,y,kind="cubic")
         X = np.linspace(x[0], x[-1], 10000, endpoint=True)
         Y = f(X)
-        if self.debug == True:
-            for ax, ay in zip(X,Y):
-                print("wavelength=",ax," Splined=", ay)
-
-        if self.wl_list[0] < self.wl_list[1]:
-            for work_x in X:
-                if self.debug: print("WORK_X1=", work_x)
-                if work_x >= wavelength:
-                    flux = f(work_x)
-                    break
-        else:
-            for work_x in X:
-                if self.debug: print("WORK_X2=", work_x)
-                if work_x <= wavelength+1.e-6:
-                    flux = f(work_x)
-                    break
-
-        if self.debug == True: 
-            print("wavelength = ", wavelength)
-            print("Flux = ", flux)
+        """
+        for ax, ay in zip(X,Y):
+            print ax, ay
+        """
+        for work_x in X:
+            if work_x > wavelength:
+                flux = f(work_x)
+                break
 
         return flux
 
@@ -241,12 +225,16 @@ class BeamsizeConfig:
         for beam in self.beamsize:
             b_idx, h_beam, v_beam = beam
             if hsize == h_beam and vsize == v_beam:
+                # print self.tcs_height[b_idx],self.tcs_width[b_idx]
                 ff = self.flux_factor[b_idx]
                 flux = self.flux_const * ff
+                # print "%5.1f um x %5.1f um flux=%e"%(hsize,vsize,flux)
                 return b_idx + 1, ff, flux
 
 if __name__ == "__main__":
-    bsc = BeamsizeConfig()
+    #config_dir = "/isilon/blconfig/bl45xu/"
+    config_dir = os.environ['BLCONFIG']
+    bsc = BeamsizeConfig(config_dir)
     # bsc.readConfig()
     tw, th, bs, ff = bsc.getBeamParamList()
     print("LEN=",len(bs))
@@ -256,10 +244,8 @@ if __name__ == "__main__":
         #print "%5.1f (H) x %5.1f (V)um %5.3e" % (q, r, ff)
         print("ALL=",p,q,r)
         #print bsc.getBeamsizeAtIndex(0)
-    #print "FLUX=",bsc.getFluxListForKUMA()
-
-    # print("EEEEEEEEEEEEE")
-    print("%e"%bsc.getFluxAtWavelength(50,50,1.0))
+    print("FLUX=",bsc.getFluxListForKUMA())
+    print("EEEEEEEEEEEEE=%e"%bsc.getFluxAtWavelength(20,20,1.4))
 
 # tcs_hmm=0.1
 # tcs_vmm=0.1

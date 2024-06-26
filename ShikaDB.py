@@ -2,7 +2,7 @@ import os
 import getpass
 import pysqlite2.dbapi2 as sqlite3
 import time
-import pickle as pickle
+import cPickle as pickle
 import numpy
 from yamtbx.dataproc import bl_logfiles
 
@@ -37,15 +37,15 @@ class ShikaDB:
 
 			c = cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='status';")
 			if c.fetchone() is None:
-				print("c.fetchone failed")
+				print "c.fetchone failed"
 				return
 
 			c = con.execute("select filename,spots from spots")
-			results = dict([(str(x[0]), pickle.loads(str(x[1]))) for x in c.fetchall()])
+			results = dict(map(lambda x: (str(x[0]), pickle.loads(str(x[1]))), c.fetchall()))
 
-			for r in list(results.values()):
+			for r in results.values():
 				if not r["spots"]: continue
-				ress = numpy.array([x[3] for x in r["spots"]])
+				ress = numpy.array(map(lambda x: x[3], r["spots"]))
 				test = numpy.zeros(len(r["spots"])).astype(numpy.bool)
 				#for rr in exranges: test |= ((min(rr) <= ress) & (ress <= max(rr)))
 				for i in reversed(numpy.where(test)[0]): del r["spots"][i]
@@ -56,7 +56,7 @@ class ShikaDB:
 					if imgf not in results: continue
 					#print "IMGF=",imgf
 					nspots=len(results[imgf]["spots"])
-					snrlist = [x[2] for x in results[imgf]["spots"]]
+					snrlist = map(lambda x: x[2], results[imgf]["spots"])
 					#print "RESULTS:",imgf,nspots,len(snrlist)
 	
 					""" KEITARO ORIGINAL
@@ -97,4 +97,4 @@ jj=ShikaDB("./asada.db","./asada.log")
 good_spots=jj.getThresh(1)
 
 for s in good_spots:
-	print(s)
+	print s

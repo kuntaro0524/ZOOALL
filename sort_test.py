@@ -21,12 +21,12 @@ lll.append((xyz4,score4))
 
 #>>> persons = [('Yoshida', 30), ('Suzuki', 100), ('Tanaka', 15)]
 for l in lll:
-	print(l[1])
-print(lll)
+	print l[1]
+print lll
 l2=sorted(lll, key=lambda x: x[1])
 l3=sorted(lll, key=lambda x: x[1],reverse=True)
-print(l2)
-print(l3)
+print l2
+print l3
 
 """
 def compCryScore(x,y):

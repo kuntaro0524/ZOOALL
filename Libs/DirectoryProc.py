@@ -24,7 +24,7 @@ class DirectoryProc():
     def roundMakeDirMaster(self, dir_prefix, ndigit = 3, option = "top", isMake = False):
         curr_dir = os.path.abspath(self.path)
         dir_to_be_made = "%s/%s"%(curr_dir, dir_prefix)
-        print("Directopy prefix = ",dir_to_be_made)
+        print "Directopy prefix = ",dir_to_be_made
         # Checking if the directory exists
         dindex = 0
         while(1):
@@ -38,7 +38,7 @@ class DirectoryProc():
                 dir_for_replace = "%s/%s"%(curr_dir, new_dir)
                 #print "Check if existence:",dir_for_replace
                 if os.path.exists(dir_for_replace) == True:
-                    print("Already exists:",dir_for_replace)
+                    print "Already exists:",dir_for_replace
                     dindex += 1
                     continue
                 else:
@@ -52,7 +52,7 @@ class DirectoryProc():
                     new_dir = "%s_%04d"%(dir_prefix, dindex)
                 dir_for_replace = "%s/%s"%(curr_dir, new_dir)
                 if os.path.exists(dir_for_replace) == True:
-                    print("Already exists:",dir_for_replace)
+                    print "Already exists:",dir_for_replace
                     dindex += 1
                     continue
                 else:
@@ -60,7 +60,7 @@ class DirectoryProc():
 
         # Making a directory
         if isMake == True:
-            print("Making %s"%dir_for_replace)
+            print "Making %s"%dir_for_replace
             os.makedirs(dir_for_replace)
 
         return dir_for_replace, dindex
@@ -81,14 +81,14 @@ class DirectoryProc():
             else:  
                 local_dir = "%s%08d"%(dir_prefix,dindex)
             target_dir = "%s/%s"%(curr_dir, local_dir)
-            print("Checking %s" % target_dir)
+            print "Checking %s" % target_dir
             if os.path.exists(target_dir) == True:
-                print("Existing=",target_dir)
+                print "Existing=",target_dir
                 dindex += 1
                 continue
             else:
-                print("To be made :  %s"%(target_dir))
-                print("dindex = %5d"%dindex)
+                print "To be made :  %s"%(target_dir)
+                print "dindex = %5d"%dindex
                 break
 
         if isMake == True:
@@ -102,7 +102,7 @@ class DirectoryProc():
         # Checking if the target file exists
         dindex = 0
         check_filename = "%04d_%s.%s" % (0, prefix, suffix)
-        print("Checking prefix = ", check_filename)
+        print "Checking prefix = ", check_filename
 
         while(1):
             if ndigit == 3:
@@ -112,7 +112,7 @@ class DirectoryProc():
             elif ndigit == 4:
                 check_filename = "%04d_%s.%s" % (dindex, prefix, suffix)
             if os.path.exists(check_filename) == True:
-                print("Already exists:", check_filename)
+                print "Already exists:", check_filename
                 dindex += 1
                 continue
             else:
@@ -151,7 +151,7 @@ class DirectoryProc():
                 if file_index > imax:
                     imax = file_index
             except:
-                print("Next file")
+                print "Next file"
                 continue
 
         if n_success == 0:
@@ -179,14 +179,14 @@ class DirectoryProc():
             else:  
                 local_dir = "%08d_%s"%(dir_prefix,dindex)
             target_dir = "%s/%s"%(curr_dir, local_dir)
-            print("Checking %s" % target_dir)
+            print "Checking %s" % target_dir
             if os.path.exists(target_dir) == True:
-                print("Existing=",target_dir)
+                print "Existing=",target_dir
                 dindex += 1
                 continue
             else:
-                print("Making! %s"%(target_dir))
-                print("dindex = %5d"%dindex)
+                print "Making! %s"%(target_dir)
+                print "dindex = %5d"%dindex
                 break
 
         return target_dir, dindex
@@ -227,7 +227,7 @@ class DirectoryProc():
                 if fname.rfind(string_in_filename)!=-1:
                     targetlist.append(fullpath)
                     pathlist.append(root)
-                    print(fname)
+                    print fname
         return targetlist,pathlist
 
     def findTargetFileInTargetDirectories(self,string_in_dire,string_in_filename,exclude_str=""):
@@ -240,7 +240,7 @@ class DirectoryProc():
             if dir_in_path.rfind(string_in_dire)!=-1:
                 if exclude_str!="":
                     if dir_in_path.rfind(exclude_str)!=-1:
-                        print("Skipping",dir_in_path)
+                        print "Skipping",dir_in_path
                         continue
                 #print dir_in_path
                 for fname in files:
@@ -270,7 +270,7 @@ class DirectoryProc():
                 for fname in files:
                     fullpath=os.path.join(root, fname)
                 if fname==targetname:
-                    print(fullpath)
+                    print fullpath
                     targetlist.append(fullpath)
             else:
                 continue
@@ -288,19 +288,21 @@ class DirectoryProc():
             return dirnames
 
     def findPathsInclude(self,keywords):
+        print "key=",keywords
         rtn_list=[]
         for dirpath, dirnames, files in os.walk(self.path):
             for keyword in keywords:
+                print "key_each=",keyword
                 if dirpath.rfind(keyword)!=-1:
                     rtn_list.append(dirpath)
-                print(dirnames)
+                print "dirnames=",dirnames
                 if dirnames.rfind(keyword)!=-1:
                     rtn_list.append(dirpath)
-                print(files)
+                print files
                 if files.rfind(keyword)!=-1:
                     rtn_list.append(dirpath)
-                print("dirnames=",dirnames)
-                print("files=",files)
+                print "dirnames=",dirnames
+                print "files=",files
 
     def findAllDirs(self):
         for dirpath, dirnames, files in os.walk(self.path):
@@ -326,13 +328,13 @@ if __name__ == "__main__":
     #dp.makeRoundDir(dir_prefix, isMake = True, ndigit=2,option='tail')
     #dp.roundMakeDirMaster(dir_prefix, ndigit = 3, option = "tail", isMake = True)
     check_dir = "/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Log/190520/025_sample/"
+    check_dir = "./"
     dp=DirectoryProc(check_dir)
     #print dp.getRoundHeadPrefix(dir_prefix, "png", ndigit = 4)
     prefix = "raster"
     suffix = "jpg"
     #print dp.getRoundHeadPrefix(ndigit=4)
-
-    print(dp.getRoundHeadPrefix(ndigit=4))
+    #print dp.getRoundHeadPrefix(ndigit=4)
 
     #def getRoundHeadPrefix(self, prefix, suffix, ndigit=4):
 
@@ -343,7 +345,9 @@ if __name__ == "__main__":
         #j.print d
     #dp.findTarget("xscale.mtz")
     #keywords=["run","final"]
+    #keywords=["_spotfinder"]
     #print dp.findPathsInclude(keywords)
+    print dp.findTargetDirs("_spotfinder")
 
     # _kamoproc directory
     #dlist.sort()

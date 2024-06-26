@@ -16,11 +16,11 @@ class SummarySHIKA:
 		self.path=path
 		self.prefix=prefix
 		self.sumdat="%s/_spotfinder/%s_selected.dat"%(self.path,self.prefix)
-		print("Treating : %s "%self.sumdat)
+		print "Treating : %s "%self.sumdat
 
 	def waitingForSummary(self):
 		while(1):
-			print("Waiting for generating %s"%self.sumdat)
+			print "Waiting for generating %s"%self.sumdat
 			if os.path.exists(self.sumdat)==False:
 				time.sleep(1.0)
 			else:
@@ -29,7 +29,7 @@ class SummarySHIKA:
 	def readSummary(self):
 		glist=[]
 		while(1):
-			print("waiting for readout %s"%self.sumdat)
+			print "waiting for readout %s"%self.sumdat
 			lines=open(self.sumdat,"r").readlines()
 			# is Finished?
 			if len(lines)<1:
@@ -39,7 +39,7 @@ class SummarySHIKA:
 				continue
 			# Scan completed but no crystals were found
 			elif len(lines)==2:
-				print("Oh my god!! No crystals!!")
+				print "Oh my god!! No crystals!!"
 				raise MyException("No crystals were found!")
 				break
 			else:
@@ -62,7 +62,7 @@ class SummarySHIKA:
 		isCompleted=False
 		i_wait=0
 		while(1):
-			print("waiting for readout %s"%self.sumdat)
+			print "waiting for readout %s"%self.sumdat
 			lines=open(self.sumdat,"r").readlines()
 			# is Finished?
 			if len(lines)<1:
@@ -70,7 +70,7 @@ class SummarySHIKA:
 			if lines[len(lines)-1].rfind("scan_complete")!=-1:
 				isCompleted=True
 				if len(lines)==2:
-					print("Oh my god!! No crystals!!")
+					print "Oh my god!! No crystals!!"
 					raise MyException("No crystals were found!")
 				for line in lines[1:]:
 					cols=line.split()
@@ -90,7 +90,7 @@ class SummarySHIKA:
 
 			if i_wait > 12: # 2.0 minutes # not completed cleanly (EIGER dropped)
 				if len(lines)==1:
-					print("Oh my god!! No crystals!!")
+					print "Oh my god!! No crystals!!"
 					raise MyException("No crystals were found!")
 				for line in lines[1:]:
 					cols=line.split()

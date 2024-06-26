@@ -21,7 +21,7 @@ class Date:
         return timestr
 
     def getToday(self):
-        print(datetime.datetime.now())
+        print datetime.datetime.now()
         return self.today
 
     def getTodayDire(self):
@@ -83,5 +83,5 @@ if __name__=="__main__":
     #print date.getTimeDire()
     #print date.getOkutsuTime("2011/06/20 06:57:20.067763")
     t1= date.getTimeFromZooDB("20190127120507")
-    t2= date.getTimeFromZooDB("20190127120638")
-    print(date.getDiffMin(t1,t2))
+    t2= date.getTimeFromZooDB("20190127120637")
+    date.getDiffMin(t1,t2)
