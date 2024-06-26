@@ -11,10 +11,12 @@
 # 2017/04/11
 # ZOOM OUT
 # move to x14 and fit pint axis
-python ~/PPPP/10.Zoo/Libs/zoom_out.py
+#python ~/PPPP/10.Zoo/Libs/zoom_out.py
+python ~/PPPP/zoom_out.py
 
 # Check the current beamsize.config
-CONFDIR=/isilon/blconfig/bl32xu.rh7/bss/
+#CONFDIR=/isilon/blconfig/bl32xu.rh7/bss/
+CONFDIR=/blconfig/bss/
 ZOOCONFDIR="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooConfig/bss/"
 #BLCONFIG="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooConfig/"
 LOG=`ls -latr $CONFDIR/beamsize.config`
