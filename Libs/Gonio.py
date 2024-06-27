@@ -48,9 +48,11 @@ class Gonio:
 
         # BL32XU specific sense parameter for a rotation axis: mysterious setting
         if self.beamline == "BL32XU":
-            self.sense_phi_bl32xu = -1.0
+            self.sense_phi_special = -1.0
+        elif self.beamline == "BL41XU":
+            self.sense_phi_special = 1.0
         else:
-            self.sense_phi_bl32xu = 1.0
+            self.sense_phi_special = 1.0
 
         # Read bss.config 
         self.v2p_x, self.sense_x, self.home_x = self.bssconf.getPulseInfo(self.x_name)
@@ -237,7 +239,7 @@ class Gonio:
         dif=phi*self.v2p_rot
 
         orig=self.base*self.v2p_rot
-        pos_pulse=self.sense_phi*self.sense_phi_bl32xu*(orig+-dif)
+        pos_pulse=self.sense_phi*self.sense_phi_special*(orig+-dif)
         self.phi.move(pos_pulse)
 
     def scan2D(self, prefix, zrange, yrange, ch, time):

@@ -63,8 +63,5 @@ if __name__=="__main__":
 
     print("OPEN")
     import time
-    blf.device.shutter.open()
-    time.sleep(5)
-    print("CLOSE")
-    time.sleep(5)
-    blf.device.shutter.close()
+
+    blf.gonio.rotatePhi(225.0)

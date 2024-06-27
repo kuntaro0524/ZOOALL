@@ -36,7 +36,8 @@ contrast_default=18000
 bright_default_dark=5500
 gain_default_dark=5500
 # Beam stopper position during centering
-beamstopper_off=False
+# True for BL41XU
+beamstopper_off=True
 
 [special_setting]
 # True: Dark mode, False: Normal mode

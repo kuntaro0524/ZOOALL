@@ -361,8 +361,10 @@ if __name__=="__main__":
     dev=Device(s)
     dev.init()
 
-    # dev.prepCentering()
-    dev.bs.on()
+    #dev.prepCentering()
+    dev.gonio.rotatePhi(225.0)
+    #dev.bs.on()
+    #dev.bs.off()
     #dev.measureFlux()
     # dev.prepScan()
     # dev.finishScan()

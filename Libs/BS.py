@@ -11,6 +11,7 @@ from MyException import *
 from Count import *
 import BSSconfig
 from configparser import ConfigParser, ExtendedInterpolation
+import WebSocketBSS
 
 class BS:
     def __init__(self, server):
@@ -58,6 +59,13 @@ class BS:
         if self.bs_z_name != "":
             self.bs_z = Motor(self.s, f"bl_{self.bl_object}_{self.bs_z_name}", "pulse")
             self.bs_z_v2p, self.bs_z_sense, self.bs_z_home = self.bssconf.getPulseInfo(self.bs_z_name)
+
+        # BL41XU -> Websocket
+        self.isWwebsocket = False
+        self.beamline = self.config.get("beamline", "beamline")
+        if self.beamline == "BL41XU":
+            self.websock = WebSocketBSS.WebSocketBSS()
+            self.isWwebsocket = True
 
         # Read configure file and get parameters
         self.isInit = False
@@ -109,14 +117,20 @@ class BS:
         self.bs_z.move(self.evac_large_holder)
 
     def on(self):
-        if self.isInit == False:
-            self.getEvacuate()
-        self.bs_z.move(self.on_pulse)
+        if self.isWwebsocket:
+            self.websock.beamstopper("on")
+        else:
+            if self.isInit == False:
+                self.getEvacuate()
+            self.bs_z.move(self.on_pulse)
 
     def off(self):
-        if self.isInit == False:
-            self.getEvacuate()
-        self.bs_z.move(self.off_pulse)
+        if self.isWwebsocket:
+            self.websock.beamstopper("off")
+        else:
+            if self.isInit == False:
+                self.getEvacuate()
+            self.bs_z.move(self.off_pulse)
 
     def isMoved(self):
         isY = self.bs_y.isMoved()

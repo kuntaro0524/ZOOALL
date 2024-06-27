@@ -1,5 +1,6 @@
 import sys, os, math, cv2, socket
 import datetime
+import time
 import numpy as np
 import File
 import matplotlib
@@ -556,6 +557,7 @@ class INOCC:
     # Largely modified on 190514 by K.Hirata
     # loop_size should have unit of "um"
     def cap4width(self, loop_size=600.0):
+        self.logger.info("++++++++++++++          cap4width starts")
         if self.isInit == False:
             self.init()
 
@@ -611,21 +613,19 @@ class INOCC:
                     self.logger.debug("%s" % tttt)
                     raise MyException("Loop cannot be found after edgeCentering x 2 times. %s " % tttt)
 
-            print("CODE1")
             phi_face = self.fitAndFace(phi_area_list)
             self.logger.info(f"face_angle = {phi_face}deg")
 
-            print("CODE2")
             # adds offset angles for plate-like crystals
             self.logger.info(">>>> offset angle setting <<<<<")
             phi_face = phi_face + offset_angle
             phi_small = phi_face + 90.0
-            self.logger.info(">>>> Simple centering <<<<<")
-            print("CODE3")
+            self.logger.info(f">>>> Simple centering at {phi_small} <<<<<")
             self.simpleCenter(phi_small, loop_size, option="gravity")
+            print("#################<FACE>ANGLE ####################3")
+            print("phi_face=", phi_face)  
             area, hamidashi_flag = self.simpleCenter(phi_face, loop_size, option="gravity")
             self.logger.info("Hamidashi_flag = %s" % hamidashi_flag)
-            print(("HAMIDASHI=", hamidashi_flag))
             # Re-centering if hamidashi_flag = True
             if hamidashi_flag == True:
                 self.simpleCenter(phi_face, loop_size, option="gravity")
@@ -633,7 +633,7 @@ class INOCC:
         # Final centering
         cx, cy, cz, phi = self.gonio.getXYZPhi()
         # Raster area definition
-        print("########IIIIIIIIIIIIIIIIIIIIIIII########3")
+        print(f"########III phi = {phi} IIIIIIII########3")
         xwidth, ywidth, r_cenx, r_ceny = self.cap4width(loop_size)
         print("########IIIIIIIIIIIIIIIIIIIIIIII########3")
 
@@ -645,6 +645,9 @@ class INOCC:
         print("Width  = %8.1f[um]" % raster_width)
         print("Height = %8.1f[um]" % raster_height)
         print("Centering.doAll finished.")
+
+        phi = self.gonio.getPhi()
+        print(phi)
 
         return raster_width, raster_height, phi_face, gonio_info
 
@@ -684,7 +687,7 @@ if __name__ == "__main__":
     inocc.setRasterPicture(raster_picpath)
 
     # def doAll(self, ntimes=3, skip=False, loop_size=600.0, offset_angle=0.0):
-    rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=600.0)
+    rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=400.0)
 
     print(("Loop width/height=", rwidth, rheight))
 
