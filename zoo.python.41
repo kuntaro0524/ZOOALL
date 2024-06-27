@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#BL41XU
+export PYTHONPATH="/staff/bl41xu/BLsoft/ZOOALL:/staff/bl41xu/BLsoft/ZOOALL/Libs"
+export ZOOCONFIGPATH="/staff/bl41xu/BLsoft/ZOOALL/Libs"
+
+args=("$*")
+echo $args
+
+python3 $args

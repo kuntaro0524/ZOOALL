@@ -1,0 +1,62 @@
+#!/bin/bash
+
+#if [ ! -e /isilon/blconfig/bl41xu/watchfurka/bss_user -o "`cat /isilon/blconfig/bl41xu/watchfurka/bss_user`" != "$uid" ]
+#then
+#  #echo "change bss_user"
+#  #echo $uid > ./bss_user
+#
+#  #echo "change Pilatus_user"
+#  #echo "restart --user "$uid":"$gid > ./PILATUS_user
+#
+#  echo $uid > /isilon/blconfig/bl41xu/watchfurka/bss_user
+#  echo "restart --user "$gid":"$uid"" > /isilon/blconfig/bl41xu/watchfurka/PILATUS_user
+#
+#fi
+
+# Cheetah
+echo "Starting Cheetah"
+/usr/local/bss/startcheetah.sh
+cheetah_server="192.168.215.124"
+#curl -s http://${cheetah_server}:8080/start/$(id -u)/$(id -g) 2>/dev/null
+
+for i in {1..10}
+do
+ sleep 1
+ cheetah_ok=0
+ #ssh 192.168.215.11 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
+ curl -s "http://${cheetah_server}:8080/check" |grep running  && break
+ notify-send "BSS startup" "Cheetah not up. retrying (${i})."
+ notify-send "BSS startup" "`/usr/local/bss/startcheetah.sh_180525_1_shika-r940_dl-r640`"
+ cheetah_ok=1
+done
+
+if [ "$cheetah_ok" == "1" ]
+then
+ notify-send "BSS startup ERROR" "Can't start cheetah!!" -i gnome-log -t 10000
+ aplay /usr/lib64/libreoffice/share/gallery/sounds/falling.wav > /dev/null 2>&1
+ exit
+fi
+
+# Download server test
+if ! ssh -oBatchMode=yes 192.168.215.12 hostname
+then
+ notify-send "BSS startup ERROR" "SSH to 192.168.215.12 NOT configured!!" -i gnome-log -t 10000
+ aplay /usr/lib64/libreoffice/share/gallery/sounds/falling.wav > /dev/null 2>&1
+ exit
+fi
+
+# Hit-extract server test
+if ! ssh -oBatchMode=yes ${cheetah_server} hostname 
+then
+ notify-send "BSS startup ERROR" "SSH to ${cheetah_server} NOT configured!!" -i gnome-log -t 10000
+ aplay /usr/lib64/libreoffice/share/gallery/sounds/falling.wav > /dev/null 2>&1
+ exit
+fi
+
+## video zoomout
+/usr/local/bin/BLZoomOut
+
+## /EIGER stuff
+
+#echo "boot bss"
+echo "\n\n" | /usr/local/bss/bss --console --server --websocket --quick --patchbssconfig=/blconfig/bss/patch/Evacuate_after_Measurement_N.config

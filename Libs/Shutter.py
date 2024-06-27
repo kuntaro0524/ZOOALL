@@ -45,6 +45,11 @@ class Shutter:
             self.clsmsg1 = "put/%s/off" % self.ax_name
             self.qmsg = "get/%s/status" % self.ax_name  
 
+        elif self.beamline == "BL41XU":
+            self.openmsg1 = "put/%s/on" % self.ax_name
+            self.clsmsg1 = "put/%s/off" % self.ax_name
+            self.qmsg = "get/%s/status" % self.ax_name  
+
     # String/Bytes communication via a socket
     def communicate(self, comstr):
         sending_command = comstr.encode()

@@ -1,11 +1,11 @@
-#!/bin/env python 
-import sys
+#!/bin/env python import sys
 import socket
 import time
 
 # My library
 from Received import *
 from Motor import *
+import WebSocketBSS
 
 import BSSconfig
 from configparser import ConfigParser, ExtendedInterpolation
@@ -35,7 +35,15 @@ class Light:
         self.light_z = Motor(self.s, self.light_name, "pulse")
         # 軸のパルス分解能を取得する
         self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.light_z_name)
-        print(self.v2p_z, self.sense_z)
+
+        # web socket or not
+        self.isWebsocket = False
+
+        # Beamline name
+        self.beamline = self.config.get("beamline", "beamline")
+        if self.beamline == "BL41XU":
+            self.isWebsocket = True
+            self.websock = WebSocketBSS.WebSocketBSS()
 
         # initialization flag
         self.isInit = False
@@ -53,16 +61,22 @@ class Light:
         return self.light_z.getPosition()
 
     def on(self):
-        if self.isInit == False: 
-            self.getEvacuate()
-        print("Moving to %s" % self.on_pulse)
-        self.light_z.move(self.on_pulse)
+        if self.isWebsocket:
+            self.websock.light("on")
+        else:
+            if self.isInit == False: 
+                self.getEvacuate()
+            print("Moving to %s" % self.on_pulse)
+            self.light_z.move(self.on_pulse)
 
     def off(self):
-        if self.isInit == False: 
-           self.getEvacuate()
-        print("Moving to %s" % self.off_pulse)
-        self.light_z.move(self.off_pulse)
+        if self.isWebsocket:
+            self.websock.light("off")
+        else:
+            if self.isInit == False: 
+               self.getEvacuate()
+            print("Moving to %s" % self.off_pulse)
+            self.light_z.move(self.off_pulse)
 
 if __name__ == "__main__":
     from configparser import ConfigParser, ExtendedInterpolation
@@ -81,7 +95,7 @@ if __name__ == "__main__":
     light.getEvacuate()
     # print(light.getPos())
     light.on()
-    # light.off()
+    light.off()
     # print(light.light_z.getPosition())
     # light.getEvacuate()
     # light.relDown()

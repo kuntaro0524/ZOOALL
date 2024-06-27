@@ -22,4 +22,4 @@ export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/TestZoo/Libs"
 args=("$*")
 echo $args
 
-python3.8 $args
+python3 $args

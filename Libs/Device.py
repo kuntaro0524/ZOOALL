@@ -35,6 +35,7 @@ import BeamsizeConfig
 import Flux
 import PreColli
 from configparser import ConfigParser, ExtendedInterpolation
+import WebSocketBSS
 
 class Device(Singleton.Singleton):
     def __init__(self, ms_port):
@@ -52,7 +53,9 @@ class Device(Singleton.Singleton):
         self.coax_pintx_pulse = int(self.config.get("inocc", "zoom_pintx"))
         # beamline name
         self.beamline = self.config.get("beamline", "beamline")
-    
+        # web socket for BSS
+        self.websock = WebSocketBSS.WebSocketBSS()
+
     def setGonio(self, instance_of_gonio):
         self.gonio = instance_of_gonio
 
@@ -167,6 +170,8 @@ class Device(Singleton.Singleton):
             self.bs.off()
         else:
             self.bs.on()
+
+        print("Collimator Off")
         self.colli.off()
 
         # BL44XU PreColli off
@@ -223,6 +228,10 @@ class Device(Singleton.Singleton):
         self.light.off()
         self.shutter.open()
 
+        # intensity monitor on
+        if self.beamline=="BL41XU":
+            self.websock.intensityMonitor("on")
+
         if self.beamline == "BL32XU":
             self.slit1.openV()
 
@@ -242,6 +251,10 @@ class Device(Singleton.Singleton):
         if self.beamline=="BL32XU" and cover_off==True:
             ## Cover off
             self.covz.off()
+
+        # intensity monitor off
+        if self.beamline == "BL41XU":
+            self.websock.intensityMonitor("off")
 
     def closeAllShutter(self):
         self.shutter.close()
@@ -349,6 +362,5 @@ if __name__=="__main__":
 
     # dev.bs.on()
     dev.measureFlux()
-
-
-    # dev.prepCentering()
+    # dev.prepScan()
+    # dev.finishScan()
