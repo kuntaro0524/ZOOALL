@@ -1,10 +1,11 @@
 #!/bin/env python import sys
 import socket
 import time
+import os
 
 # My library
-from Received import *
-from Motor import *
+import Received
+import Motor
 import WebSocketBSS
 
 import BSSconfig
@@ -32,7 +33,7 @@ class Light:
         # 軸のインスタンスを作成する
         self.light_name = "bl_%s_%s" % (self.bl_object, self.light_z_name)
         print(self.light_name)
-        self.light_z = Motor(self.s, self.light_name, "pulse")
+        self.light_z = Motor.Motor(self.s, self.light_name, "pulse")
         # 軸のパルス分解能を取得する
         self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.light_z_name)
 

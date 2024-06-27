@@ -2,9 +2,8 @@ import sys
 import os
 import glob
 import datetime
+import MyDate
 from stat import *
-from Date import *
-
 
 class File:
     def __init__(self, directory):
@@ -140,7 +139,7 @@ class File:
         return prefix
 
     def timeDire(self):
-        d = Date()
+        d = MyDate()
         tdy_dir = d.getTodayDire()
         time_dir = d.getTimeDire()
 
@@ -158,7 +157,7 @@ class File:
             return dir
 
     def getTime(self, filename):
-        d = Date()
+        d = MyDate()
         # print filename
         timeget = os.stat(filename)[ST_MTIME]
         output_fmt = "%Y/%m/%d %H:%M:%S"
@@ -168,7 +167,7 @@ class File:
         return t
 
     def getDiffTime(self, file1, file2):
-        d = Date()
+        d = MyDate()
         d1 = self.getTime(file1)
         d2 = self.getTime(file2)
         # print d1,d2

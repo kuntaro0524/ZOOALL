@@ -27,8 +27,8 @@ backimg = ${dirs:zooroot}/BackImages/back.ppm
 #gain_default=3000
 #bright_default=3000
 #gain_default=2500
-bright_default=2800
-gain_default=2000
+bright_default=15400
+gain_default=1700
 contrast_default=18000
 # Dark mode
 #bright_default_dark=7700
@@ -82,7 +82,7 @@ exp_ds=0.02
 # Rasterのときの端分解能
 resol_raster=2.5
 # "" are not required to define 'character variable'
-gonio_direction =
+gonio_direction = FROM_RIGHT
 # pin channel
 pin_channel = 3
 # pulse for non-attenuated beam
@@ -106,7 +106,7 @@ gonio_x_name = st2_gonio_1_x
 gonio_y_name = st2_gonio_1_y
 gonio_z_name = st2_gonio_1_z
 gonio_zz_name = st2_gonio_1_zz
-gonio_rot_name = st2_gonio_1_phi
+gonio_rot_name = st2_gonio_1_omega
 # zoom x axis
 zoom_x_axis = st2_coax_1_zoom
 # Cryo Z axis

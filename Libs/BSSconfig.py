@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from MyException import *
+from Libs import MyException
 import sys,os
 from configparser import ConfigParser, ExtendedInterpolation
 

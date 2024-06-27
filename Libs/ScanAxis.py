@@ -1,4 +1,4 @@
-from MyException import *
+import MyException
 
 class ScanAxis:
 

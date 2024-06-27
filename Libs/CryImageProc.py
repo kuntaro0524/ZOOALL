@@ -2,10 +2,11 @@
 import cv2,sys
 import numpy as np
 import copy
-from MyException import *
+from Libs import MyException
 import logging
 import logging.config
-import File, os
+from Libs import File
+import os
 from configparser import ConfigParser, ExtendedInterpolation
 
 class CryImageProc():

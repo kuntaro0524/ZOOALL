@@ -36,6 +36,7 @@ import Flux
 import PreColli
 from configparser import ConfigParser, ExtendedInterpolation
 import WebSocketBSS
+import MyException
 
 class Device(Singleton.Singleton):
     def __init__(self, ms_port):
@@ -78,7 +79,7 @@ class Device(Singleton.Singleton):
             self.total_num=conf.getCondition2("FIXED_POINT","total_num")
             self.count_time=conf.getCondition2("FIXED_POINT","time")
 
-        except MyException as ttt:
+        except MyException.MyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
             sys.exit(1)
@@ -131,7 +132,7 @@ class Device(Singleton.Singleton):
         self.id.moveE(en)
         if isTune==True:
             self.tuneDt1(logpath)
-
+            
     def measureFlux(self):
         en=self.mono.getE()
         # Prep scan
@@ -360,7 +361,8 @@ if __name__=="__main__":
     dev=Device(s)
     dev.init()
 
-    # dev.bs.on()
-    dev.measureFlux()
+    # dev.prepCentering()
+    dev.bs.on()
+    #dev.measureFlux()
     # dev.prepScan()
     # dev.finishScan()

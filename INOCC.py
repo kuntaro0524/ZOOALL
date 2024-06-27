@@ -1,12 +1,12 @@
 import sys, os, math, cv2, socket
 import datetime
 import numpy as np
-from File import *
+import File
 import matplotlib
 import matplotlib.pyplot as plt
-from MyException import *
+import MyException
 import CryImageProc
-import Libs.CoaxImage as CoaxImage
+import CoaxImage
 import BSSconfig
 import DirectoryProc
 import FittingForFacing
@@ -108,7 +108,7 @@ class INOCC:
         self.mx, self.my, self.mz = self.bssconfig.getCmount()
 
         # File name for each directory
-        self.ff = File(self.loop_dir)
+        self.ff = File.File(self.loop_dir)
         new_idx = self.ff.getNewIdx3()
         self.fname = "%s/%03d_test.ppm" % (self.loop_dir, new_idx)
 
@@ -159,6 +159,9 @@ class INOCC:
         # Fitting
         fff = FittingForFacing.FittingForFacing(phi_list, area_list, logpath=self.loop_dir)
         face_angle = fff.findFaceAngle()
+        fit_log.close()
+        self.logger.info("fitAndFace finished")
+
         return float(face_angle)
 
     # roi_len: length from the top in [um]
@@ -361,7 +364,6 @@ class INOCC:
             # At around phi_min
             if ok_min == False:
                 for phi in np.arange(phi_min, phi_center, phi_step):
-                    self.logfile.write("Around minimum angle\n")
                     self.logger.info("Around minimum angle\n")
                     try:
                         self.logger.info("move to simpleCenter function.")
@@ -609,14 +611,17 @@ class INOCC:
                     self.logger.debug("%s" % tttt)
                     raise MyException("Loop cannot be found after edgeCentering x 2 times. %s " % tttt)
 
+            print("CODE1")
             phi_face = self.fitAndFace(phi_area_list)
             self.logger.info(f"face_angle = {phi_face}deg")
 
+            print("CODE2")
             # adds offset angles for plate-like crystals
             self.logger.info(">>>> offset angle setting <<<<<")
             phi_face = phi_face + offset_angle
             phi_small = phi_face + 90.0
             self.logger.info(">>>> Simple centering <<<<<")
+            print("CODE3")
             self.simpleCenter(phi_small, loop_size, option="gravity")
             area, hamidashi_flag = self.simpleCenter(phi_face, loop_size, option="gravity")
             self.logger.info("Hamidashi_flag = %s" % hamidashi_flag)
@@ -628,7 +633,9 @@ class INOCC:
         # Final centering
         cx, cy, cz, phi = self.gonio.getXYZPhi()
         # Raster area definition
+        print("########IIIIIIIIIIIIIIIIIIIIIIII########3")
         xwidth, ywidth, r_cenx, r_ceny = self.cap4width(loop_size)
+        print("########IIIIIIIIIIIIIIIIIIIIIIII########3")
 
         gonio_info = cx, cy, cz, phi
         pix_size_um = self.coi.get_pixel_size()
@@ -661,7 +668,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('ZOO')
     os.chmod(logname, 0o666)
 
-    test_dir = os.environ['ZOOROOT']
+    test_dir = os.environ['PWD']
 
     inocc = INOCC(blf, test_dir)
     phi_face = 90
@@ -670,7 +677,8 @@ if __name__ == "__main__":
 
     # back image path read from 'beamline.ini'
     backimg = config.get('files', 'backimg')
-    inocc.setBack(backimg)
+    #inocc.setBack(backimg)
+    inocc.setBack("/staff/bl41xu/BLsoft/ZOOALL/BackImages/back-2406271411.ppm")
     # For each sample raster.png
     raster_picpath = "%s/raster.png" % test_dir
     inocc.setRasterPicture(raster_picpath)

@@ -2,7 +2,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-from MyException import *
+import Libs.MyException
 
 # Modified 2015/07/22
 # Y translation is changed 500um -> 1000um when the loop is 
@@ -55,6 +55,7 @@ class FittingForFacing:
         return a*np.cos(np.pi/90.0*(phi+b))+c
 
     def findFaceAngle(self):
+        print("findFaceAngle")
         if self.isDone==False:
             param_opt=self.prep()
 
@@ -75,6 +76,7 @@ class FittingForFacing:
 
         face_angle=phi_min+90.0
         print("findFaceAngle=%5.1f deg."%face_angle)
+
         return face_angle
 
     def check(self):

@@ -17,7 +17,7 @@ import datetime
 import ZooNavigator
 from MyException import *
 import socket
-import Date
+import MyDate
 import logging
 import logging.config
 import subprocess
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     print("Success")
 
     # Logging setting
-    d = Date.Date()
+    d = MyDate.MyDate()
     time_str = d.getNowMyFormat(option="date")
     logname = "%s/zoo_%s.log" % (zoologdir, time_str)
     print("changing mode of %s" % logname)
@@ -48,7 +48,8 @@ if __name__ == "__main__":
         if input_file.rfind("csv") != -1:
             navi = ZooNavigator.ZooNavigator(blf, input_file, is_renew_db=True)
             # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
-            blf.zoo.setBeamsize(1)
+            print("##########################################3")
+            # blf.zoo.setBeamsize(1)
             num_pins = navi.goAround()
         elif input_file.rfind("db") != -1:
             esa_csv = "dummy.csv"

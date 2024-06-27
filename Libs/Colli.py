@@ -5,6 +5,7 @@ import socket
 import time
 import datetime
 import WebSocketBSS
+import os
 
 # My library
 from Received import *
@@ -136,8 +137,6 @@ class Colli:
     def off(self):
         if self.beamline == "BL41XU":
             self.websock.collimator("off")
-            print("Waiting")
-            time.sleep(5.0)
         else:
             if self.isInit == False:
                 self.getEvacuate()

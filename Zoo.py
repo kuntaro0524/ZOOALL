@@ -3,7 +3,7 @@ import time, datetime
 import numpy as np
 import socket
 
-from MyException import *
+from Libs import MyException
 import logging
 import logging.config
 from configparser import ConfigParser, ExtendedInterpolation
@@ -474,10 +474,10 @@ class Zoo:
 
     def setBeamsize(self, beamsize_index):
         com = "put/beamline/beamsize_%d" % beamsize_index
+
         recstr = self.communicate(com)
         print("setBeamsize:result=", recstr)
         self.waitTillReady()
-
 
 if __name__ == "__main__":
     # Logging setting
@@ -495,7 +495,9 @@ if __name__ == "__main__":
     zoo = Zoo()
     zoo.connect()
     # zoo.setBeamsize(0)
-    zoo.getBeamsize()
+    print("BBBBBBBBBBBBBBBB")
+    print(zoo.getBeamsize())
+    zoo.setBeamsize(1)
     #print(zoo.getSampleInformation())
     #zoo.getBeamsizeQuery()
     # print(zoo.getBeamsize())
