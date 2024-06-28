@@ -5,7 +5,7 @@ import Zoo
 import AttFactor
 import AnaShika
 import Condition
-import MyException
+from MyException import *
 import StopWatch
 import CrystalSpot
 
@@ -73,7 +73,7 @@ class HITO:
                 ashika.readSummary(prefix,ngrids,comp_thresh=comp_thresh,timeout=self.timeout)
 
         except:
-                raise MyException.MyException("shikaSumSkipStrong failed to wait summary.dat")
+                raise MyException("shikaSumSkipStrong failed to wait summary.dat")
 
         return ashika
 

@@ -5,7 +5,7 @@ import numpy as np
 import File
 import matplotlib
 import matplotlib.pyplot as plt
-import MyException
+from MyException import *
 import CryImageProc
 import CoaxImage
 import BSSconfig
@@ -680,8 +680,8 @@ if __name__ == "__main__":
 
     # back image path read from 'beamline.ini'
     backimg = config.get('files', 'backimg')
-    #inocc.setBack(backimg)
-    inocc.setBack("/staff/bl41xu/BLsoft/ZOOALL/BackImages/back-2406271411.ppm")
+    inocc.setBack(backimg)
+    # inocc.setBack("/staff/bl41xu/BLsoft/ZOOALL/BackImages/back-2406271411.ppm")
     # For each sample raster.png
     raster_picpath = "%s/raster.png" % test_dir
     inocc.setRasterPicture(raster_picpath)

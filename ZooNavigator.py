@@ -23,7 +23,7 @@ from Libs import BSSconfig
 import cv2
 import time
 import math
-from Libs import MyException
+from MyException import *
 from html_log_maker import ZooHtmlLog
 
 import logging

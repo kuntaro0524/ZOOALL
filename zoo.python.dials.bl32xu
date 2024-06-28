@@ -24,11 +24,9 @@
 # The function returns nonzero for unreadable or invalid symlinks
 # and resets the RESULT to an empty string.
 
-source /local_raid/oys_ubuntu20/xtal/dials/dials-v3-8-3/dials_env.sh
-
+export ZOOROOT="/staff/bl32xu/BLsoft/TMP41XU/"
 export ZPATH="/staff/bl32xu/BLsoft/TMP41XU:/staff/bl32xu/BLsoft/TMP41XU/Libs"
 export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/TMP41XU/Libs"
-
 
 shellrealpath() {
     local ORGDIR="$PWD"

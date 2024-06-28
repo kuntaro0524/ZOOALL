@@ -2,8 +2,7 @@ import os, sys, glob
 import time, datetime
 import numpy as np
 import socket
-
-from Libs import MyException
+from MyException import *
 import logging
 import logging.config
 from configparser import ConfigParser, ExtendedInterpolation

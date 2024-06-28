@@ -3,7 +3,7 @@ import sys, math, numpy, os
 import datetime
 import LoopMeasurement
 import AttFactor
-import MyException
+from MyException import *
 import StopWatch
 import AnaHeatmap
 import CrystalList
@@ -95,7 +95,7 @@ class HEBI():
             self.zoo.doRaster(schfile)
             self.zoo.waitTillReady()
         except:
-            raise MyException.MyException("HEBI.do2Dscan : Failed.")
+            raise MyException("HEBI.do2Dscan : Failed.")
 
         return raspath
 
@@ -163,7 +163,7 @@ class HEBI():
 
         # There are no good crystals
         if len(sorted_crystal_list) == 0:
-            raise MyException.MyException("HEBI.ana2Dscan : no crystals are found in scan %s" % prefix)
+            raise MyException("HEBI.ana2Dscan : no crystals are found in scan %s" % prefix)
 
         the_best_crystal = sorted_crystal_list[0]
         if method == "peak_xyz":
@@ -181,7 +181,7 @@ class HEBI():
 
         # There are no good crystals
         if len(sorted_crystal_list) == 0:
-            raise MyException.MyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
+            raise MyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
 
         the_best_crystal = sorted_crystal_list[0]
         if method == "peak_xyz":
