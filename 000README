@@ -49,3 +49,12 @@ old al
 
 2024/05/17
 これから少し編集しようかなと思います
+
+2024/06/28
+Rough tests Okay at BL41XU at branch 
+https://github.com/kuntaro0524/ZOOALL/commits/bl41xu_240627 
+
+after BL41XU test, I evaluated the code at BL32XU.
+multi, mixed, helical were okay.
+Then, I merged 'bl41xu_240627' branch to 'main'.
+Now I can remove 'bl41xu_240627' branch.
