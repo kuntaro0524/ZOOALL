@@ -7,9 +7,12 @@ import AnaPictureMap, PixelCrystal, LogString
 # 'PixelCrystal' is a bunch of grids of found 'contour' by opencv function.
 # 'contour' would roughly shows a shape of crystal I believe.
 class LoopCrystals():
-    def __init__(self, one_micron_picture, gonio_ovec, gonio_vvec, gonio_hvec, color_inverse=False):
+    def __init__(self, one_micron_picture, gonio_ovec, gonio_vvec, gonio_hvec, raster_resol_um, color_inverse=False):
         self.image_name = one_micron_picture
         self.color_inverse = color_inverse
+
+        # Grid spatial resolution on the raster scan
+        self.raster_resol_um = raster_resol_um
 
         # Goniometer origin/vertical/horizontal vectors
         self.govec = gonio_ovec
@@ -59,7 +62,7 @@ class LoopCrystals():
         h_max_all = 0
         # Working-loop for analysing each contour corresponding to a 'pixel crystals'.
         for c_index, contour in enumerate(contours):
-            crystal = PixelCrystal.PixelCrystal(contour)
+            crystal = PixelCrystal.PixelCrystal(contour, self.raster_resol_um)
             crystal.setOutPath(self.outpath)
             self.crystal_list.append(crystal)
             self.logger.info("########### Crystal index = %5d #############" % c_index)
@@ -211,7 +214,7 @@ class LoopCrystals():
             judge_vector = crystal.checkOverlap()
             min_x = crystal.min_x
             # crystal.findFullHelicalRegion()
-            print("OSC_VECTOR %5d" % cry_index)
+            print "OSC_VECTOR %5d" % cry_index
             osc_vec = crystal.storeOscVector(self.allowed_dist)
             # The minimum horizontal grid coordinate
             osc_info.append(osc_vec)
@@ -286,7 +289,7 @@ class LoopCrystals():
                     # cv2.putText(logimg, comment, (hcenter+10, vcenter+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), thickness=1)
                     simple_blocks.append(dc_block)
                 else: # Helical data collection
-                    print(dc_block)
+                    print dc_block
                     lh, lv = dc_block['l_hv']
                     rh, rv = dc_block['r_hv']
                     self.logger.info("MODE_HELICAL: L(%5d,%5d) - R(%5d, %5d)" % (lh, lv, rh, rv))
@@ -302,7 +305,7 @@ class LoopCrystals():
                     cv2.putText(logimg, comment, (rh, rv+10), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), thickness=1)
 
                     cv2.line(logimg, (lh, lv), (rh, rv), (255,0,255), 3)
-                    print("FINAL_dc_block=", dc_block)
+                    print "FINAL_dc_block=", dc_block
                     simple_blocks.append(dc_block)
 
         out_name = os.path.join(self.outpath, "hito.png")
@@ -335,10 +338,10 @@ class LoopCrystals():
         # Left & lower
         left_lower = self.govec + float(nv_pix) * self.gvvec + float(nh_pix) * self.ghvec
 
-        print("ORI=", origin)
-        print("RL=", right_lower)
-        print("LU=", left_upper)
-        print("LL=", left_lower)
+        print "ORI=", origin
+        print "RL=", right_lower
+        print "LU=", left_upper
+        print "LL=", left_lower
 
     def prepPic(self, shape):
         self.shape = shape

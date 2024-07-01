@@ -33,7 +33,7 @@ if __name__ == "__main__":
 	for trayid in [2]:
 		for pinid in [4]:
 			prefix="%s-%02d-%02d"%(uname,trayid,pinid)
-			print("Doing %s"%prefix)
+			print "Doing %s"%prefix
 
 			lm=LoopMeasurement.LoopMeasurement(ms,root_dir,prefix)
 
@@ -45,8 +45,8 @@ if __name__ == "__main__":
 
 			try:
 				zoo.mountSample(trayid,pinid)
-			except MyException as ttt:
-				print("Sample mount failed!!")
+			except MyException,ttt:
+				print "Sample mount failed!!"
 				break
 
 			# centering
@@ -60,8 +60,8 @@ if __name__ == "__main__":
 
 			try:
 				glist,phi_mid=lm.shikaTalk()
-			except MyException as tttt:
-				print("Skipping this loop!!")
+			except MyException, tttt:
+				print "Skipping this loop!!"
 				continue
 
 			# Precise centering

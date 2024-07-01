@@ -10,12 +10,12 @@ serversock.listen(10)
 
 program="python /isilon/BL32XU/BLsoft/PPPP/10.Zoo/back_cam_cap.py"
 
-print("waiting..")
+print "waiting.."
 
 while True: 
 	clientsock,client_address=serversock.accept()
 	rcvmsg=clientsock.recv(1024)
-	print("Writing filename -> %s"%rcvmsg)
+	print "Writing filename -> %s"%rcvmsg
 	if rcvmsg=="":
 		break
 	command="%s %s"%(program,rcvmsg)

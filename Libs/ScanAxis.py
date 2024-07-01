@@ -1,4 +1,4 @@
-import MyException
+from MyException import *
 
 class ScanAxis:
 
@@ -25,11 +25,11 @@ class ScanAxis:
 
 	def setRelStart(self,curr,width): # note: the same [unit]
 		self.scan_start=curr-width
-		print(self.scan_start)
+		print self.scan_start
 
 	def setRelEnd(self,curr,width): # note: the same [unit]
 		self.scan_end=curr+width
-		print(self.scan_end)
+		print self.scan_end
 
 if __name__=="__main__":
 
@@ -41,6 +41,6 @@ if __name__=="__main__":
 
 	try:
 		k.checkScanCondition()
-	except MyException as ttt:
-		print(ttt.args[0])
+	except MyException,ttt:
+		print ttt.args[0]
 		

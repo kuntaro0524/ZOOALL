@@ -21,8 +21,8 @@ serversock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 serversock.bind((host,port))
 serversock.listen(10)
 
-print("OKAY")
-print(host,port)
+print "OKAY"
+print host,port
 
 while True: 
 	clientsock,client_address=serversock.accept()
@@ -30,7 +30,7 @@ while True:
         capture(filename)
 	s_msg="%s capture done"%filename
 	clientsock.sendall(s_msg)
-	print(s_msg)
+	print s_msg
 	clientsock.close()
 
 #clientsock.close()

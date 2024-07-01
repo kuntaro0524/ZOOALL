@@ -3,30 +3,21 @@ import time
 import numpy as np
 import socket
 import Zoo
-import MyDate
-import BLFactory
-
-import logging, logging.config
+sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs/")
+from MyException import *
 
 if __name__ == "__main__":
-
     zoo=Zoo.Zoo()
     zoo.connect()
     zoo.getSampleInformation()
-
-    # beamline configure
-    blf = BLFactory.BLFactory()
-
-    logdir = blf.config.get("dirs", "zoologdir")
-    logging_conf = blf.config.get("files", "logging_conf")
-
-    # kuntaro_log
-    d = MyDate.MyDate()
-    time_str = d.getNowMyFormat(option="date")
-    logname = f"{logdir}/zoo_{time_str}.log"
-    logging.config.fileConfig(logging_conf, defaults={'logfile_name': logname})
-    logger = logging.getLogger('ZOO')
-
-    zoo.mountSample(sys.argv[1],sys.argv[2])
-    zoo.waitTillReady()
+    time.sleep(2.0)
+    #zoo.autoCentering()
+    #zoo.stop()
+    puckid = sys.argv[1]
+    pinid = sys.argv[2]
+    try:
+        zoo.mountSample(puckid, pinid)
+        zoo.waitTillReady()
+    except MyException, ttt:
+        print "Failed", ttt.args[0]
     zoo.disconnect()

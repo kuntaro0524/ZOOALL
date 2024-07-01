@@ -1,8 +1,13 @@
-import sys
+import cv2,sys,datetime, socket, time
 import matplotlib.pyplot as plt
 import numpy as np
+import copy
 
-import Libs.MyException
+sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs")
+
+from MyException import *
+import CryImageProc
+import Device
 
 # Modified 2015/07/22
 # Y translation is changed 500um -> 1000um when the loop is 
@@ -35,9 +40,9 @@ class FittingForFacing:
 
         param_opt, covariance = scipy.optimize.curve_fit(self.func, self.phi_list, self.area_list, p0=parameter_initial)
 
-        print("phi_list = ", self.phi_list)
-        print("area_list = ", self.area_list)
-        print("parameter =", param_opt)
+        print "phi_list = ", self.phi_list
+        print "area_list = ", self.area_list
+        print "parameter =", param_opt
 
         # DEBUGGING PLOT
         plt.cla()
@@ -55,7 +60,6 @@ class FittingForFacing:
         return a*np.cos(np.pi/90.0*(phi+b))+c
 
     def findFaceAngle(self):
-        print("findFaceAngle")
         if self.isDone==False:
             param_opt=self.prep()
 
@@ -68,22 +72,21 @@ class FittingForFacing:
                 min_value=value
                 phi_min=phi
 
-        print("PHI  Fitted = %10.2f Obs = %10.2f"%(phi_min, self.phi_min_obs))
-        print("Area Fitted = %10.2f Obs = %10.2f"%(min_value, self.area_min_obs))
+        print "PHI  Fitted = %10.2f Obs = %10.2f"%(phi_min, self.phi_min_obs)
+        print "Area Fitted = %10.2f Obs = %10.2f"%(min_value, self.area_min_obs)
 
         if min_value > self.area_min_obs:
             phi_min = self.phi_min_obs
 
         face_angle=phi_min+90.0
-        print("findFaceAngle=%5.1f deg."%face_angle)
-
+        print "findFaceAngle=%5.1f deg."%face_angle
         return face_angle
 
     def check(self):
         if self.isDone==False:
             self.prep()
         phi_tmp = np.linspace(0, 360, 100)
-        print(phi_tmp)
+        print phi_tmp
         plt.figure()
         plt.plot(self.phi_list,self.area_list,'r-')
         plt.plot(phi_tmp, self.p1[0]*np.cos(np.pi/90.0*phi_tmp)+self.p1[1], 'o')
@@ -107,4 +110,4 @@ if __name__=="__main__":
     ffff = FittingForFacing(phis, areas, logpath = logpath)
     face_angle = ffff.findFaceAngle()
 
-    print("eog %s/fitted.png" % logpath)
+    print "eog %s/fitted.png" % logpath

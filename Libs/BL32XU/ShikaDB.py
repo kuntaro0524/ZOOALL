@@ -1,0 +1,125 @@
+import os,sys
+import getpass
+#import pysqlite2.dbapi2 as sqlite3
+import sqlite3
+import time
+import cPickle as pickle
+import numpy
+import bl_logfiles
+sys.path.append("/oys/xtal/yamtbx/")
+import bl_logfiles
+#from yamtbx.dataproc import bl_logfiles
+
+def add_results(results):
+    for f, stat in results: current_stats[f] = stat
+
+class Stat:
+    def __init__(self):
+        self.img_file = None
+        self.stats = [] # n_spots, total, mean
+        self.spots = []
+        self.gonio = None
+        self.grid_coord = None
+        self.scan_info = None
+        self.params = None
+        self.thumb_posmag = None
+        self.detector = ""
+
+class ShikaDB:
+	def __init__(self,dbfile,diffscan_log):
+		self.slog=bl_logfiles.BssDiffscanLog(diffscan_log)
+		self.slog.remove_overwritten_scans()
+		self.dbfile=dbfile
+		self.isRead=False
+
+	def read(self):
+		try:
+			startt = time.time()
+			self.result = []
+			con = sqlite3.connect(self.dbfile, timeout=10)
+			cur = con.cursor()
+
+			c = cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='status';")
+			if c.fetchone() is None:
+				print "c.fetchone failed"
+				return
+
+			c = con.execute("select filename,spots from spots")
+			results = dict(map(lambda x: (str(x[0]), pickle.loads(str(x[1]))), c.fetchall()))
+
+			for r in results.values():
+				if not r["spots"]: continue
+				ress = numpy.array(map(lambda x: x[3], r["spots"]))
+				test = numpy.zeros(len(r["spots"])).astype(numpy.bool)
+				#for rr in exranges: test |= ((min(rr) <= ress) & (ress <= max(rr)))
+				for i in reversed(numpy.where(test)[0]): del r["spots"][i]
+
+			if len(self.slog.scans)!=1:
+				print "Scan results are duplicated."
+				system.exit()
+	
+			for scan in self.slog.scans:
+				self.vpoints=scan.vpoints
+				self.hpoints=scan.hpoints
+				#print "VPOINTS,HPOINTS=",scan.vpoints,scan.hpoints
+				for imgf, (gonio, gc) in scan.filename_coords:
+					stat = Stat()
+					if imgf not in results: continue
+					#print "IMGF=",imgf
+					nspots=len(results[imgf]["spots"])
+					snrlist = map(lambda x: x[2], results[imgf]["spots"])
+					#print "RESULTS:",imgf,nspots,len(snrlist)
+	
+					""" KEITARO ORIGINAL
+					stat.stats = (len(snrlist), sum(snrlist), numpy.median(snrlist) if snrlist else 0)
+					stat.spots = results[imgf]["spots"]
+					stat.gonio = gonio
+					stat.grid_coord = gc
+					stat.scan_info = scan
+					stat.thumb_posmag = results[imgf]["thumb_posmag"]
+					stat.params = results[imgf]["params"]
+					"""
+					x,y,z=gonio
+					#print gonio,nspots
+					self.result.append((gonio,nspots))
+	
+		finally:
+			#print self.result
+			#for a in self.result:
+				#print a
+        		self.isRead=True
+
+	def getNdata(self):
+		if self.isRead==False:
+			self.read()
+		return len(self.result)
+
+	def getCompleteness(self):
+		if self.isRead==False:
+			self.read()	
+		input_nframes=self.vpoints*self.hpoints
+		current_nframes=len(self.result)
+		return float(current_nframes)/float(input_nframes)
+
+	def getAll(self):
+		if self.isRead==False:
+			self.read()
+		return self.result
+
+	def getThresh(self,thresh):
+		if self.isRead==False:
+			self.read()
+		new_list=[]
+		for r in self.result:
+			xyz,score=r
+			if float(score) > float(thresh):
+				new_list.append((xyz,score))
+		return new_list
+
+if __name__=="__main__":
+	jj=ShikaDB("./asada.db","./asada.log")
+	print jj.getCompleteness()
+	good_spots=jj.getThresh(1)
+	
+	for s in good_spots:
+		print s

@@ -1,9 +1,12 @@
-import sys,os,math
+import cv2,sys,datetime
 
+lines = open(sys.argv[1],"r").readlines()
 
-lines=open(sys.argv[1],"r").readlines()
-
-for line in lines:
-    cols = line.split()
-    print("%s = cond['%s']"% (cols[0], cols[0]))
-
+for filename in lines:
+    timg = cv2.imread(filename.strip())
+    mean_value = timg.mean()
+    if mean_value < 100:
+        print "Lower bad file = %s" % filename
+    if mean_value > 200:
+        print "Higher bad file = %s" % filename
+    #print filename.strip(),timg.mean()

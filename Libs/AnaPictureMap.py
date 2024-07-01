@@ -32,13 +32,13 @@ class AnaPictureMap:
 
         final_1_1_vec = vec0 + 25*v_vec + 25*h_vec
 
-        print(final_1_1_vec)
+        print final_1_1_vec
 
         junk0, junk1, x,y,z, score = self.heatmap[25,25,:]
         vec_orig = numpy.array((x,y,z))
 
         dist = numpy.linalg.norm((final_1_1_vec-vec_orig))
-        print("DIFF=", dist)
+        print "DIFF=", dist
 
     def vectorTest2(self):
         import EnlargedHeatmap
@@ -46,9 +46,9 @@ class AnaPictureMap:
         xyz_vert_edge = self.getGonioXYZat(self.nv-1,0)
         xyz_hori_edge = self.getGonioXYZat(0, self.nh-1)
 
-        print(xyz_orig)
-        print(xyz_vert_edge)
-        print(xyz_hori_edge)
+        print xyz_orig
+        print xyz_vert_edge
+        print xyz_hori_edge
 
         em = EnlargedHeatmap.EnlargedHeatmap(xyz_orig, xyz_vert_edge, xyz_hori_edge)
    
@@ -59,7 +59,7 @@ class AnaPictureMap:
         nv = int(v_um / 15.0)
         nh = int(h_um / 10.0)
 
-        print("HEATMAP", self.heatmap[nv,nh,:])
+        print "HEATMAP", self.heatmap[nv,nh,:]
 
     # Judge uchigawa points in contour
     def makeUchigawaPoints(self, cv_image, contour, prefix):
@@ -67,21 +67,21 @@ class AnaPictureMap:
         uchigawa_img = numpy.empty(cv_image.shape, dtype=numpy.float32)
 
         height, width = cv_image.shape[:2]
-        print("CONTOURS=", type(contour), contour.shape, cv_image.shape)
+        print "CONTOURS=", type(contour), contour.shape, cv_image.shape
 
         for i in range(height):
             for j in range(width):
                 value = cv2.pointPolygonTest(contour, (j, i), True)
                 uchigawa_img[i, j] = value
 
-        print("SHAPE_UCHIGAWEA=" , uchigawa_img.shape)
+        print "SHAPE_UCHIGAWEA=" , uchigawa_img.shape
         # Min/Max values
         minVal, maxVal, min_loc, max_loc = cv2.minMaxLoc(uchigawa_img)
         minVal = abs(minVal)
         maxVal = abs(maxVal)
 
         # Draw image
-        print("HEIGHT,WIDTH=", height, width)
+        print "HEIGHT,WIDTH=", height, width
         dw_img = numpy.zeros((height, width, 3), dtype=numpy.uint8)
         for y in range(height):
             for x in range(width):
@@ -213,11 +213,11 @@ class AnaPictureMap:
             ## Rinkaku Kinji
             epsilon = 0.02 * cv2.arcLength(cont, True)
             approx = cv2.approxPolyDP(cont, epsilon, True)
-            print(approx)
+            print approx
             ttt = copy.deepcopy(norm_col_img)
             iii = cv2.drawContours(ttt, [approx], 0, (255, 0, 0), 1)
             cv2.imwrite("rinkaku_kinji%02d.png" % index, iii)
-            print("rinkaku_kinji: isContourConvex=", cv2.isContourConvex(approx))
+            print "rinkaku_kinji: isContourConvex=", cv2.isContourConvex(approx)
 
             ## Angle
             (x, y), (MA, ma), angle = cv2.fitEllipse(cont)
@@ -233,8 +233,8 @@ class AnaPictureMap:
             v_pos = 5 + 1 * index
             cv2.putText(tmpimg, logstr, (0, v_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (125, 125, 125), 1)
             imgname = "./kakudai_%02d.png" % (index)
-            print("isContourConvex= %s" % cv2.isContourConvex(cont))
-            print(logstr)
+            print "isContourConvex= %s" % cv2.isContourConvex(cont)
+            print logstr
             cv2.imwrite(imgname, tmpimg)
             index += 1
 
