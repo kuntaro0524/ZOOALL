@@ -103,7 +103,6 @@ class Motor(ScanAxis.ScanAxis):
         recbuf = self.communicate(com)
         tmpf = Received.Received(recbuf)
         position = tmpf.readQuery()
-        # print "debug::", position
 
         # print position
         if position.find("mm") != -1:

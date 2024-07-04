@@ -6,7 +6,6 @@ import sys
 from File import *
 from Motor import *
 
-
 class AxesInfo:
     def __init__(self, server):
         self.s = server
@@ -26,8 +25,10 @@ class AxesInfo:
         ofile.write("width\t:%12s%7s\n" % Motor(self.s, "bl_32in_fe_slit_1_width", "mm").getApert())
         ofile.write("##### Monochromator ####\n")
         ofile.write("Energy\t:%12s%7s\n" % Motor(self.s, "bl_32in_tc1_stmono_1", "pulse").getEnergy())
+        energy,unit = Motor(self.s, "bl_32in_tc1_stmono_1", "pulse").getEnergy()
+        wavelength = 12.3984 / energy
         ofile.write("Angle\t:%12s%7s\n" % Motor(self.s, "bl_32in_tc1_stmono_1", "pulse").getAngle())
-        ofile.write("Wavelength\t:%13s%7s\n" % Motor(self.s, "bl_32in_tc1_stmono_1", "pulse").getRamda())
+        ofile.write("Wavelength\t: %12.5f angstrome\n" % wavelength)
         ofile.write("Theta\t:%12s%7s\n" % Motor(self.s, "bl_32in_tc1_stmono_1_theta", "pulse").getPosition())
         ofile.write("Y1\t:%12s%7s\n" % Motor(self.s, "bl_32in_tc1_stmono_1_y1", "pulse").getPosition())
         ofile.write("Z1\t:%12s%7s\n" % Motor(self.s, "bl_32in_tc1_stmono_1_z1", "pulse").getPosition())
