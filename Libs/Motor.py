@@ -83,7 +83,7 @@ class Motor(ScanAxis.ScanAxis):
 
         # print position
         if position.find("mm") != -1:
-            value = float(positioreplace("mm", ""))
+            value = float(position.replace("mm", ""))
             return (value, "mm")
         elif position.find("pulse") != -1:
             value = int(position.replace("pulse", ""))

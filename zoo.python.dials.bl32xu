@@ -24,9 +24,9 @@
 # The function returns nonzero for unreadable or invalid symlinks
 # and resets the RESULT to an empty string.
 
-export ZOOROOT="/staff/bl32xu/BLsoft/TMP41XU/"
-export ZPATH="/staff/bl32xu/BLsoft/TMP41XU:/staff/bl32xu/BLsoft/TMP41XU/Libs"
-export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/TMP41XU/Libs"
+export ZOOROOT="/staff/bl32xu/BLsoft/TestZoo/"
+export ZPATH="/staff/bl32xu/BLsoft/TestZoo:/staff/bl32xu/BLsoft/TestZoo/Libs"
+export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/TestZoo/Libs"
 
 shellrealpath() {
     local ORGDIR="$PWD"

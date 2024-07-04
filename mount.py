@@ -24,6 +24,7 @@ if __name__ == "__main__":
     d = MyDate.MyDate()
     time_str = d.getNowMyFormat(option="date")
     logname = f"{logdir}/zoo_{time_str}.log"
+    #logname = "{logdir}/zoo_{time_str}.log"
     logging.config.fileConfig(logging_conf, defaults={'logfile_name': logname})
     logger = logging.getLogger('ZOO')
 
