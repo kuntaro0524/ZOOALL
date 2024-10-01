@@ -1,26 +1,33 @@
-import sys, os
+import os,sys,glob, datetime
+import time
+import numpy as np
 import socket
 
-sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs")
-
-import BeamsizeConfig
 import Zoo
+from configparser import ConfigParser, ExtendedInterpolation
+import BeamsizeConfig
+import logging
+
+bss_port=5555
 
 if __name__ == "__main__":
-    config_dir = "/isilon/blconfig/bl32xu/"
-    bsc = BeamsizeConfig.BeamsizeConfig(config_dir)
-    tw, th, bs, ff = bsc.getBeamParamList()
- 
+
+    beamsize_index= int(sys.argv[1])
+    # Logging setting
+    # open configure file
+    config = ConfigParser(interpolation=ExtendedInterpolation())
+    config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    config.read(config_path)
+
+
     zoo = Zoo.Zoo()
     zoo.connect()
 
-    # input beam size
-    vsize = float(sys.argv[1])
-    hsize = float(sys.argv[2])
+    # previous_index=zoo.getBeamsize()
+    # print("Current beamsize index: %d" % previous_index)
 
-    beam_index = bsc.getBeamIndexHV(hsize, vsize)
+    zoo.setBeamsize(beamsize_index)
+    print("Set was completed")
 
-    print("Beamsize index should be %5d" % beam_index)
-
-    zoo.setBeamsize(beam_index)
-    zoo.disconnect()
+    curr_index=zoo.getBeamsize()
+    print("Current beamsize index: %d" % curr_index)

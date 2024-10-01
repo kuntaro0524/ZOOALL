@@ -401,8 +401,14 @@ class BSSconfig:
         return float(strvalue)
 
     def getCmount(self):
-        self.mx = self.getValue("Cmount_Gonio_X_Magnet")
-        self.mz = self.getValue("Cmount_Gonio_Z_Magnet")
+        try:
+            self.mx = self.getValue("Cmount_Gonio_X_Magnet")
+        except:
+            self.mx = self.getValue("Cmount_Gonio_X")
+        try:
+            self.mz = self.getValue("Cmount_Gonio_Z_Magnet")
+        except:
+            self.mz = self.getValue("Cmount_Gonio_Z")
         self.my = self.getValue("Cmount_Gonio_Y_Magnet")
         return self.mx, self.my, self.mz
 

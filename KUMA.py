@@ -25,23 +25,17 @@ class KUMA:
         self.dose_limit_file = self.config.get("files", "dose_csv")
 
     # 2023/05/10 coded by K.Hirata
-    def getDoseLimitParams(self,target_dose=10.0, energy=12.3984):
+    def getDoseLimitParams(self, energy=12.3984):
         # CSVファイルを読んでdataframeにする
         df = pd.read_csv(self.dose_limit_file)
         # energy .vs. dose_mgy_per_photonのグラフについてスプライン補完を行い
         # エネルギーが与えられたら、線量を返す関数を作成する
         # 戻り値はfloatとする
         en_dose_function = interpolate.interp1d(df['energy'], df['dose_mgy_per_photon'], kind='cubic')
-        # energy .vs. density_limitのグラフについてスプライン補完を行い
-        # エネルギーが与えられたら、density_limitを返す関数を作成する
-        # 戻り値はfloatとする
-        en_dens_function = interpolate.interp1d(df['energy'], df['density_limit'], kind='cubic')
         # dosePerPhoton
         dose_per_photon = en_dose_function(energy).flatten()[0]
-        # density limit
-        density_limit = en_dens_function(energy).flatten()[0]
 
-        return dose_per_photon, density_limit
+        return dose_per_photon
 
     def getDose1sec(self, beam_h, beam_v, flux, energy):
         # density_limit は tableにある数値 → 10 MGy に到達するまでの photon density
@@ -81,9 +75,10 @@ class KUMA:
 
     def convDoseToExptimeLimit(self, dose, beam_h, beam_v, flux, wavelength):
         en = 12.3984 / wavelength
-        dose_per_photon, density_limit = self.getDoseLimitParams(target_dose=dose, energy=en)
 
-        print(f"density_limit={density_limit:e}")
+        # density limit for aimed dose
+        dose_per_photon = self.getDoseLimitParams(energy=en)
+        density_limit = dose / dose_per_photon
 
         # Actual photon flux density
         actual_density = flux / (beam_h * beam_v)
@@ -94,7 +89,8 @@ class KUMA:
     def convDoseToDensityLimit(self, dose, wavelength):
         en = 12.3984 / wavelength
         # dose_per_photon, density_limit
-        dose_per_photon, density_limit = self.getDoseLimitParams(target_dose=dose, energy=en)
+        dose_per_photon = self.getDoseLimitParams(energy=en)
+        density_limit = dose / dose_per_photon
         self.limit_dens = density_limit
         print("Limit density= %e [phs/um2]" % self.limit_dens)
 

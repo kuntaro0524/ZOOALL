@@ -12,12 +12,17 @@
 # export ZOOCONFIGPATH=$ZOOROOT/Libs/
 
 #BL44XU
+<<<<<<< HEAD
 export PYTHONPATH="/staff/bl44xu/BLsoft/TestZOO/:/staff/bl44xu/BLsoft/TestZOO/Libs/"
 export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/TestZOO/Libs"
+=======
+#export PYTHONPATH="/staff/bl44xu/BLsoft/TestZOO/:/staff/bl44xu/BLsoft/TestZOO/Libs/"
+#export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/TestZOO/Libs"
+>>>>>>> origin/main
 
 # BL32XU test
-#export PYTHONPATH="/staff/bl32xu/BLsoft/TestZoo/:/staff/bl32xu/BLsoft/TestZoo/Libs/"
-#export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/TestZoo/Libs"
+export PYTHONPATH="/staff/bl32xu/BLsoft/TestZoo/:/staff/bl32xu/BLsoft/TestZoo/Libs/"
+export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/TestZoo/Libs"
 
 args=("$*")
 echo $args
