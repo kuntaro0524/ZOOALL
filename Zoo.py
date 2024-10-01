@@ -2,7 +2,6 @@ import os, sys, glob
 import time, datetime
 import numpy as np
 import socket
-
 from MyException import *
 import logging
 import logging.config
@@ -474,10 +473,10 @@ class Zoo:
 
     def setBeamsize(self, beamsize_index):
         com = "put/beamline/beamsize_%d" % beamsize_index
+
         recstr = self.communicate(com)
         print("setBeamsize:result=", recstr)
         self.waitTillReady()
-
 
 if __name__ == "__main__":
     # Logging setting
@@ -495,11 +494,9 @@ if __name__ == "__main__":
     zoo = Zoo()
     zoo.connect()
     # zoo.setBeamsize(0)
-#<<<<<<< HEAD
-    # zoo.getBeamsize()
-#=======
-    zoo.getBeamsize()
-#>>>>>>> origin/main
+    print("BBBBBBBBBBBBBBBB")
+    print(zoo.getBeamsize())
+    zoo.setBeamsize(1)
     #print(zoo.getSampleInformation())
     #zoo.getBeamsizeQuery()
     # print(zoo.getBeamsize())

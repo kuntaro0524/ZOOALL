@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from MyException import *
+from Libs import MyException
 import sys,os
 from configparser import ConfigParser, ExtendedInterpolation
 
@@ -163,6 +163,9 @@ class BSSconfig:
 
         if self.debug:
             print(self.all_dicts)
+            # Display all the dictionaries
+            for ddd in self.all_dicts:
+                print(ddd['_axis_name'])
         
         for ddiicc in self.all_dicts:
             if self.debug:
@@ -295,10 +298,11 @@ class BSSconfig:
     # 3. On position / Off position は軸の名前で定義されている
     #    type_axis で指定したやつの mm 単位でのOn/Off位置をゲットする
     # 4. 最終的にその軸の変換係数をかけて pulse の On/Off を返す
-    def getEvacuateInfo(self, type_axis):
+    def getEvacuateInfo(self, type_axis, the_2nd = False):
         if self.isPrepDict == False:
             self.storeAxesBlocks()
 
+        nth_axis = 0
         for dict in self.all_dicts:
             if self.debug:
                 print("!!!!!!!!!!!!!!!!!!!!!!!!!1")
@@ -308,10 +312,19 @@ class BSSconfig:
                 axis_comment = dict['_axis_comment']
                 if type_axis in axis_comment:
                     if axis_comment.rfind("evacuate") != -1:
-                        print(type_axis, dict['_axis_name'])
+                        if self.debug:
+                            print("Found evacuate axis")
+                            print(type_axis, dict['_axis_name'])
+                            print("Found evacuate axis")
                         evac_axis = dict['_axis_name']
                         val2pulse, sense, home_value = self.getPulseInfo(dict['_axis_name'])
-                        break
+                        if the_2nd == False:
+                            break
+                        elif the_2nd == True and nth_axis==0:
+                            nth_axis+=1
+                            continue
+                        else:
+                            break
 
         self.makeListOnOff()
 

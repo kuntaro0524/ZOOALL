@@ -4,6 +4,8 @@ import sys
 import socket
 import time
 import datetime
+import WebSocketBSS
+import os
 
 # My library
 from Received import *
@@ -20,6 +22,8 @@ class Colli:
         # beamline.ini 
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        # beamline name
+        self.beamline = self.config.get("beamline", "beamline")
 
         self.s = server
         # names of collimator axes
@@ -51,22 +55,60 @@ class Colli:
             # pulse information of each axis
             self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.colz_axis)
 
-        # print(self.v2p_y, self.sense_y, self.v2p_z, self.sense_z)
+        # BL41XU web socket system
+        self.websock = WebSocketBSS.WebSocketBSS()
 
         self.isInit = False
+        # Evacuation axis list
+        self.evac_axes = []
 
     # 退避する軸はビームラインごとに違っているのでそれを取得する必要がある。
     # 現時点では１軸しか取得できないのでそうでないビームライン（ビームストッパーをYZどちらも退避）が出てくると修正する必要がある
     def getEvacuate(self):
-        evacinfo = self.config.get("axes", "col_evacinfo")
-        self.evac_axis_name, self.on_pulse, self.off_pulse = self.bssconf.getEvacuateInfo(evacinfo)
-        print("Evac axis:",self.evac_axis_name)
-        print("ON (VME value):",self.on_pulse)
-        print("OFF(VME value):",self.off_pulse)
-        # 退避軸を自動認識してそれをオブジェクトとして設定してしまう
-        print("BLO=bl_%s_%s" % (self.bl_object, self.evac_axis_name))
-        self.evac_axis = Motor(self.s, "bl_%s_%s" % (self.bl_object, self.evac_axis_name), "pulse")
-        self.isInit = True
+        self.evac_dict = {}
+
+        if self.beamline == "BL41XU":
+            print("BL41XU!!!")
+            # The 1st evacuation information of collimator
+            evacinfo = self.config.get("axes", "col_evacinfo")
+            self.evac_axis_name, self.on_pulse, self.off_pulse = self.bssconf.getEvacuateInfo(evacinfo)
+            print("Evac axis:",self.evac_axis_name)
+            print("ON (VME value):",self.on_pulse)
+            print("OFF(VME value):",self.off_pulse)
+            # 退避軸を自動認識してそれをオブジェクトとして設定してしまう
+            print("BLO=bl_%s_%s" % (self.bl_object, self.evac_axis_name))
+            self.evac_axis = Motor(self.s, "bl_%s_%s" % (self.bl_object, self.evac_axis_name), "pulse")
+            # dictionary of evacuation axes
+            tmp_evac_dict = {"name":self.evac_axis_name, "on":self.on_pulse, "off":self.off_pulse, "axis":self.evac_axis}
+            self.evac_axes.append(tmp_evac_dict)
+
+            # 2nd collimator axis
+            self.evac_axis_name, self.on_pulse, self.off_pulse = self.bssconf.getEvacuateInfo(evacinfo, the_2nd=True)
+            print("Evac axis:",self.evac_axis_name)
+            print("ON (VME value):",self.on_pulse)
+            print("OFF(VME value):",self.off_pulse)
+            # 退避軸を自動認識してそれをオブジェクトとして設定してしまう
+            print("BLO=bl_%s_%s" % (self.bl_object, self.evac_axis_name))
+            self.evac_axis = Motor(self.s, "bl_%s_%s" % (self.bl_object, self.evac_axis_name), "pulse")
+            # dictionary of evacuation axes
+            tmp_evac_dict = {"name":self.evac_axis_name, "on":self.on_pulse, "off":self.off_pulse, "axis":self.evac_axis}
+            self.evac_axes.append(tmp_evac_dict)
+
+            self.isInit = True
+        # other beamlines: evacuation is a single axis
+        # The codes should be checked at BL32XU/BL44XU especially after 2024/06/27
+        else:
+            evacinfo = self.config.get("axes", "col_evacinfo")
+            self.evac_axis_name, self.on_pulse, self.off_pulse = self.bssconf.getEvacuateInfo(evacinfo)
+            print("Evac axis:",self.evac_axis_name)
+            print("ON (VME value):",self.on_pulse)
+            print("OFF(VME value):",self.off_pulse)
+            # 退避軸を自動認識してそれをオブジェクトとして設定してしまう
+            print("BLO=bl_%s_%s" % (self.bl_object, self.evac_axis_name))
+            self.evac_axis = Motor(self.s, "bl_%s_%s" % (self.bl_object, self.evac_axis_name), "pulse")
+            tmp_evac_dict = {"name":self.evac_axis_name, "on":self.on_pulse, "off":self.off_pulse, "axis":self.evac_axis}
+            self.evac_axes.append(tmp_evac_dict)
+            self.isInit = True
 
     def getY(self):
         tmp = int(self.coly.getPosition()[0])
@@ -81,17 +123,27 @@ class Colli:
         return tmp
 
     def on(self):
-        if self.isInit == False:
-            self.getEvacuate()
-        # sense 
-        # pulse_to_move = self.on_pulse * self.sense_z
-        # print(pulse_to_move)
-        self.evac_axis.move(self.on_pulse)
+        if self.beamline == "BL41XU":
+            self.websock.collimator("on")
+        else:
+            if self.isInit == False:
+                self.getEvacuate()
+            # sense 
+            for each_axis in self.evac_axes:
+                on_pulse = each_axis["on"]
+                print("on_pulse:",on_pulse)
+                each_axis['axis'].move(on_pulse)
 
     def off(self):
-        if self.isInit == False:
-            self.getEvacuate()
-        self.evac_axis.move(self.off_pulse)
+        if self.beamline == "BL41XU":
+            self.websock.collimator("off")
+        else:
+            if self.isInit == False:
+                self.getEvacuate()
+            for each_axis in self.evac_axes:
+                off_pulse = each_axis["off"]
+                print("off_pulse:",off_pulse)
+                each_axis["axis"].move(off_pulse)
 
     # 2023/04/12 Temp mod.
     def offY(self):
@@ -486,7 +538,6 @@ if __name__ == "__main__":
     config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
     print(config_path)
     config.read(config_path)
-    # host = config.get("server", "bss_server")
     host = config.get("server", "blanc_address")
     port = 10101
 
@@ -495,13 +546,9 @@ if __name__ == "__main__":
 
     coli = Colli(s)
     coli.getEvacuate()
-    # print((coli.getZ()))
-    # print((coli.getEvacZ()))
-    # coli.off()
-    coli.off()
-    # coli.scan("colllli",0)
 
-    # coli.on()
+    coli.on()
+    coli.off()
     # coli.off()
     # def scan2D(self,prefix,startz,endz,stepz,starty,endy,stepy):
     # coli.goOff()

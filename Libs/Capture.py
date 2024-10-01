@@ -7,7 +7,7 @@ import datetime
 import os
 import numpy
 from socket import error as socket_error
-from MyException import *
+from Libs import MyException
 from configparser import ConfigParser, ExtendedInterpolation
 
 class Capture:

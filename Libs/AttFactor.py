@@ -3,7 +3,7 @@ import socket
 import time
 import math
 from numpy import *
-import BSSconfig
+from Libs import BSSconfig
 import logging
 from configparser import ConfigParser, ExtendedInterpolation
 

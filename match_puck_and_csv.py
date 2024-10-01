@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     csvfile = sys.argv[1]
     n_ng = 0
-    with open(csvfile, 'rb') as f:
+    with open(csvfile, 'r') as f:
         b = csv.reader(f)
         header = next(b)
         # CSV line processing

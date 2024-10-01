@@ -1,5 +1,8 @@
 #!/bin/bash
+# BL41XU
+source /opt/dials/dials-v3-9-2/dials_env.sh
 
+<<<<<<< HEAD
 #export PYTHONPATH="/staff/bl32xu/BLsoft/NewZoo/:/staff/bl32xu/BLsoft/NewZoo/Libs/"
 #export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/NewZoo/Libs/"
 # BL32XU
@@ -23,8 +26,12 @@ export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/TestZOO/Libs"
 # BL32XU test
 export PYTHONPATH="/staff/bl32xu/BLsoft/TestZoo/:/staff/bl32xu/BLsoft/TestZoo/Libs/"
 export ZOOCONFIGPATH="/staff/bl32xu/BLsoft/TestZoo/Libs"
+=======
+export PYTHONPATH="/staff/bl41xu/BLsoft/ZOOALL/:/staff/bl41xu/BLsoft/TestZoo/Libs/"
+export ZOOCONFIGPATH="/staff/bl41xu/BLsoft/ZOOALL/Libs"
+>>>>>>> origin/main
 
 args=("$*")
 echo $args
 
-python3.8 $args
+yamtbx.python $args

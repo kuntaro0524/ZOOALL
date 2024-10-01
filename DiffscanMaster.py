@@ -1,6 +1,6 @@
 import sys, math, numpy, os
 
-import MyException
+from MyException import *
 import StopWatch
 import AnaHeatmap
 import CrystalList
@@ -141,7 +141,7 @@ class NOU():
                 self.do_multi(cond, dc_block, dc_index)
         except Exception as e:
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("dododo failed in data collection. Exception caught.")
+            raise MyException("dododo failed in data collection. Exception caught.")
 
     def commentException(self, args):
         comment = ""
@@ -167,7 +167,7 @@ class NOU():
         except Exception as e:
             self.logger.info("Left centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("Left centering failed.")
+            raise MyException("Left centering failed.")
         # Right centering
         # max_repeat でセンタリングができなかった場合には例外になる→これは問題ない
         try:
@@ -177,7 +177,7 @@ class NOU():
         except Exception as e:
             self.logger.info("Right centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("Right centering failed.")
+            raise MyException("Right centering failed.")
 
         # Data collection
         try:
@@ -185,7 +185,7 @@ class NOU():
         except Exception as e:
             self.logger.info("startHelical failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("do_helical_full: startHelical failed.")
+            raise MyException("do_helical_full: startHelical failed.")
 
     # Partial helical data collection
     def do_helical_part(self, cond, dc_block, dc_index):
@@ -203,7 +203,7 @@ class NOU():
         except Exception as e:
             self.logger.info("Left centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("hel_part: Left centering failed.")
+            raise MyException("hel_part: Left centering failed.")
         # Right centering
         try:
             right_xyz = self.vertCentering(cond, osc_end, right_face_xyz, vscan_length, option="Right", dc_index=dc_index,
@@ -211,7 +211,7 @@ class NOU():
         except Exception as e:
             self.logger.info("Right centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("hel_part: Right centering failed.")
+            raise MyException("hel_part: Right centering failed.")
 
         # Data collection
         try:
@@ -220,7 +220,7 @@ class NOU():
         except Exception as e:
             self.logger.info("startHelical failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("hel_part: startHelical failed.")
+            raise MyException("hel_part: startHelical failed.")
 
 
     # Non-centering helical data collection
@@ -238,7 +238,7 @@ class NOU():
         except Exception as e:
             self.logger.info("do_helical_noalign: startHelical failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("do_helical_noalign: startHelical failed.")
+            raise MyException("do_helical_noalign: startHelical failed.")
 
 
     # Helical data collection
@@ -256,7 +256,7 @@ class NOU():
         except Exception as e:
             self.logger.info("Side view centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("single_full: vertical centering failed.")
+            raise MyException("single_full: vertical centering failed.")
         # Data collection
         try:
             self.doSingle(center_xyz, cond, osc_start, osc_end, prefix)
@@ -265,7 +265,7 @@ class NOU():
         except Exception as e:
             self.logger.info("doSingle failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException.MyException("single_full: doSingle failed.")
+            raise MyException("single_full: doSingle failed.")
 
 
     # Single partial data collection
@@ -391,7 +391,7 @@ class NOU():
 
         # There are no good crystals
         if len(sorted_crystal_list) == 0:
-            raise MyException.MyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
+            raise MyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
 
         the_best_crystal = sorted_crystal_list[0]
         if method == "peak_xyz":
@@ -465,7 +465,7 @@ class NOU():
         elif exp_min > 0.05 and exp_min <= 0.1:
             exptime = 0.1
         else:
-            raise MyException.MyException("fitExptime: No ideal exposure time is found!!")
+            raise MyException("fitExptime: No ideal exposure time is found!!")
 
         return exptime
 
@@ -514,7 +514,7 @@ class NOU():
         if isFoundGoodPoint == True:
             return new_xyz
         else:
-            raise MyException.MyException("%s vertical scan finally failed after %5d scans." % (option.lower(), nscan))
+            raise MyException("%s vertical scan finally failed after %5d scans." % (option.lower(), nscan))
 
     # Sort the data collection blocks according to wedge sizes.
     def sortDCblocks(self, dc_blocks):

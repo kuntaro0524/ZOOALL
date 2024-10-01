@@ -1,0 +1,149 @@
+#! /bin/sh
+# LIBTBX_DISPATCHER DO NOT EDIT
+#
+# THIS IS AN AUTOMATICALLY GENERATED FILE.
+# DO NOT EDIT! CHANGES WILL BE LOST.
+# To customize this auto-generated script create
+#
+#   dispatcher_include*.sh
+#
+# files in "/opt/dials/dials-v3-9-2/build" and run
+#
+#   libtbx.refresh
+#
+# to re-generate the dispatchers (libtbx.refresh is a subset
+# of the functionality of the libtbx/configure.py command).
+#
+# See also:
+#   "/opt/dials/dials-v3-9-2/build/dispatcher_include_template.sh"
+#
+
+# ----------------------------------------------------------------------------
+# The shellrealpath function resolves an absolute physical path of its
+# first argument and stores it in a global shell variable RESULT.
+# The function returns nonzero for unreadable or invalid symlinks
+# and resets the RESULT to an empty string.
+
+
+# This script was generated from yamtbx.python in DIALS 3-9-2
+export ZPATH="/staff/bl41xu/BLsoft/ZOOALL:/staff/bl41xu/BLsoft/ZOOALL/Libs"
+export ZOOCONFIGPATH="/staff/bl41xu/BLsoft/ZOOALL/Libs"
+
+shellrealpath() {
+    local ORGDIR="$PWD"
+    local TARGET="$1"
+    RESULT=""
+    # This test fails for a symlink loop.  We can do without resolution
+    # of symlinks that point to existing unreadable files.
+    [ -r "$TARGET" ] || return $?
+    # Check if the readlink command exists.
+    type readlink >/dev/null || return $?
+    while true; do
+        cd "$(dirname "$TARGET")"
+        TARGET="$(basename "$TARGET")"
+        if [ -L "$TARGET" ]; then
+            TARGET="$(readlink "$TARGET")"
+            continue
+        fi
+        RESULT="$(pwd -P)/$TARGET"
+        break
+    done
+    cd "$ORGDIR"
+}
+# ----------------------------------------------------------------------------
+
+unset PYTHONHOME
+LC_ALL=en_US.UTF-8
+export LC_ALL
+LIBTBX_BUILD="$(shellrealpath "$0" && cd "$(dirname "$RESULT")/.." && pwd)"
+export LIBTBX_BUILD
+echo "###########################"
+echo "$LIBTBX_BUILD"
+export LIBTBX_BUILD=/opt/dials/dials-v3-9-2/build/
+echo "###########################"
+LIBTBX_PYEXE_BASENAME="python"
+export LIBTBX_PYEXE_BASENAME
+LIBTBX_DISPATCHER_NAME="yamtbx.python"
+export LIBTBX_DISPATCHER_NAME
+# ---------------------------------------------------------------------------------------------
+# included from /opt/dials/dials-v3-9-2/build/dispatcher_include_dials.sh
+if [ "$LIBTBX_DISPATCHER_NAME" != "libtbx.scons" ] &&    [ -z "$PHENIX_TRUST_OTHER_ENV" ]; then
+  # work around broken library environments
+  LD_LIBRARY_PATH=""
+  DYLD_LIBRARY_PATH=""
+  DYLD_FALLBACK_LIBRARY_PATH=""
+  PYTHONPATH=""
+fi
+# ---------------------------------------------------------------------------------------------
+SSL_CERT_FILE="$LIBTBX_BUILD/../conda_base/lib/python3.9/site-packages/certifi/cacert.pem"
+export SSL_CERT_FILE
+OPENBLAS_NUM_THREADS="1"
+export OPENBLAS_NUM_THREADS
+unset GTK_MODULES
+unset GTK2_RC_FILES
+unset GTK_RC_FILES
+export FONTCONFIG_PATH=$LIBTBX_BUILD/../conda_base/etc/fonts
+export FONTCONFIG_FILE=$FONTCONFIG_PATH/fonts.conf
+export GDK_PIXBUF_MODULE_FILE=$LIBTBX_BUILD/../conda_base/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
+export GTK_PATH=$LIBTBX_BUILD/../conda_base/lib/gtk-2.0/2.10.0
+if [ -n "$PYTHONPATH" ]; then
+  PYTHONPATH="$LIBTBX_BUILD/../modules/cctbx_project:$LIBTBX_BUILD/../modules:$LIBTBX_BUILD/../modules/cctbx_project/boost_adaptbx:$LIBTBX_BUILD/../modules/yamtbx:$LIBTBX_BUILD/lib:$LIBTBX_BUILD/../conda_base/lib/python3.9/site-packages:$PYTHONPATH:$ZPATH"
+  export PYTHONPATH
+else
+  PYTHONPATH="$LIBTBX_BUILD/../modules/cctbx_project:$LIBTBX_BUILD/../modules:$LIBTBX_BUILD/../modules/cctbx_project/boost_adaptbx:$LIBTBX_BUILD/../modules/yamtbx:$LIBTBX_BUILD/lib:$LIBTBX_BUILD/../conda_base/lib/python3.9/site-packages:$ZPATH"
+  export PYTHONPATH
+fi
+if [ -n "$LD_LIBRARY_PATH" ]; then
+  LD_LIBRARY_PATH="$LIBTBX_BUILD/lib:$LIBTBX_BUILD/../conda_base/lib:$LD_LIBRARY_PATH"
+  export LD_LIBRARY_PATH
+else
+  LD_LIBRARY_PATH="$LIBTBX_BUILD/lib:$LIBTBX_BUILD/../conda_base/lib"
+  export LD_LIBRARY_PATH
+fi
+if [ -n "$PATH" ]; then
+  PATH="$LIBTBX_BUILD/bin:$PATH"
+  export PATH
+else
+  PATH="$LIBTBX_BUILD/bin"
+  export PATH
+fi
+# -----------------------------------------------------------------------
+# included from /opt/dials/dials-v3-9-2/build/dispatcher_include_dials.sh
+export DIALS="/opt/dials/dials-v3-9-2"
+export DIALS_VERSION=v3-9-2
+export DIALS_ENVIRONMENT=1
+export DIALS_MTYPE=intel-linux-2.6-x86_64
+
+if [ "$PHENIX_GUI_ENVIRONMENT" = "1" ]; then
+  if [ -z "$DISABLE_PHENIX_GUI" ]; then
+    export BOOST_ADAPTBX_FPE_DEFAULT=1
+    export BOOST_ADAPTBX_SIGNALS_DEFAULT=1
+  fi
+fi
+
+
+if [ ! -z "$QB_PYTHONPATH" ]; then
+  export PYTHONPATH=$PYTHONPATH:$QB_PYTHONPATH
+fi
+if [ ! -z "$QB_LD_LIBRARY_PATH" ]; then
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QB_LD_LIBRARY_PATH
+fi
+if [ ! -z "$QB_DYLD_LIBRARY_PATH" ]; then
+  export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$QB_DYLD_LIBRARY_PATH
+fi
+
+
+# -----------------------------------------------------------------------
+LIBTBX_PYEXE="$LIBTBX_BUILD/../conda_base/bin/$LIBTBX_PYEXE_BASENAME"
+export LIBTBX_PYEXE
+if [ -n "$LIBTBX__VALGRIND_FLAG__" ]; then
+  exec $LIBTBX_VALGRIND "$LIBTBX_PYEXE" "$@"
+elif [ $# -eq 0 ]; then
+  echo "UE"
+  echo $PYTHONPATH
+  exec "$LIBTBX_PYEXE"
+else
+  echo "SHITA"
+  echo $PYTHONPATH
+  exec "$LIBTBX_PYEXE" "$@"
+fi

@@ -4,10 +4,11 @@ import time
 import datetime
 import math
 import timeit
+import os
 
-from Received import *
-from File import *
-from AnalyzePeak import *
+import Received
+import File
+import AnalyzePeak
 import BSSconfig
 from configparser import ConfigParser, ExtendedInterpolation    
 
@@ -71,7 +72,7 @@ class Count:
         recbuf=self.communicate(com3)
 
         # obtain the 3rd column in the returned buffer
-        cnt_buf=Received(recbuf).get(3)
+        cnt_buf=Received.Received(recbuf).get(3)
 
         print(cnt_buf)
 
@@ -120,7 +121,7 @@ class Count:
         # print(recbuf)
 
         # obtain the 3rd column in the returned buffer
-        cnt_buf=Received(recbuf).get(3)
+        cnt_buf=Received.Received(recbuf).get(3)
 
         return cnt_buf
 

@@ -35,6 +35,8 @@ import BeamsizeConfig
 import Flux
 import PreColli
 from configparser import ConfigParser, ExtendedInterpolation
+import WebSocketBSS
+import MyException
 
 class Device(Singleton.Singleton):
     def __init__(self, ms_port):
@@ -52,7 +54,9 @@ class Device(Singleton.Singleton):
         self.coax_pintx_pulse = int(self.config.get("inocc", "zoom_pintx"))
         # beamline name
         self.beamline = self.config.get("beamline", "beamline")
-    
+        # web socket for BSS
+        self.websock = WebSocketBSS.WebSocketBSS()
+
     def setGonio(self, instance_of_gonio):
         self.gonio = instance_of_gonio
 
@@ -75,7 +79,7 @@ class Device(Singleton.Singleton):
             self.total_num=conf.getCondition2("FIXED_POINT","total_num")
             self.count_time=conf.getCondition2("FIXED_POINT","time")
 
-        except MyException as ttt:
+        except MyException.MyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
             sys.exit(1)
@@ -128,7 +132,7 @@ class Device(Singleton.Singleton):
         self.id.moveE(en)
         if isTune==True:
             self.tuneDt1(logpath)
-
+            
     def measureFlux(self):
         en=self.mono.getE()
         # Prep scan
@@ -167,6 +171,8 @@ class Device(Singleton.Singleton):
             self.bs.off()
         else:
             self.bs.on()
+
+        print("Collimator Off")
         self.colli.off()
 
         # BL44XU PreColli off
@@ -219,15 +225,22 @@ class Device(Singleton.Singleton):
         ## Cover check
         if self.beamline=="BL32XU":
             self.covz.isCover()
+
         self.light.off()
         self.shutter.open()
+
+        # intensity monitor on
+        if self.beamline=="BL41XU":
+            self.websock.intensityMonitor("on")
+
         if self.beamline == "BL32XU":
             self.slit1.openV()
+
         ## Attenuator
         self.att.setNoAtt()
         # collimator on
         self.colli.on()
-        # Beamstopper on
+        # Beamstopper off
         self.bs.off()
 
     def finishScan(self,cover_off=True):
@@ -239,6 +252,10 @@ class Device(Singleton.Singleton):
         if self.beamline=="BL32XU" and cover_off==True:
             ## Cover off
             self.covz.off()
+
+        # intensity monitor off
+        if self.beamline == "BL41XU":
+            self.websock.intensityMonitor("off")
 
     def closeAllShutter(self):
         self.shutter.close()
@@ -344,8 +361,10 @@ if __name__=="__main__":
     dev=Device(s)
     dev.init()
 
-    # dev.bs.on()
-    dev.measureFlux()
-
-
-    # dev.prepCentering()
+    #dev.prepCentering()
+    dev.gonio.rotatePhi(225.0)
+    #dev.bs.on()
+    #dev.bs.off()
+    #dev.measureFlux()
+    # dev.prepScan()
+    # dev.finishScan()

@@ -9,7 +9,7 @@ import numpy
 #from numpy import *
 from pylab import *
 from scipy.interpolate import splrep,splev,interp1d,splprep
-from MyException import *
+import MyException
 
 class AnalyzePeak:
     def __init__(self,datfile):

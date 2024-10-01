@@ -124,6 +124,12 @@ class Mono:
         self.m_dtheta1.move(int(center))
         return fwhm, center
 
+    def getWL(self):
+        energy = self.getE()
+        wavelength = 12.3984 / energy
+
+        return wavelength
+
     def scanDt1Peak(self, prefix, start, end, step, cnt_ch1, cnt_ch2, sec):
         # Setting
         ofile = prefix + "_dtheta1.scn"
@@ -370,12 +376,13 @@ class Mono:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.57'
+    host = '172.24.242.41'
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
     mono = Mono(s)
     print(mono.getE())
+    print(mono.getWL())
     # mono.moveZ2(1627)
     s.close()

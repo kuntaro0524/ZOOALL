@@ -1,22 +1,10 @@
-import os, sys, math, numpy, socket, datetime, time
+import os, sys, math, numpy, socket, datetime
 
 sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
 import IboINOCC
 import Zoo
 import Gonio, BS
 import Device
-import LoopMeasurement
-import StopWatch
-import MyException
-import logging
-import AnaHeatmap
-import CrystalList
-import logging
-import logging.config
-
-# 2021/06/10 22:50
-
-beamline="BL32XU"
 
 if __name__ == "__main__":
     blanc = '172.24.242.41'
@@ -24,208 +12,161 @@ if __name__ == "__main__":
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((blanc, b_blanc))
 
-    dev = Device.Device(s)
-    dev.init()
+    gonio = Gonio.Gonio(s)
+    bs = BS.BS(s)
+    inocc = IboINOCC.IboINOCC(gonio)
 
     zoo = Zoo.Zoo()
     zoo.connect()
     zoo.getSampleInformation()
 
-    # Logger
-    logname = "./iboinocc.log"
-    logging.config.fileConfig('/isilon/%s/BLsoft/PPPP/10.Zoo/Libs/logging.conf' % beamline,
-                              defaults={'logfile_name': logname})
+    # preparation
+    dev = Device.Device(s)
+    dev.init()
 
-    logger = logging.getLogger('ZOO')
+    zoo.dismountCurrentPin()
+    zoo.waitTillReady()
+
+    dev.prepCenteringLargeHolderCam1()
+    inocc.getImage("back1.png")
 
     # preparation
-    dev.colli.off()
+    dev.prepCenteringLargeHolderCam2()
+    inocc.getCam2Image("back2.png")
 
-    flux = 1.2E13 # photons/sec
+    zoo.mountSample("HRC1010", 2)
+    zoo.waitTillReady()
 
-    # Conditions (normally cond.####)
-    cond = {
-        'raster_hbeam': 10.0,
-        'raster_vbeam': 15.0,
-        'att_raster': 100.0,
-        'exp_raster': 0.01,
-        'dist_raster': 200.0,
-        'score_min' : 10,
-        'score_max' : 300,
-        'maxhits' : 200,
-        'total_osc' : 5.0,
-        'osc_width' : 0.1,
-        'ds_vbeam': 15.0,
-        'ds_hbeam': 10.0,
-        'exp_ds' : 0.02,
-        'dist_ds': 200.0,
-        'cry_max_size_um': 20.0,
-        'dose_ds' : 10.0,
-        'sample_name' : 'nor',
-        'scanv_um' : 2000,
-        'scanh_um' : 2000,
-        'hstep_um' : 10.0,
-        'vstep_um' : 15.0,
-        'att_idx' : 0,
-        'raster_exp' : 0.01,
-        'wavelength' : 0.90,
-        'reduced_fact' : 1.00,
-        'raster_roi': 1,
-        'ntimes': 1,
-        'cover_scan_flag': 1,
-        'sample_name' : 'lysbr',
-        'root_dir' : '/isilon/users/target/target/Staff/kuntaro/210727-Okkotonushi/TEST/'
-    }
+    starttime = datetime.datetime.now()
+    # Recover Face angle
+    bs.evacLargeHolder()
+    inocc.recoverFaceAngle()
+    inocc.recoverFaceAngle()
 
-    # Change energy
-    # Wavelength is changed
-    en = 12.3984 / cond['wavelength']
+    # Precise facing
+    inocc.rotateToFace()
 
-    curr_en = dev.mono.getE()
+    cx = 0.7757
+    cy = -11.5582
+    cz = 0.3020
 
-    if math.fabs(curr_en - en) > 0.001:
-        dev.changeEnergy(en, isTune=True)
+    for i in range(0, 3):
+        dev.prepCenteringLargeHolderCam1()
+        ix, iy, iz = dev.gonio.getXYZmm()
 
-    #for puckid in ["CPS2721", "CPS2720"]:
-    for puckid in ["CPS2720"]:
-        for pinid in [4]:
-            # NAGO initialized for each pin
-            nago = IboINOCC.IboINOCC(dev)
-            prefix = "%s-%02d" % (puckid, pinid)
+        # Max value= 1.0 TOP_LEFT= (238, 275)
+        # horizontal resolution -0.00684848
+        # vertical resolution -0.00915152
+        h_diff_um, v_diff_um, max_2d = inocc.moveToOtehon()
+        print("2D=", max_2d)
 
-            nago.setPrefix(prefix)
+    # preparation
+    # dev.prepCenteringLargeHolderCam2()
 
-            stopwatch = StopWatch.StopWatch()
-            stopwatch.setTime("start")
+    # ((316, 143), 0.97274786233901978)
+    # um/pixel=0.0135
+    # move_um,max_pint= inocc.moveToOtehonPint()
+    # print "PINT=",max_pint
 
-            # the backlight should be up before mounting the loop
-            dev.light.on()
-            # Mounting the loop
-            zoo.mountSample(puckid, pinid)
-            zoo.waitTillReady()
+    x, y, z = dev.gonio.getXYZmm()
+    dx = x - cx
+    dy = y - cy
+    dz = z - cz
+    diff = math.sqrt(dx * dx + dy * dy + dz * dz)
+    print("Distance=%8.3f mm\n" % diff)
 
-            stopwatch.setTime("mount_finished")
-            starttime = datetime.datetime.now()
+    endtime = datetime.datetime.now()
+    time_sec = (endtime - starttime).seconds
 
-            # Alignment with 'beam stopper on'
-            nago.captureMatchBackcam()
+    print(time_sec)
 
-            # Alignment without 'beam stopper on'
-            dev.prepCenteringLargeHolderCam1()
-            nago.centerHolder(prefix)
 
-            # Alignment of 'pint' direction
-            nago.alignGonioPintDirection(scan_wing=1000.0, scan_div=10.0)
+    def collectMulti(self, trayid, pinid, prefix, cond, sphi):
+        # Multiple crystal mode
+        # For multiple crystal : 2D raster
+        raster_schedule, raster_path = self.lm.prepRaster(dist=cond.distance,
+                                                          att_idx=self.att_idx, exptime=cond.raster_exp,
+                                                          crystal_id=cond.sample_name)
+        raster_start_time = time.localtime()
+        self.stopwatch.setTime("raster_start")
+        self.zoo.doRaster(raster_schedule)
+        self.zoo.waitTillReady()
+        self.stopwatch.setTime("raster_end")
 
-            # Alignment without 'beam stopper on'
-            dev.prepCenteringLargeHolderCam1()
-            nago.fit_tateyoko()
+        # Raster scan results
+        try:
+            glist = []
+            cxyz = self.sx, self.sy, self.sz
+            scan_id = self.lm.prefix
+            # Crystal size setting
+            if cond.h_beam > cond.v_beam:
+                crysize = cond.h_beam / 1000.0 + 0.0001
+            else:
+                crysize = cond.v_beam / 1000.0 + 0.0001
 
-            sx, sy, sz = dev.gonio.getXYZmm()
-            sphi = dev.gonio.getPhi()
-            stopwatch.setTime("centering_finished")
+            glist = self.lm.shikaSumSkipStrongMulti(cxyz, sphi, raster_path,
+                                                    scan_id, thresh_nspots=cond.shika_minscore, crysize=crysize,
+                                                    max_ncry=cond.shika_maxhits,
+                                                    mode="peak")
 
-            ################# Loop measurement
-            lm = LoopMeasurement.LoopMeasurement(s, cond['root_dir'], prefix)
-            cxyz = sx, sy, sz
-            raster_id = "2d"
-            lm.setWavelength(cond['wavelength'])
-            lm.prepDataCollection()
-            # scan V and H length is fixed
-            scanv_um = cond['scanv_um']
-            scanh_um = cond['scanh_um']
-            vstep_um = cond['raster_vbeam']
-            hstep_um = cond['raster_hbeam']
+            n_crystals = len(glist)
 
-            scan_id="2d"
-            scan_mode="2D"
-            raster_schedule, raster_path = lm.rasterMaster(scan_id, scan_mode, cxyz,
-                                                                scanv_um, scanh_um, vstep_um, hstep_um,
-                                                                sphi, cond)
+            # Time calculation
+            t_for_mount = self.stopwatch.getDsecBtw("start", "mount_finished") / 60.0
+            t_for_center = self.stopwatch.getDsecBtw("mount_finished", "centering_finished") / 60.0
+            t_for_raster = self.stopwatch.getDsecBtw("raster_start", "raster_end") / 60.0
+            logstr = "%20s %20s %5d crystals MCRD[min]:%5.2f %5.2f %5.2f" % (
+                self.stopwatch.getTime("start"), prefix, n_crystals, t_for_mount, t_for_center, t_for_raster)
+            self.zooprog.write("%s " % logstr)
+            self.zooprog.flush()
 
-            raster_start_time = time.localtime()
-            stopwatch.setTime("raster_start")
-            zoo.doRaster(raster_schedule)
-            zoo.waitTillReady()
-            stopwatch.setTime("raster_end")
-
-            # Raster scan results
-            ###################
-            # Analyzing raster scan results
-            try:
-                glist = []
-                cxyz = sx, sy, sz
-                scan_id = lm.prefix
-                # Crystal size setting
-                raster_hbeam = cond['raster_hbeam']
-                raster_vbeam = cond['raster_vbeam']
-
-                # getSortedCryList copied from HEBI.py
-                # Size of crystals?
-                cxyz = 0, 0, 0
-                ahm = AnaHeatmap.AnaHeatmap(raster_path)
-                min_score = cond['score_min']
-                max_score = cond['score_max']
-                ahm.setMinMax(min_score, max_score)
-
-                # Crystal size setting
-                cry_size_mm = cond['cry_max_size_um'] / 1000.0  # [mm]
-                # Analyze heatmap and get crystal list
-                crystal_array = ahm.searchMulti(scan_id, cry_size_mm)
-                crystals = CrystalList.CrystalList(crystal_array)
-                glist = crystals.getSortedPeakCodeList()
-
-                # Limit the number of crystals
-                maxhits = cond['maxhits']
-                if len(glist) > maxhits:
-                    glist = glist[:maxhits]
-
-                # number of found crystals
-                n_crystals = len(glist)
-                # self.esa.updateValueAt(o_index, "nds_multi", n_crystals)
-
-                # Writing down the goniometer coordinate list
-                gfile = open("%s/collected.dat" % lm.raster_dir, "w")
-                gfile.write("# Found crystals = %5d\n" % n_crystals)
-                for gxyz in glist:
-                    x, y, z = gxyz
-                    gfile.write("%8.4f %8.4f %8.4f\n" % (x, y, z))
-                gfile.close()
-
-            except MyException as tttt:
-                raise Exception("Something wrong in the main data collection loop.")
-                sys.exit(1)
-
-            # Number of detected crystals = 0
-            if len(glist) == 0:
-                logger.info("Skipping this loop!!")
-                # Disconnecting capture in this loop's 'capture' instance
-                logger.info("Disconnecting capture")
-                lm.closeCapture()
-                continue
-
-            # Data collection
-            time.sleep(5.0)
-            data_prefix = "%s-%02d-multi" % (puckid, pinid)
-            multi_sch = lm.genMultiSchedule(sphi, glist, cond, flux, prefix=data_prefix)
-            time.sleep(5.0)
-
-            dev.gonio.moveXYZmm(sx, sy, sz)
-            zoo.doDataCollection(multi_sch)
-            zoo.waitTillReady()
-
-            # Writing CSV file for data processing
-            sample_name = cond['sample_name']
-            root_dir = cond['root_dir']
-            # data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
-            # data_proc_file.flush()
-
-            # Writing Time table for this data collection
+        except MyException as tttt:
+            print("Skipping this loop!!")
+            self.zooprog.write("\n")
+            self.zooprog.flush()
             # Disconnecting capture in this loop's 'capture' instance
-            logger.info("Data collection has been finished.")
-            lm.closeCapture()
+            print("Disconnecting capture")
+            self.lm.closeCapture()
+            return
+        finally:
+            try:
+                nhits = len(glist)
+                self.html_maker.add_result(puckname=trayid, pin=pinid,
+                                           h_grid=self.lm.raster_n_width, v_grid=self.lm.raster_n_height,
+                                           nhits=nhits, shika_workdir=os.path.join(self.lm.raster_dir, "_spotfinder"),
+                                           prefix=self.lm.prefix, start_time=raster_start_time)
+                self.html_maker.write_html()
+            except:
+                print(traceback.format_exc())
 
-            # prep the next data collection
-            dev.colli.off()
+        if len(glist) == 0:
+            print("Skipping this loop!!")
+            self.zooprog.write("\n")
+            self.zooprog.flush()
+            # Disconnecting capture in this loop's 'capture' instance
+            print("Disconnecting capture")
+            self.lm.closeCapture()
+            return
 
-    zoo.disconnect()
+        # Precise centering
+        time.sleep(5.0)
+        data_prefix = "%s-%02d-multi" % (trayid, pinid)
+        multi_sch = self.lm.genMultiSchedule(sphi, glist, cond.osc_width, cond.total_osc,
+                                             cond.exp_henderson, cond.exp_time, cond.distance, cond.sample_name,
+                                             prefix=data_prefix)
+
+        time.sleep(5.0)
+
+        self.stopwatch.setTime("data_collection_start")
+        self.zoo.doDataCollection(multi_sch)
+        self.zoo.waitTillReady()
+        self.stopwatch.setTime("data_collection_end")
+
+        # Writing Time table for this data collection
+        t_for_ds = self.stopwatch.getDsecBtw("data_collection_start", "data_collection_end") / 60.0
+        logstr = "%6.1f " % (t_for_ds)
+        self.zooprog.write("%s\n" % logstr)
+        self.zooprog.flush()
+        # Disconnecting capture in this loop's 'capture' instance
+        print("Disconnecting capture")
+        self.lm.closeCapture()

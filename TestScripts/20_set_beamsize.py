@@ -19,7 +19,6 @@ if __name__ == "__main__":
     config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
     config.read(config_path)
 
-
     zoo = Zoo.Zoo()
     zoo.connect()
 

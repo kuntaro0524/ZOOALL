@@ -2,12 +2,12 @@ import os
 import traceback
 import logging
 import numpy as np
+import sys
 
-from MyException import *
 import Zoo
-import AttFactor
+from Libs import AttFactor
 import LoopMeasurement
-import BeamsizeConfig
+from Libs import BeamsizeConfig
 import datetime
 import StopWatch
 import Device
@@ -17,12 +17,13 @@ import AnaHeatmap
 import ESA
 import KUMA
 import CrystalList
-import Date
+import MyDate
 import DiffscanMaster
-import BSSconfig
+from Libs import BSSconfig
 import cv2
 import time
 import math
+from MyException import *
 from html_log_maker import ZooHtmlLog
 
 import logging
@@ -160,7 +161,7 @@ class ZooNavigator():
         if os.path.exists(root_dir) == False:
             os.makedirs(root_dir)
         # zoo.db file check and remake and save
-        d = Date.Date()
+        d = MyDate.MyDate()
         time_str = d.getNowMyFormat(option="sec")
         dbfile = "%s/zoo_%s.db" % (root_dir, time_str)
         self.esa = ESA.ESA(dbfile)
@@ -267,7 +268,7 @@ class ZooNavigator():
             timg = cv2.imread(self.backimg)
             mean_value = timg.mean()
             self.logger.debug("Checking the file size and background level.")
-            if self.beamline.upper() == "BL32XU" or self.beamline.upper()=="BL44XU":
+            if self.beamline.upper() == "BL32XU" or self.beamline.upper()=="BL44XU" or self.beamline.upper()=="BL41XU":
                 # mean_thresh = 230
                 mean_thresh = 240  # 2021/01/21 HM temporary setting
             elif self.beamline.upper() == "BL45XU":
@@ -664,7 +665,6 @@ class ZooNavigator():
         # 2015/11/21 Loop size can be set
         self.esa.addEventTimeAt(o_index, "center_start")
         try:
-
             self.logger.info("ZooNavigator starts centering procedure...")
             height_add = 0.0
             self.rwidth, self.rheight = self.lm.centering(
@@ -676,8 +676,12 @@ class ZooNavigator():
             self.esa.updateValueAt(o_index, "scan_height", self.rheight)
             self.esa.updateValueAt(o_index, "scan_width", self.rwidth)
 
-        except:
+        # exception reason
+        except MyException as ttt:
             self.logger.error("ZOO detects exception in centering")
+            # reason
+            exception_message = ttt.args[0]
+            self.logger.error("Exception message: %s" % exception_message)
             self.logger.error("Go to next sample")
             self.esa.updateValueAt(o_index, "isLoopCenter", -9999)
             self.esa.updateValueAt(o_index, "isDone", 5002)

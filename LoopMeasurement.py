@@ -2,11 +2,11 @@ import sys, os, math, socket, time
 import numpy as np
 import datetime
 
-from MyException import *
+from Libs import MyException
 import INOCC
 import RasterSchedule
-import Light
-import Colli
+import Libs.Light
+import Libs.Colli
 import MultiCrystal
 import AttFactor
 import Beamsize
@@ -161,7 +161,8 @@ class LoopMeasurement:
             self.rwidth = rwidth
 
             return rwidth, rheight
-        except:
+        except MyException as e:
+            self.logger.warning("Exception detected.{0}".format(e))
             self.logger.warning("Exception detected.")
             raise MyException("Centering failed.")
 

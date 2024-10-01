@@ -1,12 +1,13 @@
 import sys, os, math, cv2, socket
 import datetime
+import time
 import numpy as np
-from File import *
+import File
 import matplotlib
 import matplotlib.pyplot as plt
 from MyException import *
 import CryImageProc
-import Libs.CoaxImage as CoaxImage
+import CoaxImage
 import BSSconfig
 import DirectoryProc
 import FittingForFacing
@@ -108,7 +109,7 @@ class INOCC:
         self.mx, self.my, self.mz = self.bssconfig.getCmount()
 
         # File name for each directory
-        self.ff = File(self.loop_dir)
+        self.ff = File.File(self.loop_dir)
         new_idx = self.ff.getNewIdx3()
         self.fname = "%s/%03d_test.ppm" % (self.loop_dir, new_idx)
 
@@ -159,6 +160,9 @@ class INOCC:
         # Fitting
         fff = FittingForFacing.FittingForFacing(phi_list, area_list, logpath=self.loop_dir)
         face_angle = fff.findFaceAngle()
+        fit_log.close()
+        self.logger.info("fitAndFace finished")
+
         return float(face_angle)
 
     # roi_len: length from the top in [um]
@@ -361,7 +365,6 @@ class INOCC:
             # At around phi_min
             if ok_min == False:
                 for phi in np.arange(phi_min, phi_center, phi_step):
-                    self.logfile.write("Around minimum angle\n")
                     self.logger.info("Around minimum angle\n")
                     try:
                         self.logger.info("move to simpleCenter function.")
@@ -554,6 +557,7 @@ class INOCC:
     # Largely modified on 190514 by K.Hirata
     # loop_size should have unit of "um"
     def cap4width(self, loop_size=600.0):
+        self.logger.info("++++++++++++++          cap4width starts")
         if self.isInit == False:
             self.init()
 
@@ -616,11 +620,12 @@ class INOCC:
             self.logger.info(">>>> offset angle setting <<<<<")
             phi_face = phi_face + offset_angle
             phi_small = phi_face + 90.0
-            self.logger.info(">>>> Simple centering <<<<<")
+            self.logger.info(f">>>> Simple centering at {phi_small} <<<<<")
             self.simpleCenter(phi_small, loop_size, option="gravity")
+            print("#################<FACE>ANGLE ####################3")
+            print("phi_face=", phi_face)  
             area, hamidashi_flag = self.simpleCenter(phi_face, loop_size, option="gravity")
             self.logger.info("Hamidashi_flag = %s" % hamidashi_flag)
-            print(("HAMIDASHI=", hamidashi_flag))
             # Re-centering if hamidashi_flag = True
             if hamidashi_flag == True:
                 self.simpleCenter(phi_face, loop_size, option="gravity")
@@ -628,7 +633,9 @@ class INOCC:
         # Final centering
         cx, cy, cz, phi = self.gonio.getXYZPhi()
         # Raster area definition
+        print(f"########III phi = {phi} IIIIIIII########3")
         xwidth, ywidth, r_cenx, r_ceny = self.cap4width(loop_size)
+        print("########IIIIIIIIIIIIIIIIIIIIIIII########3")
 
         gonio_info = cx, cy, cz, phi
         pix_size_um = self.coi.get_pixel_size()
@@ -638,6 +645,9 @@ class INOCC:
         print("Width  = %8.1f[um]" % raster_width)
         print("Height = %8.1f[um]" % raster_height)
         print("Centering.doAll finished.")
+
+        phi = self.gonio.getPhi()
+        print(phi)
 
         return raster_width, raster_height, phi_face, gonio_info
 
@@ -661,7 +671,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('ZOO')
     os.chmod(logname, 0o666)
 
-    test_dir = os.environ['ZOOROOT']
+    test_dir = os.environ['PWD']
 
     inocc = INOCC(blf, test_dir)
     phi_face = 90
@@ -671,12 +681,13 @@ if __name__ == "__main__":
     # back image path read from 'beamline.ini'
     backimg = config.get('files', 'backimg')
     inocc.setBack(backimg)
+    # inocc.setBack("/staff/bl41xu/BLsoft/ZOOALL/BackImages/back-2406271411.ppm")
     # For each sample raster.png
     raster_picpath = "%s/raster.png" % test_dir
     inocc.setRasterPicture(raster_picpath)
 
     # def doAll(self, ntimes=3, skip=False, loop_size=600.0, offset_angle=0.0):
-    rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=600.0)
+    rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=400.0)
 
     print(("Loop width/height=", rwidth, rheight))
 

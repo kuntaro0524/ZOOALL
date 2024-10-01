@@ -2,17 +2,16 @@ import sys
 import socket
 import time
 
-from Received import *
-from ScanAxis import *
-from Count import *
-
+import Received
+import ScanAxis
+import Count
 
 # from CounterInfo import *
 
-class Motor(ScanAxis):
+class Motor(ScanAxis.ScanAxis):
     def __init__(self, srv, motor, unit):
         # parent class
-        ScanAxis.__init__(self)
+        ScanAxis.ScanAxis.__init__(self)
         # server
         self.srv = srv
         # motor name
@@ -21,7 +20,6 @@ class Motor(ScanAxis):
         self.qcommand = "get/" + self.motor + "/" + "query"
         # unit
         self.unit = unit
-
 
     # String/Bytes communication via a socket
     def communicate(self, comstr):
@@ -48,7 +46,7 @@ class Motor(ScanAxis):
         while True:
             #### Get query information
             recbuf = self.communicate(self.qcommand)
-            rrrr = Received(recbuf)
+            rrrr = Received.Received(recbuf)
             if rrrr.checkQuery():
                 # print "Finished: current status="+rrrr.readQuery()
                 return 1
@@ -80,12 +78,12 @@ class Motor(ScanAxis):
     def getApert(self):
         com = "get/" + self.motor + "/aperture"
         recbuf = self.communicate(com)
-        tmpf = Received(recbuf)
+        tmpf = Received.Received(recbuf)
         position = tmpf.readQuery()
 
         # print position
         if position.find("mm") != -1:
-            value = float(positioreplace("mm", ""))
+            value = float(position.replace("mm", ""))
             return (value, "mm")
         elif position.find("pulse") != -1:
             value = int(position.replace("pulse", ""))
@@ -103,9 +101,8 @@ class Motor(ScanAxis):
     def getPosition(self):
         com = "get/" + self.motor + "/position"
         recbuf = self.communicate(com)
-        tmpf = Received(recbuf)
+        tmpf = Received.Received(recbuf)
         position = tmpf.readQuery()
-        # print "debug::", position
 
         # print position
         if position.find("mm") != -1:
@@ -227,12 +224,12 @@ class Motor(ScanAxis):
 
     def query(self):
         recbuf = self.communicate(self.qcommand)
-        rrrr = Received(recbuf)
+        rrrr = Received.Received(recbuf)
         return rrrr.readQuery()
 
     def isMoved(self):
         recbuf = self.communicate(self.qcommand)
-        rrrr = Received(recbuf)
+        rrrr = Received.Received(recbuf)
         return rrrr.checkQuery()
 
     def moveGravity(self, outfile):
@@ -254,7 +251,7 @@ class Motor(ScanAxis):
         com = "get/" + self.motor + "/energy"
         recbuf = self.communicate(com)
 
-        rrrr = Received(recbuf)
+        rrrr = Received.Received(recbuf)
         position = rrrr.readQuery()
 
         if position.find("kev") != -1:
@@ -268,7 +265,7 @@ class Motor(ScanAxis):
     def getRamda(self):
         com = "get/" + self.motor + "/wavelength"
         recbuf = self.communicate(self.qcommand)
-        tmpf = Received(recbuf)
+        tmpf = Received.Received(recbuf)
         position = tmpf.readQuery()
 
         if position.find("angstrome") != -1:
@@ -281,7 +278,7 @@ class Motor(ScanAxis):
     def getAngle(self):
         com = "get/" + self.motor + "/angle"
         recbuf = self.communicate(com)
-        tmpf = Received(recbuf)
+        tmpf = Received.Received(recbuf)
         position = tmpf.readQuery()
 
         if position.find("degree") != -1:

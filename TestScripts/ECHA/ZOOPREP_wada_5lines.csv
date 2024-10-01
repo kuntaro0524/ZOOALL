@@ -1,0 +1,7 @@
+ECHA_API_TEST_003,admin26b2,BL32XU,2024/5/22,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+root_dir,p_index,mode,puckid,pinid,sample_name,wavelength,raster_vbeam,raster_hbeam,att_raster,hebi_att,exp_raster,dist_raster,loopsize,score_min,score_max,maxhits,total_osc,osc_width,ds_vbeam,ds_hbeam,exp_ds,dist_ds,dose_ds,offset_angle,reduced_fact,ntimes,meas_name,cry_min_size_um,cry_max_size_um,hel_full_osc,hel_part_osc,raster_roi,ln2_flag,cover_scan_flag,zoomcap_flag,warm_time
+/user/target/Auto/2024A/BL32XU_240515_Wada,0,multi,CPS4517,1,SufS_01_11m,1,15,10,100,100,0.01,200,300,10,100,30,10,0.1,15,10,0.02,210.5,10,0,1,1,normal,30,30,60,40,1,1,1,1,120
+/user/target/Auto/2024A/BL32XU_240515_Wada,1,helical,CPS4517,2,SufS_01_1h,1,15,10,100,100,0.01,200,300,10,9999,1,360,0.1,15,10,0.02,210.5,10,0,1,1,normal,30,30,60,40,1,1,1,1,120
+/user/target/Auto/2024A/BL32XU_240515_Wada,2,helical,CPS4517,3,SufS_02_10s,1,15,10,100,100,0.01,200,300,10,9999,1,360,0.1,15,10,0.02,210.5,10,0,1,1,normal,30,30,60,40,1,1,1,1,120
+/user/target/Auto/2024A/BL32XU_240515_Wada,3,helical,CPS4517,4,SufS_03_40s,1,15,10,100,100,0.01,200,300,10,9999,1,360,0.1,15,10,0.02,210.5,10,0,1,1,normal,30,30,60,40,1,1,1,1,120
+/user/target/Auto/2024A/BL32XU_240515_Wada,4,helical,CPS4517,5,SufS_03_38m,1,15,10,100,100,0.01,200,300,10,9999,1,360,0.1,15,10,0.02,210.5,10,0,1,1,normal,30,30,60,40,1,1,1,1,120
