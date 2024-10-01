@@ -56,11 +56,18 @@ if [ "$cheetah_ok" == "1" ]
 
 
 ## EIGER end
+
+
+
 ############ For log copy daemon ############
 killall cp_config.com
 /staff/Common/SW/cp_config.com bl44xu 10 &
 
-echo "\n\n" | /usr/local/bss/bss --console --server --admin --quick
+#/usr/local/bin/bss_jan23_2018a
+#/usr/local/bin/bss
+#/usr/local/bss/bss
+/usr/local/bss/bss --websocket
+
 
 
 ####### for log copy daemeon ###########
