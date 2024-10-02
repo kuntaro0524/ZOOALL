@@ -5,9 +5,9 @@ import numpy as np
 import sys
 
 import Zoo
-from Libs import AttFactor
+import AttFactor
 import LoopMeasurement
-from Libs import BeamsizeConfig
+import BeamsizeConfig
 import datetime
 import StopWatch
 import Device
@@ -524,6 +524,7 @@ class ZooNavigator():
         try:
             self.zoo.mountSample(trayid, pinid)
         except MyException as ttt:
+
             exception_message = ttt.args[0]
             self.logger.info("Failed to mount a sample pin:%s" % ttt)
             # Accident case
@@ -531,7 +532,7 @@ class ZooNavigator():
                 message = "SPACE accident occurred! Please contact a beamline scientist."
                 message += "Check if 'puckid' matches in CSV file and SPACE server."
                 self.logger.error(message)
-                self.esa.updateValueAt(o_index, "log_mount", msg)
+                self.esa.updateValueAt(o_index, "log_mount", message)
                 self.esa.addEventTimeAt(o_index, "meas_end")
                 self.logger.critical(message)
                 self.esa.updateValueAt(o_index, "isDone", 9999)
@@ -540,7 +541,7 @@ class ZooNavigator():
                 message = "SPACE accident occurred! Please contact a beamline scientist.\n"
                 message += "L-head value is negative in picking up the designated pin."
                 self.logger.error(message)
-                self.esa.updateValueAt(o_index, "log_mount", msg)
+                self.esa.updateValueAt(o_index, "log_mount", message)
                 self.esa.addEventTimeAt(o_index, "meas_end")
                 self.logger.critical(message)
                 self.esa.updateValueAt(o_index, "isDone", 9997)

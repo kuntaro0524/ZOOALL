@@ -2,8 +2,7 @@
 import cv2,sys
 import numpy as np
 import copy
-#from Libs import MyException
-from MyException import *
+from Libs import MyException
 import logging
 import logging.config
 from Libs import File

@@ -2,7 +2,7 @@ import sys, os, math, socket, time
 import numpy as np
 import datetime
 
-from Libs import MyException
+from MyException import *
 import INOCC
 import RasterSchedule
 import Libs.Light
