@@ -66,9 +66,7 @@ killall cp_config.com
 #/usr/local/bin/bss_jan23_2018a
 #/usr/local/bin/bss
 #/usr/local/bss/bss
-/usr/local/bss/bss --websocket
-
-
+/usr/local/bss/bss --websocket --console --notune
 
 ####### for log copy daemeon ###########
 killall cp_config.com

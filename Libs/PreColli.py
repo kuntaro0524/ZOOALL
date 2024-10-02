@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/bin/env python 
+import os
 import sys
 import socket
 import time

@@ -14,8 +14,9 @@
 #BL44XU
 #export PYTHONPATH="/staff/bl44xu/BLsoft/TestZOO/:/staff/bl44xu/BLsoft/TestZOO/Libs/"
 #export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/TestZOO/Libs"
-export PYTHONPATH="/staff/bl44xu/BLsoft/ZOO44XU/:/staff/bl44xu/BLsoft/ZOO44XU/Libs/"
-export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/ZOO44XU/Libs/"
+export ZOOROOT="/staff/bl44xu/BLsoft/TestZOO/"
+export PYTHONPATH="/staff/bl44xu/BLsoft/TestZOO/:/staff/bl44xu/BLsoft/TestZOO/Libs/"
+export ZOOCONFIGPATH="/staff/bl44xu/BLsoft/TestZOO/Libs/"
 
 # BL32XU test
 #export PYTHONPATH="/staff/bl32xu/BLsoft/TestZoo/:/staff/bl32xu/BLsoft/TestZoo/Libs/"

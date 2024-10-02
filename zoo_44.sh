@@ -60,7 +60,8 @@ if [ "$cheetah_ok" == "1" ]
 killall cp_config.com
 /staff/Common/SW/cp_config.com bl44xu 10 &
 
-echo "\n\n" | /usr/local/bss/bss --console --server --admin --quick
+# echo "\n\n" | /usr/local/bss/bss --console --server --admin --quick --notune
+echo "\n\n" | /usr/local/bss/bss --console --server  --quick
 
 
 ####### for log copy daemeon ###########

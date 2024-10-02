@@ -29,6 +29,7 @@ from html_log_maker import ZooHtmlLog
 import logging
 import logging.config
 
+import os
 from configparser import ConfigParser, ExtendedInterpolation
 
 def check_abort(lm):
