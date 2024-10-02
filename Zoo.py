@@ -269,6 +269,7 @@ class Zoo:
             command = "get/measurement/query"
             recstr = self.communicate(command)
             svoc_c = self.getSVOC_C(recstr)
+            print(f"{svoc_c} is detected.")
             if svoc_c.rfind("ready") != -1:
                 print("isBusy:RECBUF=", recstr)
                 return False

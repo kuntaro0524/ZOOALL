@@ -342,8 +342,8 @@ if __name__ == "__main__":
     # phi=gonio.getPhi()
     # print("Current phi=", phi)
 
-    # xyz=gonio.getXYZmm()
-    # print(xyz)
+    xyz=gonio.getXYZmm()
+    print(xyz)
 
     # xyz=gonio.moveXYZmm(-0.091,5.679,-0.161)
 

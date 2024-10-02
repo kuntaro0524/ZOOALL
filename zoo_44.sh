@@ -62,7 +62,7 @@ killall cp_config.com
 
 # echo "\n\n" | /usr/local/bss/bss --console --server --admin --quick --notune
 #echo "\n\n" | /usr/local/bss/bss --console --server  --quick
-echo "\n\n" | /usr/local/bss/bss --console --server --admin
+echo "\n\n" | /usr/local/bss/bss --console --server --admin --quick
 
 
 ####### for log copy daemeon ###########
