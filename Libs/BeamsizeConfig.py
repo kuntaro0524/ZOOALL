@@ -87,6 +87,19 @@ class BeamsizeConfig:
                     if self.max_vsize < v_beam:
                         self.max_vsize = v_beam
 
+                # BL44XU circle beam size 2024/10/02 
+                if defstr.rfind("circle") != -1 and defstr.rfind("outline") != -1:
+                    cols = defstr.split()
+                    h_beam = float(cols[2]) * 1000.0
+                    v_beam = float(cols[3]) * 1000.0
+                    blist = beam_index, h_beam, v_beam
+                    self.beamsize.append(blist)
+                    # Searching max beam
+                    if self.max_hsize < h_beam:
+                        self.max_hsize = h_beam
+                    if self.max_vsize < v_beam:
+                        self.max_vsize = v_beam
+
                 if defstr.rfind("tc1_slit_1_width") != -1:
                     cols = defstr.split()
                     # print "SLIT-W",cols[2]
@@ -259,7 +272,7 @@ if __name__ == "__main__":
     #print "FLUX=",bsc.getFluxListForKUMA()
 
     # print("EEEEEEEEEEEEE")
-    print("%e"%bsc.getFluxAtWavelength(50,50,1.0))
+    #print("%e"%bsc.getFluxAtWavelength(50,50,1.0))
 
 # tcs_hmm=0.1
 # tcs_vmm=0.1

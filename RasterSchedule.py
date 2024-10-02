@@ -44,8 +44,17 @@ class RasterSchedule:
         # Rotation raster flag
         # BL44XU : trigger of the raster scan is the rotation of the goniometer
         if self.beamline == "BL44XU":
-            self.rot_flag = 1
-            self.rot_angle = 0.01
+            # smargon exist?
+            # Read configure file and get 'isSmargon' value as a boolean from 'experiment' section
+            self.isSmargon = self.config.getboolean("experiment", "isSmargon")
+            # If smargon is used, set the rotation angle to 0.01
+            if self.isSmargon:
+                self.rot_flag = 1
+                self.rot_angle = 0.01
+            else:
+                self.rot_flag = 0
+                self.rot_angle = 0.01
+
         # Any other beamlines
         else:
             self.rot_flag = 0
@@ -212,7 +221,7 @@ class RasterSchedule:
         schstr.append("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual")
         if self.beamline == "BL41XU" or self.beamline == "BL32XU":
             schstr.append("Attenuator transmission: %8.4f\n" % self.trans)
-        elif self.beamline == "BL45XU":
+        elif self.beamline == "BL45XU" or self.beamline=="BL44XU":
             schstr.append("Attenuator: %d  # None" % self.att_idx)
         schstr.append("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]")
         schstr.append("XAFS Count time: 1.000000  # [sec]")
