@@ -61,7 +61,8 @@ killall cp_config.com
 /staff/Common/SW/cp_config.com bl44xu 10 &
 
 # echo "\n\n" | /usr/local/bss/bss --console --server --admin --quick --notune
-echo "\n\n" | /usr/local/bss/bss --console --server  --quick
+#echo "\n\n" | /usr/local/bss/bss --console --server  --quick
+echo "\n\n" | /usr/local/bss/bss --console --server  
 
 
 ####### for log copy daemeon ###########
