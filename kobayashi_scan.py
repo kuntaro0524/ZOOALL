@@ -1,15 +1,6 @@
 import sys,math,numpy,os
 from configparser import ConfigParser, ExtendedInterpolation
-import Zoo
-import datetime
-import ZooNavigator
 from MyException import *
-import socket
-import MyDate
-import logging
-import logging.config
-import subprocess
-import BLFactory
 import numpy as np
 
 if __name__ == "__main__":
@@ -133,7 +124,6 @@ Raster Horizontal Center: 0.0000 # [mm]
 Raster Rotation Flag: 0 # 0:not rotate, 1:rotate
 Raster Rotation Range: 0.000 # [deg] rotation range
 Raster Zig-Zag Flag: 1 # 0: off, 1:on
-Comment:
-    """
+Comment:"""
     
     print(schedule_string)
