@@ -2,15 +2,27 @@ import sys,math,numpy,os
 from configparser import ConfigParser, ExtendedInterpolation
 # from MyException import *
 import numpy as np
+import logging
+
+logging.basicConfig(level=logging.INFO)
+# ファイルと標準出力
+logging.getLogger().addHandler(logging.FileHandler("koba_make_schedule.log"))
+#logging.getLogger().addHandler(logging.StreamHandler())
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     gonio_xyz = [-1.6280, 0.1977, -0.8195]
     start_omega = -40
     end_omega = 40
+=======
+    gonio_xyz = [-1.9281, -0.3554, -0.8295]
+    start_omega = 0.0
+    end_omega = 60.0
+>>>>>>> origin/main
     delta_omega = 1.0
 
     omega_centre = (start_omega + end_omega) / 2.0
-
+    logging.info(f"omega_centre: {omega_centre}")
     # cover area [um]
     v_cover = 50.0
     h_cover = 50.0
@@ -27,9 +39,13 @@ if __name__ == "__main__":
     attenuator = 0.0126775
 
     # step inclined [mm]
+    logging.info(f"omega_centre: {omega_centre}")
+
     dx = v_step * np.sin(np.radians(omega_centre)) / 1000.0
     dz = v_step * np.cos(np.radians(omega_centre)) / 1000.0
     print(f"dx={dx}, dz={dz}")
+
+    logging.info(f"dx: {dx}, dz: {dz}")
 
     # number of steps
     # scan length
@@ -37,20 +53,28 @@ if __name__ == "__main__":
     nv = int(v_cover / v_step) 
     nh = int(h_cover / h_step) 
 
+    logging.info(f"nv: {nv}, nh: {nh}")
+
     # start x,y,z
-    x0 = gonio_xyz[0] - int(nv/2) * dx
-    y0 = gonio_xyz[1] - int(nh/2) * h_step/1000.0
-    z0 = gonio_xyz[2] - int(nv/2) * dz
+    x0 = gonio_xyz[0] - float(int(nv/2)) * dx
+    y0 = gonio_xyz[1] - float(int(nh/2)) * h_step/1000.0
+    z0 = gonio_xyz[2] - float(int(nv/2)) * dz
+
+    logging.info(" gonio x y z")
+    logging.info(gonio_xyz)
+    
+    logging.info(f"x0: {x0}, y0: {y0}, z0: {z0}")
 
     crystal_index =0
     advanced_xyz_strings = ""
     for i in range(nh):
         for j in range(nv):
-            x = x0 + j * dx
-            y = y0 + i * h_step/1000.0
-            z = z0 + j * dz
+            x = x0 + float(j) * dx
+            y = y0 + float(i) * h_step/1000.0
+            z = z0 + float(j) * dz
             crystal_index+=1
             advanced_xyz_strings+="Advanced gonio coordinates %d: %f %f %f\n" % (crystal_index,x,y,z)
+            logging.info(f"crystal_index: {crystal_index}, x: {x:10.5f}, y: {y:10.5f}, z: {z:10.5f}")
     ## number of crystal
     n_crystal = crystal_index
     ## input dictionary value to schedule_string
@@ -127,4 +151,6 @@ Raster Rotation Range: 0.000 # [deg] rotation range
 Raster Zig-Zag Flag: 1 # 0: off, 1:on
 Comment:"""
     
-    print(schedule_string)
+    # write to file
+    with open(f"./koba.sch", "w") as f:
+        f.write(schedule_string)
