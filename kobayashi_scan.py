@@ -1,22 +1,22 @@
 import sys,math,numpy,os
 from configparser import ConfigParser, ExtendedInterpolation
-from MyException import *
+# from MyException import *
 import numpy as np
 
 if __name__ == "__main__":
-    gonio_xyz = [-1.9281, -0.3554, -0.8295]
-    start_omega = 20.0
-    end_omega = 80.0
+    gonio_xyz = [-1.6280, 0.1977, -0.8195]
+    start_omega = -40
+    end_omega = 40
     delta_omega = 1.0
 
     omega_centre = (start_omega + end_omega) / 2.0
 
     # cover area [um]
     v_cover = 50.0
-    h_cover = 90.0
+    h_cover = 50.0
 
     # directory 
-    dire = "sample02"
+    dire = "sample03"
     prefix="data"
 
     # setup
@@ -29,6 +29,7 @@ if __name__ == "__main__":
     # step inclined [mm]
     dx = v_step * np.sin(np.radians(omega_centre)) / 1000.0
     dz = v_step * np.cos(np.radians(omega_centre)) / 1000.0
+    print(f"dx={dx}, dz={dz}")
 
     # number of steps
     # scan length
@@ -38,8 +39,8 @@ if __name__ == "__main__":
 
     # start x,y,z
     x0 = gonio_xyz[0] - int(nv/2) * dx
-    z0 = gonio_xyz[2] - int(nv/2) * dz
     y0 = gonio_xyz[1] - int(nh/2) * h_step/1000.0
+    z0 = gonio_xyz[2] - int(nv/2) * dz
 
     crystal_index =0
     advanced_xyz_strings = ""
