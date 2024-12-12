@@ -67,3 +67,4 @@ TestScripts/*ppm
 *.png
 ZooConfig/
 LargeHolder/
+wget*
