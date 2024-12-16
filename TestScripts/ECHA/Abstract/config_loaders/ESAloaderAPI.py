@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 # 設定値
 import pandas as pd
 import json
+import logging
 
 class ESAloaderAPI:
     def __init__(self, zoo_id):
@@ -24,6 +25,19 @@ class ESAloaderAPI:
         self.isExpired = False
         self.isPrepParams = False
         self.isPrepConds = False # get condition list from DB 
+
+        # logger 
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
+        # handler
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
+        self.logger.addHandler(handler)
+        # log file 
+        log_file = 'esa_loader.log'
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(logging.DEBUG)
+        self.logger.addHandler(file_handler)
 
     def get_access_token(self):
         print(self.login_url,self.username, self.password)
@@ -47,15 +61,13 @@ class ESAloaderAPI:
             print("Exception!!!!!!!!!!!")
             raise Exception("Failed to login")
 
-    def getCondDataFrame(self):
-        print("getCondDataFrame starts")
-        print("Data request URL:",self.data_request_url)
-        print("ZOOID: ", self.zoo_id)
+    def getCondDataFrame_obsoleted(self):
+        self.logger.info("getCondDataFrame starts")
+        self.logger.info(f"Data request URL: {self.data_request_url}")
+        self.logger.info(f"ZOOID: {self.zoo_id}")
         auth_headers = self.make_authenticated_request()
         response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
-        print("###### Get down #####################")
-        print(response.json())
-        print("#####################################")
+        self.logger.info(f"Response: {response}")
         # response を pandas DataFrame に変換
         df = pd.DataFrame(response.json())
         # df の１行ずつのデータ取得
@@ -88,6 +100,38 @@ class ESAloaderAPI:
         self.isPrepConds = True
 
         return self.conds_df
+
+    # coded by K. Hirata 2024/12/16
+    def getCondDataFrame(self):
+        self.logger.info("getCondDataFrame starts")
+        self.logger.info(f"Data request URL: {self.data_request_url}")
+        self.logger.info(f"ZOOID: {self.zoo_id}")
+        auth_headers = self.make_authenticated_request()
+        response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
+        # response を pandas DataFrame に変換
+        df = pd.DataFrame(response.json())
+        # df の１行ずつのデータ取得
+        # この辞書をリストに追加していく
+        data_list = []
+        for i in range(len(df)):
+            # 'zoo_samplepin_id' を取得
+            zoo_samplepin_id=df.iloc[i]['id']
+            self.logger.info(f"zoo sample pin id: {zoo_samplepin_id}")
+            # parameter を取得する
+            # APIのメソッドを利用する
+            # zoo_parameter_samplepin/get_list/
+            target_url = f"{self.api_url}/zoo_parameter_samplepin/get_list/"
+            # params: {"zoo_samplepin_id":zoo_samplepin_id}
+            response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id":zoo_samplepin_id})
+            # json を dictにして保存
+            # 最終的にはリストに追加してDataFrameに変換する
+            tmp_dict = response.json()
+            data_list.append(tmp_dict)
+
+        # DataFrame に変換
+        self.conds_df = pd.DataFrame(data_list)
+        return self.conds_df
+        # end of getCondDataFrame2
 
     def make_authenticated_request(self):
         # すでにログインしている場合には、トークンの有効期限を確認する
@@ -249,8 +293,10 @@ if __name__ == '__main__':
     # # 消費時間を計算 (sec)
     # consumed_time = end_time - start_time
     # print("Consumed Time: ", consumed_time)
+    #conds_df = esa_loader.getCondDataFrame()
     conds_df = esa_loader.getCondDataFrame()
     print(conds_df)
+    #conds_df.to_csv("test.csv")
     # csv_file_path = 'received_mod2.csv'
     # conds_df.to_csv(csv_file_path)
     # esa_loader.addZOOparams()
