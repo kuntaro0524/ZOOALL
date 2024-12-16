@@ -9,7 +9,8 @@ class ESAloaderAPI:
     def __init__(self, zoo_id):
         self.api_url = "https://dcha-spx.spring8.or.jp/api1.0.2/"
         self.login_url = "%sdj-rest-auth/login/"%self.api_url
-        self.data_request_url = "%szoo_measure/"%self.api_url
+        #self.data_request_url = "%szoo_measure/"%self.api_url
+        self.data_request_url = "%szoo_samplepin/"%self.api_url
         self.measure_data_url = "%sparameter_measure/"%self.api_url
         self.params_data_url = "%sparameter/"%self.api_url
         self.username = "admin"
@@ -51,7 +52,10 @@ class ESAloaderAPI:
         print("Data request URL:",self.data_request_url)
         print("ZOOID: ", self.zoo_id)
         auth_headers = self.make_authenticated_request()
-        response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
+        response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_samplepin":self.zoo_id})
+        print("###### Get down #####################")
+        print(response)
+        print("#####################################")
         # response を pandas DataFrame に変換
         df = pd.DataFrame(response.json())
         # df の１行ずつのデータ取得
@@ -166,7 +170,6 @@ class ESAloaderAPI:
     def getParameterList(self):
         auth_headers = self.make_authenticated_request()
         response = requests.get(self.params_data_url, headers=auth_headers)
-        # print(response.json())
         json_data = response.json()
         self.paramtable_df = pd.DataFrame(json_data)
         self.isPrepParams=True
@@ -231,11 +234,11 @@ if __name__ == '__main__':
     zoo_id = 5
     esa_loader = ESAloaderAPI(zoo_id)
     # ログイン
-    # esa_loader.make_authenticated_request()
+    esa_loader.make_authenticated_request()
     
     # データを取得する関数を使用
-    # start_time = datetime.now()
-    # esa_loader.getParameterList()
+    start_time = datetime.now()
+    esa_loader.getParameterList()
     
     # 条件を新たに追加したらどうなるか？
     # esa_loader.addZOOparams()
@@ -244,12 +247,12 @@ if __name__ == '__main__':
     # # 消費時間を計算 (sec)
     # consumed_time = end_time - start_time
     # print("Consumed Time: ", consumed_time)
-    
-    # conds_df = esa_loader.getCondDataFrame()
+    conds_df = esa_loader.getCondDataFrame()
+    print(conds_df)
     # csv_file_path = 'received_mod2.csv'
     # conds_df.to_csv(csv_file_path)
     # esa_loader.addZOOparams()
-    esa_loader.updateCond(21520, "isDone", "12")
+    #esa_loader.updateCond(21520, "isDone", "12")
     # esa_loader.putCond(21520, "isDone", 1)
     # conds_df = esa_loader.getCondDataFrame()
     # csv_file_path = 'pppp.csv'
