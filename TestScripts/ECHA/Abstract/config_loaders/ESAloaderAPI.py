@@ -52,9 +52,9 @@ class ESAloaderAPI:
         print("Data request URL:",self.data_request_url)
         print("ZOOID: ", self.zoo_id)
         auth_headers = self.make_authenticated_request()
-        response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_samplepin":self.zoo_id})
+        response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
         print("###### Get down #####################")
-        print(response)
+        print(response.json())
         print("#####################################")
         # response を pandas DataFrame に変換
         df = pd.DataFrame(response.json())
@@ -62,10 +62,12 @@ class ESAloaderAPI:
         # この辞書をリストに追加していく
         data_list = []
         for i in range(len(df)):
-            # 'measure_id' を取得
-            meas_id=df.iloc[i]['measure_id']
-            target_url = f"{self.api_url}/parameter_measure/"
-            response = requests.get(target_url, headers=auth_headers, params={"measure_id":meas_id})
+            # 'zoo_samplepin_id' を取得
+            zoo_samplepin_id=df.iloc[i]['id']
+            print(f"zoo sample pin id: {zoo_samplepin_id}")
+            # parameterを取得する
+            target_url = f"{self.api_url}/zoo_parameter_samplepin/"
+            response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id":zoo_samplepin_id})
             # print(response.json())
             each_df = pd.DataFrame(response.json())
             # print(each_df.columns)
@@ -74,7 +76,7 @@ class ESAloaderAPI:
             # この each_df に含まれている１行のデータの 'parameter_name' と 'value' で dictionaryを作成
                 dicts[each_df.iloc[j]['parameter_name']] = each_df.iloc[j]['value']
                 # measure_idを追加する
-                dicts['measure_id'] = meas_id
+                dicts['zoo_samplepin_id'] = zoo_samplepin_id
 
             # dicts を Series に変換
             each_pin_df = pd.Series(dicts)
@@ -231,7 +233,7 @@ class ESAloaderAPI:
 # もしもmainが定義されていない場合以下を実行
 if __name__ == '__main__':
     # class をインスタンス化
-    zoo_id = 5
+    zoo_id = 6
     esa_loader = ESAloaderAPI(zoo_id)
     # ログイン
     esa_loader.make_authenticated_request()
