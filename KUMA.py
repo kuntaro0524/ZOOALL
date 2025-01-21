@@ -21,8 +21,10 @@ class KUMA:
         # 左から順に、エネルギー、1フォトンあたりの線量、10MGyに到達するまでのリミット(photons/um2)
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+        print(f"################ Config path: {config_path}")
         self.config.read(config_path)
         self.dose_limit_file = self.config.get("files", "dose_csv")
+        print(f"### dose limit file: {self.dose_limit_file}")
 
     # 2023/05/10 coded by K.Hirata
     def getDoseLimitParams(self, energy=12.3984):
@@ -32,10 +34,12 @@ class KUMA:
         # エネルギーが与えられたら、線量を返す関数を作成する
         # 戻り値はfloatとする
         en_dose_function = interpolate.interp1d(df['energy'], df['dose_mgy_per_photon'], kind='cubic')
-        # dosePerPhoton
+        # dose_per_photon: CSV 2nd column
         dose_per_photon = en_dose_function(energy).flatten()[0]
+        # density_limit: CSV 3rd column
+        density_limit = interpolate.interp1d(df['energy'], df['density_limit'], kind='cubic')(energy).flatten()[0]
 
-        return dose_per_photon
+        return dose_per_photon, density_limit
 
     def getDose1sec(self, beam_h, beam_v, flux, energy):
         # density_limit は tableにある数値 → 10 MGy に到達するまでの photon density

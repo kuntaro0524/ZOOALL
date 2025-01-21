@@ -41,7 +41,8 @@ class UserESA():
 
         # logger の設定
         self.logger = logging.getLogger("ZOO")
-        self.logger.setLevel(logging.DEBUG)
+        # output log string with level 'info'
+        self.logger.setLevel(logging.INFO)
         # levelがwarningのときには標準出力とファイル両方に出力する
         
         # create file handler which logs even debug messages
@@ -52,6 +53,7 @@ class UserESA():
         self.logger_ch.setLevel(logging.WARNING)
         # create formatter and add it to the handlers
         self.logger_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        # set formatter to handlers
         self.logger_fh.setFormatter(self.logger_formatter)
         self.logger_ch.setFormatter(self.logger_formatter)
         # add the handlers to logger
@@ -304,6 +306,13 @@ class UserESA():
         # dose_per_frame = kuma.getDose(hbeam, vbeam, flux, energy, exp_raster) * self.df['att_raster'] / 100.0
         self.df.loc[mask3, 'dose_per_frame'] = kuma.getDose(self.df['ds_hbeam'], self.df['ds_vbeam'], self.df['flux'], self.df['energy'], self.df['exp_raster']) * self.df['att_raster'] / 100.0
 
+        # self.logger.info -> 'dose_per_frame' をリスト表示
+        # puckid, pinid, dose_per_frame のリストを表示する
+        # format f"PuckID: {puckid} PinID: {pinid} dose_per_frame: {dose_per_frame}"
+        self.logger.info("Scan conditions estimated results")
+        for i in range(len(self.df)):
+            self.logger.info(f"Puck-Pin ID: {self.df['puckid'][i]}-{self.df['pinid'][i]:2d} : dose/frame: {self.df['dose_per_frame'][i]:.3f} MGy")
+
         #print(self.df)
 
 
@@ -333,7 +342,7 @@ class UserESA():
                     self.logger.warning("Warning: ppf_raster is less than 4.0E10. Please check the exposure condition.")
                     self.logger.warning("puckid: {} pinid: {} ppf_raster {}".format(self.df['puckid'][i], self.df['pinid'][i], self.df['ppf_raster'][i]))
         else:
-            self.logger.info("No warning message for photons/frame check.")
+            self.logger.info("No warning message for photons/frame check")
 
     def sizeWarning(self):
         # self.df['mode']が 'multi' である場合、self.df['max_crystal_size']と self.df['beam_size']を比較して、
@@ -411,7 +420,8 @@ class UserESA():
                 'ln2_flag', 'pin_flag', 'zoomcap_flag', 'what', 'confirmation_require']
 
         # データは4行目から
-        self.df = pd.read_excel(self.fname, sheet_name="ZOOPREP_YYMMDD_NAME_BLNAME_v2", header=2)
+        # 250121: sheet_name -> ZOO_YYMMDD_NAME_BLNAME_v2 -> Sheet
+        self.df = pd.read_excel(self.fname, sheet_name="Sheet", header=2)
         # 列名を指定する
         self.df.columns = columns
         self.isPrep = True
@@ -501,117 +511,6 @@ class UserESA():
         #       loop_size,score_min,score_max,n_crystals,total_osc,osc_width,vbeam,hbeam,distance,dose_ds,0.0,1.0,1.0, \
         #        desired_exp,cry_min_size,cry_max_size,60,40,raster_roi,ln2_flag,cover_flag,zoom_flag,warm_time) 
     
-    def makeCondList_obsoleted(self):
-        if self.isGot:
-            return
-        if self.fname.count("_zoo.csv"):
-            self.csvout = self.fname
-            return
-        if not self.isPrep:
-            self.exRealList()
-
-        self.conds  = []
-        p_index = 0
-
-        keys = "root_dir,p_index,mode,puckid,pinid,sample_name,wavelength,raster_vbeam,raster_hbeam,att_raster,\
-        hebi_att,exp_raster,dist_raster,loopsize,score_min,score_max,maxhits,total_osc,osc_width,ds_vbeam,ds_hbeam,\
-        exp_ds,dist_ds,dose_ds,offset_angle,reduced_fact,ntimes,meas_name,cry_min_size_um,cry_max_size_um,\
-        hel_full_osc,hel_part_osc".split(",")
-
-        pin_param = []
-        line_strs = []
-        line_strs.append("root_dir,p_index,mode,puckid,pinid,sample_name,wavelength,raster_vbeam,"
-                         "raster_hbeam,att_raster,hebi_att,exp_raster,dist_raster,loopsize,score_min,score_max,"
-                         "maxhits,total_osc,osc_width,ds_vbeam,ds_hbeam,exp_ds,dist_ds,dose_ds,offset_angle,"
-                         "reduced_fact,ntimes,meas_name,cry_min_size_um,cry_max_size_um,hel_full_osc,hel_part_osc,"
-                         "raster_roi,ln2_flag,cover_scan_flag,zoomcap_flag,warm_time")
-
-        for cols in self.contents:
-            puckid              = cols[0].replace("-", "")
-            pinid               = cols[1]
-            mode                = cols[4]
-            print((cols[6]))
-            wavelength          = float(cols[6])
-            loop_size           = float(cols[7])
-            # resolution_limitが10.0より大きい場合は1.5に設定するという意味だそうな
-            resolution_limit    = float(cols[8]) if float(cols[8]) <= 10.0 else 1.5
-            max_crystal_size    = float(cols[10])
-            beamsize            = cols[9]
-            # sample名に()が入っている場合は-に置換する
-            sample_name         = cols[2].replace("(", "-").replace(")", "-")
-            desired_exp         = cols[3]
-            n_crystals          = int(cols[11])
-            total_osc           = float(cols[12])
-            osc_width           = float(cols[13])
-            anomalous_flag      = cols[5]
-            # LN2 flagについては、"no"の場合は0、それ以外は1とする
-            ln2_flag            = 0 if cols[14].lower == "no" else 1
-            pin_flag            = cols[15]
-            # Zoom flag については、"no"の場合は0、それ以外は1とする
-            zoom_flag           = 0 if cols[16].lower == "no" else 1
-
-            if pin_flag.lower() == "spine":
-                warm_time = 10
-            elif pin_flag.lower() == "als + ssrl":
-                warm_time = 20
-            elif pin_flag.lower() == "copper": 
-                warm_time = 60
-            elif pin_flag.lower() == "no-wait":
-                warm_time = 0
-            else:
-                warm_time = 30
-
-            # カメラ長を計算する 小数点以下1位に丸める
-            distance = math.floor(self.calcDist(wavelength, resolution_limit)*10)/10 # 2020/11/24 modified by HM 
-            hbeam, vbeam = self.checkBeamsize(beamsize)
-
-            # Reading flux value
-            flux = self.bsconf.getFluxAtWavelength(hbeam, vbeam, wavelength)
-            print("Flux value is read from beamsize.conf: %5.2e\n" % flux)
-
-            # Dose estimation for raster scan
-            score_min, score_max, raster_dose, dose_ds, raster_roi, exp_raster, att_raster, hebi_att, cover_flag = self.getParams(desired_exp, mode)
-            # Calculate 'att_raster', 'exp_raster'
-            att_raster, mod_exp_raster = self.defineScanCondition(desired_exp, wavelength, hbeam, vbeam, flux, exp_raster)
-
-            exp_raster = round(mod_exp_raster, 3)
-            hebi_att = round(att_raster,3)
-            att_raster = hebi_att
-
-            cry_min_size = max_crystal_size
-            cry_max_size = max_crystal_size
-            # Special code
-            if mode == "multi" and cry_max_size > 100.0:
-                cry_min_size = 25.0
-                cry_max_size = 25.0
-
-            self.conds.append((puckid, pinid, mode, wavelength, loop_size, resolution_limit, max_crystal_size, beamsize, 
-                sample_name, desired_exp, n_crystals, total_osc, osc_width, anomalous_flag))
-
-            if self.beamline.lower() == "bl32xu":
-                dist_raster = 200.0
-            elif self.beamline.lower() == "bl45xu":
-#                dist_raster = 500.0
-                dist_raster = math.floor(self.calcDist(wavelength, 2.53)/10)*10
-
-            line_str = "%s,%d,%s,%s,%s,%s," % (root_dir,p_index,mode,puckid,pinid,sample_name)
-            line_str += "%7.5f,%f,%f,%f,%f,%f,%f,%f,%d,%d,%d,%f,%f,%f,%f,0.02,%f,%f,%f,%f,%f,%s,%f,%f,%f," \
-                        "%f,%d,%d,%d,%d,%d" % \
-                (wavelength,vbeam,hbeam,att_raster,hebi_att,exp_raster,dist_raster,
-                loop_size,score_min,score_max,n_crystals,total_osc,osc_width,vbeam,hbeam,distance,dose_ds,0.0,1.0,1.0,
-                 desired_exp,cry_min_size,cry_max_size,60,40,raster_roi,ln2_flag,cover_flag,zoom_flag,warm_time)
-            line_strs.append(line_str)
-            pin_param = []
-            p_index += 1
-
-        self.csvout = "%s_zoo.csv"%self.basename[0]
-        fin = open(self.csvout, "w")
-        for line in line_strs:
-            fin.write("%s\n" % line)
-        fin.close()
-
-        self.isGot = True
-        return pin_param
 
 if __name__ == "__main__":
     root_dir = os.getcwd()
