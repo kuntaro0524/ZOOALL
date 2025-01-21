@@ -68,3 +68,5 @@ TestScripts/*ppm
 ZooConfig/
 LargeHolder/
 wget*
+*csv
+*.log
