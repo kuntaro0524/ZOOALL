@@ -58,11 +58,10 @@ class AnaHeatmap:
         # The 1st scan result will be analyzed
         dlmap = dl.getNumpyArray(scan_index=0)
         self.nv, self.nh = dl.getScanDimensions()
-        print("Vertical  =", self.nv)
-        print("Horizontal=", self.nh)
+        self.logger.info(f"Vertilcal={self.nv} Horizontal={self.nh}")
         # in [mm] steps
         self.v_step, self.h_step = dl.getScanSteps()
-        print(self.v_step, self.h_step)
+        self.logger.info(f"Vertical step[mm]={self.v_step} Horizontal step[mm]={self.h_step}")
 
         nimages_all = self.nv * self.nh
 
@@ -81,7 +80,6 @@ class AnaHeatmap:
                 # diffscan.log map
                 scanindex, imgnum, x, y, z = dlmap[v, h]
                 new_list.append((scanindex, imgnum, x, y, z, tmp_heatmap[v, h]))
-                # print "ORIGINAL:",v,h,tmp_heatmap[v,h]
 
         # ND array for XYZ coordinate(from diffscan.log)
         aa = numpy.array(new_list)
@@ -93,7 +91,7 @@ class AnaHeatmap:
         # Preparation of self.heatmap
         if self.isPrep == False:
             self.prep(prefix)
-            print("Heatmap shape=", self.heatmap.shape)
+            self.logger.info(f"Heatmap shape={self.heatmap.shape}")
 
         bin_boxes = numpy.arange(self.nv * self.nh).reshape(self.nv, self.nh)
 
@@ -103,10 +101,10 @@ class AnaHeatmap:
         start_v = 0
         end_v = self.nv
 
-        print("Vstart, Hstart", self.heatmap[start_v, start_h])
-        print("Vend, Hstart", self.heatmap[end_v - 1, start_h])
-        print("Vstart, Hend", self.heatmap[start_v, end_h - 1])
-        print("Vend, Hend", self.heatmap[end_v - 1, end_h - 1])
+        self.logger.info(f"Vstart, Hstart {self.heatmap[start_v, start_h]}")
+        self.logger.info(f"Vend, Hstart {self.heatmap[end_v - 1, start_h]}")
+        self.logger.info(f"Vstart, Hend {self.heatmap[start_v, end_h - 1]}")
+        self.logger.info(f"Vend, Hend {self.heatmap[end_v - 1, end_h - 1]}")
 
         # Making a binarized heat map of crystals
         for v in range(0, self.nv):
@@ -183,7 +181,7 @@ class AnaHeatmap:
         # Preparation of self.heatmap
         if self.isPrep == False:
             self.prep(prefix)
-            print("Heatmap shape=", self.heatmap.shape)
+            self.logger.info("Heatmap shape=", self.heatmap.shape)
 
         # A new map array is prepared here based on self.heatmap
         check_map_array = []
@@ -211,7 +209,7 @@ class AnaHeatmap:
         # Making numpy array for checking map and tree
         kdtree_map = numpy.array(kdtree_map_array)
         check_map = numpy.reshape(numpy.array(check_map_array), (self.nv, self.nh, 6))
-        print("TreeMap and CheckMap shape=", kdtree_map.shape, check_map.shape)
+        self.logger.info(f"TreeMap and CheckMap shape={kdtree_map.shape} {check_map.shape}")
         kdtree = scipy.spatial.cKDTree(kdtree_map)
 
         return kdtree_map, check_map, kdtree
@@ -237,7 +235,7 @@ class AnaHeatmap:
         # code here to set 'cry_size_mm' as 'search_radius_mm' in 
         # 'multiple small wedge data collection'
         self.search_radius_mm = cry_size_mm
-        print("Distance threshold = ", self.search_radius_mm)
+        self.logger.info(f"Distance threshold (radius of crystal)[mm] = {self.search_radius_mm}")
 
         # Crystal array
         crystal_array = []
@@ -287,8 +285,9 @@ class AnaHeatmap:
             # append Crystal class to the crystal_list
             crystal_array.append(crystal)
 
-        print("Number of found crystals=", len(crystal_array))
-        print("Checked grids=", checked_grids)
+        self.logger.info(f"Number of found crystals={len(crystal_array)}")
+        self.logger.info(f"Checked grids={checked_grids}")
+
         for crystal in crystal_array:
             crystal.printAll()
 
@@ -316,7 +315,7 @@ class AnaHeatmap:
             # This is very straight forward method (empilical function for robust 
             # search of helical crystals
             # self.search_radius_mm = math.sqrt(2.0)*((self.v_step+self.h_step)/2.0)
-            print("Distance threshold = ", self.search_radius_mm)
+            self.logger.info(f"Distance threshold (radius of crystal)[mm] = {self.search_radius_mm}")
         else:
             # set the threshold of distance (Empirical value)
             if self.v_step > self.h_step:
@@ -326,7 +325,7 @@ class AnaHeatmap:
 
             size_for_bunch = 2.0 * step_mm
             self.setCrystalSize(size_for_bunch)
-            print("Distance threshold = ", self.search_radius_mm)
+            self.logger.info(f"Distance threshold (radius of crystal)[mm] = {self.search_radius_mm}")
 
         # If this scan is vertical or horizontal scan
         #   vertical scan: size_for_bunch should be set to 2.0 * vertical scan step
@@ -344,14 +343,14 @@ class AnaHeatmap:
             cry_indices = []
             print("\n\n")
             h_max, v_max, maxindex, maxvalue = self.getMaxScoreIndex(check_map)
-            print("self.getMaxScoreIndex(H,V)=", h_max, v_max)
+            self.logger.info(f"self.getMaxScoreIndex(H,V)={h_max} {v_max}")
             good_list = self.process_pixel(check_map, kdtree_map, kdtree, maxindex)
             if len(good_list) != 0:
                 cry_indices += good_list
             else:
                 print("Process finished")
                 break
-            print("The first good_list=", good_list)
+            self.logger.info(f"First good_list={good_list}")
             cycle_list = []
             while (1):
                 cycle_list = self.process_cycle(check_map, kdtree_map, kdtree, good_list)
@@ -376,7 +375,7 @@ class AnaHeatmap:
             each_crystal = Crystal.Crystal(self.h_step, self.v_step)
             # Adding all XYZs to crystal
             for target_index in crystal:
-                print("Target index=", target_index)
+                self.logger.info(f"Target index={target_index}")
                 h_index, v_index = self.conv1Dto2D(target_index)
                 # The pixel which has the maximum score 
                 junk0, junk1, tx, ty, tz, score = original_map[v_index, h_index, :]
@@ -458,13 +457,16 @@ class AnaHeatmap:
         junk0, junk1, tx, ty, tz, score = check_map[v_index, h_index, :]
         # List up neighboring grids on a heat map
         neighbor_indices = kdtree.query_ball_point((tx, ty, tz), self.search_radius_mm)
-        print("KDtree query ball points: target=", target_index, h_index, v_index)
-        print(neighbor_indices)
-        print("KDtree query ball points")
-        print(kdtree_map[neighbor_indices])
+        self.logger.info(f"KDtree query ball points: target={target_index} {h_index} {v_index}")
+        self.logger.info(neighbor_indices)
+
+        if self.debug:
+            self.logger.info("KDtree query ball points")
+            self.logger.info(kdtree_map[neighbor_indices])
+            self.logger.info(f"Searchin good neighbor to {h_index} {v_index}")
+
         good_list = []
 
-        print("SEARCHING GOOD neigbor to ", h_index, v_index)
         # Get the score from neighbor grids of the maximum grid
         for i in neighbor_indices:
             v_index = int(i / self.nh)
@@ -482,18 +484,19 @@ class AnaHeatmap:
                 tmpxyz = check_map[v_index, h_index, :]
                 # good_list of index 
                 good_list.append(i)
-                print("GOOD: %8.3f %8.3f %8.3f %5d %5d" % (tmpxyz[2], tmpxyz[3], tmpxyz[4], check_score, i))
+                self.logger.info(f"GOOD: {tmpxyz[2]} {tmpxyz[3]} {tmpxyz[4]} {check_score} {i}")
         return good_list
 
     # Shape of the check_map (self.nv x self.nh)
     def getMaxScoreIndex(self, check_map):
-        print("getMaxScoreIndex: check_map shape=", check_map.shape)
-        print("#### max #####")
+        self.logger.info(f"getMaxScoreIndex: check_map shape={check_map.shape}")
+        self.logger.info("#### max #####")
+
         # slicing the column of the score
         # and get the maximum value and its index
         value = numpy.amax(check_map[:, :, -1])
         index = numpy.argmax(check_map[:, :, -1])
-        print("getMaxScoreIndex.INDEX,MaxValue=", index, value)
+        self.logger.info(f"getMaxScoreIndex: INDEX,MaxValue={index} {value}")
 
         h_index, v_index = self.conv1Dto2D(index)
 
@@ -572,7 +575,7 @@ class AnaHeatmap:
 
         # All of grids in this scan will be analyzed
         max_score = -9999.9999
-        print("SCORE_GOOD len=", len(self.score_good))
+        self.logger.info(f"SCORE_GOOD len={len(self.score_good)}")
         for i in numpy.arange(0, len(self.score_good)):
             x1, y1, score1, imgnum = self.score_good[i]
         total_score += score1

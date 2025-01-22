@@ -13,7 +13,7 @@ class KUMA:
         self.limit_dens = 1E10  # phs/um^2 this is for 1A wavelength
         # Kuntaro Log file
         self.logger = logging.getLogger('ZOO').getChild("KUMA")
-        self.debug = True
+        self.debug = False
 
         # Dose limit file
         # en_dose_lys.csv, en_dose_oxi.csv
@@ -83,7 +83,7 @@ class KUMA:
 
         # density limit for aimed dose
         dose_per_photon, density_limit = self.getDoseLimitParams(energy=en)
-        print(f"Energy={en:.3f}, dose_per_photon={dose_per_photon:.3f}, density_limit={density_limit:.3e}")
+        self.logger.info(f"Energy={en:.3f}, dose_per_photon={dose_per_photon:.3f}, density_limit={density_limit:.3e}")
 
         # Actual photon flux density
         actual_density = flux / (beam_h * beam_v)
