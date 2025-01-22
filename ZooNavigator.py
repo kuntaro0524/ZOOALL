@@ -117,7 +117,7 @@ class ZooNavigator():
         self.meas_flux_list = []
         self.meas_wavelength_list = []
 
-        self.needMeasureFlux = True  # test at 2019/06/18 at BL45XU
+        self.needMeasureFlux = False  # test at 2019/06/18 at BL45XU
 
         # If BSS can change beamsize via command
         self.doesBSSchangeBeamsize = True
@@ -760,8 +760,14 @@ class ZooNavigator():
             self.collectSingle(trayid, pinid, prefix, cond, sphi)
         elif cond['mode'] == "ssrox":
             self.collectSSROX(cond, sphi)
+        elif cond['mode'] == "quick":
+            self.collectQuick(trayid, pinid, prefix, cond, sphi)
         elif cond['mode'] == "screening":
             self.collectScreen(cond, sphi)
+        else:
+            self.logger.error("Unknown mode: %s" % cond['mode'])
+            self.esa.updateValueAt(o_index, "isDone", 9999)
+            return
 
         self.num_pins += 1
 
@@ -909,6 +915,62 @@ class ZooNavigator():
         # Generate Schedule file
         multi_sch = self.lm.genMultiSchedule(sphi, glist, cond, flux, prefix=data_prefix)
         # def genMultiSchedule(self, phi_mid, glist, cond, flux, logfile, prefix="multi"):
+
+        time.sleep(0.1)
+
+        self.esa.addEventTimeAt(o_index, "ds_start")
+        self.zoo.doDataCollection(multi_sch)
+        self.zoo.waitTillReady()
+        self.esa.addEventTimeAt(o_index, "ds_end")
+        self.esa.incrementInt(o_index, "isDS")
+        self.esa.updateValueAt(o_index, "isDone", 1)
+
+        # Writing CSV file for data processing
+        sample_name = cond['sample_name']
+        prefix = "%s-%02d" % (trayid, pinid)
+        root_dir = cond['root_dir']
+        self.data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
+        self.data_proc_file.flush()
+
+        self.logger.info("Disconnecting capture")
+        self.lm.closeCapture()
+
+    # Collect quick
+    def collectQuick(self, trayid, pinid, prefix, cond, sphi):
+        o_index = cond['o_index']
+
+        # Current position
+        self.sx, self.sy, self.sz, sphi = self.dev.gonio.getXYZPhi()
+
+        # Data collection
+        time.sleep(0.1)
+        data_prefix = "%s-%02d-quick" % (trayid, pinid)
+
+        # Photon flux is extracted from beamsize.config
+        if self.phosec_meas == 0.0:
+            beamsizeconf = BeamsizeConfig.BeamsizeConfig()
+            flux = beamsizeconf.getFluxAtWavelength(cond['ds_hbeam'], cond['ds_vbeam'], cond['wavelength'])
+            self.logger.info("Flux value is read from beamsize.conf: %5.2e" % flux)
+        else:
+            flux = self.phosec_meas
+            # loggerにbeam size と Fluxを書き込む
+            self.logger.info(f"Flux value is read from phosec: {flux:5.2e}")
+            # beam size はそれぞれ小数点以下1桁まで記載する
+            # cond['ds_hbeam], cond['ds_vbeam'] は小数点以下1桁まで記載する
+            self.logger.info(f"Beam size is read from config: {cond['ds_hbeam']:.1f} x {cond['ds_vbeam']:.1f} um")
+            
+        # For dose estimation
+        # self.loggerにbeam size と Fluxを書き込む
+        self.logger.info(f"Flux value is read from phosec: {flux:5.2e}")
+        # beam size はそれぞれ小数点以下1桁まで記載する
+        # cond['ds_hbeam], cond['ds_vbeam'] は小数点以下1桁まで記載する
+        self.logger.info(f"Beam size is read from config: {cond['ds_hbeam']:.1f}um x {cond['ds_vbeam']:.1f} um")
+
+        # Generate Schedule file
+        glist=[]
+        # current position をglistに追加
+        glist.append([self.sx, self.sy, self.sz])
+        multi_sch = self.lm.genMultiSchedule(sphi, glist, cond, flux, prefix=data_prefix)
 
         time.sleep(0.1)
 

@@ -19,7 +19,7 @@ class ESA:
         self.debug = False
         # ZOO schemes
         # 2019/04/17
-        self.scheme_list = ["multi", "helical", "single", "mixed", "screening", "ssrox"]
+        self.scheme_list = ["multi", "helical", "single", "mixed", "screening", "quick","ssrox"]
 
         # my log file
         self.logger = logging.getLogger('ZOO').getChild("ESA")
