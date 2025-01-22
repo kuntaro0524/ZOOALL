@@ -47,6 +47,7 @@ class KUMA:
         # このビームの flux density を計算する
         flux_density = flux / (beam_h * beam_v)
         # このビームの 1 sec あたりの dose を計算する
+        # density_limit: は　10MGy あたりの photon density なので
         dose_per_sec = flux_density * 10.0 / density_limit
         return dose_per_sec
 
@@ -81,8 +82,8 @@ class KUMA:
         en = 12.3984 / wavelength
 
         # density limit for aimed dose
-        dose_per_photon = self.getDoseLimitParams(energy=en)
-        density_limit = dose / dose_per_photon
+        dose_per_photon, density_limit = self.getDoseLimitParams(energy=en)
+        print(f"Energy={en:.3f}, dose_per_photon={dose_per_photon:.3f}, density_limit={density_limit:.3e}")
 
         # Actual photon flux density
         actual_density = flux / (beam_h * beam_v)
@@ -93,8 +94,7 @@ class KUMA:
     def convDoseToDensityLimit(self, dose, wavelength):
         en = 12.3984 / wavelength
         # dose_per_photon, density_limit
-        dose_per_photon = self.getDoseLimitParams(energy=en)
-        density_limit = dose / dose_per_photon
+        dose_per_photon, density_limit = self.getDoseLimitParams(energy=en)
         self.limit_dens = density_limit
         print("Limit density= %e [phs/um2]" % self.limit_dens)
 
@@ -217,8 +217,12 @@ if __name__ == "__main__":
     dose = 10.0
     wl_list = np.arange(0.5, 1.5, 0.1)
 
+    # getDose の挙動テスト
+    dose_tmp = kuma.getDose(1,1,2E10,12.3984,1.0)
+    print(f"getDose: {dose_tmp:.3f}")
+
     dose_1sec = kuma.getDose1sec(10, 15, 9.9E12, 12.3984)
-    dose_per_exptime = 0.3/dose_1sec
+    dose_per_exptime = 0.01*dose_1sec
     print("##################################")
     print(f'dose_1sec={dose_1sec:.3f}, dose_per_exptime={dose_per_exptime:.3f}')
     print("##################################")

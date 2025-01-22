@@ -23,6 +23,8 @@ import logging.config
 import subprocess
 import BLFactory
 
+import logging.config
+
 if __name__ == "__main__":
     ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("connecting %s" % blanc_address)
@@ -34,9 +36,40 @@ if __name__ == "__main__":
     time_str = d.getNowMyFormat(option="date")
     logname = "%s/zoo_%s.log" % (zoologdir, time_str)
     print("changing mode of %s" % logname)
-    logging.config.fileConfig(logging_conf, defaults={'logfile_name': logname})
-    logger = logging.getLogger('ZOO')
-    os.chmod(logname, 0o666)
+
+    logging_config = {
+    "version": 1,
+    "formatters": {
+        "f1": {
+            "format": "%(asctime)s - %(module)s - %(levelname)s - %(funcName)s - %(lineno)d - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        }
+    },
+    "handlers": {
+        "consoleHandler": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "f1",
+            "stream": "ext://sys.stdout",
+        },
+        "fileHandler": {
+            "class": "logging.FileHandler",
+            "level": "DEBUG",
+            "formatter": "f1",
+            "filename": logname,  # 動的に設定
+        },
+    },
+    "loggers": {
+        "": {
+            "level": "DEBUG",
+            "handlers": ["consoleHandler", "fileHandler"],
+        }
+    },
+    }
+
+    logging.config.dictConfig(logging_config)
+    logger = logging.getLogger("Zoo")
+    logger.info("Start ZOO")
 
     # Initialize BLFactory
     blf = BLFactory.BLFactory()
@@ -48,7 +81,6 @@ if __name__ == "__main__":
         if input_file.rfind("csv") != -1:
             navi = ZooNavigator.ZooNavigator(blf, input_file, is_renew_db=True)
             # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
-            print("##########################################3")
             # blf.zoo.setBeamsize(1)
             num_pins = navi.goAround()
         elif input_file.rfind("db") != -1:
