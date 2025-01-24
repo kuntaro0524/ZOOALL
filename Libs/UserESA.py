@@ -426,6 +426,12 @@ class UserESA():
         self.df = pd.read_excel(self.fname, sheet_name="Sheet", header=2)
         # 列名を指定する
         self.df.columns = columns
+        # 現時点でのデータ数をself.loggerに出力する
+        self.logger.info("Number of data: %d"%len(self.df))
+        # 'puckid' がないデータを削除する
+        self.df = self.df.dropna(subset=['puckid'])
+        # 現時点でのデータ数をself.loggerに出力する
+        self.logger.info("Number of data after polishment: %d"%len(self.df))
         self.isPrep = True
         
     def calcDist(self, wavelength, resolution_limit):
