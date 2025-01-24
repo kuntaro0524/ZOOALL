@@ -309,9 +309,11 @@ class UserESA():
         # self.logger.info -> 'dose_per_frame' をリスト表示
         # puckid, pinid, dose_per_frame のリストを表示する
         # format f"PuckID: {puckid} PinID: {pinid} dose_per_frame: {dose_per_frame}"
+        # 'pinid' については文字列の場合があるのでそのまま表示する
         self.logger.info("Scan conditions estimated results")
         for i in range(len(self.df)):
-            self.logger.info(f"Puck-Pin ID: {self.df['puckid'][i]}-{self.df['pinid'][i]:2d} : dose/frame: {self.df['dose_per_frame'][i]:.3f} MGy")
+            self.logger.info(f"PuckID: {self.df['puckid'][i]} PinID: {self.df['pinid'][i]} dose_per_frame: {self.df['dose_per_frame'][i]:.3f}")
+            #self.logger.info(f"Puck-Pin ID: {self.df['puckid'][i]}-{self.df['pinid'][i]:2d} : dose/frame: {self.df['dose_per_frame'][i]:.3f} MGy")
 
         #print(self.df)
 
