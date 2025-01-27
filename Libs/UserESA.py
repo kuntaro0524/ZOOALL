@@ -506,19 +506,53 @@ class UserESA():
                         'exp_ds', 'dist_ds', 'dose_ds', 'offset_angle', 'reduced_fact', 'ntimes', 'meas_name', 'cry_min_size_um', 'cry_max_size_um', \
                         'hel_full_osc', 'hel_part_osc', 'raster_roi', 'ln2_flag', 'cover_scan_flag', 'zoomcap_flag', 'warm_time']       
 
-        # float については小数点以下第一位までに丸める
+        # ここで変数の型を明示的に指定する
+        # float を想定しているもののみ
+        # wavelength, resolution_limit, max_crystal_size, total_osc, osc_width
+        # については float として読み込む
+        set_types = {
+            'wavelength': float,
+            'raster_vbeam': float,
+            'raster_hbeam': float,
+            'att_raster': float,
+            'hebi_att': float,
+            'exp_raster': float,
+            'dist_raster': float,
+            'loopsize': float,
+            'score_min': int,
+            'score_max': int,
+            'maxhits': int,
+            'total_osc': float,
+            'osc_width': float,
+            'ds_vbeam': float,
+            'ds_hbeam': float,
+            'exp_ds': float,
+            'dist_ds': float,
+            'dose_ds': float,
+            'offset_angle': float,
+            'reduced_fact': float,
+            'ntimes': int,
+            'cry_min_size_um': float,
+            'cry_max_size_um': float,
+            'hel_full_osc': float,
+            'hel_part_osc': float,
+            'warm_time': float,
+            'resolution_limit': float,
+            'max_crystal_size': float,
+            'total_osc': float,
+            'osc_width': float,
+        }
+        # 型を指定する
+        self.df = self.df.astype(set_types)
+
         # floatのフォーマットを指定
-        float_format = '%.2f'
+        float_format = '%.4f'
         # to_csv()メソッドでファイルに書き出す際にfloatのフォーマットを指定して書き出す
         zoo_csv_name = f"{self.csv_prefix}.csv"
         self.df.to_csv(zoo_csv_name, columns=self.columns, index=False, float_format=float_format)
-        
-        #line_str = "%s,%d,%s,%s,%s,%s," % (root_dir,p_index,mode,puckid,pinid,sample_name)
-        #line_str += "%7.5f,%f,%f,%f,%f,%f,%f,%f,%d,%d,%d,%f,%f,%f,%f,0.02,%f,%f,%f,%f,%f,%s,%f,%f,%f," \
-        #               "%f,%d,%d,%d,%d,%d" % \ (wavelength,vbeam,hbeam,att_raster,hebi_att,exp_raster,dist_raster, \
-        #       loop_size,score_min,score_max,n_crystals,total_osc,osc_width,vbeam,hbeam,distance,dose_ds,0.0,1.0,1.0, \
-        #        desired_exp,cry_min_size,cry_max_size,60,40,raster_roi,ln2_flag,cover_flag,zoom_flag,warm_time) 
-    
+
+        # 全パラメータの型を出力
+        self.logger.info(f"Data types of all parameters in the DataFrame: {self.df.dtypes}")
 
 if __name__ == "__main__":
     root_dir = os.getcwd()
