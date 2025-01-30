@@ -70,3 +70,4 @@ wget*
 *csv
 *.log
 *.swp
+*.db
