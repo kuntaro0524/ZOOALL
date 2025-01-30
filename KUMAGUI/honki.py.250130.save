@@ -26,6 +26,8 @@ elif beamline.upper() == "BL41XU":
 
 sys.path.append("/isilon/%s/BLsoft/PPPP/10.Zoo/" % beamline.upper())
 sys.path.append("/isilon/%s/BLsoft/PPPP/10.Zoo/Libs/" % beamline.upper())
+sys.path.append("/staff/bl32xu/BLsoft/ZOO32XU/")
+sys.path.append("/staff/bl32xu/BLsoft/ZOO32XU/Libs/")
 
 import datetime
 import AttFactor
@@ -104,7 +106,7 @@ class ExpCondDialog(wx.Dialog):
         pass
 
     def __set_properties(self):
-        # Content of this block not found. Did you rename)
+        # Content of this block not found. Did you rename this class?
         pass
 
     def __do_layout(self):
@@ -165,7 +167,7 @@ class MyFrame2(wx.Frame):
         self.checkbox_2_copy = wx.CheckBox(self.notebook_1_pane_1, wx.ID_ANY, "with Back Light[Evac]")
         self.evacManual = wx.Button(self.notebook_1_pane_1, wx.ID_ANY, "Evacuate [manual mount]")
         self.bitmap_1 = wx.StaticBitmap(self.notebook_1_pane_1, wx.ID_ANY,
-                                        wx.Bitmap("/user/target/ZOO32XU/KUMAGUI/a.png",
+                                        wx.Bitmap("/isilon/BL32XU/BLsoft/PPPP/03.GUI/98.Factory/Honki/a.png",
                                                   wx.BITMAP_TYPE_ANY))
         self.notebook_1_pane_4 = wx.Panel(self.notebook_1, wx.ID_ANY)
         self.label_1_copy_1 = wx.StaticText(self.notebook_1_pane_4, wx.ID_ANY, "Data directory", style=wx.ALIGN_CENTER)
@@ -508,7 +510,8 @@ class MyFrame2(wx.Frame):
         self.attfac = AttFactor.AttFactor()
 
         # LOG FILE
-        logname = "/user/target/ZOO32XU/KUMAGUI/Logs/kuma_%s.log" % datetime.datetime.now().strftime('%Y%m%d%H%M')
+        logname = "/isilon/%s/BLsoft/PPPP/10.Zoo/KUMAGUI/Log/kuma_%s.log" % \
+                  (beamline.upper(), datetime.datetime.now().strftime('%Y%m%d%H%M'))
         self.logfile = open(logname, "w")
 
         # SHIKA
