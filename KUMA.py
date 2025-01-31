@@ -13,7 +13,7 @@ class KUMA:
         self.limit_dens = 1E10  # phs/um^2 this is for 1A wavelength
         # Kuntaro Log file
         self.logger = logging.getLogger('ZOO').getChild("KUMA")
-        self.debug = True
+        self.debug = False
 
         # Dose limit file
         # en_dose_lys.csv, en_dose_oxi.csv
@@ -21,8 +21,10 @@ class KUMA:
         # 左から順に、エネルギー、1フォトンあたりの線量、10MGyに到達するまでのリミット(photons/um2)
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+        print(f"################ Config path: {config_path}")
         self.config.read(config_path)
         self.dose_limit_file = self.config.get("files", "dose_csv")
+        print(f"### dose limit file: {self.dose_limit_file}")
 
     # 2023/05/10 coded by K.Hirata
     def getDoseLimitParams(self, energy=12.3984):
@@ -32,10 +34,12 @@ class KUMA:
         # エネルギーが与えられたら、線量を返す関数を作成する
         # 戻り値はfloatとする
         en_dose_function = interpolate.interp1d(df['energy'], df['dose_mgy_per_photon'], kind='cubic')
-        # dosePerPhoton
+        # dose_per_photon: CSV 2nd column
         dose_per_photon = en_dose_function(energy).flatten()[0]
+        # density_limit: CSV 3rd column
+        density_limit = interpolate.interp1d(df['energy'], df['density_limit'], kind='cubic')(energy).flatten()[0]
 
-        return dose_per_photon
+        return dose_per_photon, density_limit
 
     def getDose1sec(self, beam_h, beam_v, flux, energy):
         # density_limit は tableにある数値 → 10 MGy に到達するまでの photon density
@@ -43,6 +47,7 @@ class KUMA:
         # このビームの flux density を計算する
         flux_density = flux / (beam_h * beam_v)
         # このビームの 1 sec あたりの dose を計算する
+        # density_limit: は　10MGy あたりの photon density なので
         dose_per_sec = flux_density * 10.0 / density_limit
         return dose_per_sec
 
@@ -77,8 +82,8 @@ class KUMA:
         en = 12.3984 / wavelength
 
         # density limit for aimed dose
-        dose_per_photon = self.getDoseLimitParams(energy=en)
-        density_limit = dose / dose_per_photon
+        dose_per_photon, density_limit = self.getDoseLimitParams(energy=en)
+        self.logger.info(f"Energy={en:.3f}, dose_per_photon={dose_per_photon:.3f}, density_limit={density_limit:.3e}")
 
         # Actual photon flux density
         actual_density = flux / (beam_h * beam_v)
@@ -89,8 +94,7 @@ class KUMA:
     def convDoseToDensityLimit(self, dose, wavelength):
         en = 12.3984 / wavelength
         # dose_per_photon, density_limit
-        dose_per_photon = self.getDoseLimitParams(energy=en)
-        density_limit = dose / dose_per_photon
+        dose_per_photon, density_limit = self.getDoseLimitParams(energy=en)
         self.limit_dens = density_limit
         print("Limit density= %e [phs/um2]" % self.limit_dens)
 
@@ -213,8 +217,12 @@ if __name__ == "__main__":
     dose = 10.0
     wl_list = np.arange(0.5, 1.5, 0.1)
 
+    # getDose の挙動テスト
+    dose_tmp = kuma.getDose(1,1,2E10,12.3984,1.0)
+    print(f"getDose: {dose_tmp:.3f}")
+
     dose_1sec = kuma.getDose1sec(10, 15, 9.9E12, 12.3984)
-    dose_per_exptime = 0.3/dose_1sec
+    dose_per_exptime = 0.01*dose_1sec
     print("##################################")
     print(f'dose_1sec={dose_1sec:.3f}, dose_per_exptime={dose_per_exptime:.3f}')
     print("##################################")

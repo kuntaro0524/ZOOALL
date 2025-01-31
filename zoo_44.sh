@@ -24,7 +24,8 @@ for i in {1..10}
 do
  sleep 1
  cheetah_ok=0
- ssh $eiger_cheetah_node1 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
+ ssh $eiger_cheetah_node1 "/oys/xtal/cctbx/snapshots/dials-v1-14-13/build/bin2/yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
+# ssh $eiger_cheetah_node1 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
 # ssh $eiger_cheetah_node2 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
  notify-send "BSS startup" "Cheetah not up. retrying (${i})."
  notify-send "BSS startup" "`/usr/local/bss/startcheetah.sh`"
