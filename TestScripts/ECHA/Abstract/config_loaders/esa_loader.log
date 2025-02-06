@@ -167,3 +167,37 @@ zoo sample pin id: 5
 zoo sample pin id: 6
 zoo sample pin id: 7
 zoo sample pin id: 8
+getCondDataFrame starts
+Data request URL: https://dcha-spx.spring8.or.jp/api1.0.2/zoo_samplepin/
+ZOOID: 6
+zoo sample pin id: 1
+zoo sample pin id: 2
+zoo sample pin id: 3
+zoo sample pin id: 4
+zoo sample pin id: 5
+zoo sample pin id: 6
+zoo sample pin id: 7
+zoo sample pin id: 8
+getCondDataFrame starts
+Data request URL: https://dcha-spx.spring8.or.jp/api1.0.2/zoo_samplepin/
+ZOOID: 6
+Dataframe:    id               exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0   1  ECHA_API_TEST_004        0        0       0       0  2024-10-07T18:59:16.438564+09:00  2024-10-07T18:59:16.438579+09:00       6
+1   2  ECHA_API_TEST_004        1        1       0       0  2024-10-07T18:59:16.496837+09:00  2024-10-07T18:59:16.496851+09:00       6
+2   3  ECHA_API_TEST_004        2        2       0       0  2024-10-07T18:59:16.554237+09:00  2024-10-07T18:59:16.554264+09:00       6
+3   4  ECHA_API_TEST_004        3        3       0       0  2024-10-07T18:59:16.611656+09:00  2024-10-07T18:59:16.611670+09:00       6
+4   5  ECHA_API_TEST_004        4        4       0       0  2024-10-07T18:59:16.670114+09:00  2024-10-07T18:59:16.670128+09:00       6
+5   6  ECHA_API_TEST_004        5        5       0       0  2024-10-07T18:59:16.724058+09:00  2024-10-07T18:59:16.724072+09:00       6
+6   7  ECHA_API_TEST_004        6        6       0       0  2024-10-07T18:59:16.777810+09:00  2024-10-07T18:59:16.777824+09:00       6
+7   8  ECHA_API_TEST_004        7        7       0       0  2024-10-07T18:59:16.843737+09:00  2024-10-07T18:59:16.843751+09:00       6
+zoo sample pin id: 1
+zoo sample pin id: 2
+zoo sample pin id: 3
+zoo sample pin id: 4
+zoo sample pin id: 5
+zoo sample pin id: 6
+zoo sample pin id: 7
+zoo sample pin id: 8
+getCondDataFrame starts
+Data request URL: https://dcha-spx.spring8.or.jp/api1.0.2/zoo_samplepin/
+ZOOID: 6

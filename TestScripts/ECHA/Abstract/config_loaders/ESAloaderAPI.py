@@ -61,46 +61,6 @@ class ESAloaderAPI:
             print("Exception!!!!!!!!!!!")
             raise Exception("Failed to login")
 
-    def getCondDataFrame_obsoleted(self):
-        self.logger.info("getCondDataFrame starts")
-        self.logger.info(f"Data request URL: {self.data_request_url}")
-        self.logger.info(f"ZOOID: {self.zoo_id}")
-        auth_headers = self.make_authenticated_request()
-        response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
-        self.logger.info(f"Response: {response}")
-        # response を pandas DataFrame に変換
-        df = pd.DataFrame(response.json())
-        # df の１行ずつのデータ取得
-        # この辞書をリストに追加していく
-        data_list = []
-        for i in range(len(df)):
-            # 'zoo_samplepin_id' を取得
-            zoo_samplepin_id=df.iloc[i]['id']
-            print(f"zoo sample pin id: {zoo_samplepin_id}")
-            # parameterを取得する
-            target_url = f"{self.api_url}/zoo_parameter_samplepin/"
-            response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id":zoo_samplepin_id})
-            # print(response.json())
-            each_df = pd.DataFrame(response.json())
-            # print(each_df.columns)
-            dicts = {}
-            for j in range(len(each_df)):
-            # この each_df に含まれている１行のデータの 'parameter_name' と 'value' で dictionaryを作成
-                dicts[each_df.iloc[j]['parameter_name']] = each_df.iloc[j]['value']
-                # measure_idを追加する
-                dicts['zoo_samplepin_id'] = zoo_samplepin_id
-
-            # dicts を Series に変換
-            each_pin_df = pd.Series(dicts)
-            # print(each_pin_df)
-            data_list.append(each_pin_df)
-
-        # data_list からpandas DataFrameを作成
-        self.conds_df = pd.DataFrame(data_list)
-        self.isPrepConds = True
-
-        return self.conds_df
-
     # coded by K. Hirata 2024/12/16
     def getCondDataFrame(self):
         self.logger.info("getCondDataFrame starts")
@@ -110,6 +70,8 @@ class ESAloaderAPI:
         response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
         # response を pandas DataFrame に変換
         df = pd.DataFrame(response.json())
+        self.logger.info(f"Dataframe: {df}")
+
         # df の１行ずつのデータ取得
         # この辞書をリストに追加していく
         data_list = []
@@ -196,6 +158,39 @@ class ESAloaderAPI:
         print(response.json())
         print("updated!!")
 
+    # post result 
+    # param_jsonはJSON形式
+    def postResult(self, sample_pin_id, param_json):
+        # target url 
+        target_url = f"{self.api_url}/zoo_result_samplepin/"
+        print(f"target_url: {target_url}")
+
+        # param_jsonにsample_pin_id を追加する
+        param_json['zoo_samplepin_id'] = sample_pin_id
+        print(f"after: {param_json}")
+        # put
+        auth_headers = self.make_authenticated_request()
+        response = requests.post(target_url, headers=auth_headers, json=param_json)
+        # 失敗したら例外を発生させる
+        if response.status_code != 200 and response.status_code != 201:
+            raise Exception(f"Failed to post result: {response.status_code}")
+        print(response.json())
+        print("posted!!")
+
+    def getResult(self, sample_pin_id):
+        target_url = f"{self.api_url}/zoo_result_samplepin/"
+        auth_headers = self.make_authenticated_request()
+        response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id":sample_pin_id})
+        # 取得したJSONを辞書にする
+        result_dict = response.json()
+        print("############################")
+        print(result_dict)
+        # 結果について表示をする
+        # 同じ名前のパラメータがある場合には、最後のものが表示される
+        for result in result_dict:
+            print(result['result_name'], result['value'])
+        print("############################")
+        
     def convParamname2Paramid(self, parameter_name):
         # パラメータのリストを取得する
         if self.isPrepParams == False:
@@ -283,8 +278,8 @@ if __name__ == '__main__':
     esa_loader.make_authenticated_request()
     
     # データを取得する関数を使用
-    start_time = datetime.now()
-    esa_loader.getParameterList()
+    #start_time = datetime.now()
+    #esa_loader.getParameterList()
     
     # 条件を新たに追加したらどうなるか？
     # esa_loader.addZOOparams()
@@ -294,8 +289,21 @@ if __name__ == '__main__':
     # consumed_time = end_time - start_time
     # print("Consumed Time: ", consumed_time)
     #conds_df = esa_loader.getCondDataFrame()
-    conds_df = esa_loader.getCondDataFrame()
-    print(conds_df)
+    #conds_df = esa_loader.getCondDataFrame()
+    #print(conds_df)
+
+    # Result 登録の試験
+    sample_pin_id = 90
+    param_json ={
+        "data": [
+            {"isMount":"1"},
+            {"isLoopCenter":"1"}
+        ]
+    }
+
+    esa_loader.postResult(sample_pin_id, param_json)
+    esa_loader.getResult(sample_pin_id)
+    
     #conds_df.to_csv("test.csv")
     # csv_file_path = 'received_mod2.csv'
     # conds_df.to_csv(csv_file_path)
