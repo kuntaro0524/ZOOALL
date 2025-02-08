@@ -1,5 +1,5 @@
 [beamline]
-beamline = BL44XU
+beamline = BL32XU
 [server]
 bss_server = 192.168.163.2
 bss_port = 5555
