@@ -1,5 +1,5 @@
 [beamline]
-beamline = BL32XU
+beamline = BL44XU
 [server]
 bss_server = 192.168.163.2
 bss_port = 5555
@@ -68,14 +68,19 @@ score_min = 10
 score_max = 100
 raster_dose = 0.1
 dose_ds = 10.0
-raster_roi = 1
 exp_raster = 0.01
 att_raster = 20
 hebi_att = 20
 cover_flag = 1
 exp_ds=0.02
+# Raster ROIにするかどうか
+raster_roi = 1
+# raster_roi=1の場合には
+# RasterのROIの端までの最短半径（ビーム中心からの距離[mm]）を入力する
+# この距離によってRaster scanのカメラ距離を調整する
+raster_roi_edge_mm=35
 # Rasterのときの端分解能
-resol_raster=2.5
+resol_raster=5.0
 # "" are not required to define 'character variable'
 gonio_direction =FROM_RIGHT
 # Pin photo diode channel
@@ -84,7 +89,7 @@ pin_channel = 3
 pulse_for_noatt = 3500
 
 [detector]
-# カメラ長最短 [mm]
+# カメラ長最短 [mm] (BSS configure fileから読むべきか・・・)
 min_camera_len=125.0
 # カメラの長さ（短て方向） [mm]
 min_camera_dim = 233.0

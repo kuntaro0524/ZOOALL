@@ -6,7 +6,7 @@ ESA -> the main function : the class to read & write zoo database file
 This code is originally written by K.Hirata and modified by N.Mizuno.
 NM added function to read xlsx file directly and output zoo.db by using ESA class.
 
-Author: Nobuhiro Mizuno
+Vice-author: Nobuhiro Mizuno
 """
 import sys, os, math, numpy, csv, re, datetime, xlrd, codecs
 import configparser
@@ -434,23 +434,42 @@ class UserESA():
         self.logger.info("Number of data after polishment: %d"%len(self.df))
         self.isPrep = True
         
-    def calcDist(self, wavelength, resolution_limit):
-        # beamline.ini　の experiment セクション　から min_camera_dim を読んで min_dimに代入
-        # wavelength と resolution_limit から camera_len を計算する
-        # camera_len が min_dim 以下なら min_dim を返す
-        # camera_len が min_dim より大きいなら camera_len を返す
+    def calcDist(self, wavelength, resolution_limit, isROI=False):
+        # beamline.ini　の experiment セクション　から min_camera_lim を読んで min_camera_len に代入する
         min_camera_len = self.config.getfloat("detector", "min_camera_len")
-        min_camera_dim = self.config.getfloat("detector", "min_camera_dim")
-        theta = numpy.arcsin(wavelength / 2.0 / resolution_limit)
-        bunbo = 2.0 * numpy.tan(2.0 * theta)
-        camera_len = min_camera_dim / bunbo
+
+        # ROIがない場合
+        if isROI == False:
+            print("ROI is not True")
+            # wavelength と resolution_limit から camera_len を計算する
+            # camera_len が min_camera_len 以下なら min_camera_len を返す
+            min_camera_dim = self.config.getfloat("detector", "min_camera_dim")
+        else:
+            print("ROI is True")
+            # ROIがある場合なんだが、calcDistFromLength()は半径でなく直径を要求する -> min_camera_dim = 2 * min_camera_dim
+            min_camera_dim = self.config.getfloat("experiment", "raster_roi_edge_mm") * 2.0
+
+        camera_len = self.calcDistFromLength(wavelength, resolution_limit, min_camera_dim)
+
+        print(f"calcuated camera_len: {camera_len}")
+
         # camera_len が　min_camera_len 以下なら min_camera_len を返す
+        # camera_len が min_dim より大きいなら camera_len を返す
         if camera_len < min_camera_len:
             camera_len = min_camera_len
 
         # 小数点第一位に丸める camera_len
         camera_len = round(camera_len, 1)
 
+        return camera_len
+
+    def calcDistFromLength(self, wavelength, resolution_limit, detector_radius):
+        # wavelength と resolution_limit から camera_len を計算する
+        # camera_len が min_dim 以下なら min_dim を返す
+        # camera_len が min_dim より大きいなら camera_len を返す
+        theta = numpy.arcsin(wavelength / 2.0 / resolution_limit)
+        bunbo = 2.0 * numpy.tan(2.0 * theta)
+        camera_len = detector_radius / bunbo
         return camera_len
 
     def checkBeamsize(self, beamsize_char):
@@ -469,7 +488,21 @@ class UserESA():
         self.df['dist_ds'] = self.df.apply(lambda x: self.calcDist(x['wavelength'], x['resolution_limit']), axis=1)
         # resolution limit は beamline.iniから読み込む
         # self.config : section=experiment, option=resol_raster
-        self.df['dist_raster'] = self.df.apply(lambda x: self.calcDist(x['wavelength'], self.config.getfloat("experiment", "resol_raster")), axis=1)
+        roi_value = self.config.getint("experiment", "raster_roi")
+        if self.beamline.lower() == "bl32xu":
+            # roi flag
+            # roi_value =1 -> roi_flag=True
+            # roi_value =0 -> roi_flag=False
+            if roi_value == 1:
+                print("ROI is True")
+                dist_raster = self.calcDist(roi_value, self.config.getfloat("experiment", "resol_raster"), True)
+            else:
+                dist_raster = self.calcDist(roi_value, self.config.getfloat("experiment", "resol_raster"), False)
+        else:
+            dist_raster = self.calcDist(roi_value, self.config.getfloat("experiment", "resol_raster"), False)
+
+        print(f"dist_raster: {dist_raster}")
+        self.df['dist_raster'] = dist_raster
 
     def makeCondList(self):
         # DataFrameとしてExcelファイルを読み込む　 →　self.df
