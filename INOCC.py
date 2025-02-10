@@ -438,12 +438,15 @@ class INOCC:
             self.init()
         phi_area_list = []
         n_good = 0
+        # core centeringu
+        self.logger.info(f"coreCentering: phi_list = {phi_list}")
         # Loop for rough centering
         for phi in phi_list:
             self.gonio.rotatePhi(phi)
             # Gonio current coordinate
             # Try centering
             if isRoughCenter == False:
+                self.logger.info(f"coreCentering: simpleCenter phi = {phi}")
                 try:
                     # If this trial fails, exception will be detected
                     junk, hamidashi_flag = self.simpleCenter(phi, loop_size=loop_size, option='top')
@@ -505,17 +508,19 @@ class INOCC:
     def edgeCentering(self, phi_list, ntimes, challenge=False, loop_size=600.0):
         if self.isInit == False:
             self.init()
-        self.logger.info("################### EDGE CENTERING ######################")
+        self.logger.info(">>>>>>>>>>>>>>>>>>> EDGE CENTERING <<<<<<<<<<<<<<<<<<<<<<")
         n_good = 0
         for i in range(0, ntimes):
             try:
                 n_good, phi_area_list = self.coreCentering(phi_list, loop_size=loop_size)
-                print("NGOOD=", n_good)
+                self.logger.info(f"coreCentering: phi_area_list = {phi_area_list} n_good = {n_good}")
                 # Added 160514     
                 # A little bit dangerous modification
                 # 190514 I cannot understand this code
+                # 2025/02/10 K. Hirata: たぶんすべての phi_list が成功した場合に break する
                 if challenge == True and n_good == len(phi_list):
                     break
+            # coreCenteringの例外処理
             except MyException as tttt:
                 self.logger.info("INOCC.edgeCentering moves Y 2000um")
                 gx, gy, gz, phi = self.gonio.getXYZPhi()
@@ -525,10 +530,11 @@ class INOCC:
                     raise MyException("Movement was larger than threshold (Yamagiwa safety)")
                 
                 self.gonio.moveXYZPhi(gx, newgy, gz, phi)
+
+        self.logger.info("<<<<<<<<<<<<<<<<<<<< EDGE CENTERING ENDED >>>>>>>>>>>>>>>>>>>>")
         if n_good == 0:
             raise MyException("edgeCentering failed")
 
-        print("################### EDGE CENTERING ENDED ######################")
         return n_good, phi_area_list
 
     def facing(self, phi_list):
