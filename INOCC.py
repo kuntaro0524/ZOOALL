@@ -15,6 +15,8 @@ import logging
 import logging.config
 from configparser import ConfigParser, ExtendedInterpolation
 
+from ResultEnum import ResultCentering as ResultCentering
+
 class INOCC:
     def __init__(self, blf, root_dir, sample_name="sample"):
         self.blf = blf
@@ -328,11 +330,11 @@ class INOCC:
     def simpleCenter(self, phi, loop_size=600.0, option='top'):
         new_idx = self.ff.getNewIdx3()
         self.fname = "%s/%03d_center.ppm" % (self.loop_dir, new_idx)
-        self.logger.info("##################### TOP CENTERING %5.2f deg.\n" % phi)
+        self.logger.info("##################### Tip centering %5.2f deg." % phi)
         self.logger.info("INOCC.coreCentering captures %s\n" % self.fname)
         self.gonio.rotatePhi(phi)
         cx, cy, cz, phi = self.gonio.getXYZPhi()
-        print("Capturing....")
+        self.logger.info("Capturing....")
         self.coi.get_coax_image(self.fname)
         # This instance is for this centering process only
         cip = CryImageProc.CryImageProc(logdir=self.loop_dir)
@@ -340,14 +342,27 @@ class INOCC:
         roi_image = os.path.join(self.loop_dir, "%03d_roi.png" % self.ff.getNewIdx3())
         cip.setROIpic(roi_image)
         self.roi_counter += 1
-        # This generates exception if it could not find any centering information
-        xtarget, ytarget, area, hamidashi_flag = cip.getCenterInfo(loop_size=loop_size, option=option)
-        self.logger.info("PHI: %5.2f deg Option=%s Centering: (Xtarget, Ytarget) = (%5d, %5d) HAMIDASHI = %s\n"
-                         % (phi, option, xtarget, ytarget, hamidashi_flag))
-        x, y, z = self.coi.calc_gxyz_of_pix_at(xtarget, ytarget, cx, cy, cz, phi)
+        try:
+            # This generates exception if it could not find any centering information
+            self.logger.info(f"analyzing")
+            result, xtarget, ytarget, area, hamidashi_flag = cip.getCenterInfo(loop_size=loop_size, option=option)
+            # if result is not SUCCESS
+            if result != ResultCentering.SUCCESS:
+                raise MyException("simpleCenter cannot detect the loop")
 
-        self.gonio.moveXYZPhi(x, y, z, phi)
-        self.logger.info(">>>>>> FILE=%s Area=%8.3f at %8.3f" % (self.fname, area, phi))
+            self.logger.info(f"analysis finished")
+            self.logger.info("PHI: %5.2f deg Option=%s Centering: (Xtarget, Ytarget) = (%5d, %5d) HAMIDASHI = %s"
+                         % (phi, option, xtarget, ytarget, hamidashi_flag))
+            x, y, z = self.coi.calc_gxyz_of_pix_at(xtarget, ytarget, cx, cy, cz, phi)
+            self.gonio.moveXYZPhi(x, y, z, phi)
+        # getCenterInfo が失敗すると例外を出すのでここは検出フラグで処理する
+        # 最終的には、getCenterInfo も例外ではない処理を考えるべきでは？
+        except:
+            raise MyException("simpleCenter cannot detect the loop")
+
+        self.logger.info(f">>>>>> captured image={self.fname} <<<<<<<<")
+        self.logger.info(f"Object detected!  Area=%8.3f [pixels] at %8.3f [deg.]" % (area, phi))
+        self.logger.info(f"Goniometer(XYZ) = {x:8.3f} {y:8.3f} {z:8.3f} {phi:8.3f}")
 
         return area, hamidashi_flag
 
@@ -446,11 +461,17 @@ class INOCC:
             # Gonio current coordinate
             # Try centering
             if isRoughCenter == False:
-                self.logger.info(f"coreCentering: simpleCenter phi = {phi}")
+                self.logger.info(f"+++++++++++++++++++++++++++++++")
+                self.logger.info(f"$$$ Rough centering started $$$")
+                self.logger.info(f"+++++++++++++++++++++++++++++++")
                 try:
                     # If this trial fails, exception will be detected
+                    # simpleCenterの関数が例外だったらコードが実行されないという設計はまずいような気がするんだが
+                    self.logger.info(f"coreCentering: simpleCenter phi = {phi}")
                     junk, hamidashi_flag = self.simpleCenter(phi, loop_size=loop_size, option='top')
+                    self.logger.info(f"coreCentering: simpleCenter phi = {phi} hamidashi_flag = {hamidashi_flag}")
                     # When the first centering succeeds, suribachi centering will start
+                    self.logger.info(f"coreCentering: suribachiCentering phi = {phi} loop_size = {loop_size}")
                     area, hamidashi_flag = self.suribachiCentering(phi, loop_size=loop_size)
                     # area of ROI for facing
                     # Comment out : 2021/05/31
@@ -481,6 +502,8 @@ class INOCC:
                     break
                 # Case when the loop was not found in the trial section
                 except MyException as ttt:
+                    # message to logfile
+                    self.logger.info(f"coreCentering: simpleCenter phi = {phi:.2f} failed")
                     # raise MyException("INOCC.coreCentering failed"
                     self.logfile.write("Go to next phi from %5.2f deg\n" % phi)
                     continue
@@ -520,12 +543,17 @@ class INOCC:
                 # 2025/02/10 K. Hirata: たぶんすべての phi_list が成功した場合に break する
                 if challenge == True and n_good == len(phi_list):
                     break
+                else:
+                    self.logger.info("coreCentering could not find the tip of the loop.")
+                    self.logger.info(f"tested phi_list = {phi_list}")
             # coreCenteringの例外処理
             except MyException as tttt:
-                self.logger.info("INOCC.edgeCentering moves Y 2000um")
+                self.logger.info(f"-- coreCentering could not detect any edges ----")
                 gx, gy, gz, phi = self.gonio.getXYZPhi()
+                self.logger.info("INOCC.edgeCentering moves Y 2.0mm")
                 move_ymm = self.cip.calcYdistAgainstGoniometer(2.0)
                 newgy = gy + move_ymm
+                # 動かした量とマウントポジションを比較して長すぎたらやめる
                 if self.isYamagiwaSafe(gx, newgy, gz) == False:
                     raise MyException("Movement was larger than threshold (Yamagiwa safety)")
                 
@@ -670,19 +698,45 @@ if __name__ == "__main__":
     blf = BLFactory.BLFactory()
     blf.initDevice()
 
+    logname = "./inocc.log"
+    # configure
+    logging_config = {
+        "version": 1,
+        "formatters": {
+            "f1": {
+                "format": "%(asctime)s - %(module)s - %(levelname)s - %(funcName)s - %(lineno)d - %(message)s",
+                "datefmt": "%Y-%m-%d %H:%M:%S",
+            }
+        },
+        "handlers": {
+            "consoleHandler": {
+                "class": "logging.StreamHandler",
+                "level": "DEBUG",
+                "formatter": "f1",
+                "stream": "ext://sys.stdout",
+            },
+            "fileHandler": {
+                "class": "logging.FileHandler",
+                "level": "DEBUG",
+                "formatter": "f1",
+                "filename": logname,  # 動的に設定
+            },
+        },
+        "loggers": {
+            "": {
+                "level": "DEBUG",
+                "handlers": ["consoleHandler", "fileHandler"],
+            }
+        },
+    }
+
     # read configure file(beamline.init)
     config = ConfigParser(interpolation=ExtendedInterpolation())
     ini_file = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
     config.read(ini_file)
-    zooroot = config.get('dirs', 'zooroot')
-    print(zooroot)
 
-    logname = "./inocc.log"
-    logging_conf = config.get('files', 'logging_conf')
-    print(logging_conf)
-    logging.config.fileConfig(logging_conf, defaults={'logfile_name': logname})
-    logger = logging.getLogger('ZOO')
-    os.chmod(logname, 0o666)
+    # logger setting
+    logging.config.dictConfig(logging_config)
 
     test_dir = os.environ['PWD']
 

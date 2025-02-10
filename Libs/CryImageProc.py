@@ -9,6 +9,7 @@ import logging.config
 from Libs import File
 import os
 from configparser import ConfigParser, ExtendedInterpolation
+from ResultEnum import ResultCentering as ResultCentering
 
 class CryImageProc():
     def __init__(self, logdir = "./"):
@@ -385,11 +386,14 @@ class CryImageProc():
     # option: 'gravity' or 'top'
     def getCenterInfo(self, loop_size=600.0, option = "gravity"):
         roi_pix_len = self.calcPixLen(loop_size)
+        
         try:
             if self.isContourROI == False:
                 self.roi_cont = self.getROIcontour(loop_size)
         except MyException as ttt:
-            raise MyException(ttt)
+            self.logger.info("CIP.getCenterInfo could not find any contours.")
+            return ResultCentering.NO_CONTOUR, 0, 0, 0, 0
+            #raise MyException(ttt)
 
         # Area of the ROI contour
         area = cv2.contourArea(self.roi_cont)
@@ -397,6 +401,7 @@ class CryImageProc():
 
         # Check if the loop is out of scene.
         if option == "top":
+            self.logger.info(f"Top analysis")
             topx, topy = self.top_xy
             if topx <= self.xmin_top or topy <= self.ymin_top:
                 hamidashi_flag = True
@@ -404,14 +409,15 @@ class CryImageProc():
                 hamidashi_flag = True
             else:
                 hamidashi_flag = False
-            return topx, topy, area, hamidashi_flag
+            return ResultCentering.SUCCESS, topx, topy, area, hamidashi_flag
 
         # Option = "gravity center of the point distant from 'loop_size' from the loop top
         # Find centering point
         try:
             target_x, target_y = self.findCenteringPoint(self.roi_cont, self.roi_pix_len, self.top_xy)
         except MyException as ttt:
-            raise MyException("CIP.getCenterInfo could not find any centering target.")
+            return ResultCentering.ERROR, 0, 0, 0, 0
+            #raise MyException("CIP.getCenterInfo could not find any centering target.")
 
         # Hamidashi flag
         top_x = self.top_xy[0]
@@ -424,7 +430,7 @@ class CryImageProc():
         else:
             hamidashi_flag = False
 
-        return target_x, target_y, area, hamidashi_flag
+        return ResultCentering.SUCCESS,target_x, target_y, area, hamidashi_flag
 
     # The previous code was not suitable to cover all range of the loop.
     # This was coded to fix the problem on 2019/06/12
