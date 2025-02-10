@@ -411,6 +411,13 @@ class INOCC:
             # print "DIFF_PHI=", (found_phi_around_max - found_phi_around_min)
             # print "#####################################"
 
+        # ok_minがこの時点でfalseならば suribachiCentering は失敗している
+        # 2025/02/10　K. Hirata
+        # 普通のセンタリングでこのことが起きる可能性があるかどうか？が疑問
+        # 簡単に試験して確認する必要はある
+        if ok_min is False:
+            raise MyException("suribachiCentering failed")
+
         # Finally at the phi_center
         try:
             area, hamidashi_flag = self.simpleCenter(phi_center, option="top")
