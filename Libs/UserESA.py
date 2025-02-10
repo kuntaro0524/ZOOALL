@@ -440,18 +440,18 @@ class UserESA():
 
         # ROIがない場合
         if isROI == False:
-            print("ROI is not True")
+            self.logger.info(f"ROI is False")
             # wavelength と resolution_limit から camera_len を計算する
             # camera_len が min_camera_len 以下なら min_camera_len を返す
             min_camera_dim = self.config.getfloat("detector", "min_camera_dim")
         else:
-            print("ROI is True")
+            self.logger.info(f"ROI is True")
             # ROIがある場合なんだが、calcDistFromLength()は半径でなく直径を要求する -> min_camera_dim = 2 * min_camera_dim
             min_camera_dim = self.config.getfloat("experiment", "raster_roi_edge_mm") * 2.0
 
         camera_len = self.calcDistFromLength(wavelength, resolution_limit, min_camera_dim)
 
-        print(f"calcuated camera_len: {camera_len}")
+        self.logger.info(f"calcuated camera_len: {camera_len}")
 
         # camera_len が　min_camera_len 以下なら min_camera_len を返す
         # camera_len が min_dim より大きいなら camera_len を返す
@@ -494,14 +494,14 @@ class UserESA():
             # roi_value =1 -> roi_flag=True
             # roi_value =0 -> roi_flag=False
             if roi_value == 1:
-                print("ROI is True")
+                self.logger.info(f"BL32XU: EIGER X 9M ROI")
                 dist_raster = self.calcDist(roi_value, self.config.getfloat("experiment", "resol_raster"), True)
             else:
                 dist_raster = self.calcDist(roi_value, self.config.getfloat("experiment", "resol_raster"), False)
         else:
             dist_raster = self.calcDist(roi_value, self.config.getfloat("experiment", "resol_raster"), False)
 
-        print(f"dist_raster: {dist_raster}")
+        self.logger.info(f"dist_raster: {dist_raster}")
         self.df['dist_raster'] = dist_raster
 
     def makeCondList(self):
@@ -579,7 +579,7 @@ class UserESA():
         self.df = self.df.astype(set_types)
 
         # floatのフォーマットを指定
-        float_format = '%.4f'
+        float_format = '%.5f'
         # to_csv()メソッドでファイルに書き出す際にfloatのフォーマットを指定して書き出す
         zoo_csv_name = f"{self.csv_prefix}.csv"
         self.df.to_csv(zoo_csv_name, columns=self.columns, index=False, float_format=float_format)
