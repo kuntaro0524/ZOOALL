@@ -6,7 +6,7 @@ bss_port = 5555
 blanc_address = 172.24.242.41
 
 [dirs]
-zooroot = /staff/bl32xu/BLsoft/ZOO32XU/
+zooroot = /home/kuntaro/kundev/zooall
 logdir = ${dirs:zooroot}/Logs/
 zoologdir= ${dirs:zooroot}/ZooLogs/
 bssconfig_dir=/staff/config/bl32xu/

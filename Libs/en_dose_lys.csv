@@ -1,4 +1,4 @@
-energy,dose_mgy_per_photon,density_limit
+energy,dose_mgy_per_photon,density_limit_for10MGy
      6.0,1.88000e-09,5.31915e+09
      6.5,1.62000e-09,6.17284e+09
      7.0,1.40000e-09,7.14286e+09

@@ -17,7 +17,7 @@ class KUMA:
 
         # Dose limit file
         # en_dose_lys.csv, en_dose_oxi.csv
-        # energy,dose_mgy_per_photon,density_limit
+        # energy,dose_mgy_per_photon,density_limit_for10MGy
         # 左から順に、エネルギー、1フォトンあたりの線量、10MGyに到達するまでのリミット(photons/um2)
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
@@ -36,8 +36,8 @@ class KUMA:
         en_dose_function = interpolate.interp1d(df['energy'], df['dose_mgy_per_photon'], kind='cubic')
         # dose_per_photon: CSV 2nd column
         dose_per_photon = en_dose_function(energy).flatten()[0]
-        # density_limit: CSV 3rd column
-        density_limit = interpolate.interp1d(df['energy'], df['density_limit'], kind='cubic')(energy).flatten()[0]
+        # density_limit: CSV 3rd column (10MGyに到達するまでの photon density)
+        density_limit = interpolate.interp1d(df['energy'], df['density_limit_for10MGy'], kind='cubic')(energy).flatten()[0]
 
         return dose_per_photon, density_limit
 
