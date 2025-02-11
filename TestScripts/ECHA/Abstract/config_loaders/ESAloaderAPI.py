@@ -64,14 +64,22 @@ class ESAloaderAPI:
     # coded by K. Hirata 2024/12/16
     def getCondDataFrame(self):
         self.logger.info("getCondDataFrame starts")
+        # zoo_samplepin の取得
         self.logger.info(f"Data request URL: {self.data_request_url}")
         self.logger.info(f"ZOOID: {self.zoo_id}")
+        # 認証
         auth_headers = self.make_authenticated_request()
+        # 情報の取得
         response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
+        # この時点で取得したデータは以下が含まれている
+        # id, exid, o_index, p_index, isSkip, 
+        # isDone, created_at, updated_at, zoo_id
         # response を pandas DataFrame に変換
         df = pd.DataFrame(response.json())
         self.logger.info(f"Dataframe: {df}")
 
+        # 上記で取得した id -> zoo_samplepin_id を利用して
+        # 各パラメータを辞書にする→最終的にDFに変換する
         # df の１行ずつのデータ取得
         # この辞書をリストに追加していく
         data_list = []
@@ -157,6 +165,27 @@ class ESAloaderAPI:
         response = requests.post(target_url, headers=auth_headers, json=json_data)
         print(response.json())
         print("updated!!")
+
+    def setDone(self, zoo_samplepin_id):
+        auth_headers = self.make_authenticated_request()
+        target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
+        print(f"target_url: {target_url}")
+        #response = requests.put(target_url, headers=auth_headers, params={"isDone":0})
+        # {"isDone":1} をJSONとする
+        params= {"isDone":False}
+        #json_data = {"p_index":123} 
+        response = requests.put(target_url, headers=auth_headers, params=params)
+        print("Response Status Code:", response.status_code)
+        print("Response Text:", response.text)  # JSON以外のレスポンスが来ていないか確認
+
+        try:
+            json_data = response.json()
+            print("JSON Response:", json_data)
+        except requests.exceptions.JSONDecodeError:
+            print("Invalid JSON format in response")
+        
+        print(response.json())
+        print("set done")
 
     # post result 
     # param_jsonはJSON形式
@@ -272,7 +301,7 @@ class ESAloaderAPI:
 # もしもmainが定義されていない場合以下を実行
 if __name__ == '__main__':
     # class をインスタンス化
-    zoo_id = 6
+    zoo_id = 12
     esa_loader = ESAloaderAPI(zoo_id)
     # ログイン
     esa_loader.make_authenticated_request()
@@ -288,11 +317,15 @@ if __name__ == '__main__':
     # # 消費時間を計算 (sec)
     # consumed_time = end_time - start_time
     # print("Consumed Time: ", consumed_time)
-    #conds_df = esa_loader.getCondDataFrame()
+    # conds_df = esa_loader.getCondDataFrame()
     #conds_df = esa_loader.getCondDataFrame()
     #print(conds_df)
+    #print(conds_df.columns)
+    # columnsの型を表示
+    #print(conds_df.dtypes)
 
     # Result 登録の試験
+    """
     sample_pin_id = 90
     param_json ={
         "data": [
@@ -303,6 +336,12 @@ if __name__ == '__main__':
 
     esa_loader.postResult(sample_pin_id, param_json)
     esa_loader.getResult(sample_pin_id)
+        """
+
+    # zoo_samplepin について結果を登録する
+    target_pin_id = 186
+    esa_loader.setDone(target_pin_id)
+    
     
     #conds_df.to_csv("test.csv")
     # csv_file_path = 'received_mod2.csv'
