@@ -132,6 +132,8 @@ class ESAloaderAPI:
             else:
                 print("Token is still valid")
 
+    # this was obsoleted in the current 'zoo_samplepin' version
+    # 2025/02/12
     def putCond(self, measure_id, parameter_name, value):
         print(f"putCond!!!! {measure_id}, {parameter_name}, {value}")
         # convert 'parameter_name' to 'parameter_id'
@@ -166,29 +168,34 @@ class ESAloaderAPI:
         print(response.json())
         print("updated!!")
 
-    def setDone(self, zoo_samplepin_id):
+    # 2025/02/12 coded
+    def setDone(self, p_index, zoo_samplepin_id):
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
         print(f"target_url: {target_url}")
         #response = requests.put(target_url, headers=auth_headers, params={"isDone":0})
         # {"isDone":1} をJSONとする
-        params= {"isDone":False}
-        #json_data = {"p_index":123} 
-        response = requests.put(target_url, headers=auth_headers, params=params)
-        print("Response Status Code:", response.status_code)
-        print("Response Text:", response.text)  # JSON以外のレスポンスが来ていないか確認
+        params= {
+            "isDone":999,
+            "p_index": p_index
+        }
+
+        # params は data で渡す必要がある（三田さん情報）
+        response = requests.put(target_url, headers=auth_headers, data=params)
+        print(f"Raw response={response}")
 
         try:
             json_data = response.json()
-            print("JSON Response:", json_data)
+            self.logger.info(f"Response: {json_data}")
+            return True
         except requests.exceptions.JSONDecodeError:
-            print("Invalid JSON format in response")
+            self.logger.info(f"Failed to setDone: {response.status_code}")
+            return False
         
-        print(response.json())
-        print("set done")
-
     # post result 
     # param_jsonはJSON形式
+    # パラメータのリストは以下のURL先にある
+    # https://docs.google.com/spreadsheets/d/1FOFIqBsO4myY7BVIsj6hlMz3fsNlrLBrxmJaJw7bSkQ/edit?gid=2077362619#gid=2077362619
     def postResult(self, sample_pin_id, param_json):
         # target url 
         target_url = f"{self.api_url}/zoo_result_samplepin/"
@@ -206,6 +213,8 @@ class ESAloaderAPI:
         print(response.json())
         print("posted!!")
 
+        return True
+
     def getResult(self, sample_pin_id):
         target_url = f"{self.api_url}/zoo_result_samplepin/"
         auth_headers = self.make_authenticated_request()
@@ -216,6 +225,7 @@ class ESAloaderAPI:
         print(result_dict)
         # 結果について表示をする
         # 同じ名前のパラメータがある場合には、最後のものが表示される
+        self.logger.info(f"Result: {result_dict}")
         for result in result_dict:
             print(result['result_name'], result['value'])
         print("############################")
@@ -301,7 +311,7 @@ class ESAloaderAPI:
 # もしもmainが定義されていない場合以下を実行
 if __name__ == '__main__':
     # class をインスタンス化
-    zoo_id = 12
+    zoo_id = 8
     esa_loader = ESAloaderAPI(zoo_id)
     # ログイン
     esa_loader.make_authenticated_request()
@@ -317,15 +327,21 @@ if __name__ == '__main__':
     # # 消費時間を計算 (sec)
     # consumed_time = end_time - start_time
     # print("Consumed Time: ", consumed_time)
-    # conds_df = esa_loader.getCondDataFrame()
-    #conds_df = esa_loader.getCondDataFrame()
-    #print(conds_df)
-    #print(conds_df.columns)
-    # columnsの型を表示
-    #print(conds_df.dtypes)
+    isDebug=False
+    if isDebug==True:
+        conds_df = esa_loader.getCondDataFrame()
+        print(conds_df)
+        print(conds_df.columns)
+        # columnsの型を表示
+        print(conds_df.dtypes)
 
+    # zoo_samplepin について結果を登録する
+    target_pin_id = 186
+    p_index = 0
+    esa_loader.setDone(p_index, target_pin_id)
+
+"""
     # Result 登録の試験
-    """
     sample_pin_id = 90
     param_json ={
         "data": [
@@ -334,14 +350,10 @@ if __name__ == '__main__':
         ]
     }
 
-    esa_loader.postResult(sample_pin_id, param_json)
-    esa_loader.getResult(sample_pin_id)
-        """
 
-    # zoo_samplepin について結果を登録する
-    target_pin_id = 186
-    esa_loader.setDone(target_pin_id)
-    
+    esa_loader.postResult(target_pin_id, param_json)
+    esa_loader.getResult(target_pin_id)
+"""
     
     #conds_df.to_csv("test.csv")
     # csv_file_path = 'received_mod2.csv'
