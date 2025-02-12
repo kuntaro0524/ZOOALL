@@ -69,6 +69,9 @@ class ZooNavigator():
         # directory to store background images.
         self.backimage_dir = self.config.get("dirs", "backimage_dir")
 
+        # ECHAを利用した測定かどうか？
+        self.isECHA = self.config.getboolean("ECHA", "isECHA")
+
         # beamline name is read from 'beamline.ini'
         # section:beamline, option: beamline
         self.beamline = self.config.get("beamline", "beamline")
@@ -322,6 +325,68 @@ class ZooNavigator():
             self.stopwatch.setTime("last_energy_change")
 
         return change_flag
+
+    def goAroundECHA(self, zoo_id):
+        # ECHA class 
+        # zoo_id is identical for each 'ZOOPREP' sheet.
+        import ECHA.ESAloaderAPI as ESAloaderAPI
+        self.echa_esa = ESAloaderAPI(zoo_id)
+
+        # Zoom out
+        self.dev.zoom.zoomOut()
+        # save the starting time for this data collection
+        self.stopwatch.setTime("start_data_collection")
+        # set the initial time for cleaning
+        self.stopwatch.setTime("last_cleaning")
+        while (1):
+            # Get a condition of the most important pin stored in a current zoo.db
+            try:
+                self.logger.info("Trying to get the prior pin")
+                # getNextPin
+                dict_next = self.echa_esa.getNextPin()
+                # 'zoo_samplepin_id' 
+                zoo_samplepin_id = dict_next['zoo_samplepin_id']
+                # condition dictionary
+
+                cond = self.esa.getPriorPinCond()
+                self.processLoop(cond, checkEnergyFlag=True)
+                self.logger.info("ZN: processLoop has been finished for this pin.")
+            except MyException as ttt:
+                # Logging a caught exception message from modules.
+                exception_message = ttt.args[0]
+                self.logger.info("+++ Caught exception in a main loop.:%s +++" % exception_message)
+
+                if self.num_pins == 0:
+                    message = "Exception in ZN.processLoop: Please check CSV file or ZOODB file."
+                else:
+                    message = "All measurements have been finished."
+                self.logger.info(message)
+                return self.num_pins
+            finally:
+                # Check for total consumed time
+                lap_time = self.stopwatch.calcTimeFrom("start_data_collection") / 3600.0  # hours
+                residual_time_for_ds = self.time_limit_ds - lap_time
+
+                self.logger.info("Lap time for data collection: %5.2f hours (residual= %5.2f hours)" % (
+                    lap_time, residual_time_for_ds))
+
+                if residual_time_for_ds < 0.0:
+                    self.logger.info("Data collection has been finished due to the booked time finish.")
+                    self.logger.info("Consumed time = %8.4f hours" % lap_time)
+                    return self.num_pins
+
+                # Time from last cleaning
+                self.logger.info("Checking the cleaning interval time...")
+                time_from_last_cleaning = self.stopwatch.calcTimeFrom("last_cleaning")
+                residual_time_for_next_cleaning = self.cleaning_interval_hours * 3600 - time_from_last_cleaning
+                self.logger.info("Time from last cleaning: %s seconds (%s remains)" % (
+                    time_from_last_cleaning, residual_time_for_next_cleaning))
+                if residual_time_for_next_cleaning < 0:
+                    # cleaning
+                    self.zoo.cleaning()
+                    self.zoo.waitSPACE()
+                    # Set the new 'last_cleaning' time
+                    self.stopwatch.setTime("last_cleaning")
 
     def goAround(self, zoodb="none"):
         # Common settings

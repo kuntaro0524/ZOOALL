@@ -61,6 +61,14 @@ class ESAloaderAPI:
             print("Exception!!!!!!!!!!!")
             raise Exception("Failed to login")
 
+    def getCond(self, zoo_samplepin_id):
+        auth_headers = self.make_authenticated_request()
+        target_url = f"{self.api_url}/zoo_parameter_samplepin/get_list/"
+        response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id":zoo_samplepin_id})
+        # dictionary に変換
+        cond_dict = response.json()
+        return cond_dict
+
     # coded by K. Hirata 2024/12/16
     def getCondDataFrame(self):
         self.logger.info("getCondDataFrame starts")

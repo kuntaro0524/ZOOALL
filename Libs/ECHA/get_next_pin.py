@@ -1,4 +1,3 @@
-import sys
 import ECHA.ESAloaderAPI as ESAloaderAPI
 
 if __name__ == '__main__':
