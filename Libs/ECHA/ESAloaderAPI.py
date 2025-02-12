@@ -169,14 +169,14 @@ class ESAloaderAPI:
         print("updated!!")
 
     # 2025/02/12 coded
-    def setDone(self, p_index, zoo_samplepin_id):
+    def setDone(self, p_index, zoo_samplepin_id, isDone):
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
         print(f"target_url: {target_url}")
         #response = requests.put(target_url, headers=auth_headers, params={"isDone":0})
         # {"isDone":1} をJSONとする
         params= {
-            "isDone":999,
+            "isDone": isDone,
             "p_index": p_index
         }
 
@@ -204,9 +204,11 @@ class ESAloaderAPI:
         # param_jsonにsample_pin_id を追加する
         param_json['zoo_samplepin_id'] = sample_pin_id
         print(f"after: {param_json}")
+
         # put
         auth_headers = self.make_authenticated_request()
         response = requests.post(target_url, headers=auth_headers, json=param_json)
+        #response = requests.post(target_url, headers=auth_headers, data=param_json)
         # 失敗したら例外を発生させる
         if response.status_code != 200 and response.status_code != 201:
             raise Exception(f"Failed to post result: {response.status_code}")
@@ -221,14 +223,9 @@ class ESAloaderAPI:
         response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id":sample_pin_id})
         # 取得したJSONを辞書にする
         result_dict = response.json()
-        print("############################")
-        print(result_dict)
         # 結果について表示をする
-        # 同じ名前のパラメータがある場合には、最後のものが表示される
-        self.logger.info(f"Result: {result_dict}")
-        for result in result_dict:
-            print(result['result_name'], result['value'])
-        print("############################")
+        result_df = pd.DataFrame(result_dict)
+        return result_df
         
     def convParamname2Paramid(self, parameter_name):
         # パラメータのリストを取得する
@@ -275,7 +272,7 @@ class ESAloaderAPI:
             'scan_width' : 0.0,
             'n_mount' : 0,
             'nds_multi' : 0,
-            'nds_herical' : 0,
+            'nds_helical' : 0,
             'nds_helpart' : 0,
             't_meas_start' : "0",
             't_mount_end' : "",
@@ -311,7 +308,7 @@ class ESAloaderAPI:
 # もしもmainが定義されていない場合以下を実行
 if __name__ == '__main__':
     # class をインスタンス化
-    zoo_id = 8
+    zoo_id = 12
     esa_loader = ESAloaderAPI(zoo_id)
     # ログイン
     esa_loader.make_authenticated_request()
@@ -328,6 +325,10 @@ if __name__ == '__main__':
     # consumed_time = end_time - start_time
     # print("Consumed Time: ", consumed_time)
     isDebug=False
+    target_pin_id = 186
+    p_index = 0
+    isDone = 0
+
     if isDebug==True:
         conds_df = esa_loader.getCondDataFrame()
         print(conds_df)
@@ -335,24 +336,68 @@ if __name__ == '__main__':
         # columnsの型を表示
         print(conds_df.dtypes)
 
-    # zoo_samplepin について結果を登録する
-    target_pin_id = 186
-    p_index = 0
-    esa_loader.setDone(p_index, target_pin_id)
+        # zoo_samplepin について結果を登録する
+        esa_loader.setDone(p_index, target_pin_id, isDone=isDone)
 
-"""
+    # 結果の登録
     # Result 登録の試験
-    sample_pin_id = 90
     param_json ={
         "data": [
-            {"isMount":"1"},
-            {"isLoopCenter":"1"}
+            {"isMount":1},
+            {"isDS":1},
+            {"scan_height":300.0},
+            {"scan_width":300.6},
+            {"n_mount":3},
+            {"nds_multi":1},
+            {"nds_helical":0},
+            {"nds_helpart":0},
+            {"data_index":1},
+            {"n_mount_fails":0},
+            {"hel_cry_size":0.0},
+            {"flux":2.35E10},
+            {"phs_per_deg":1.0E15},
+            {"log_mount":"Mount started"},
+            {"t_meas_start":"data collection started"},
+            {"t_mount_end":"mounting a pin finished"},
+            {"t_cent_start":"centering started"},
+            {"t_cent_end":"centering finished"},
+            {"t_raster_start":"raster scan started"},
+            {"t_raster_end":"raster scan finished"},
+            {"t_ds_start":"data collection started"},
+            {"t_ds_end":"data collection finished"},
+            {"t_dismount_start":"dismounting sample started"},
+            {"t_dismount_end":"dismounting sample finished"}
         ]
     }
-
-
+    """
+    """
     esa_loader.postResult(target_pin_id, param_json)
-    esa_loader.getResult(target_pin_id)
+    result_df = esa_loader.getResult(target_pin_id)
+
+    print(f"Result: {result_df}")
+    # result_df の絡むごとに変数型を表示
+    print(result_df.dtypes)
+    # coluns 'created_at' には　'2025-02-12T12:24:30.497808+09:00
+    # という形式で格納されている時間がある
+    # これをdatetime型に変換する
+    result_df['created_at'] = pd.to_datetime(result_df['created_at'])
+    print(result_df.dtypes)
+
+    """
+    # conds_df に登録されているものについて isDoneを設定する
+    for i in range(len(conds_df)):
+        # zoo_samplepin_id
+        zoo_samplepin_id = conds_df.iloc[i]['zoo_samplepin_id']
+        # p_index
+        p_index = conds_df.iloc[i]['p_index']
+        # isDone
+        isDone = 1
+        # 登録
+        esa_loader.setDone(p_index, zoo_samplepin_id, isDone=isDone)
+    """
+
+"""
+
 """
     
     #conds_df.to_csv("test.csv")
