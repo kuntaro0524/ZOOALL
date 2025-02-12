@@ -61,6 +61,22 @@ class ESAloaderAPI:
             print("Exception!!!!!!!!!!!")
             raise Exception("Failed to login")
 
+    def isSkipped(self, zoo_samplepin_id):
+        start_time = datetime.now()
+        auth_headers = self.make_authenticated_request()
+        target_url = f"{self.api_url}/zoo_samplepin/"
+        print(f"target_url: {target_url}")
+        response = requests.get(target_url, headers=auth_headers,params={"zoo_id":self.zoo_id})
+        json_data = response.json()
+        # zoo_samplepin_id に対応するデータを取得
+        for data in json_data:
+            if data['id'] == zoo_samplepin_id:
+                # data['isSkip'] が 1 ならばTrue そうでないならばFalse
+                end_time = datetime.now()
+                consumed_time = end_time - start_time
+                print(f"Consumed Time: {consumed_time}")
+                return data['isSkip'] == 1
+
     def getCond(self, zoo_samplepin_id):
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_parameter_samplepin/get_list/"
@@ -69,22 +85,27 @@ class ESAloaderAPI:
         cond_dict = response.json()
         return cond_dict
 
-    # coded by K. Hirata 2024/12/16
-    def getCondDataFrame(self):
-        self.logger.info("getCondDataFrame starts")
-        # zoo_samplepin の取得
-        self.logger.info(f"Data request URL: {self.data_request_url}")
-        self.logger.info(f"ZOOID: {self.zoo_id}")
-        # 認証
+    def getSamplePin(self):
         auth_headers = self.make_authenticated_request()
-        # 情報の取得
-        response = requests.get(self.data_request_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
+        target_url = f"{self.api_url}/zoo_samplepin/"
+        response = requests.get(target_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
         # この時点で取得したデータは以下が含まれている
         # id, exid, o_index, p_index, isSkip, 
         # isDone, created_at, updated_at, zoo_id
         # response を pandas DataFrame に変換
         df = pd.DataFrame(response.json())
         self.logger.info(f"Dataframe: {df}")
+
+        return df
+
+    # coded by K. Hirata 2024/12/16
+    def getCondDataFrame(self):
+        self.logger.info("getCondDataFrame starts")
+        # zoo_samplepin の取得
+        auth_headers = self.make_authenticated_request()
+
+        # zoo_samplepin の取得
+        df = self.getSamplePin(self.zoo_id)
 
         # 上記で取得した id -> zoo_samplepin_id を利用して
         # 各パラメータを辞書にする→最終的にDFに変換する

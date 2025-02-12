@@ -344,11 +344,14 @@ class ZooNavigator():
                 self.logger.info("Trying to get the prior pin")
                 # getNextPin
                 dict_next = self.echa_esa.getNextPin()
+                # dict_next がNoneの場合には測定を終了する
+                if dict_next is None:
+                    self.logger.info("All measurements have been finished.")
+                    break
                 # 'zoo_samplepin_id' 
                 zoo_samplepin_id = dict_next['zoo_samplepin_id']
-                # condition dictionary
-
-                cond = self.esa.getPriorPinCond()
+                # acquire condition
+                cond = self.echa_esa.getCond(zoo_samplepin_id)
                 self.processLoop(cond, checkEnergyFlag=True)
                 self.logger.info("ZN: processLoop has been finished for this pin.")
             except MyException as ttt:
@@ -362,31 +365,31 @@ class ZooNavigator():
                     message = "All measurements have been finished."
                 self.logger.info(message)
                 return self.num_pins
-            finally:
-                # Check for total consumed time
-                lap_time = self.stopwatch.calcTimeFrom("start_data_collection") / 3600.0  # hours
-                residual_time_for_ds = self.time_limit_ds - lap_time
 
-                self.logger.info("Lap time for data collection: %5.2f hours (residual= %5.2f hours)" % (
-                    lap_time, residual_time_for_ds))
+        # Check for total consumed time
+        lap_time = self.stopwatch.calcTimeFrom("start_data_collection") / 3600.0  # hours
+        residual_time_for_ds = self.time_limit_ds - lap_time
 
-                if residual_time_for_ds < 0.0:
-                    self.logger.info("Data collection has been finished due to the booked time finish.")
-                    self.logger.info("Consumed time = %8.4f hours" % lap_time)
-                    return self.num_pins
+        self.logger.info("Lap time for data collection: %5.2f hours (residual= %5.2f hours)" % (
+            lap_time, residual_time_for_ds))
 
-                # Time from last cleaning
-                self.logger.info("Checking the cleaning interval time...")
-                time_from_last_cleaning = self.stopwatch.calcTimeFrom("last_cleaning")
-                residual_time_for_next_cleaning = self.cleaning_interval_hours * 3600 - time_from_last_cleaning
-                self.logger.info("Time from last cleaning: %s seconds (%s remains)" % (
-                    time_from_last_cleaning, residual_time_for_next_cleaning))
-                if residual_time_for_next_cleaning < 0:
-                    # cleaning
-                    self.zoo.cleaning()
-                    self.zoo.waitSPACE()
-                    # Set the new 'last_cleaning' time
-                    self.stopwatch.setTime("last_cleaning")
+        if residual_time_for_ds < 0.0:
+            self.logger.info("Data collection has been finished due to the booked time finish.")
+            self.logger.info("Consumed time = %8.4f hours" % lap_time)
+            return self.num_pins
+
+        # Time from last cleaning
+        self.logger.info("Checking the cleaning interval time...")
+        time_from_last_cleaning = self.stopwatch.calcTimeFrom("last_cleaning")
+        residual_time_for_next_cleaning = self.cleaning_interval_hours * 3600 - time_from_last_cleaning
+        self.logger.info("Time from last cleaning: %s seconds (%s remains)" % (
+            time_from_last_cleaning, residual_time_for_next_cleaning))
+        if residual_time_for_next_cleaning < 0:
+            # cleaning
+            self.zoo.cleaning()
+            self.zoo.waitSPACE()
+            # Set the new 'last_cleaning' time
+            self.stopwatch.setTime("last_cleaning")
 
     def goAround(self, zoodb="none"):
         # Common settings
@@ -445,11 +448,33 @@ class ZooNavigator():
                     # Set the new 'last_cleaning' time
                     self.stopwatch.setTime("last_cleaning")
 
+    def checkSkipped(self,cond):
+        # ECHAを利用している場合
+        if self.isECHA == True:
+            zoo_samplepin_id = cond['zoo_samplepin_id']
+            # ECHAのデータベースからスキップされたかどうかを確認
+            if self.echa_esa.isSkipped(zoo_samplepin_id) == True:
+                self.logger.info("zoo_samplepin_id=%5d is skipped" % zoo_samplepin_id)
+                return True
+            else:
+                return False
+        else:
+            # ZOODBからスキップされたかどうかを確認
+            if self.esa.isSkipped(cond['o_index']) == True:
+                self.logger.info("o_index=%5d %s-%s is skipped" % (cond['o_index'], cond['puckid'], cond['pinid']))
+                return True
+            else:
+                return False
+
+        # isSkip が立っている場合にはTrueを返す
+
     def processLoop(self, cond, checkEnergyFlag=False, measFlux=False):
         # Root directory
         root_dir = cond['root_dir']
         # priority index 
         o_index = cond['o_index']
+        if self.isECHA == True:
+            zoo_samplepin_id = cond['zoo_samplepin_id']
 
         # For data processing
         dp_file_name = "%s/data_proc.csv" % root_dir
@@ -463,16 +488,12 @@ class ZooNavigator():
             # Flag for opening the data processing file
             self.isOpenDPfile = True
 
-        # Check point of 'skipping' this loop
-        # check 'isSkip' in zoo.db
-        if self.esa.isSkipped(o_index) == True:
+        if self.isSkipped(cond) == True:
             self.logger.info("o_index=%5d %s-%s is skipped" % (o_index, cond['puckid'], cond['pinid']))
-            self.logger.info("Disconnecting capture")
-            self.lm.closeCapture()
             return
 
         # Write log string
-        self.logger.info(">>>>>>>>>>>>>>>> Processing %4s-%2s <<<<<<<<<<<<<<<<" % (cond['puckid'], cond['pinid']))
+        self.logger.info(f">>>>>>>>>>>>>>>> Processing {cond['puckid']:s}-{cond['pinid']:2s} <<<<<<<<<<<<<<<<<")
 
         # Making root directory
         if os.path.exists(root_dir):
@@ -544,7 +565,16 @@ class ZooNavigator():
             self.logger.debug("ZooNavigator.measureFlux is called from main routin")
             self.measureFlux(cond)
             # Recording flux value to ZOODB
-            self.esa.updateValueAt(o_index, "flux", self.phosec_meas)
+            # ECHAを利用している場合
+            if self.isECHA == True:
+                # JSON
+                param_json = {
+                    "flux": self.phosec_meas
+                }
+                self.echa_esa.postResult(zoo_samplepin_id, param_json)
+            # ZOODBを利用している場合
+            else:
+                self.esa.updateValueAt(o_index, "flux", self.phosec_meas)
         elif self.helical_debug == True:
             self.phosec_meas = 1E13  # 2019/05/24 K.Hirata
 
@@ -552,7 +582,6 @@ class ZooNavigator():
         # Beamsize should be changed via BSS
         else:
             self.logger.info("Skipping measuring flux")
-            # self.measureFlux(cond)
 
         # Experiment
         trayid = cond['puckid']
