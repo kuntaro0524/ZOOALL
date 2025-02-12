@@ -120,18 +120,6 @@ class ESAloaderAPI:
                 }
         return self.auth_headers
 
-    def test(self):
-        if self.isLogin == False:
-        # トークンの有効期限が切れているか確認
-            if self.token_expiry is None or datetime.now() >= self.token_expiry:
-                print("Token is expired")
-                self.get_access_token()  # トークンが切れていたら新しく取得
-                self.auth_headers = {
-                    "Authorization": f"Bearer {self.access_token}"
-                }
-            else:
-                print("Token is still valid")
-
     # this was obsoleted in the current 'zoo_samplepin' version
     # 2025/02/12
     def putCond(self, measure_id, parameter_name, value):
@@ -148,25 +136,6 @@ class ESAloaderAPI:
         # response = requests.put(target_url, headers=auth_headers, data={"measure_id":measure_id, "parameter_id":parameter_id, "value":value})
         print(response.json())
         print("putCond is done")
-
-    def updateCond(self, measure_id, parameter_name, value):
-        auth_headers = self.make_authenticated_request()
-        target_url = f"{self.api_url}/parameter_measure/update_multiple_data/"
-
-        # JSON リストを作成する
-        data = [{"measure_id":measure_id, "parameter_name":parameter_name, "value":value}]
-        # JSONへ変換
-        # data = json.dumps(data)
-        response = requests.post(target_url, headers=auth_headers, json=data)
-        print(response.json())
-        print("updated!!")
-
-    def updateConds(self, json_data):
-        auth_headers = self.make_authenticated_request()
-        target_url = f"{self.api_url}/parameter_measure/update_multiple_data/"
-        response = requests.post(target_url, headers=auth_headers, json=json_data)
-        print(response.json())
-        print("updated!!")
 
     # 2025/02/12 coded
     def setDone(self, p_index, zoo_samplepin_id, isDone):
@@ -190,6 +159,24 @@ class ESAloaderAPI:
             return True
         except requests.exceptions.JSONDecodeError:
             self.logger.info(f"Failed to setDone: {response.status_code}")
+            return False
+
+    def setSkip(self, p_index, zoo_samplepin_id, isSkip):
+        auth_headers = self.make_authenticated_request()
+        target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
+        self.logger.info(f"target_url: {target_url}")
+        data_params = {
+            "isSkip": isSkip,
+            "p_index": p_index
+        }
+        response = requests.put(target_url, headers=auth_headers, data=data_params)
+        self.logger.info(f"Raw response={response}")
+        try:
+            json_data = response.json()
+            self.logger.info(f"Response: {json_data}")
+            return True
+        except requests.exceptions.JSONDecodeError:
+            self.logger.info(f"Failed to setSkip: {response.status_code}")
             return False
         
     # post result 
@@ -226,6 +213,33 @@ class ESAloaderAPI:
         # 結果について表示をする
         result_df = pd.DataFrame(result_dict)
         return result_df
+
+    def getNextPin(self):
+        auth_headers = self.make_authenticated_request()
+        # URL for get the limited 
+        target_url = f"{self.api_url}/zoo_samplepin/"
+
+        # query parameters
+        query_params = {
+            "isDone":0,
+            "isSkip":0,
+            "limit":1,
+            "zoo_id":self.zoo_id
+        }
+
+        # isDone=0 & isSkip=0 & p_index 
+        response = requests.get(self.data_request_url, headers=auth_headers, params=query_params)
+        results_json = response.json()['results']
+        # dictionary 
+        # results_json が空の場合
+        if len(results_json) == 0:
+            return None
+        dict_results = results_json[0]
+        # 'id' の名称を 'zoo_samplepin_id' に変更する
+        dict_results['zoo_samplepin_id'] = dict_results.pop('id')
+        print(dict_results['zoo_samplepin_id'])
+
+        return dict_results
         
     def convParamname2Paramid(self, parameter_name):
         # パラメータのリストを取得する
@@ -324,7 +338,7 @@ if __name__ == '__main__':
     # # 消費時間を計算 (sec)
     # consumed_time = end_time - start_time
     # print("Consumed Time: ", consumed_time)
-    isDebug=False
+    isDebug=True
     target_pin_id = 186
     p_index = 0
     isDone = 0
@@ -382,6 +396,8 @@ if __name__ == '__main__':
     # これをdatetime型に変換する
     result_df['created_at'] = pd.to_datetime(result_df['created_at'])
     print(result_df.dtypes)
+
+    esa_loader.getNextPin()
 
     """
     # conds_df に登録されているものについて isDoneを設定する
