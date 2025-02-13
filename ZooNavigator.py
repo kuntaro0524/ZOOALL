@@ -1433,7 +1433,7 @@ class ZooNavigator():
         self.updateTime(cond, "ds_end", comment="Data collection finished")
         self.updateDBinfo(cond, "isDS", 1)
         self.updateDBinfo(cond, "isDone", 1)
-        self.updateDBinfo(cond, "meas_end", comment="Measurement normally finished")
+        self.updateDBinfo(cond, "meas_end", "Measurement normally finished")
         self.logger.info("Now ZOO finishes single data collection.")
         # Data proc
         sample_name = cond['sample_name']
