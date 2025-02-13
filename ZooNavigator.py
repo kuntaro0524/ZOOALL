@@ -25,7 +25,7 @@ import time
 import math
 from MyException import *
 from html_log_maker import ZooHtmlLog
-import ErrorCode
+from ErrorCode import ErrorCode
 
 import logging
 import logging.config
@@ -1566,7 +1566,6 @@ class ZooNavigator():
                                                 sphi, cond)
         # Raster start
         self.updateTime(cond, "raster_start", comment="Raster scan started")
-        self.esa.addEventTimeAt(o_index, "raster_start")
         self.zoo.doRaster(schfile)
         self.zoo.waitTillReady()
         self.updateDBinfo(cond, "isRaster", 1)
@@ -1601,7 +1600,10 @@ class ZooNavigator():
 
         # Log file for time stamp
         self.updateTime(cond, "ds_end", comment="Data collection finished")
-        self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+        if n_datasets == 0:
+            self.updateTime(cond, "meas_end", comment="No data was collected")
+        else:
+            self.updateTime(cond, "meas_end", comment="Measurement normally finished")
         self.logger.info("mixed end")
 
     # 2020/06/02 Major revision in order to activate this function for BL45XU.
