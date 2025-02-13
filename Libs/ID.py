@@ -29,10 +29,16 @@ class ID:
         # print gap
         self.move(gap)
 
+    def communicate(self, comstr):
+        sending_command = comstr.encode()
+        print(type(sending_command))
+        self.srv.sendall(sending_command)
+        recstr = self.srv.recv(8000)
+        return repr(recstr)
+
     def isLocked(self):
         qcommand = "get/bl_32in_id_gap/query"
-        self.srv.sendall(qcommand)
-        recbuf = self.srv.recv(8000)
+        recbuf = self.communicate(qcommand)
         print(recbuf)
         bufs = recbuf.split('/')
         buf = bufs[len(bufs) - 2]

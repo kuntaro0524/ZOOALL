@@ -14,8 +14,10 @@ class ESAloaderAPI:
         self.data_request_url = "%szoo_samplepin/"%self.api_url
         self.measure_data_url = "%sparameter_measure/"%self.api_url
         self.params_data_url = "%sparameter/"%self.api_url
-        self.username = "admin"
-        self.password = "000nimda"
+        #self.username = "admin"
+        #self.password = "000nimda"
+        self.username = "operator"
+        self.password = "1tk2p3640"
         self.token_expiry = None
         self.access_token = None
         self.zoo_id = zoo_id
