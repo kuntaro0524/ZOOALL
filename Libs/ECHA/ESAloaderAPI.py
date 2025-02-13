@@ -226,6 +226,7 @@ class ESAloaderAPI:
         response = requests.post(target_url, headers=auth_headers, json=param_json)
         #response = requests.post(target_url, headers=auth_headers, data=param_json)
         # 失敗したら例外を発生させる
+        print(f"response: {response}")
         if response.status_code != 200 and response.status_code != 201:
             raise Exception(f"Failed to post result: {response.status_code}")
         print(response.json())
@@ -266,7 +267,6 @@ class ESAloaderAPI:
         dict_results = results_json[0]
         # 'id' の名称を 'zoo_samplepin_id' に変更する
         dict_results['zoo_samplepin_id'] = dict_results.pop('id')
-        print(dict_results['zoo_samplepin_id'])
 
         return dict_results
         

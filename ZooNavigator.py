@@ -43,7 +43,7 @@ def check_abort(lm):
 # Version 2.1.2 modified on 2019/10/26 K.Hirata at BL45XU
 
 class ZooNavigator():
-    def __init__(self, blf, esa_csv, is_renew_db=False):
+    def __init__(self, blf, esa_csv="", is_renew_db=False):
         # From arguments
         # BLFactory containing zoo, ms, device already initialized in calling function.
         self.blf = blf
@@ -121,7 +121,7 @@ class ZooNavigator():
         self.meas_flux_list = []
         self.meas_wavelength_list = []
 
-        self.needMeasureFlux = True  # test at 2019/06/18 at BL45XU
+        self.needMeasureFlux = False  # test at 2019/06/18 at BL45XU
 
         # If BSS can change beamsize via command
         self.doesBSSchangeBeamsize = True
@@ -330,7 +330,7 @@ class ZooNavigator():
     def goAroundECHA(self, zoo_id):
         # ECHA class 
         # zoo_id is identical for each 'ZOOPREP' sheet.
-        import ECHA.ESAloaderAPI as ESAloaderAPI
+        from ECHA.ESAloaderAPI import ESAloaderAPI
         self.echa_esa = ESAloaderAPI(zoo_id)
 
         # Zoom out
@@ -345,6 +345,9 @@ class ZooNavigator():
                 self.logger.info("Trying to get the prior pin")
                 # getNextPin
                 dict_next = self.echa_esa.getNextPin()
+                # o_indexを抜き出す
+                o_index = dict_next['o_index']
+                p_index = dict_next['p_index']
                 # dict_next がNoneの場合には測定を終了する
                 if dict_next is None:
                     self.logger.info("All measurements have been finished.")
@@ -353,6 +356,12 @@ class ZooNavigator():
                 zoo_samplepin_id = dict_next['zoo_samplepin_id']
                 # acquire condition
                 cond = self.echa_esa.getCond(zoo_samplepin_id)
+                # cond に o_index,p_indexを追加する
+                cond['o_index'] = o_index
+                cond['p_index'] = p_index
+                print(f"#########################################")
+                print(f"cond: {cond}")
+                print(f"#########################################")
                 self.processLoop(cond, checkEnergyFlag=True)
                 self.logger.info("ZN: processLoop has been finished for this pin.")
 
@@ -475,11 +484,19 @@ class ZooNavigator():
         # ECHAを利用している場合
         if self.isECHA == True:
             zoo_samplepin_id = cond['zoo_samplepin_id']
-            # JSON
-            param_json = {
-                param_name: param_value
-            }
-            self.echa_esa.postResult(zoo_samplepin_id, param_json)
+            # param_name="isDone"の場合には zoo_samplepin を更新する必要がある
+            if param_name == "isDone":
+                p_index = cond['p_index']
+                self.echa_esa.setDone(p_index, zoo_samplepin_id, param_value)
+            else:
+                # JSON
+                param_json = {
+                    "data": [{
+                        param_name: param_value
+                    }]
+                }
+                self.logger.info(f"param_json: {param_json}")
+                self.echa_esa.postResult(zoo_samplepin_id, param_json)
         # ZOODBを利用している場合
         else:
             self.esa.updateValueAt(cond['o_index'], param_name, param_value)
@@ -507,7 +524,9 @@ class ZooNavigator():
             echa_paramname = "t_" + event_name
             # JSON
             param_json = {
-                echa_paramname: comment
+                "data":[{
+                    echa_paramname: comment
+                }]
             }
             self.echa_esa.postResult(zoo_samplepin_id, param_json)
         # ZOODBを利用している場合
@@ -535,12 +554,12 @@ class ZooNavigator():
             # Flag for opening the data processing file
             self.isOpenDPfile = True
 
-        if self.isSkipped(cond) == True:
+        if self.checkSkipped(cond) == True:
             self.logger.info("o_index=%5d %s-%s is skipped" % (o_index, cond['puckid'], cond['pinid']))
             return
 
         # Write log string
-        self.logger.info(f">>>>>>>>>>>>>>>> Processing {cond['puckid']:s}-{cond['pinid']:2s} <<<<<<<<<<<<<<<<<")
+        self.logger.info(f">>>>>>>>>>>>>>>> Processing {cond['puckid']}-{cond['pinid']:02d} <<<<<<<<<<<<<<<<<")
 
         # Making root directory
         if os.path.exists(root_dir):
@@ -799,8 +818,8 @@ class ZooNavigator():
             return
 
         # The goniometer moves to the saved position
-        # self.npins が 0 の場合には、self.sx = self.mx, self.sy = self.my, self.sz = self.mz
-        if self.npins == 0:
+        # self.num_pins が 0 の場合には、self.sx = self.mx, self.sy = self.my, self.sz = self.mz
+        if self.num_pins == 0:
             self.sx, self.sy, self.sz = self.mx, self.my, self.mz
 
         self.logger.info("move to the save point (%9.4f %9.4f %9.4f)" % (self.sx, self.sy, self.sz))
@@ -983,8 +1002,6 @@ class ZooNavigator():
         raster_schedule, raster_path = self.lm.rasterMaster(scan_id, scan_mode, self.center_xyz,
                                                             scanv_um, scanh_um, vstep_um, hstep_um,
                                                             sphi, cond)
-        raster_start_time = time.localtime()
-
         # To catch a detailed exception
         self.updateTime(cond, "raster_start", comment="Raster scan started")
         try:
@@ -1117,6 +1134,7 @@ class ZooNavigator():
         self.data_proc_file.flush()
 
         # end of measurement
+        self.updateDBinfo(cond, "isDone", 1)
         self.updateTime(cond, "meas_end", comment="Measurement normally finished")
         self.logger.info("Disconnecting capture")
         self.lm.closeCapture()
@@ -1261,6 +1279,7 @@ class ZooNavigator():
             initial_left_y = raster_cxyz[1]
             vertical_index = 0
             final_cxyz = 0, 0, 0
+            # Vertical scan loop till the crystal is found
             n_try = 5
             while (True):
                 self.logger.info("Vertical scan loop..")
@@ -1319,6 +1338,8 @@ class ZooNavigator():
 
                     crystals = CrystalList.CrystalList(crystal_array)
                     final_cxyz = crystals.getBestCrystalCode()
+                # もしかしてここもExceptionで結晶が検出されないことを判定しているのか。
+                # いつか修正したい
                 except Exception as e:
                     self.logger.warning("Analyze vertical scans failed.\n")
                     self.logger.warning("ZN.collectSingle: Left vertical scan analysis failed.")
@@ -1489,7 +1510,7 @@ class ZooNavigator():
                 self.logger.info("Helical data collection ended.")
                 self.updateDBinfo(cond, "isDS", 1)
                 # meas_end
-                #self.updateTime(cond, "meas_end", comment="Helical data collection finished")
+                self.updateTime(cond, "meas_end", comment="Helical data collection finished")
             else:
                 self.logger.info("No crystals were found in HEBI.")
                 # isDone, meas_record にエラーコードを入れる
@@ -1498,7 +1519,7 @@ class ZooNavigator():
                 self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 self.updateTime(cond, "ds_end", comment="No crystals were found in HEBI.")
                 # meas_end
-                #self.updateTime(cond, "meas_end", comment="No crystals were found in HEBI.")
+                self.updateTime(cond, "meas_end", comment="No crystals were found in HEBI.")
         # Unknown exception captured
         except:
             self.logger.info("ZooNavigator.collectHelical failed.")
@@ -1565,6 +1586,8 @@ class ZooNavigator():
             self.logger.info(e.args[0])
             message = f"Data collection failed in unknown reasons: {e.args[0]}"
             self.updateTime(cond, "ds_end", comment=message)
+            error_code = ErrorCode.DATA_COLLECTION_UNKNOWN_ERROR
+            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
 
         # Wrong information but update the zoo.db
         # hitoから情報を得るか、あちらで登録することにする
@@ -1577,7 +1600,7 @@ class ZooNavigator():
 
         # Log file for time stamp
         self.updateTime(cond, "ds_end", comment="Data collection finished")
-        #self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+        self.updateTime(cond, "meas_end", comment="Measurement normally finished")
         self.logger.info("mixed end")
 
     # 2020/06/02 Major revision in order to activate this function for BL45XU.

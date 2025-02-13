@@ -76,19 +76,13 @@ if __name__ == "__main__":
     blf.initDevice()
 
     total_pins = 0
-    for input_file in sys.argv[1:]:
-        logger.info("Start processing %s" % input_file)
-        if input_file.rfind("csv") != -1:
-            navi = ZooNavigator.ZooNavigator(blf, input_file, is_renew_db=True)
-            # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
-            # blf.zoo.setBeamsize(1)
-            num_pins = navi.goAround()
-        elif input_file.rfind("db") != -1:
-            esa_csv = "dummy.csv"
-            navi=ZooNavigator.ZooNavigator(blf, esa_csv, is_renew_db=False)
-            # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
-            blf.zoo.setBeamsize(1)
-            num_pins = navi.goAround(input_file)
+    for zoo_id in sys.argv[1:]:
+        zoo_id = int(zoo_id)
+        logger.info(f"Start ZOO for {zoo_id}")
+        navi=ZooNavigator.ZooNavigator(blf)
+        # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
+        blf.zoo.setBeamsize(1)
+        num_pins = navi.goAroundECHA(zoo_id)
         total_pins += num_pins
 
     if total_pins == 0:
