@@ -25,6 +25,7 @@ import time
 import math
 from MyException import *
 from html_log_maker import ZooHtmlLog
+import ErrorCode
 
 import logging
 import logging.config
@@ -653,9 +654,19 @@ class ZooNavigator():
         # ラップタイムの記録
         self.updateTime(cond, "mount_start", comment="Sample mounting started")
 
+        # ErrorCode module
+        """
+        SPACE_WARNING_SUSPECTED = 9001  # 存在が疑われるもの
+        SPACE_WARNING_LHEAD_PUSHED = 9002  # Lheadが過剰に押された場合
+        SPACE_WARNING_ROTATE_TOO_MUCH = 9003  # ヘッドが掴めなかった系
+    
+        # SPACE accidents
+        SPACE_ACCIDENT_LHEAD_PULLED = 9997  # Lheadが引っ張られた
+        SPACE_UNKNOWN_ACCIDENT = 9998  # 上記以外の未知の事故
+        SPACE_ACCIDENT = 9999  # SPACEアクシデント
+        """
         try:
             self.zoo.mountSample(trayid, pinid)
-
         except MyException as ttt:
             exception_message = ttt.args[0]
             self.logger.info("Failed to mount a sample pin:%s" % ttt)
@@ -666,9 +677,9 @@ class ZooNavigator():
                 self.logger.error(message)
                 log_message = message
                 # isDoneにエラーコードを持たせている→meas_record
-                error_code = 9999
+                error_code = ErrorCode.SPACE_ACCIDENT
                 # update
-                self.updateDBinfo(cond, "meas_record", error_code)
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 # isDoneもZOODB用に入れておくことに
                 self.updateDBinfo(cond, "isDone", error_code)
                 self.updateDBinfO(cond, "log_mount", log_message)
@@ -679,9 +690,9 @@ class ZooNavigator():
                 message += "L-head value is negative in picking up the designated pin."
                 self.logger.error(message)
                 log_message = message
-                error_code = 9997
+                error_code = ErrorCode.SPACE_WARNING_LHEAD_PUSHED
                 # update
-                self.updateDBinfo(cond, "meas_record", error_code)
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 # isDoneもZOODB用に入れておくことに
                 self.updateDBinfo(cond, "isDone", error_code)
                 self.updateDBinfO(cond, "log_mount", log_message)
@@ -690,8 +701,8 @@ class ZooNavigator():
             elif exception_message.rfind('-1005100001') != -1:
                 message = "'SPACE_WARNING_existense_pin_%s_%s'" % (trayid, pinid)
                 self.logger.warning(message)
-                error_code = 5001
-                self.updateDBinfo(cond, "meas_record", error_code)
+                error_code = ErrorCode.SPACE_WARNING_SUSPECTED
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 # isDoneもZOODB用に入れておくことに
                 self.updateDBinfo(cond, "isDone", error_code)
                 self.updateDBinfo(cond, "log_mount", message)
@@ -707,9 +718,9 @@ class ZooNavigator():
                 # ここも特殊
                 self.logger.warning(message)
                 self.zoo.skipSample()
-                error_code = 5002
-                self.updateDBinfo(cond, "meas_record", error_code)
-                self.updateDBinfo(cond, "isDone", error_code)
+                error_code = ErrorCode.SPACE_WARNING_SUSPECTED
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "log_mount", message)
                 self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
                 self.logger.info("SPACE output a warning message. Next sample")
@@ -718,9 +729,9 @@ class ZooNavigator():
             elif exception_message.rfind('-1005100003') != -1:
                 message = "'SPACE_WARNING_rotate_too_much_%s_%s'" % (trayid, pinid)
                 self.logger.warning(message)
-                error_code = 5003
-                self.updateDBinfo(cond, "meas_record", error_code)
-                self.updateDBinfo(cond, "isDone", error_code)
+                error_code = ErrorCode.SPACE_WARNING_ROTATE_TOO_MUCH
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
                 self.updateDBinfo(cond, "log_mount", message)
                 self.zoo.skipSample()
@@ -732,10 +743,10 @@ class ZooNavigator():
             elif exception_message.rfind('-1005100007') != -1:
                 message = "'Failed to pickup the sample pin from the tray. %s_%s'" % (trayid, pinid)
                 self.logger.warning(message)
-                error_code = 5004
+                error_code = ErrorCode.SPACE_WARNING_SUSPECTED
                 self.zoo.skipSample()
-                self.updateDBinfo(cond, "meas_record", error_code)
-                self.updateDBinfo(cond, "isDone", error_code)
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "log_mount", message)
                 self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
                 self.logger.info("SPACE output a warning message. Next sample")
@@ -744,12 +755,11 @@ class ZooNavigator():
             else:
                 message = "Unknown Exception: %s. Program terminates" % ttt
                 self.logger.error(message)
-                error_code = 9998
-                self.updateDBinfo(cond, "meas_record", error_code)
-                self.updateDBinfo(cond, "isDone", error_code)
+                error_code = ErrorCode.SPACE_UNKNOWN_ACCIDENT
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "log_mount", message)
                 self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
-                self.esa.updateValueAt(o_index, "isDone", 9998)
                 sys.exit()
             return
 
@@ -855,8 +865,9 @@ class ZooNavigator():
             # isLoopCenter = 9999
             self.updateDBinfo(cond, "isLoopCenter", 9999)
             self.updateTime(cond, "cent_end", comment="Centering failed")
-            self.updateDBinfo(cond, "isDone", 5002)
-            self.updateDBinfo(cond, "meas_record", 5002)
+            error_code = ErrorCode.CENTERING_FAILED
+            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             # Disconnecting capture in this loop's 'capture' instance
             self.logger.info("close Capture instance")
             self.lm.closeCapture()
@@ -935,8 +946,9 @@ class ZooNavigator():
             self.collectScreen(cond, sphi)
         else:
             self.logger.error("Unknown mode: %s" % cond['mode'])
-            self.updateDBinfo(cond, "isDone", 9999)
-            self.updateDBinfo(cond, "meas_record", 9999)
+            error_code = ErrorCode.UNKNOWN_MODE
+            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             self.updateTime(cond, "meas_end", comment="Unknown mode in a condition")
             return
 
@@ -979,6 +991,9 @@ class ZooNavigator():
             self.zoo.doRaster(raster_schedule)
             self.zoo.waitTillReady()
         except:
+            error_code = ErrorCode.RASTER_SCAN_FAILURE_MEASUREMENT
+            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             self.updateTime(cond, "raster_end", comment="Raster scan failed in unknown exception.")
             self.updateTime(cond, "meas_end", comment="Raster scan failed in unknown exception.")
             raise Exception("Raster scan by BSS failed.")
@@ -1027,12 +1042,14 @@ class ZooNavigator():
 
             gfile.close()
 
+        # Raster scan analysis failed.
         except MyException as tttt:
             logstring = tttt.args[0]
             self.logger.warning(f"Raster scan failed: {logstring}")
             # isDone, meas_record にエラーコードを入れる
-            self.updateDBinfo(cond, "isDone", 4002)
-            self.updateDBinfo(cond, "meas_record", 4002)
+            error_code = ErrorCode.RASTER_SCAN_FAILURE_ANALYSIS
+            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             # end_time も入れておく
             self.updateTime(cond, "raster_end", comment="Exception in analyzing raster scan result")
             self.updateTime(cond, "meas_end", comment="Exception in analyzing raster scan result")
@@ -1041,11 +1058,13 @@ class ZooNavigator():
             self.lm.closeCapture()
             return
 
+        # No crystal was found
         if len(glist) == 0:
             self.logger.warning("Skipping this loop!!")
             # isDone, meas_record にエラーコードを入れる
-            self.updateDBinfo(cond, "isDone", 4001)
-            self.updateDBinfo(cond, "meas_record", 4001)
+            error_code = ErrorCode.RASTER_SCAN_NO_CRYSTAL
+            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             # end_time も入れておく
             self.updateTime(cond, "raster_end", comment="No crystal was found")
             self.updateTime(cond, "meas_end", comment="No crystals were found after the analysis")
@@ -1215,8 +1234,9 @@ class ZooNavigator():
                 self.logger.info("No crystals were found on this loop. Break a main loop.")
                 self.logger.info("Skipping this loop: diffraction based centering loop.")
                 # isDone, meas_record にエラーコードを入れる
-                self.updateDBinfo(cond, "isDone", 4005)
-                self.updateDBinfo(cond, "meas_record", 4005)
+                error_code = ErrorCode.DATA_COLLECTION_NO_CRYSTAL
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 # end_time
                 self.updateTime(cond, "raster_end", comment="No crystal was found")
                 self.updateTime(cond, "meas_end", comment="No crystals were found after the analysis")
@@ -1308,8 +1328,9 @@ class ZooNavigator():
                         self.logger.info("Failed to find crystal in vertical scan.")
                         self.logger.info("Skipping this loop: diffraction based centering loop.")
                         # isDone, meas_record にエラーコードを入れる
-                        self.updateDBinfo(cond, "isDone", 4006)
-                        self.updateDBinfo(cond, "meas_record", 4006)
+                        error_code = ErrorCode.DATA_COLLECTION_NO_CRYSTAL
+                        self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+                        self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                         # end_time
                         comment=f"Vertical scan failed after {n_try} trials..."
                         self.updateTime(cond, "raster_end", comment)
@@ -1336,8 +1357,9 @@ class ZooNavigator():
             self.logger.info("Caught error: %s " % message)
             self.logger.info("Skipping this loop: diffraction based centering loop.")
             # isDone, meas_record にエラーコードを入れる
-            self.updateDBinfo(cond, "isDone", 4002)
-            self.updateDBinfo(cond, "meas_record", 4002)
+            error_code = ErrorCode.RASTER_SCAN_UNKNOWN_ERROR
+            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             # comment
             comment = f"Raster scan failed in inknown reasons: {message}"
             self.updateTime(cond, "raster_end", comment)
@@ -1471,8 +1493,9 @@ class ZooNavigator():
             else:
                 self.logger.info("No crystals were found in HEBI.")
                 # isDone, meas_record にエラーコードを入れる
-                self.updateDBinfo(cond, "isDone", 4003)
-                self.updateDBinfo(cond, "meas_record", 4003)
+                error_code = ErrorCode.DATA_COLLECTION_NO_CRYSTAL
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 self.updateTime(cond, "ds_end", comment="No crystals were found in HEBI.")
                 # meas_end
                 #self.updateTime(cond, "meas_end", comment="No crystals were found in HEBI.")
@@ -1480,8 +1503,9 @@ class ZooNavigator():
         except:
             self.logger.info("ZooNavigator.collectHelical failed.")
             # isDone, meas_record にエラーコードを入れる
-            self.updateDBinfo(cond, "isDone", 4004)
-            self.updateDBinfo(cond, "meas_record", 4004)
+            error_code = ErrorCode.DATA_COLLECTION_UNKNOWN_ERROR
+            self.updateDBinfo(cond, "isDone", error_code.to_db_value()) 
+            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             # end_time
             self.updateTime(cond, "ds_end", comment="Helical data collection failed in unknown reasons.")
             # meas_end
@@ -1652,7 +1676,9 @@ class ZooNavigator():
             n_crystals = len(glist)
             self.updateDBinfo(cond, "nds_multi", n_crystals)
             self.updateDBinfo(cond, "isDS", 1)
-            self.updateDBinfo(cond, "meas_record", 1)
+            # error code
+            error_code = ErrorCode.SUCCESS
+            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             self.updateDBinfo(cond, "isDone", 1)
             # end_time
             #self.updateTime(cond, "meas_end", comment="Measurement normally finished")
