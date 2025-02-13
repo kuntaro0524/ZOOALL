@@ -41,6 +41,7 @@ def check_abort(lm):
 # Version 2.1.0 modified on 2019/07/04 K.Hirata
 # Version 2.1.1 modified on 2019/07/23 K.Hirata
 # Version 2.1.2 modified on 2019/10/26 K.Hirata at BL45XU
+# Version 5.0.0 modified on 2025/02/14 K.Hirata at BL32XU www
 
 class ZooNavigator():
     def __init__(self, blf, esa_csv="", is_renew_db=False):
@@ -121,7 +122,7 @@ class ZooNavigator():
         self.meas_flux_list = []
         self.meas_wavelength_list = []
 
-        self.needMeasureFlux = False  # test at 2019/06/18 at BL45XU
+        self.needMeasureFlux = True  # test at 2019/06/18 at BL45XU
 
         # If BSS can change beamsize via command
         self.doesBSSchangeBeamsize = True
