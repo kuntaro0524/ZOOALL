@@ -542,6 +542,13 @@ class ZooNavigator():
         if self.isECHA == True:
             zoo_samplepin_id = cond['zoo_samplepin_id']
 
+        # Root directory : exisiting or not
+        if os.path.exists(root_dir):
+            self.logger.info("%s already exists" % root_dir)
+        else:
+            self.logger.info("%s is being made now..." % root_dir)
+            os.makedirs(root_dir)
+
         # For data processing
         dp_file_name = "%s/data_proc.csv" % root_dir
         if self.isOpenDPfile == False:
