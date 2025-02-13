@@ -345,13 +345,13 @@ class ZooNavigator():
                 self.logger.info("Trying to get the prior pin")
                 # getNextPin
                 dict_next = self.echa_esa.getNextPin()
-                # o_indexを抜き出す
-                o_index = dict_next['o_index']
-                p_index = dict_next['p_index']
                 # dict_next がNoneの場合には測定を終了する
                 if dict_next is None:
                     self.logger.info("All measurements have been finished.")
-                    break
+                    return self.num_pins
+                # o_indexを抜き出す
+                o_index = dict_next['o_index']
+                p_index = dict_next['p_index']
                 # 'zoo_samplepin_id' 
                 zoo_samplepin_id = dict_next['zoo_samplepin_id']
                 # acquire condition
@@ -1508,8 +1508,9 @@ class ZooNavigator():
                 # Log file for time stamp
                 self.updateTime(cond, "ds_end", comment="Helical data collection finished")
                 self.logger.info("Helical data collection ended.")
-                self.updateDBinfo(cond, "isDS", 1)
                 # meas_end
+                self.updateDBinfo(cond, "isDS", 1)
+                self.updateDBinfo(cond,"isDone", 1)
                 self.updateTime(cond, "meas_end", comment="Helical data collection finished")
             else:
                 self.logger.info("No crystals were found in HEBI.")
@@ -1625,6 +1626,7 @@ class ZooNavigator():
         # ds_end
         self.updateTime(cond, "ds_end", comment="Data collection finished")
         self.updateDBinfo(cond, "isDS", 1)
+        self.updateDBinfo(cond, "isDone", 1)
         # meas_end
         #self.updateTime(cond, "meas_end", comment="Measurement normally finished")
         self.logger.info("Disconnecting capture")

@@ -171,8 +171,6 @@ class ESAloaderAPI:
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
         print(f"target_url: {target_url}")
-        #response = requests.put(target_url, headers=auth_headers, params={"isDone":0})
-        # {"isDone":1} をJSONとする
         params= {
             "isDone": isDone,
             "p_index": p_index
