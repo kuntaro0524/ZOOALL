@@ -14,7 +14,7 @@ zenity --info --title="BSS" --text="BSS_startup.sh has been running" --width 150
 # fi
 
 ## K. Sakurai added at 2025.02.20
-ln -sf beamsize_zoo.config beamsize.config
+ln -sf /blconfig/bss/beamsize_zoo.config /blconfig/bss/beamsize.config
 
 ## EIGER begin
 
