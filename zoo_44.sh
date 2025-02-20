@@ -13,6 +13,8 @@ zenity --info --title="BSS" --text="BSS_startup.sh has been running" --width 150
 #  python3 /usr/local/bss/BSS_is_executing.py &
 # fi
 
+## K. Sakurai added at 2025.02.20
+ln -sf beamsize_zoo.config beamsize.config
 
 ## EIGER begin
 
