@@ -479,6 +479,16 @@ class Zoo:
         print("setBeamsize:result=", recstr)
         self.waitTillReady()
 
+    # Special setting for LN2 flow device
+    def exposeLN2(self, wait_time = 15.0):
+        com = "put/defroster/on"
+        recstr = self.communicate(com)
+        time.sleep(wait_time)
+        print("Now closing the shutter")
+        com = "put/defroster/off"
+        recstr = self.communicate(com)
+        return recstr
+
 if __name__ == "__main__":
     # Logging setting
     # open configure file
@@ -486,14 +496,15 @@ if __name__ == "__main__":
     config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
     print(config_path)
     config.read(config_path)
-    logging_conf_file = config.get("files", "logging_conf")
-    logname = os.path.join(config.get("dirs","zoologdir"), "Zoo.log")
+    # logging_conf_file = config.get("files", "logging_conf")
+    # logname = os.path.join(config.get("dirs","zoologdir"), "Zoo.log")
      
-    logging.config.fileConfig(logging_conf_file,defaults={'logfile_name': logname})
-    logger = logging.getLogger('ZOO')
+    # logging.config.fileConfig(logging_conf_file,defaults={'logfile_name': logname})
+    # logger = logging.getLogger('ZOO')
 
     zoo = Zoo()
     zoo.connect()
+    zoo.exposeLN2(15)
     # zoo.setBeamsize(0)
     #print("BBBBBBBBBBBBBBBB")
     #print(zoo.getBeamsize())
@@ -556,7 +567,7 @@ if __name__ == "__main__":
     # schfile_hirata="/isilon/users/target/target/Staff/ZooTest/Schedule/test.sch"
     # schfile_yaruzo="/isilon/users/target/target/Staff/ZooTest/Schedule/yaruzo.sch"
     # time.sleep(10.0)
-    zoo.doRaster(sys.argv[1])
+    #zoo.doRaster(sys.argv[1])
     # zoo.doRaster(sys.argv[1])
     # zoo.doRaster("/isilon/users/target/target/AutoUsers/160509/Xiangyu/Xi-KLaT005-01/scan/Xi-KLaT005-01.sch")
     # zoo.doDataCollection(sys.argv[1])
