@@ -14,8 +14,10 @@ class ESAloaderAPI:
         self.data_request_url = "%szoo_samplepin/"%self.api_url
         self.measure_data_url = "%sparameter_measure/"%self.api_url
         self.params_data_url = "%sparameter/"%self.api_url
-        self.username = "admin"
-        self.password = "000nimda"
+        #self.username = "admin"
+        #self.password = "000nimda"
+        self.username = "operator"
+        self.password = "1tk2p3640"
         self.token_expiry = None
         self.access_token = None
         self.zoo_id = zoo_id
@@ -171,8 +173,6 @@ class ESAloaderAPI:
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
         print(f"target_url: {target_url}")
-        #response = requests.put(target_url, headers=auth_headers, params={"isDone":0})
-        # {"isDone":1} をJSONとする
         params= {
             "isDone": isDone,
             "p_index": p_index
@@ -226,6 +226,7 @@ class ESAloaderAPI:
         response = requests.post(target_url, headers=auth_headers, json=param_json)
         #response = requests.post(target_url, headers=auth_headers, data=param_json)
         # 失敗したら例外を発生させる
+        print(f"response: {response}")
         if response.status_code != 200 and response.status_code != 201:
             raise Exception(f"Failed to post result: {response.status_code}")
         print(response.json())
@@ -266,7 +267,6 @@ class ESAloaderAPI:
         dict_results = results_json[0]
         # 'id' の名称を 'zoo_samplepin_id' に変更する
         dict_results['zoo_samplepin_id'] = dict_results.pop('id')
-        print(dict_results['zoo_samplepin_id'])
 
         return dict_results
         
