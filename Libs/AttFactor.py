@@ -280,6 +280,9 @@ class AttFactor:
 if __name__ == "__main__":
     att = AttFactor()
     att.readAttConfig()
+    print(att.att_material)
+    print(att.att_idx)
+    print(att.att_thick)
 
     thick=att.getBestAtt(1.0, 0.015)
     print(thick)

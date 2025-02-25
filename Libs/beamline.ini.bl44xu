@@ -9,7 +9,7 @@ blanc_port = 10101
 zooroot = /staff/bl44xu/BLsoft/TestZOO/
 logdir = ${dirs:zooroot}/Logs/
 zoologdir= ${dirs:zooroot}/ZooLogs/
-bssconfig_dir=/staff/config/bl44xu/
+bssconfig_dir=/blconfig
 backimage_dir = ${dirs:zooroot}/BackImages/
 
 [files]
@@ -69,7 +69,7 @@ score_max = 100
 raster_dose = 0.1
 dose_ds = 10.0
 raster_roi = 1
-exp_raster = 0.01
+exp_raster = 0.1
 att_raster = 20
 hebi_att = 20s
 cover_flag = 1
@@ -82,6 +82,8 @@ gonio_direction =FROM_LEFT
 pin_channel = 2
 # 0 Attenuator pulse : attenuator
 pulse_for_noatt = 0
+# Smargon exist (BL44XU specific paramter)
+isSmargon=False
 
 [detector]
 # カメラ長最短 [mm]
