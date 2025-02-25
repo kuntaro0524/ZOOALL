@@ -1,11 +1,12 @@
 import sys,math,numpy,os
+sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
 import datetime
 import LoopMeasurement
 import Zoo
 import AttFactor
 import AnaShika
 import Condition
-from MyException import *
+import MyException
 import StopWatch
 import CrystalSpot
 
@@ -49,7 +50,7 @@ class HITO:
         self.min_hel_size=minsize
         self.max_hel_size=maxsize
     def getGoodTrans(self):
-        print("faceScan")
+        print "faceScan"
         return 1.0
 
         # Relating to the summary.dat
@@ -62,7 +63,7 @@ class HITO:
         ashika.setSummaryFile("summary.dat")
         # scan_id & prefix are different each other
         prefix="%s"%scan_id
-        print("Searching prefix is %s"%prefix)
+        print "Searching prefix is %s"%prefix
 
         # N grids on the 2D raster scan
         ngrids=self.lm.raster_n_height*self.lm.raster_n_width
@@ -73,7 +74,7 @@ class HITO:
                 ashika.readSummary(prefix,ngrids,comp_thresh=comp_thresh,timeout=self.timeout)
 
         except:
-                raise MyException("shikaSumSkipStrong failed to wait summary.dat")
+                raise MyException.MyException("shikaSumSkipStrong failed to wait summary.dat")
 
         return ashika
 
@@ -86,11 +87,11 @@ class HITO:
         def compCryScore(x,y):
                 a=x.score_total
                 b=y.score_total
-                print("SCORE COMPARE",a,b)
+                print "SCORE COMPARE",a,b
                 if a==b: return 0
                 if a<b: return 1
                 return -1
-                print(thresh_nspots,crysize)
+                print thresh_nspots,crysize
 
         # SHIKA analysis
         ashika=self.readSummaryDat(raster_path,scan_id,self.cxyz_2d,self.phi_face)
@@ -98,10 +99,10 @@ class HITO:
         ashika.setThresh(thresh_nspots)
 
         # Crystal finding
-        print("Crystal size = %8.5f"%crysize)
+        print "Crystal size = %8.5f"%crysize
         crystals=ashika.findCrystals(scan_id,dist_thresh=crysize)
         n_cry=len(crystals)
-        print("Crystals %5d\n"%n_cry)
+        print "Crystals %5d\n"%n_cry
 
         # Sorting better crystals by total number of spots
         # The top of crystal is the best one
@@ -122,7 +123,7 @@ class HITO:
             if a==b: return 0
             if a<b: return 1
             return -1
-            print(thresh_nspots,crysize)
+            print thresh_nspots,crysize
 
         # SHIKA analysis
         ashika=self.readSummaryDat(raster_path,scan_id,self.cxyz_2d,self.phi_face)
@@ -131,10 +132,10 @@ class HITO:
         ashika.setMinMax(min_score,max_score)
 
         # Crystal finding
-        print("Crystal size = %8.5f"%crysize)
+        print "Crystal size = %8.5f"%crysize
         crystals=ashika.findCrystals(scan_id,dist_thresh=crysize)
         n_cry=len(crystals)
-        print("Crystals %5d\n"%n_cry)
+        print "Crystals %5d\n"%n_cry
 
         # Sorting better crystals by total number of spots
         # The top of crystal is the best one
@@ -179,7 +180,7 @@ class HITO:
                 if a==b: return 0
                 if a<b: return 1
                 return -1
-                print(thresh_nspots,crysize)
+                print thresh_nspots,crysize
 
 
         # SHIKA analysis
@@ -189,13 +190,13 @@ class HITO:
         diffscan_path=raster_path
 
         # Crystal finding
-        print("Crystal size = %8.5f"%crysize)
+        print "Crystal size = %8.5f"%crysize
         crystals=ashika.findCrystals(scan_id,dist_thresh=crysize)
         n_cry=len(crystals)
-        print("Crystals %5d\n"%n_cry)
+        print "Crystals %5d\n"%n_cry
 
         # Check overlap
-        print("#########################")
+        print "#########################"
         perfect_crystals=[]
         kabutteru_index_list=[]
         check_list=[0]*len(crystals)
@@ -219,12 +220,12 @@ class HITO:
                 if (l2>=r1 and l2<=l1) or (r2>=r1 and r2<=l1):
                     kabutteru_index_list.append((index1,index2))
                     # Flags for overlapped with other crystals
-                    print("Flags for overlapped with other crystals: pattern1")
+                    print "Flags for overlapped with other crystals: pattern1"
                     check_list[index1]=1
                     check_list[index2]=1
                     # one crystal is larger than one and completely overlapped
                 elif (l1>=r2 and l1<=l2) or (r1>=r2 and l1<=l2):
-                    print("Flags for overlapped with other crystals: pattern2")
+                    print "Flags for overlapped with other crystals: pattern2"
                     kabutteru_index_list.append((index1,index2))
                     check_list[index1]=1
                     check_list[index2]=1
@@ -232,7 +233,7 @@ class HITO:
         kaburidat=open("%s/kabutteru.dat"%raster_path,"w")
         hontouni_kabutteru_index_list=[]
         for c1,c2 in kabutteru_index_list:
-            print("INDEX=",c1,c2)
+            print "INDEX=",c1,c2
             cry1=crystals[c1]
             cry2=crystals[c2]
             x1a,y1a=cry1.getXYlist()
@@ -241,7 +242,7 @@ class HITO:
             for y1,y2 in zip(y1a,y2a):
                 vert_distance=numpy.fabs(y1-y2)
                 if vert_distance < self.dist_cry_thresh:
-                    print(" (%5d-%5d) vertical distance %8.5f mm is shorter than %8.5f mm"%(c1,c2,vert_distance,self.dist_cry_thresh))
+                    print " (%5d-%5d) vertical distance %8.5f mm is shorter than %8.5f mm"%(c1,c2,vert_distance,self.dist_cry_thresh)
                     hontouni_kabutteru_index_list.append((c1,c2))
                     for x1,y1 in zip(x1a,y1a):
                         kaburidat.write("%8.5f %8.5f\n"%(x1,y1))
@@ -262,11 +263,11 @@ class HITO:
 
             # Case: crystal size is not enough for helical data collection
             if hsize < self.min_hel_size:
-                print("crystal size is smaller than threshold(%8.5f)"%self.min_hel_size)
+                print "crystal size is smaller than threshold(%8.5f)"%self.min_hel_size
                 check_list[index]=10
             # Case: crystal size is larger than set value for helical data collection
             else:
-                print("Crystal size H,V=",hsize,vsize)
+                print "Crystal size H,V=",hsize,vsize
                 if hsize > self.max_hel_size or vsize > self.max_hel_size:
                     check_list[index]=-2
             index+=1
@@ -303,7 +304,7 @@ class HITO:
         good_crystals=[]
         index=0
         for c in check_list:
-            print("CHECKLIST=",c)
+            print "CHECKLIST=",c
             # check_list: c=10 -> single crystal (grid consists of 1)
             if c>0 and c!=10:
                 cry=crystals[index]
@@ -329,7 +330,7 @@ class HITO:
             index+=1
         singlefile.close()
 
-        print("Initial single crystals",len(single_crystals))
+        print "Initial single crystals",len(single_crystals)
 
         # make crycodes
         def makeCryCode(x,y,score,imgnum):
@@ -344,12 +345,12 @@ class HITO:
         # then "small wedge data collection" was applied 
         bad_index=[]
         # each crystal
-        print("Clustered crystals=",len(zutazuta))
+        print "Clustered crystals=",len(zutazuta)
         # Loop for each crystal
         for cryindex in range(0,len(zutazuta)):
             x1a,y1a,scorea,imgna=zutazuta[cryindex].getInfo()
             bad_index=[0]*len(x1a)
-            print("NUMBER OF GRIDS",cryindex,len(x1a))
+            print "NUMBER OF GRIDS",cryindex,len(x1a)
             # each grid
             for index1 in range(0,len(x1a)):
                 if bad_index[index1]==1:
@@ -359,8 +360,8 @@ class HITO:
                 score1=scorea[index1]
                 imgnum1=imgna[index1]
                 for index2 in range(index1+1,len(x1a)):
-                    print("comparison cry1,cry2=",index1,index2)
-                    print("bad_index=",bad_index)
+                    print "comparison cry1,cry2=",index1,index2
+                    print "bad_index=",bad_index
                     if bad_index[index2]==1:
                         continue
                     x2=x1a[index2]
@@ -371,11 +372,11 @@ class HITO:
                     dy=y1-y2
                     #print x1,y1,x2,y2,dx,dy
                     dist=math.sqrt(dx*dx+dy*dy)
-                    print("distance(%d,%d)=%8.5f mm"%(index1,index2,dist))
+                    print "distance(%d,%d)=%8.5f mm"%(index1,index2,dist)
                     if dist <= self.vbeam:
                         bad_index[index2]=1
-            print("BAD",len(bad_index))
-            print("Final bad index=",bad_index)
+            print "BAD",len(bad_index)
+            print "Final bad index=",bad_index
             ncount=0
             for i in range(0,len(bad_index)):
                 if bad_index[i]==0:
@@ -387,10 +388,10 @@ class HITO:
                     crycode=makeCryCode(x,y,score,imgnum)
                     single_crystals.append(crycode)
                     ncount+=1
-            print("Small wedge points=",ncount)
-        print("SINGLE :",len(single_crystals))
-        print("GOOD   :",len(good_crystals))
-        print("PERFECT:",len(perfect_crystals))
+            print "Small wedge points=",ncount
+        print "SINGLE :",len(single_crystals)
+        print "GOOD   :",len(good_crystals)
+        print "PERFECT:",len(perfect_crystals)
 
         # Single crystal
         sss=open("%s/single_new.dat"%raster_path,"w")

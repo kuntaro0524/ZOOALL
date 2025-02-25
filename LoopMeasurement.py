@@ -2,11 +2,12 @@ import sys, os, math, socket, time
 import numpy as np
 import datetime
 
+sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs/")
 from MyException import *
 import INOCC
 import RasterSchedule
-import Libs.Light
-import Libs.Colli
+import Light
+import Colli
 import MultiCrystal
 import AttFactor
 import Beamsize
@@ -20,17 +21,17 @@ import DirectoryProc
 import logging
 import logging.config
 
+beamline = "BL45XU"
+
 # version 2.0.0 modified on 2019/07/04 K.Hirata
 
 class LoopMeasurement:
-    def __init__(self, blf, root_dir, prefix):
-        self.blf = blf
-        self.dev = self.blf.device
+    def __init__(self, ms, root_dir, prefix):
+        self.ms = ms
         self.root_dir = root_dir
         self.prefix = prefix
-        self.inocc = INOCC.INOCC(blf, root_dir, sample_name=prefix)
+        self.inocc = INOCC.INOCC(ms, root_dir, sample_name=prefix)
         self.inocc.init()
-
         self.h_beam = 10.0  # [um]
         self.v_beam = 10.0  # [um]
         self.max_framerate = 200.0  # [Hz]
@@ -45,31 +46,35 @@ class LoopMeasurement:
         self.raster_n_height = 10
         self.raster_n_width = 10
 
-        self.beamsizeconf = BeamsizeConfig.BeamsizeConfig()
-        self.multi_dir = "/foo/bar"
+        self.light = Light.Light(self.ms)
+        self.colli = Colli.Colli(self.ms)
+
+        config_dir = "/isilon/blconfig/%s/" % beamline.lower()
+        self.beamsizeconf = BeamsizeConfig.BeamsizeConfig(config_dir)
+        self.bss_config = "%s/bss/bss.config" % config_dir
+
+        self.multi_dir = "/isilon/users/admin45/admin45/AutoUsers/190420/"
 
         # Raster scan setting: additional grids
         self.raster_n_add = 3
         # True for including beamsize index in 'schedule file'
         self.isBeamsizeIndexOnScheduleFile = True
 
-        # beamline name 
-        self.beamline = self.blf.beamline
-
         # Kuntaro Log file
         self.logger = logging.getLogger('ZOO').getChild("LoopMeasurement")
 
-        # 10um step raster scan
-        self.beamsize_thresh_10um = 20.0 #[um]
-        self.flag10um = False
+        # Special step of raster scan
+        self.isSpecialRasterStep = False
+        self.special_raster_step = 10.0 # [um]
+        self.maximum_scan_speed = 1000.0 # [um]
 
     # 2015/11/21 horizontal, vertical beamsize
     def setPhotonDensityLimit(self, photon_density_limit):
         self.photon_density_limit = photon_density_limit
 
-    def setMinBeamsize10umRaster(self, beamsize_thresh):
-        self.flag10um = True
-        self.beamsize_thresh_10um = beamsize_thresh
+    def setSpecialRasterStep(self, raster_step_um):
+        self.isSpecialRasterStep = True
+        self.special_raster_step = raster_step_um
 
     # 2015/11/21 horizontal, vertical beamsize
     # Penging 2019/04/20 at BL45XU K.Hirata
@@ -83,8 +88,18 @@ class LoopMeasurement:
     def setWavelength(self, wavelength):
         self.wavelength = wavelength
 
+    def prepCentering(self):
+        self.colli.off()
+        self.light.on()
+
+    def saveGXYZphi(self):
+        return self.inocc.getGXYZphi()
+
+    def moveGXYZphi(self, x, y, z, phi):
+        return self.inocc.moveGXYZphi(x, y, z, phi)
+
     def captureImage(self, capture_name):
-        self.dev.prepCentering()
+        self.prepCentering()
         filename_abs = "%s/%s/%s" % (self.root_dir, self.prefix, capture_name)
         self.inocc.capture(filename_abs)
 
@@ -97,13 +112,13 @@ class LoopMeasurement:
         if os.path.exists(dirname) == False:
             os.mkdir(dirname)
 
-    # 2015/12/11 K.Hirata 
+    # 2015/12/11 K.Hirata
     # Tests for one action to make directory tree
     def prepPath(self, pathname):
         if os.path.exists(pathname) == False:
             os.makedirs(pathname)
 
-    # 2018/04/13 'n_mount' parameter was added 
+    # 2018/04/13 'n_mount' parameter was added
     # 2019/05/19 K. Hirata
     def prepDataCollection(self):
         self.logger.info("prepDataCollection started.")
@@ -133,7 +148,7 @@ class LoopMeasurement:
     # 2016/10/08 height_add was added. unit [um]
     def centering(self, backimg, loop_size="small", offset_angle=0.0, height_add=0.0, largest_movement=5.0):
         # Prep centering
-        self.dev.prepCentering()
+        self.prepCentering()
         # setting background image
         self.logger.info("LM:centering background file is replaced by %s" % backimg)
         self.inocc.setBack(backimg)
@@ -161,15 +176,14 @@ class LoopMeasurement:
             self.rwidth = rwidth
 
             return rwidth, rheight
-        except MyException as e:
-            self.logger.warning("Exception detected.{0}".format(e))
+        except:
             self.logger.warning("Exception detected.")
             raise MyException("Centering failed.")
 
     # 2016/10/08 height_add was added. unit [um]
     def roughCentering(self, backimg, loop_size=600, offset_angle=0.0, height_add=0.0, largest_movement=5.0):
         # Prep centering
-        self.dev.prepCentering()
+        self.prepCentering()
         # setting background image
         self.logger.info("LM:centering background file is replaced by %s" % backimg)
         self.inocc.setBack(backimg)
@@ -189,7 +203,7 @@ class LoopMeasurement:
             return False
 
     # 2015/11/21 Exposure time can be set
-    # To be obsoleted 2015/12/11 
+    # To be obsoleted 2015/12/11
     # New one is raster2D
     def prepRaster(self, dist=300.0, att_idx=10, exptime=0.02, crystal_id="unknown"):
         rss = RasterSchedule.RasterSchedule()
@@ -224,6 +238,9 @@ class LoopMeasurement:
 
         self.logger.info("LM.SSROX starts...")
         rss = RasterSchedule.RasterSchedule()
+
+        # Maximum rotation for a horizontal line is set to 90.0 deg
+        max_rotation = 90.0 # [deg.]
 
         # 2020/01/31 For abe experiments: vertical step = 4.0 um
         # This is enough for almost sample (2019/12/05 results)
@@ -290,19 +307,12 @@ class LoopMeasurement:
         self.logger.info("LM: Best exposure time from KUMA = %9.6f[sec]" % exp_time)
         ntimes = cond['ntimes']
 
-        # Hot fix for abe data collection 2020/12/06
-        # Hot fix for abe data collection 2021/02/10
-        # Hot fix for shihoya data collection 2021/02/10
-        exp_time=cond['exp_raster']
-        best_transmission=100.0
-
         rss.setSSROX()
         rss.setWL(self.wavelength)
         rss.setExpTime(exp_time)
         rss.setPrefix(scan_id)
-
         # Attenuator raster is set by 'best_transmission' (0<= value<=1.0)
-        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline=="BL45XU":
+        if beamline == "BL32XU" or beamline == "BL41XU" or beamline=="BL45XU":
             rss.setTrans(best_transmission)
         else:
             # Attenuator index is calculated
@@ -331,7 +341,7 @@ class LoopMeasurement:
     # Swithced from prepRaster 2015/12/11
     def prepRaster2D(self, scan_id, gxyz, phi, dist=300.0, att_idx=10, exptime=0.02, crystal_id="unknown"):
         sx, sy, sz = gxyz
-        self.dev.gonio.moveGXYZPhi(sx, sy, sz, phi)
+        self.moveGXYZphi(sx, sy, sz, phi)
         rss = RasterSchedule.RasterSchedule()
 
         # Set step size as same with the beam size
@@ -373,8 +383,8 @@ class LoopMeasurement:
 
         # Move to the defined goniometer coordinate and phi angle.
         sx, sy, sz = gxyz
-        self.dev.gonio.moveXYZPhi(sx, sy, sz, phi)
-        tx, ty, tz, tphi = self.dev.gonio.getXYZPhi()
+        self.moveGXYZphi(sx, sy, sz, phi)
+        tx, ty, tz, tphi = self.saveGXYZphi()
 
         dist_raster = cond['dist_raster']
         exp_raster = cond['exp_raster']
@@ -401,19 +411,19 @@ class LoopMeasurement:
 
         # Attenuator index from 'att_fac' for BL32XU/BL45XU
         # Attenuator should be set in 'an index of attenuator defined in bss.config'
-        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline == "BL45XU":
+        if beamline == "BL32XU" or beamline == "BL41XU" or beamline == "BL45XU":
             # if you need to activate 'attenuator modification', put 'flag_mod_exptime' on at the top of this function
             if flag_mod_exptime:
                 # Check transmission with 'thinnest attenuator'
                 trans_ratio = transmission / 100.0  # convertion to 'ratio'
-                attfac = AttFactor.AttFactor()
+                attfac = AttFactor.AttFactor(self.bss_config)
                 mod_exp, mod_trans = attfac.checkThinnestAtt(cond['wavelength'], exp_raster, trans_ratio)
                 tmp_trans = mod_trans * 100.0
                 # Schedule setting (attenuator factor) [% is converted to ratio in RSS])
                 rss.setTrans(tmp_trans)  # this is unit of [%]
                 # case when the transmission is modified.
                 if mod_trans != trans_ratio:
-                    self.logger.info("Transmission is changed : %9.5f   -> %9.5f (Max 1.0 (=100 perc.))" % (
+                    self.logger.info("Transmission is changed : %9.5f   -> %9.5f (Max 1.0 (=100%))" % (
                     best_transmission, mod_trans))
                     self.logger.info("Exposure     is changed : %9.5f[s]-> %9.5f[s]" % (exp_time, mod_exp))
                 exp_raster = mod_exp
@@ -422,25 +432,23 @@ class LoopMeasurement:
                 rss.setTrans(transmission)
 
         # case for the beamline with discrete attenuator thickness
-        # only for BL44XU (2023/11/29 K.Hirata memo.)
         else:
-            att_fact = AttFactor.AttFactor()
+            att_fact = AttFactor.AttFactor(self.bss_config)
             trans = transmission / 100.0  # convertion to 'ratio'
             best_thick = att_fact.getBestAtt(cond['wavelength'], trans)
             self.att_idx = att_fact.getAttIndexConfig(best_thick)
             # Schedule setting (attenuator index)
             rss.setAttIndex(self.att_idx)
 
-        # 2020/11/02 Coded for BL45XU
-        # If this flag is 'True', raster scan is always conducted by using 10 um step.
-        if raster_hbeam >= self.beamsize_thresh_10um or raster_vbeam >= self.beamsize_thresh_10um:
-            if self.flag10um:
-                vstep_um = 10.0
-                hstep_um = 10.0
-                exp_raster = 1/100.0 # 100 Hz is fixed now
+        # 2020/11/18 K. Hirata modified.
+        if self.isSpecialRasterStep:
+            vstep_um = self.special_raster_step
+            hstep_um = self.special_raster_step
+            # exposure time for this raster scan will be fixed
+            exp_raster = self.special_raster_step / self.maximum_scan_speed
 
         # Scan points for vertical and horizontal
-        if scan_mode == "2D" or scan_mode=="2d":
+        if scan_mode == "2D":
             if isAdd == True:
                 self.raster_n_height = int(vscan_um / vstep_um) + self.raster_n_add
                 self.raster_n_width = int(hscan_um / hstep_um) + self.raster_n_add
@@ -477,7 +485,7 @@ class LoopMeasurement:
         rss.setPrefix(scan_id)
         rss.setCL(dist_raster)
         # 2019/10/26 Detector cover scan for salt screening
-        if self.beamline.lower() == "bl45xu" and cond['cover_scan_flag'] == 1:
+        if cond['cover_scan_flag'] == 1 and beamline.lower() == "bl45xu":
             rss.setCoverScan()
         rss.setImgDire(raster_path)
         rss.setStartPhi(phi)
@@ -500,19 +508,19 @@ class LoopMeasurement:
     # 2015/12/11 Precise setting for centering raster
     # More easy to be read by K.Hirata
     # scan_id: character buffer for making 'directory'
-    # beam_h, beam_v : raster beamsize 
+    # beam_h, beam_v : raster beamsize
     def prepVrasterIn(self, scan_id, beam_h, beam_v, range_mm, step_mm, gxyz, phi, att_idx=10, distance=300.0,
                       exptime=0.02):
-        print("DEBUG")
+        print "DEBUG"
         sx, sy, sz = gxyz
-        self.moveXYZphi(sx, sy, sz, phi)
-        tx, ty, tz, tphi = self.getXYZPhi()
+        self.moveGXYZphi(sx, sy, sz, phi)
+        tx, ty, tz, tphi = self.saveGXYZphi()
 
-        print("DEBUG2")
-        print("Target position:", sx, sy, sz, phi)
-        print("Current position:", tx, ty, tz, tphi)
+        print "DEBUG2"
+        print "Target position:", sx, sy, sz, phi
+        print "Current position:", tx, ty, tz, tphi
 
-        print("DEBUG3")
+        print "DEBUG3"
         rss = RasterSchedule.RasterSchedule()
         # Raster beam size (temporal code 151204)
         self.setBeamsize(beam_h, beam_v)  # [um]
@@ -550,7 +558,7 @@ class LoopMeasurement:
 
     # 2015/12/05 Precise setting for centering raster
     # scan_id: character buffer for making 'directory'
-    # beam_h, beam_v : raster beamsize 
+    # beam_h, beam_v : raster beamsize
     def prepVraster(self, scan_id, beam_h, beam_v, range_mm, step_mm, gxyz, phi, att_idx=10, distance=300.0,
                     exptime=0.02):
         rss = RasterSchedule.RasterSchedule()
@@ -572,8 +580,8 @@ class LoopMeasurement:
         self.prepDirectory(this_directory)
         this_schedule = "%s/vraster.sch" % (this_directory)
 
-        print("Raster for this crystal in %s" % this_schedule)
-        print("Schedule file is %s.sch" % scan_id)
+        print "Raster for this crystal in %s" % this_schedule
+        print "Schedule file is %s.sch" % scan_id
 
         rss.setPrefix("vraster")
         rss.setCL(distance)
@@ -590,17 +598,17 @@ class LoopMeasurement:
         return this_schedule
 
     # 2015/12/15 K.Hirata coded
-    # Notebook p.?? around 
+    # Notebook p.?? around
     # Target: SHIKA _selected.dat
     # thresh_nspots = threshold to select 'existing crystal'
-    # Mode : "grav" = gravity center (2 or more 
+    # Mode : "grav" = gravity center (2 or more
     def shikaEdges(self, raster_path, scan_id, thresh_nspots=30, margin=0.005):
         # SHIKA results
         sshika = SummarySHIKA.SummarySHIKA(raster_path, scan_id)
         sshika.waitingForSummary()
         try:
             glist = sshika.readSummary()
-        except MyException as tttt:
+        except MyException, tttt:
             raise MyException("SHIKA could not get any good crystasl")
 
         left_xyz = [99.999, 99.999, 99.999]
@@ -630,10 +638,10 @@ class LoopMeasurement:
         ymax = ymax - margin
 
         if xmin == 99.9999 or ymin == 99.9999 or zmin == 99.9999:
-            print("shikaEdges:XMIN")
+            print "shikaEdges:XMIN"
             raise MyException("Left edge of the crystal: Wrong")
         elif xmax == 99.9999 or ymax == 99.9999 or zmax == 99.9999:
-            print("shikaEdges:XMAX")
+            print "shikaEdges:XMAX"
             raise MyException("Right edge of the crystal: Wrong")
         else:
             left_code = xmin, ymin, zmin
@@ -648,8 +656,8 @@ class LoopMeasurement:
         ashika.setSummaryFile("summary.dat")
         # scan_id & prefix are different each other
         prefix = "%s_" % scan_id
-        print("PREFIX=", prefix)
-        print("SCAN_ID=", scan_id)
+        print "PREFIX=", prefix
+        print "SCAN_ID=", scan_id
         # KUNIO setDiffscanLog(self,path):
 
         # N grids on the 2D raster scan
@@ -660,9 +668,9 @@ class LoopMeasurement:
         # 5 minutes
         try:
             ashika.readSummary(prefix, ngrids, comp_thresh=comp_thresh, timeout=600)
-            print("LoopMeasurement.readSummaryDat succeeded.")
+            print "LoopMeasurement.readSummaryDat succeeded."
 
-        except MyException as tttt:
+        except MyException, tttt:
             raise MyException("shikaSumSkipStrong failed to wait summary.dat")
 
         return ashika
@@ -682,7 +690,7 @@ class LoopMeasurement:
             if a == b: return 0
             if a < b: return 1
             return -1
-            print(thresh_nspots, crysize)
+            print thresh_nspots, crysize
 
         # Center of this scan
         cx, cy, cz = cxyz
@@ -693,10 +701,10 @@ class LoopMeasurement:
         ashika.setMinMax(min_score, max_score)
 
         # Crystal finding
-        print("Crystal size = %8.5f" % crysize)
+        print "Crystal size = %8.5f" % crysize
         crystals = ashika.findCrystals(scan_id, dist_thresh=crysize)
         n_cry = len(crystals)
-        print("Crystals %5d\n" % n_cry)
+        print "Crystals %5d\n" % n_cry
 
         # Sorting better crystals
         # The top of crystal is the best one
@@ -712,7 +720,7 @@ class LoopMeasurement:
                 crystal.setDiffscanLog(raster_path)
                 gx, gy, gz = crystal.getGrav()
                 gxyz_list.append((gx, gy, gz))
-                print(n_cry, gx, gy, gz)
+                print n_cry, gx, gy, gz
                 if n_cry >= max_ncry:
                     break
         elif mode == "peak":
@@ -721,7 +729,7 @@ class LoopMeasurement:
                 crystal.setDiffscanLog(raster_path)
                 gx, gy, gz = crystal.getPeakCode()
                 gxyz_list.append((gx, gy, gz))
-                print(n_cry, gx, gy, gz)
+                print n_cry, gx, gy, gz
                 if n_cry >= max_ncry:
                     break
 
@@ -735,22 +743,23 @@ class LoopMeasurement:
         ring_current = float(strs[len(strs) - 2].replace("mA", ""))
 
         if ring_current > 50.0:
-            print("Ring current %5.1f" % ring_current)
+            print "Ring current %5.1f" % ring_current
             return False
         else:
-            print("Ring aborted.")
-            print("Ring current %5.1f" % ring_current)
+            print "Ring aborted."
+            print "Ring current %5.1f" % ring_current
         return True
 
     # 2019/05/21 test coding
     # Recover original one (upper as _old)
-    # 2019/05/22 Largely modified to use KUMA as external function to estimate 
+    # 2019/05/22 Largely modified to use KUMA as external function to estimate
     # exposure condition.
     # 2019/12/11 'same_point' option should be set to 'True' if dose slicing experiments are done
     # at the same crystal repeatedly. Schedule file for each crystal will be made.
     def genMultiSchedule(self, phi_mid, glist, cond, flux, prefix="multi", same_point=True):
         mc = MultiCrystal.MultiCrystal()
         multi_sch = "%s/multi.sch" % self.multi_dir
+
 
         # Multi conditions
         half_width = cond['total_osc'] / 2.0
@@ -759,7 +768,7 @@ class LoopMeasurement:
 
         # Beam size setting
         beamsize_index = self.beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
-        print("Beamsize index in rasterMaster is %5d" % beamsize_index)
+        print "Beamsize index in rasterMaster is %5d" % beamsize_index
 
         # Estimating dose and set suitable exposure condition
         # Exposure time will sometimes be modified when
@@ -767,16 +776,16 @@ class LoopMeasurement:
         kuma = KUMA.KUMA()
         exp_time, best_transmission = kuma.getBestCondsMulti(cond, flux)
 
-        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline=="BL45XU":
+        if beamline == "BL32XU" or beamline == "BL41XU" or beamline=="BL45XU":
             # Check transmission with 'thinnest attenuator'
-            attfac = AttFactor.AttFactor()
+            attfac = AttFactor.AttFactor(self.bss_config)
             mod_exp, mod_trans = attfac.checkThinnestAtt(cond['wavelength'], exp_time, best_transmission)
             tmp_trans = mod_trans * 100.0
             mc.setTrans(tmp_trans)  # this is unit of [%]
 
             # case when the transmission is modified.
             if mod_trans != best_transmission:
-                self.logger.info("Transmission is changed : %9.5f   -> %9.5f (Max 1.0 (=100 perc.))" % (best_transmission, mod_trans))
+                self.logger.info("Transmission is changed : %9.5f   -> %9.5f (Max 1.0 (=100%))" % (best_transmission, mod_trans))
                 self.logger.info("Exposure     is changed : %9.5f[s]-> %9.5f[s]" % (exp_time, mod_exp))
 
             exp_time = mod_exp
@@ -807,7 +816,6 @@ class LoopMeasurement:
 
         return multi_sch
 
-
     # 2020/07/09 K.Hirata coded.
     # multi_sch = self.lm.genMultiSchedule(phi_start, phi_end, center_xyz, cond, self.phosec_meas, prefix=prefix)
     def genSingleSchedule(self, phi_start, phi_end, cenxyz, cond, flux, prefix="multi", same_point=True):
@@ -819,7 +827,7 @@ class LoopMeasurement:
 
         # Beam size setting
         beamsize_index = self.beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
-        print("Beamsize index in rasterMaster is %5d" % beamsize_index)
+        print "Beamsize index in rasterMaster is %5d" % beamsize_index
 
         # Estimating dose and set suitable exposure condition
         # Exposure time will sometimes be modified when
@@ -830,16 +838,16 @@ class LoopMeasurement:
         kuma = KUMA.KUMA()
         exp_time, best_transmission = kuma.getBestCondsMulti(cond, flux)
 
-        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline == "BL45XU":
+        if beamline == "BL32XU" or beamline == "BL41XU" or beamline == "BL45XU":
             # Check transmission with 'thinnest attenuator'
-            attfac = AttFactor.AttFactor()
+            attfac = AttFactor.AttFactor(self.bss_config)
             mod_exp, mod_trans = attfac.checkThinnestAtt(cond['wavelength'], exp_time, best_transmission)
             tmp_trans = mod_trans * 100.0
             mc.setTrans(tmp_trans)  # this is unit of [%]
 
             # case when the transmission is modified.
             if mod_trans != best_transmission:
-                self.logger.info("Transmission is changed : %9.5f   -> %9.5f (Max 1.0 (=100 perc.))" % (best_transmission, mod_trans))
+                self.logger.info("Transmission is changed : %9.5f   -> %9.5f (Max 1.0 (=100%))" % (best_transmission, mod_trans))
                 self.logger.info("Exposure     is changed : %9.5f[s]-> %9.5f[s]" % (exp_time, mod_exp))
 
             # change the value
@@ -875,7 +883,7 @@ class LoopMeasurement:
     # Important parameters: rot_speed, total_photons, flux_beam, exp_time
     # rot_speed [deg./sec.]
     # total_photons [phs] : total photons for data collection
-    # flux_beam [phs/sec.]: photon flux 
+    # flux_beam [phs/sec.]: photon flux
     def calcExpConds1(self, wavelength, start_phi, end_phi, osc_width, rot_speed, total_photons, flux_beam):
         attfac = AttFactor.AttFactor()
         # total oscillation range
@@ -883,21 +891,21 @@ class LoopMeasurement:
 
         # Multi conditions
         n_frames = int(total_osc / osc_width)
-        print("Frame=", n_frames)
+        print "Frame=", n_frames
 
         # Total photons/frame
         phs_per_frame = total_photons / float(n_frames)
-        print("Aimed flux(%5.2e)/frame: %5.2e" % (total_photons, phs_per_frame))
+        print "Aimed flux(%5.2e)/frame: %5.2e" % (total_photons, phs_per_frame)
 
         # Exposure time for full flux
         ff_exptime = phs_per_frame / flux_beam
-        print("Full flux exposure time for aimed photons per frame=%13.8f sec/frame" % ff_exptime)
+        print "Full flux exposure time for aimed photons per frame=%13.8f sec/frame" % ff_exptime
 
         # Suitable exposure time range
         # 5 deg/frame FIXED
         exp_time = osc_width / rot_speed
-        print("Exposure time = ", exp_time, "secs")
-        print("Attenuation factor for this exposure time/frame=", ff_exptime / exp_time)
+        print "Exposure time = ", exp_time, "secs"
+        print "Attenuation factor for this exposure time/frame=", ff_exptime / exp_time
 
         trans_ideal = ff_exptime / exp_time
 
@@ -905,17 +913,17 @@ class LoopMeasurement:
         att_thick = attfac.getBestAtt(wavelength, trans_ideal)
         trans_real = attfac.calcAttFac(wavelength, att_thick)
 
-        print("%8.1f[um] trans=%12.8f (Aimed trans=%12.8f)" \
-              % (att_thick, trans_real, trans_ideal))
+        print "%8.1f[um] trans=%12.8f (Aimed trans=%12.8f)" \
+              % (att_thick, trans_real, trans_ideal)
 
         # Final calculation
         exptime_final = ff_exptime / trans_real
         att_idx = attfac.getAttIndexConfig(att_thick)
-        print("Initial exposure time = ", exp_time)
-        print("Final   exposure time = ", exptime_final)
-        print("round %8.5f sec" % (round(exptime_final, 3)))
+        print "Initial exposure time = ", exp_time
+        print "Final   exposure time = ", exptime_final
+        print "round %8.5f sec" % (round(exptime_final, 3))
         photons_real = exptime_final * trans_real * flux_beam * float(n_frames)
-        print("Photons/data=%8.3e" % photons_real)
+        print "Photons/data=%8.3e" % photons_real
 
         return att_idx, exptime_final
 
@@ -925,7 +933,7 @@ class LoopMeasurement:
     # Important parameters: rot_speed, total_photons, flux_beam, exp_time
     # rot_speed [deg./sec.]
     # total_photons [phs] : total photons for data collection
-    # flux_beam [phs/sec.]: photon flux 
+    # flux_beam [phs/sec.]: photon flux
     def calcExpConds2(self, wavelength, start_phi, end_phi, osc_width, rot_speed, total_photons, flux_beam):
         attfac = AttFactor.AttFactor()
         # total oscillation range
@@ -933,21 +941,21 @@ class LoopMeasurement:
 
         # Multi conditions
         n_frames = int(total_osc / osc_width)
-        print("Frame=", n_frames)
+        print "Frame=", n_frames
 
         # Total photons/frame
         phs_per_frame = total_photons / float(n_frames)
-        print("Aimed flux(%5.2e)/frame: %5.2e" % (total_photons, phs_per_frame))
+        print "Aimed flux(%5.2e)/frame: %5.2e" % (total_photons, phs_per_frame)
 
         # Exposure time for full flux
         ff_exptime = phs_per_frame / flux_beam
-        print("Full flux exposure time for aimed photons per frame=%13.8f sec/frame" % ff_exptime)
+        print "Full flux exposure time for aimed photons per frame=%13.8f sec/frame" % ff_exptime
 
         # Suitable exposure time range
         # 5 deg/frame FIXED
         exp_time = osc_width / rot_speed
-        print("Exposure time = ", exp_time, "secs")
-        print("Attenuation factor for this exposure time/frame=", ff_exptime / exp_time)
+        print "Exposure time = ", exp_time, "secs"
+        print "Attenuation factor for this exposure time/frame=", ff_exptime / exp_time
 
         trans_ideal = ff_exptime / exp_time
 
@@ -955,17 +963,17 @@ class LoopMeasurement:
         att_thick = attfac.getBestAtt(wavelength, trans_ideal)
         trans_real = attfac.getAttFacObs(wavelength, att_thick)
 
-        print("%8.1f[um] trans=%12.8f (Aimed trans=%12.8f)" \
-              % (att_thick, trans_real, trans_ideal))
+        print "%8.1f[um] trans=%12.8f (Aimed trans=%12.8f)" \
+              % (att_thick, trans_real, trans_ideal)
 
         # Final calculation
         exptime_final = ff_exptime / trans_real
         att_idx = attfac.getAttIndexConfig(att_thick)
-        print("Initial exposure time = ", exp_time)
-        print("Final   exposure time = ", exptime_final)
-        print("round %8.5f sec" % (round(exptime_final, 3)))
+        print "Initial exposure time = ", exp_time
+        print "Final   exposure time = ", exptime_final
+        print "round %8.5f sec" % (round(exptime_final, 3))
         photons_real = exptime_final * trans_real * flux_beam * float(n_frames)
-        print("Photons/data=%8.3e" % photons_real)
+        print "Photons/data=%8.3e" % photons_real
 
         return att_idx, exptime_final
 
@@ -977,27 +985,27 @@ class LoopMeasurement:
 
         # Multi conditions
         n_frames = int(total_osc / osc_width)
-        print("Frame=", n_frames)
+        print "Frame=", n_frames
 
         # Total photons/frame
         phs_per_frame = total_photons / float(n_frames)
-        print("Aimed flux/frame: %5.2e" % (phs_per_frame))
+        print "Aimed flux/frame: %5.2e" % (phs_per_frame)
 
         # Exposure time for full flux
         ff_exptime = phs_per_frame / flux_beam
-        print("Full flux exposure time for aimed flux=%13.8f sec/frame" % ff_exptime)
+        print "Full flux exposure time for aimed flux=%13.8f sec/frame" % ff_exptime
 
         # Suitable exposure time range
         # 5 deg/frame FIXED
         # exptime=osc_width/5.0
-        print("Attenuation factor for 1sec exposure/frame", ff_exptime / exp_time)
+        print "Attenuation factor for 1sec exposure/frame", ff_exptime / exp_time
         transmission = ff_exptime / exp_time
 
         # Suitable attenuation factor
         att_thick = attfac.getBestAtt(wavelength, transmission)
         trans = attfac.calcAttFac(wavelength, att_thick)
 
-        print("%8.1f[um] Transmission=%12.8f" % (att_thick, trans))
+        print "%8.1f[um] Transmission=%12.8f" % (att_thick, trans)
 
         # Final calculation
         exptime = ff_exptime / trans
@@ -1018,7 +1026,7 @@ class LoopMeasurement:
 
         # total oscillation range
         total_osc = end_phi - start_phi
-        # Caclculate exposure condition 
+        # Caclculate exposure condition
         # 2016/12/09 added the function: calcExpConds2
         # exposure time is estimated from rotation speed.
         att_idx, real_exptime = self.calcExpConds2(wavelength, start_phi, end_phi, osc_width, rot_speed, total_photons,
@@ -1050,14 +1058,14 @@ class LoopMeasurement:
 
         # Total photons/frame
         phs_per_frame = total_photons / float(n_frames)
-        print("Aimed flux/frame: %5.2e" % (phs_per_frame))
+        print "Aimed flux/frame: %5.2e" % (phs_per_frame)
 
         # Exposure time for full flux
         ff_exptime = phs_per_frame / flux_beam
-        print("Full flux exposure time for aimed flux=%13.8f sec/frame" % ff_exptime)
+        print "Full flux exposure time for aimed flux=%13.8f sec/frame" % ff_exptime
 
         # Suitable exposure time range
-        print("Attenuation factor for 1sec exposure/frame", ff_exptime / exp_time)
+        print "Attenuation factor for 1sec exposure/frame", ff_exptime / exp_time
         transmission = ff_exptime / exp_time
 
         # Suitable attenuation factor
@@ -1079,9 +1087,9 @@ class LoopMeasurement:
 
         # rotation speed [deg./s]
         exp_time = osc_width / rot_speed
-        # EIGER readout time 
+        # EIGER readout time
         if 1.0 / exp_time > self.max_framerate:
-            print("genRotSpeed. Frame rate exceeds the maximum frame rate!!")
+            print "genRotSpeed. Frame rate exceeds the maximum frame rate!!"
             sys.exit(1)
 
         # total oscillation range
@@ -1141,7 +1149,7 @@ class LoopMeasurement:
             attfac = AttFactor.AttFactor()
             best_transmission = exp_limit / float(n_frames) / exp_time
             best_thick = attfac.getBestAtt(self.wavelength, best_transmission)
-            print("Suggested Al thickness = %8.1f[um]" % best_thick)
+            print "Suggested Al thickness = %8.1f[um]" % best_thick
             att_idx = attfac.getAttIndexConfig(best_thick)
             # 160618 Added by K. Hirata
             this_prefix = "%s-%02d" % (prefix, data_index)
@@ -1162,7 +1170,7 @@ class LoopMeasurement:
         mf = open(multi_sch, "w")
         for cstr in comstr:
             for line in cstr:
-                print(line)
+                print line
                 mf.write("%s" % line)
         return multi_sch
 
@@ -1218,16 +1226,16 @@ class LoopMeasurement:
         # Beam size setting : extracting beamsize index from beamsize.config
         beamsize_index = self.beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
 
-        if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline == "BL45XU":
+        if beamline == "BL32XU" or beamline == "BL41XU" or beamline == "BL45XU":
             # Check transmission with 'thinnest attenuator'
-            attfac = AttFactor.AttFactor()
+            attfac = AttFactor.AttFactor(self.bss_config)
             mod_exp, mod_trans = attfac.checkThinnestAtt(cond['wavelength'], exp_time, best_transmission)
             tmp_trans = mod_trans * 100.0
             schbss.setTrans(tmp_trans)  # this is unit of [%]
 
             # case when the transmission is modified.
             if mod_trans != best_transmission:
-                self.logger.info("Transmission is changed : %9.5f   -> %9.5f (Max 1.0 (=100 perc))" % (best_transmission, mod_trans))
+                self.logger.info("Transmission is changed : %9.5f   -> %9.5f (Max 1.0 (=100%))" % (best_transmission, mod_trans))
                 self.logger.info("Exposure     is changed : %9.5f[s]-> %9.5f[s]" % (exp_time, mod_exp))
 
             # change the value
@@ -1270,7 +1278,7 @@ class LoopMeasurement:
         else:
             schbss.makeMulti(schedule_file, ntimes)
 
-        print("OK")
+        print "OK"
         return schedule_file
 
     # 2015/11/26 AM5:15 K.Hirata wrote
@@ -1309,15 +1317,15 @@ if __name__ == "__main__":
     import ESA
 
     ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ms.connect(("172.24.242.41", 10101))
+    ms.connect(("172.24.242.59", 10101))
 
     # ESA
     esa = ESA.ESA("./zoo.db")
-    esa.makeTable(sys.argv[1])
+    esa.makeTable("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/41.Ohto/test5.csv")
     ppp = esa.getDict()
 
     root_dir = "/isilon/users/t_shimizu_4368/t_shimizu_4368/Junk/junk4/"
-    root_dir = "/isilon/users/target/target/AutoUsers/191114/kun/"
+
     cxyz = [1.7601, -6.1756, 0.6280]
     phi = 0.00
     scan_id = "sample99"
@@ -1327,7 +1335,7 @@ if __name__ == "__main__":
 
     lm = LoopMeasurement(ms, root_dir, scan_id)
 
-    wavelength = 1.0
+    wavelength = 0.9
     startphi = 0.0
     endphi = 90.0
     osc_width = 0.1
@@ -1335,15 +1343,10 @@ if __name__ == "__main__":
 
     left_xyz = [0.0, 0.0, 0.1]
     right_xyz = [0.0, 0.1, 0.0]
-    print(left_xyz, right_xyz)
+    print left_xyz, right_xyz
     prefix = "TEST"
 
     logfile = open("logfile.log", "w")
-    #lm.genHelical(startphi, endphi, left_xyz, right_xyz, prefix, flux, ppp[0], logfile)
-
-    lm.multi_dir = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo"
-    glist=[left_xyz, right_xyz]
-    cond={'total_osc':10.0,'dist_ds':130.0, 'ds_hbeam':10.0, 'ds_vbeam':10.0, 'osc_width':0.1,'dose_ds':10.0, 'wavelength':1.0,'exp_ds':0.02, 'reduced_fact':1.0, 'sample_name':"TEST",'ntimes':1}
-    lm.genMultiSchedule(0.0, glist, cond, flux, prefix="multi")
+    lm.genHelical(startphi, endphi, left_xyz, right_xyz, prefix, flux, ppp[0], logfile)
 
     ms.close()

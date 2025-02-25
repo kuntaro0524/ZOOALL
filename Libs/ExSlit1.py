@@ -10,18 +10,32 @@ from AnalyzePeak import *
 from File import *
 from AxesInfo import *
 
-
 class ExSlit1:
 
     def __init__(self, server):
         self.s = server
-        self.blade_upper = Motor(self.s, "bl_32in_st2_slit_1_upper", "pulse")
-        self.blade_ring = Motor(self.s, "bl_32in_st2_slit_1_ring", "pulse")
-        self.blade_lower = Motor(self.s, "bl_32in_st2_slit_1_lower", "pulse")
+        self.blade_width = Motor(self.s, "bl_45in_st2_slit_1_width", "mm")
+        self.blade_height = Motor(self.s, "bl_45in_st2_slit_1_height", "mm")
+        self.blade_horizontal = Motor(self.s, "bl_45in_st2_slit_1_horizontal", "mm")
+        self.blade_vertical = Motor(self.s, "bl_45in_st2_slit_1_vertical", "mm")
+
+        # Each blade
+        self.blade_upper = Motor(self.s, "bl_45in_st2_slit_1_upper", "pulse")
+        self.blade_lower = Motor(self.s, "bl_45in_st2_slit_1_lower", "pulse")
+        self.blade_ring = Motor(self.s, "bl_45in_st2_slit_1_ring", "pulse")
+        self.blade_hall = Motor(self.s, "bl_45in_st2_slit_1_hall", "pulse")
+
+    def getBladePos(self):
+        u = self.blade_upper.getPosition()
+        l = self.blade_lower.getPosition()
+        r = self.blade_ring.getPosition()
+        h = self.blade_hall.getPosition()
+
+        return u,l,r,h
 
     def getVpos(self):
         pos = self.blade_lower.getPosition()
-        print(pos)
+        print pos
 
     def openV(self):
         # self.blade_upper.move(18000)
@@ -64,23 +78,23 @@ class ExSlit1:
         for vtmp in range(-18000, 0, 2000):
             self.blade_lower.move(vtmp)
             value0 = int(counter.getCount(1.0)[0])
-            print(vtmp, value0)
+            print  vtmp, value0
             if value0 < save_i / 2.0:
                 roughv = vtmp
                 break
             save_i = value0
 
-        print(vtmp)
+        print vtmp
         save_i = 0.0
         for vtmp in range(roughv - 2000, roughv + 2000, 400):
             self.blade_lower.move(vtmp)
             value0 = int(counter.getCount(1.0)[0])
-            print(vtmp, value0)
+            print  vtmp, value0
             if value0 < save_i / 2.0:
                 roughv = vtmp
                 break
             save_i = value0
-        print(roughv)
+        print roughv
 
         self.scanV(prefix, roughv - 2000, roughv + 2000, 100, cnt_ch1, cnt_ch2, 1.0)
 
@@ -103,20 +117,11 @@ class ExSlit1:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.41'
+    host = '172.24.242.59'
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
-    print("prog PREFIX CHANNEL")
+    print "prog PREFIX CHANNEL"
     test = ExSlit1(s)
-    f = File("./")
-    test.openV()
-# test.closeV()
-# test.scanVquick("TEST",3,0,0.2)
-
-# prefix="%03d"%f.getNewIdx3()
-# test.scanV(prefix,15000,500,-500,3,0,0.2)
-
-# prefix="%03d"%f.getNewIdx3()
-# test.scanH(prefix,-18010,-10,50,3,0,0.2)
+    print test.getBladePos()

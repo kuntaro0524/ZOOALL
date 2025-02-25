@@ -8,7 +8,7 @@ class Received:
 		return(self.rtnmsg[num])
 
 	def getN(self):
-		print(len(self.rtnmsg))
+		#print len(self.rtnmsg)
 		return(len(self.rtnmsg))
 
 	def checkQuery(self):

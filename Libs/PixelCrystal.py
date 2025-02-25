@@ -9,10 +9,12 @@ import LogString
 
 class PixelCrystal:
     # initialize with 3D coordinate
-    def __init__(self, contour):
+    def __init__(self, contour, raster_resol_um):
         # Currently, contour should be rectangle shape
         self.contour = contour
         self.DEBUG=False
+        # Raster scan resolution
+        self.raster_resol_um = raster_resol_um
         # Information of spatial relationships
         self.sporel = []
         # Logging setting
@@ -258,8 +260,11 @@ class PixelCrystal:
 
         saved_osc = self.osc_vector[0]
         left_edge_grid = 0
+        right_edge_grid = 0
 
         self.logger.debug("First oscillation= %8.2f deg." % saved_osc)
+
+        print(self.osc_vector)
 
         each_crystal_volume = {}
         for volume_index, osc_range in enumerate(self.osc_vector):
@@ -269,6 +274,7 @@ class PixelCrystal:
             if osc_range == saved_osc:
                 right_edge_grid = volume_index
             else:
+                print("VI=",volume_index)
                 self.logger.info("Left - right: %5d-%5d" % (left_edge_grid, right_edge_grid))
                 each_crystal_volume['left_edge'] = left_edge_grid
                 each_crystal_volume['right_edge'] = right_edge_grid
@@ -308,7 +314,7 @@ class PixelCrystal:
             try:
                 self.makeCrystalInfo(dc_block)
             except Exception as e:
-                print("EEEEEEEEEEEEEEEE=",e.args)
+                print "EEEEEEEEEEEEEEEE=",e.args
                 self.logger.info(e.args)
                 continue
 
@@ -356,7 +362,7 @@ class PixelCrystal:
                     # Re-calculate gonio XYZ coordinates
                     self.dc_block_update(dd_block, left_edge, right_edge, osc_new, cry_length)
                     dd_block['cry_length'] = cry_length
-                    print("NEW=",dd_block)
+                    print "NEW=",dd_block
                     dc_block['mode'] = "not_collect"
 
                     self.logger.info("""NEW_CRYSTAL= %(left_edge)d-%(right_edge)d: %(osc_range).2f """ % dc_block)
@@ -437,9 +443,10 @@ class PixelCrystal:
             dc_block['c_hv'] = (hcenter, vcenter)
 
         elif dc_block['mode'].rfind("helical")!=-1:
-            # Crystal left edge
-            left_edge_inner = left_edge + 5 + self.min_x# [um]
-            right_edge_inner = right_edge - 5 + self.min_x # [um]
+            # Crystal left edge (unit: pixel)
+            left_edge_inner = int(left_edge + 0.5 * self.raster_resol_um + self.min_x)  #[um]
+            # Crystal right edge (unit: pixel)
+            right_edge_inner = int(right_edge - 0.5 * self.raster_resol_um + self.min_x)  #[um]
             left_vcen = self.getVertCenterAtH(left_edge_inner)
             right_vcen = self.getVertCenterAtH(right_edge_inner)
             self.logger.info(">>> Mode=%6s L(H,V)=(%5d,%5d)" % (dc_block['mode'], left_edge_inner, left_vcen))
@@ -574,7 +581,7 @@ class PixelCrystal:
     def getRoughEdges(self):
         if self.isPrep==False:
             self.prepInfo()
-        print(self.cry_hsize,self.isSingle,self.score_total,self.edges)
+        print self.cry_hsize,self.isSingle,self.score_total,self.edges
         return self.edges
 
 if __name__=="__main__":
@@ -589,7 +596,7 @@ if __name__=="__main__":
     # Image name
     image_name = sys.argv[1]
     apm = AnaPictureMap.AnaPictureMap(image_name)
-    contours = apm.anaInclinedRect(color_inverse=False)
+    contours = apm.anaInclinedRect(color_inverse=True)
 
     img = cv2.imread(image_name)
     shape = img.shape
@@ -600,7 +607,7 @@ if __name__=="__main__":
     h_min_all=99999
     h_max_all=0
     for c_index,contour in enumerate(contours):
-        crystal = PixelCrystal(contour)
+        crystal = PixelCrystal(contour, 1)
         crystal_list.append(crystal)
         logger.info("##############################")
         crystal.prepInfo()
@@ -616,7 +623,7 @@ if __name__=="__main__":
         index += 1
 
     # Loop property
-    print("MARIO MIN/MAX=", h_min_all, h_max_all)
+    print "MARIO MIN/MAX=", h_min_all, h_max_all
 
     # For logging
     logs = LogString.LogString()

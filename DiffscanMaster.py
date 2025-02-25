@@ -1,14 +1,13 @@
 import sys, math, numpy, os
 
-from MyException import *
+sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
+import MyException
 import StopWatch
 import AnaHeatmap
 import CrystalList
 import logging
 import logging.config
 import LoopCrystals
-# python 3 sorted function
-from functools import cmp_to_key
 
 beamline = "BL32XU"
 
@@ -49,10 +48,10 @@ class NOU():
         self.sw = StopWatch.StopWatch()
 
         # Data collection time for this pin
-        self.time_limit = 60.0  # [min]
+        self.time_limit = 60.0 # [min]
 
-        # Centering repetition number
-        self.max_repeat = 5
+        # Maximum number of repetition
+        self.max_num_vert = 2
 
     def setTimeLimit(self, limit_minutes):
         self.time_limit = limit_minutes
@@ -70,9 +69,10 @@ class NOU():
         # 1 um pixel crystal map from SHIKA heatmap
         binimage_name = "%s/bin_summary.png" % scan_path
         origin_xyz, vert_koma, hori_koma = ahm.makeBinMap(prefix, binimage_name)
-
+        # Raster scan horizontal step [um]
+        raster_resol_um = cond['raster_hbeam']
         # color_inverse = True: when the back ground color is black
-        lc = LoopCrystals.LoopCrystals(binimage_name, origin_xyz, vert_koma, hori_koma, color_inverse=True)
+        lc = LoopCrystals.LoopCrystals(binimage_name, origin_xyz, vert_koma, hori_koma, raster_resol_um, color_inverse=True)
         # Log image files are output to 'scan_path' directory.
         lc.setOutPath(scan_path)
         lc.prep()
@@ -96,6 +96,9 @@ class NOU():
     def sokuteiSuru(self, scan_path, cond, prefix):
         # Prepare 'data collection blocks'
         dc_blocks = self.junbiSuru(scan_path, cond, prefix)
+        # number of all data collection blocks to be collected
+        n_dc_blocks = len(dc_blocks)
+        self.logger.info(">> All of DC blocks: %5d" % n_dc_blocks)
         # The number of collected datasets (log)
         n_datasets = 0
 
@@ -110,11 +113,13 @@ class NOU():
             except Exception as e:
                 self.logger.info(self.commentException(e.args))
                 self.logger.info(">> DC_INDEX=%5d data collection failed." % dc_index)
+            # This logger is quite important to investigate the exception sequence.
+            self.logger.info("Go to the next sample.")
             # Check the time for data collection
-            consumed_minutes = self.sw.calcTimeFrom("start") / 60.0  # [mins]
+            consumed_minutes = self.sw.calcTimeFrom("start") / 60.0 # [mins]
             if consumed_minutes > self.time_limit:
                 self.logger.info(">> Data collection time exceeds the limit : %5.1f [mins]" % consumed_minutes)
-                return n_datasets
+                break
 
         # Return the number of collected datasets
         return n_datasets
@@ -123,7 +128,7 @@ class NOU():
     def dododo(self, cond, dc_block, dc_index):
         # Mode selection
         # 'helical_full'
-        mode = dc_block['mode']
+        mode=dc_block['mode']
         try:
             if mode == "helical_full":
                 self.do_helical_full(cond, dc_block, dc_index)
@@ -141,7 +146,7 @@ class NOU():
                 self.do_multi(cond, dc_block, dc_index)
         except Exception as e:
             self.logger.info(self.commentException(e.args))
-            raise MyException("dododo failed in data collection. Exception caught.")
+            raise MyException.MyException("dododo failed in data collection. Exception caught.")
 
     def commentException(self, args):
         comment = ""
@@ -149,7 +154,7 @@ class NOU():
             comment += arg
         return comment
 
-    # Helical data collectionasdfadsf
+    # Helical data collection
     def do_helical_full(self, cond, dc_block, dc_index):
         # Header information for this data collection
         left_face_xyz = dc_block['lxyz']
@@ -157,27 +162,23 @@ class NOU():
         osc_start = dc_block['osc_start'] + self.face_angle
         osc_end = dc_block['osc_end'] + self.face_angle
         prefix = "helfull_%02d" % dc_index
-        vscan_length = 1000.0  # [um]
+        vscan_length = 1000.0 # [um]
         # Left centering
-        # max_repeat でセンタリングができなかった場合には例外になる→これは問題ない
         try:
-            left_phi = self.face_angle - 90.0  # [deg.]
-            left_xyz = self.vertCentering(cond, left_phi, left_face_xyz, vscan_length, option="Left", dc_index=dc_index,
-                                          max_repeat=self.max_repeat)
+            left_phi = self.face_angle - 90.0 # [deg.]
+            left_xyz = self.vertCentering(cond, left_phi, left_face_xyz, vscan_length, option="Left", dc_index=dc_index, max_repeat=self.max_num_vert)
         except Exception as e:
             self.logger.info("Left centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("Left centering failed.")
+            raise MyException.MyException("Left centering failed.")
         # Right centering
-        # max_repeat でセンタリングができなかった場合には例外になる→これは問題ない
         try:
-            right_phi = self.face_angle + 90.0  # [deg.]
-            right_xyz = self.vertCentering(cond, right_phi, right_face_xyz, vscan_length, option="Right", dc_index=dc_index,
-                                           max_repeat=self.max_repeat)
+            right_phi = self.face_angle + 90.0 #[deg.]
+            right_xyz = self.vertCentering(cond, right_phi, right_face_xyz, vscan_length, option="Right", dc_index=dc_index, max_repeat=self.max_num_vert)
         except Exception as e:
             self.logger.info("Right centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("Right centering failed.")
+            raise MyException.MyException("Right centering failed.")
 
         # Data collection
         try:
@@ -185,7 +186,7 @@ class NOU():
         except Exception as e:
             self.logger.info("startHelical failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("do_helical_full: startHelical failed.")
+            raise MyException.MyException("do_helical_full: startHelical failed.")
 
     # Partial helical data collection
     def do_helical_part(self, cond, dc_block, dc_index):
@@ -195,23 +196,21 @@ class NOU():
         osc_start = dc_block['osc_start'] + self.face_angle
         osc_end = dc_block['osc_end'] + self.face_angle
         prefix = "helpart_%02d" % dc_index
-        vscan_length = 15.0 * 10  # [um]
+        vscan_length = 15.0 * 10 # [um]
         # Left centering
         try:
-            left_xyz = self.vertCentering(cond, osc_start, left_face_xyz, vscan_length, option="Left", dc_index=dc_index,
-                                          max_repeat=self.max_repeat)
+            left_xyz = self.vertCentering(cond, osc_start, left_face_xyz, vscan_length, option="Left", dc_index=dc_index, max_repeat=self.max_num_vert)
         except Exception as e:
             self.logger.info("Left centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("hel_part: Left centering failed.")
+            raise MyException.MyException("hel_part: Left centering failed.")
         # Right centering
         try:
-            right_xyz = self.vertCentering(cond, osc_end, right_face_xyz, vscan_length, option="Right", dc_index=dc_index,
-                                           max_repeat=self.max_repeat)
+            right_xyz = self.vertCentering(cond, osc_end, right_face_xyz, vscan_length, option="Right", dc_index=dc_index, max_repeat=self.max_num_vert)
         except Exception as e:
             self.logger.info("Right centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("hel_part: Right centering failed.")
+            raise MyException.MyException("hel_part: Right centering failed.")
 
         # Data collection
         try:
@@ -220,8 +219,7 @@ class NOU():
         except Exception as e:
             self.logger.info("startHelical failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("hel_part: startHelical failed.")
-
+            raise MyException.MyException("hel_part: startHelical failed.")
 
     # Non-centering helical data collection
     def do_helical_noalign(self, cond, dc_block, dc_index):
@@ -231,15 +229,14 @@ class NOU():
         osc_start = dc_block['osc_start'] + self.face_angle
         osc_end = dc_block['osc_end'] + self.face_angle
         prefix = "helnoal_%02d" % dc_index
-        vscan_length = 15.0 * 6  # [um]
+        vscan_length = 15.0 * 6 # [um]
         # Data collection
         try:
             self.startHelical(left_face_xyz, right_face_xyz, cond, osc_start, osc_end, prefix)
         except Exception as e:
             self.logger.info("do_helical_noalign: startHelical failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("do_helical_noalign: startHelical failed.")
-
+            raise MyException.MyException("do_helical_noalign: startHelical failed.")
 
     # Helical data collection
     def do_single_full(self, cond, dc_block, dc_index):
@@ -251,12 +248,11 @@ class NOU():
         prefix = "singlefull_%02d" % dc_index
         try:
             centering_phi = self.face_angle + 90.0
-            center_xyz = self.vertCentering(cond, centering_phi, center_face_xyz, vscan_length, option="center",
-                                            dc_index=dc_index, max_repeat=self.max_repeat)
+            center_xyz = self.vertCentering(cond, centering_phi, center_face_xyz, vscan_length, option="center", dc_index=dc_index, max_repeat=self.max_num_vert)
         except Exception as e:
             self.logger.info("Side view centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("single_full: vertical centering failed.")
+            raise MyException.MyException("single_full: vertical centering failed.")
         # Data collection
         try:
             self.doSingle(center_xyz, cond, osc_start, osc_end, prefix)
@@ -265,8 +261,7 @@ class NOU():
         except Exception as e:
             self.logger.info("doSingle failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("single_full: doSingle failed.")
-
+            raise MyException.MyException("single_full: doSingle failed.")
 
     # Single partial data collection
     # Rotation range ends at 90 deg.
@@ -280,8 +275,7 @@ class NOU():
 
         # Left centering
         try:
-            center_xyz = self.vertCentering(cond, osc_end, center_face_xyz, vscan_length, option="center",
-                                            dc_index=dc_index, max_repeat=self.max_repeat)
+            center_xyz = self.vertCentering(cond, osc_end, center_face_xyz, vscan_length, option="center", dc_index=dc_index, max_repeat=self.max_num_vert)
         except Exception as e:
             self.logger.info("Side view centering failed.")
             self.logger.info(self.commentException(e.args))
@@ -293,7 +287,6 @@ class NOU():
             self.logger.info("single:partial failed.")
             self.logger.info(self.commentException(e.args))
             raise Exception("during doSingle in do_single_part")
-
 
     # Single partial data collection
     # Rotation range ends at 90 deg.
@@ -311,7 +304,6 @@ class NOU():
             self.logger.info(self.commentException(e.args))
             raise Exception("during 'doSingle' in do_single_noalign")
 
-
     def do_multi(self, cond, dc_block, dc_index):
         # Header information for this data collection
         center_xyz = dc_block['cxyz']
@@ -325,7 +317,6 @@ class NOU():
             self.logger.info("multi:do_multi failed.")
             self.logger.info(self.commentException(e.args))
             raise Exception("during 'doSingle' in do_multi")
-
 
     # 2020/07/10 modified from HEBI
     def doVscan(self, prefix, center, cond, scan_length, phi):
@@ -384,21 +375,19 @@ class NOU():
 
         return raspath
 
-
     # method "peak_xyz" : return xyz coordinate from the heatmap
     def anaVscan(self, diffscan_path, prefix, phi_center, method="peak_xyz", isWeakScan=False):
         sorted_crystal_list = self.getSortedCryList(diffscan_path, prefix, phi_center, isWeakScan)
 
         # There are no good crystals
         if len(sorted_crystal_list) == 0:
-            raise MyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
+            raise MyException.MyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
 
         the_best_crystal = sorted_crystal_list[0]
         if method == "peak_xyz":
             peak_xyz = the_best_crystal.getPeakCode()
 
         return peak_xyz
-
 
     # All ID beamlines here can share this directions 2019/07/11 K.Hirata
     def getRescanDist(self, index, option):
@@ -409,7 +398,6 @@ class NOU():
             return -1.0 * y_abs
         else:
             return +1.0 * y_abs
-
 
     def doSingle(self, center_xyz, cond, osc_start, osc_end, prefix):
         try:
@@ -422,7 +410,6 @@ class NOU():
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("doSingle: ERRors occured in data collection loop.\n")
 
-
     # 2020/07/09 coded by K. Hirata
     def startHelical(self, left_xyz, right_xyz, cond, osc_start, osc_end, prefix):
         self.logger.info("Exposure condition will be considered from now...")
@@ -430,14 +417,21 @@ class NOU():
         try:
             # crystal size is smaller than horizontal beam size
             # helical data collection is switched to 'single irradiation mode'
-            cry_y_len = numpy.fabs(left_xyz[1] - right_xyz[1]) * 1000.0  # [um]
+            cry_y_len = numpy.fabs(left_xyz[1] - right_xyz[1]) * 1000.0 # [um]
             self.logger.info("Crystal length for this measurement: %8.3f [um]" % cry_y_len)
 
-            # if cry_y_len <= cond['ds_hbeam']:
+            #if cry_y_len <= cond['ds_hbeam']:
             if cry_y_len <= (2.0 * cond['ds_hbeam']):
-                self.logger.info("Crystal size is smaller than the horizontal beam size (%5.2f [um])" % cond['ds_hbeam'])
+                self.logger.info("Crystal size is smaller than the horizontal 2x beam size (%5.2f [um])" % cond['ds_hbeam'])
                 self.logger.info("Helical data collection is swithced to the single irradiation mode")
                 self.doSingle(left_xyz, cond, phi_face, prefix)
+                # Swithed to single data collection : vector should be the center of left/right edges.
+                cen_x = (left_xyz[0]+right_xyz[0])/2.0
+                cen_y = (left_xyz[1]+right_xyz[1])/2.0
+                cen_z = (left_xyz[2]+right_xyz[2])/2.0
+                center_xyz = (cen_x, cen_y, cen_z)
+                self.doSingle(center_xyz, cond, osc_start, osc_end, prefix)
+
             else:
                 self.logger.info("Generate helical schedule file")
                 helical_sch = self.lm.genHelical(osc_start, osc_end, left_xyz, right_xyz, prefix, self.phosec_meas, cond)
@@ -465,7 +459,7 @@ class NOU():
         elif exp_min > 0.05 and exp_min <= 0.1:
             exptime = 0.1
         else:
-            raise MyException("fitExptime: No ideal exposure time is found!!")
+            raise MyException.MyException("fitExptime: No ideal exposure time is found!!")
 
         return exptime
 
@@ -473,19 +467,17 @@ class NOU():
     # left_xyz = self.vertCentering(cond, osc_start, left_face_xyz, option="Left", cry_index=cry_index, max_repeat=1)
     # Crystal edge: Left/Right vertical scan to define crystal position in 3D
     # option: "Left", "Right", "Center"
-    def vertCentering(self, cond, phi_scan, init_xyz, scan_length, option="Left", dc_index=0, max_repeat=1):
-        nscan = 0
-        prefix = "%s_%02d" % (option.lower(), dc_index)
+    def vertCentering(self, cond, phi_scan, init_xyz, scan_length, option="Left", dc_index=0, max_repeat=0):
+        index_of_this_scan = 0
+        prefix="%s_%02d" % (option.lower(), dc_index)
         # No need to do 'searching crystal edge'
         if option.lower() == "center":
-            max_repeat = 1
+            max_repeat = 0
         initial_y = init_xyz[1]
 
         # Final XYZ for the answer
         isFoundGoodPoint = False
-        for scan_index in range(0, max_repeat):
-            # increment of nscan
-            nscan += 1
+        for scan_index in range(0, max_repeat + 1):
             self.logger.info("%s vertical scan started." % option)
             # Vertical scan: This block conducts 'translation' of Y-axis to catch 'edge of crystal'.
             scan_prefix = "%s_%02d" % (prefix, scan_index)
@@ -500,6 +492,7 @@ class NOU():
             except Exception as e:
                 self.logger.info("Exception occurred.")
                 self.commentException(e.args)
+                # raise MyException.MyException("doVscan failed.")
             # Analysis of raster scan
             try:
                 new_xyz = self.anaVscan(scan_vert_path, scan_prefix, phi_scan, method="peak_xyz", isWeakScan=False)
@@ -508,44 +501,44 @@ class NOU():
                 isFoundGoodPoint = True
                 break
             except Exception as e:
-                self.logger.info("Current %s scan failed: num of scans = %5d" % (option, nscan))
-                self.commentException(e.args)
+                self.logger.info("%s scan analysis failed." % option)
+                if scan_index == max_repeat:
+                    self.commentException(e.args)
+                    raise Exception("vertCentering: analysis failed.")
 
         if isFoundGoodPoint == True:
             return new_xyz
         else:
-            raise MyException("%s vertical scan finally failed after %5d scans." % (option.lower(), nscan))
+            raise MyException.MyException("%s vertical scan finally failed." % option.lower())
 
     # Sort the data collection blocks according to wedge sizes.
     def sortDCblocks(self, dc_blocks):
         # a,b: an object of 'Crystal' class
-        def compOscRange(x, y):
+        def compOscRange(x,y):
             x_rotation = x['osc_range']
             y_rotation = y['osc_range']
-            if x_rotation == y_rotation: return 0
-            if x_rotation < y_rotation: return 1
+            if x_rotation==y_rotation: return 0
+            if x_rotation<y_rotation: return 1 
             return -1
 
-        if self.debug == True:
-            print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+        if self.debug==True: 
+            print "OOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
             for c in dc_blocks:
-                print(c)
-            print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-
+                print c
+            print "OOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+    
         # Sorting data collection blocks
-        # The top of crystal is the best one
+        # The top of crystal is the best one 
         # The bottom is the worst one
-        # dc_blocks.sort(cmp=compOscRange)
-        dc_blocks=sorted(dc_blocks, key=cmp_to_key(compOscRange))
+        dc_blocks.sort(cmp=compOscRange)
 
-
-        if self.debug == True:
-            print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
+        if self.debug==True:
+            print "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
             for c in dc_blocks:
-                print(c)
-            print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
+                print c
+            print "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 
-        self.isSorted = True
+        self.isSorted=True
 
         return dc_blocks
 
@@ -564,7 +557,7 @@ class NOU():
             self.logger.info("Minimum score = %s" % self.min_score_smallbeam)
             self.logger.info("Maximum score = %s" % self.max_score)
             ahm.setMinMax(self.min_score_smallbeam, self.max_score)
-        print("HEBI.getSortedCryList: AnaHeatmap.searchPixelBunch starts")
+        print "HEBI.getSortedCryList: AnaHeatmap.searchPixelBunch starts"
         crystal_array = ahm.searchPixelBunch(scan_prefix, self.naname_include)
         crystals = CrystalList.CrystalList(crystal_array)
         sorted_crystals = crystals.getSortedCrystalList()
@@ -573,6 +566,7 @@ class NOU():
         self.logger.info("The number of crystals= %5d" % len(sorted_crystals))
 
         return sorted_crystals
+
 
 if __name__ == "__main__":
     face_agnle = 60.0

@@ -21,7 +21,7 @@ from GonioVec import *
 # 2016/06/03 Crystal ID for KAMO
 # 2016/07/07 Multi helical schedule
 
-beamline = "BL32XU"
+beamline = "BL45XU"
 
 class ScheduleBSS:
     def __init__(self):
@@ -108,7 +108,7 @@ class ScheduleBSS:
         gv = GonioVec()
         lvec = gv.makeLineVec(startvec, endvec)
         length = gv.calcDist(lvec) * 1000.0
-        print(length)
+        print length
         # npoints
         self.npoints = int(length / astep)
         self.isAdvanced = 1
@@ -117,9 +117,6 @@ class ScheduleBSS:
         self.startphi = startphi
         # end phi
         self.endphi = self.startphi + self.stepphi * self.npoints * ainterval * self.scan_interval
-
-    def unsetAdvanced(self):
-        self.isAdvanced = False
 
     def setAdvanced(self, npoints, astep, ainterval):
         self.npoints = npoints
@@ -195,10 +192,10 @@ class ScheduleBSS:
         schstr.append("Oscillation delay: 100.000000  # [msec]\n")
         schstr.append("Anomalous Nuclei: Mn  # Mn-K\n")
         schstr.append("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
-        if beamline == "BL45XU":
-            schstr.append("Attenuator: %5d\n" % self.att_index)
-        elif beamline == "BL41XU" or beamline == "BL32XU":
+        if beamline == "BL41XU" or beamline == "BL32XU" or beamline == "BL45XU":
             schstr.append("Attenuator transmission: %9.6f\n" % self.transmission)
+        else:
+            schstr.append("Attenuator: %5d\n" % self.att_index)
         schstr.append("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]\n")
         schstr.append("XAFS Count time: 1.000000  # [sec]\n")
         schstr.append("XAFS Wait time: 30  # [msec]\n")
@@ -279,10 +276,10 @@ class ScheduleBSS:
         ofile.write("Anomalous Nuclei: Mn  # Mn-K\n")
         ofile.write("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
 
-        if beamline == "BL45XU":
-            ofile.write("Attenuator: %5d\n" % self.att_index)
-        elif beamline == "BL41XU" or beamline == "BL32XU":
+        if beamline == "BL41XU" or beamline == "BL32XU" or beamline == "BL45XU":
             ofile.write("Attenuator transmission: %9.6f\n" % self.transmission)
+        else:
+            ofile.write("Attenuator: %5d\n" % self.att_index)
 
         ofile.write("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]\n")
         ofile.write("XAFS Count time: 1.000000  # [sec]\n")
@@ -302,6 +299,7 @@ class ScheduleBSS:
         ofile.write("Comment:  \n")
 
         ofile.close()
+
 
 # _beam_size_begin:
 # _label: [h 1.00 x  v 10.00 um]

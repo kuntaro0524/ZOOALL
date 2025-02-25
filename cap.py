@@ -16,7 +16,7 @@ class IboINOCC:
 		self.ysize=self.roi_y1-self.roi_y0
 
 	def anaim(self,prefix):
-		print("Start calcEdge")
+		print "Start calcEdge"
 		im = cv2.imread(self.pinimg)
 		bk = cv2.imread(self.backimg)
 	
@@ -35,12 +35,12 @@ class IboINOCC:
 		cv2.imwrite("./%s.jpg"%prefix,th)
 
 		#ROI
-		print(im.shape)
+		print im.shape
 		#roi=th[self.roi_x0:self.roi_x1,self.roi_y0:self.roi_y1]
 		self.roi=th[self.roi_y0:self.roi_y1,self.roi_x0:self.roi_x1]
 		cv2.imwrite("%s_roi.jpg"%(prefix),self.roi)
 		
-		print("Image subtraction in calcEdge finished")
+		print "Image subtraction in calcEdge finished"
 
 	# This analyzes x line for detecting line bunch 
 	def lineAnalysis(self,x_line):
@@ -85,7 +85,7 @@ class IboINOCC:
                                 y_len_max_each=ylength
 				n_max_each=ycenter
                                 n_found+=1
-                                print("FIND!",y_len_max_each)
+                                print "FIND!",y_len_max_each
 
 		if n_found==0:
 			y_cen_max_each=-99.9999
@@ -105,7 +105,7 @@ class IboINOCC:
 		y_len_max_cen=0.0
 		none_x=150
 
-		print("STARTING PHI=",phi)
+		print "STARTING PHI=",phi
                 for xline in [0,10,20,30,40,50,60,70,80,90,100,110,120,130,140]:
 			#print "XLINE=",xline
                         find_flag=False
@@ -122,10 +122,10 @@ class IboINOCC:
                 	# Line not found
                 	elif n_found==0:
                         	if none_x > xline:
-					print("NOT FOUND",xline,none_x)
+					print "NOT FOUND",xline,none_x
                                 	none_x=xline
 
-		print("NONE X=",none_x)
+		print "NONE X=",none_x
 		#good_index=none_x-20
 		hashi_index1=none_x-20
 		hashi_index2=none_x-10
@@ -145,7 +145,7 @@ class IboINOCC:
 		client.connect((self.capture_host,self.capture_port))
 		client.send("from nadechin")
 		response=client.recv(4096)
-		print(response)
+		print response
 		return True
 
 	def captureROI(self,phi):
@@ -163,7 +163,7 @@ class IboINOCC:
 			self.anaim(prefix)
 		
 		endtime=datetime.datetime.now()
-		print(starttime,endtime)
+		print starttime,endtime
 	
 if __name__ == "__main__":
 	import Gonio

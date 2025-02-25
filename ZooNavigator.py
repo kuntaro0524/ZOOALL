@@ -1,9 +1,13 @@
-import os
+import sys, os, math, cv2, socket, time, copy
 import traceback
 import logging
 import numpy as np
-import sys
 
+beamline = "BL45XU"
+sys.path.append("/isilon/%s/BLsoft/PPPP/10.Zoo/Libs/" % beamline)
+sys.path.append("/isilon/%s/BLsoft/PPPP/10.Zoo/" % beamline)
+
+from MyException import *
 import Zoo
 import AttFactor
 import LoopMeasurement
@@ -11,73 +15,53 @@ import BeamsizeConfig
 import datetime
 import StopWatch
 import Device
-import HEBI
+import HEBI, HITO
 import DumpRecover
 import AnaHeatmap
 import ESA
 import KUMA
 import CrystalList
-import MyDate
+import Date
 import DiffscanMaster
-from Libs import BSSconfig
-import cv2
-import time
-import math
-from MyException import *
+
 from html_log_maker import ZooHtmlLog
-from ErrorCode import ErrorCode
 
 import logging
 import logging.config
 
-import os
-from configparser import ConfigParser, ExtendedInterpolation
-
 def check_abort(lm):
-    print("Abort check")
+    print "Abort check"
     ret = lm.isAbort()
-    if ret: print("ABORTABORT")
+    if ret: print "ABORTABORT"
     return ret
+# check_abort()
 
 # Version 2.1.0 modified on 2019/07/04 K.Hirata
 # Version 2.1.1 modified on 2019/07/23 K.Hirata
 # Version 2.1.2 modified on 2019/10/26 K.Hirata at BL45XU
-# Version 5.0.0 modified on 2025/02/14 K.Hirata at BL32XU www
 
 class ZooNavigator():
-    def __init__(self, blf, esa_csv="", is_renew_db=False):
+    def __init__(self, zoo, ms, esa_csv, is_renew_db=False):
+        print "ZooNavigator was called."
         # From arguments
-        # BLFactory containing zoo, ms, device already initialized in calling function.
-        self.blf = blf
-        self.zoo = self.blf.zoo
+        self.zoo = zoo
         self.esa_csv = esa_csv
-        self.ms = self.blf.ms
+        self.ms = ms
 
         # Device settings
-        # this has a gonio instance already for BL44XU and others.
-        self.dev = self.blf.device
+        self.dev = Device.Device(ms)
+        self.dev.init()
 
         # Beam dump treatment
         self.dump_recov = DumpRecover.DumpRecover(self.dev)
         self.recoverOption = False
 
         # Back img
-        self.backimg = "dummy.ppm"
+        self.backimg = "/isilon/%s/BLsoft/PPPP/10.Zoo/BackImages/back-1811221806.ppm" % beamline.upper()
 
-        # BSS configure file path
-        # beamline.ini から読み込む 
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
-        self.config_file = self.config.get("files", "bssconfig_file")
-        # directory to store background images.
-        self.backimage_dir = self.config.get("dirs", "backimage_dir")
-
-        # ECHAを利用した測定かどうか？
-        self.isECHA = self.config.getboolean("ECHA", "isECHA")
-
-        # beamline name is read from 'beamline.ini'
-        # section:beamline, option: beamline
-        self.beamline = self.config.get("beamline", "beamline")
+        # Configure directory
+        self.config_dir = "/isilon/blconfig/%s/" % beamline.lower()
+        self.config_file = "%s/bss/bss.config" % self.config_dir
 
         # Attenuator index
         self.att = AttFactor.AttFactor()
@@ -87,6 +71,7 @@ class ZooNavigator():
 
         self.logger = logging.getLogger('ZOO').getChild("ZooNavigator")
 
+        self.zooprog = open("/isilon/%s/BLsoft/PPPP/10.Zoo/ZooLogs/zoo_progress.log" % beamline.upper(), "a")
         self.stopwatch = StopWatch.StopWatch()
 
         # Data processing file
@@ -95,16 +80,16 @@ class ZooNavigator():
         # Checking data processing file
         self.isDPheader = False
 
-        # Goniometer positions 
+        # Goniometer positions
         # The values will be updated by the current pin position
-        self.sx = 1.0
-        self.sy = -7.74
-        self.sz = -1.00
+        self.sx = -0.75
+        self.sy = 8.500
+        self.sz = 0.020
 
         # Goniometer mount position( will be read from BSS configure file)
-        self.mx = 1.0
-        self.my = -7.74
-        self.mz = -1.00
+        self.mx = -0.75
+        self.my = 8.5000
+        self.mz = 0.020
 
         # DB name
         self.phosec_meas = 0
@@ -127,47 +112,48 @@ class ZooNavigator():
 
         # If BSS can change beamsize via command
         self.doesBSSchangeBeamsize = True
+#        self.doesBSSchangeBeamsize = False
 
         # For cleaning information
         self.num_pins = 0
         self.n_pins_for_cleaning = 16
-        self.cleaning_interval_hours = 1.0  # [hour]
-        self.time_for_elongation = 0.0  # [sec]
+        self.cleaning_interval_hours = 0.75 #[hour]
+        self.time_for_elongation = 0.0 #[sec]
 
         # Bukkake & capture
         self.isZoomCapture = True
 
         # Time limit
-        self.time_limit_ds = 9999  # [hours]
+        self.time_limit_ds = 9999 #[hours]
 
         # Flag for 10um raster scan at BL45XU
-        self.flag10um_raster = False
-        self.min_beamsize_10um_raster = 20.0
-
-        # isDark flag : read from 'beamline.ini'
-        # section: special_setting, option: isDark, value: boolean
-        self.isDark = self.config.getboolean("special_setting", "isDark")
+        self.isSpecialRasterStep = False
+        self.beamsize_thresh_special_raster = 50.0
+        self.special_raster_step = 25.0 # [um]
+        # Dark experiment
+        self.isDark = False
 
     def readZooDB(self, dbfile):
         self.esa = ESA.ESA(dbfile)
         return True
 
     def setTimeLimit(self, time_hours):
-        self.logger.info("Limiting time for this data colletion to %5.1f hours" % time_hours)
         self.time_limit_ds = time_hours
 
-    def setMinBeamsize10umRaster(self, beamsize_thresh):
-        self.min_beamsize_10um_raster = beamsize_thresh
-        self.flag10um_raster = True
+    def setRasterStep(self, step_size_um, beamsize_thresh):
+        self.logger.info("Step size for 2D raster scan has been changed to %8.2f um" % step_size_um)
+        self.isSpecialRasterStep = True
+        self.beamsize_thresh_special_raster = beamsize_thresh
+        self.special_raster_step = step_size_um
 
-    def prepESA(self, doesExist=False):
+    def prepESA(self, doesExist = False):
         self.logger.info("Preparation of ZOO database file from input CSV file. %s" % self.esa_csv)
         # Root directory from CSV file
-        root_dir = open(self.esa_csv, "r").readlines()[1].replace("\"", "").split(",")[0]
+        root_dir = open(self.esa_csv, "r").readlines()[1].replace("\"","").split(",")[0]
         if os.path.exists(root_dir) == False:
             os.makedirs(root_dir)
         # zoo.db file check and remake and save
-        d = MyDate.MyDate()
+        d = Date.Date()
         time_str = d.getNowMyFormat(option="sec")
         dbfile = "%s/zoo_%s.db" % (root_dir, time_str)
         self.esa = ESA.ESA(dbfile)
@@ -214,22 +200,16 @@ class ZooNavigator():
         # Beam size change
         if self.doesBSSchangeBeamsize == True:
             current_beam_index = self.zoo.getBeamsize()
-            beamsizeconf = BeamsizeConfig.BeamsizeConfig()
-            self.beamsize_index = beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
-            if current_beam_index != self.beamsize_index:
+            beamsizeconf = BeamsizeConfig.BeamsizeConfig(self.config_dir)
+            beamsize_index = beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
+            if current_beam_index != beamsize_index:
                 self.logger.info("Beam size will be changed from now.")
-                self.logger.info("Beamsize index = %5d" % self.beamsize_index)
-                self.zoo.setBeamsize(self.beamsize_index)
+                self.logger.info("Beamsize index = %5d" % beamsize_index)
+                self.zoo.setBeamsize(beamsize_index)
 
         # Measure the flux
         self.logger.info("Measuring photon flux....")
         self.phosec_meas = self.dev.measureFlux()
-        # 2020/07/17 To be fixed.
-        # 2021/04/12 Test without no X-ray beam
-        if self.phosec_meas < 1E10:
-            self.logger.info("Illegally weak X-ray... but test will continue (test mode w/o X-ray beam)")
-            sys.exit()
-
         # Adding measured flux & beam size to the list
         self.meas_beamh_list.append(beamh)
         self.meas_beamv_list.append(beamv)
@@ -253,36 +233,31 @@ class ZooNavigator():
         # Check if the pin is mounted or not
         try:
             self.zoo.dismountCurrentPin()
-        except MyException as tttt:
+        except MyException, tttt:
             self.logger.info("dismounting sample for capturing background image failed.")
             sys.exit()
         # Background image for centering
-        self.backimg = "%s/%s" % (self.backimage_dir, datetime.datetime.now().strftime("back-%y%m%d%H%M.ppm"))
-        self.logger.debug("Before while loop for capturing.")
-        while (True):
+        backdir = "/isilon/%s/BLsoft/PPPP/10.Zoo/BackImages/" % beamline.upper()
+        self.backimg = "%s/%s" % (backdir, datetime.datetime.now().strftime("back-%y%m%d%H%M.ppm"))
+        while(True):
             try:
-                self.dev.prepCentering(zoom_out=True)
+                self.dev.prepCentering()
                 self.logger.debug("Dummy capture for the first image")
                 self.dev.capture.capture(self.backimg)
                 time.sleep(0.5)
                 self.logger.debug("The 2nd image..")
                 self.dev.capture.capture(self.backimg)
-            except MyException as tttt:
+            except MyException, tttt:
                 raise MyException("Capture background file failed")
                 sys.exit()
 
             timg = cv2.imread(self.backimg)
             mean_value = timg.mean()
-            self.logger.debug("Checking the file size and background level.")
-            if self.beamline.upper() == "BL32XU" or self.beamline.upper()=="BL44XU" or self.beamline.upper()=="BL41XU":
-                # mean_thresh = 230
-                mean_thresh = 240  # 2021/01/21 HM temporary setting
-            elif self.beamline.upper() == "BL45XU":
-                mean_thresh = 200
-
-            self.logger.debug("HERHERERERER")
-            if self.isDark == False and mean_value < 100:
-                self.logger.info("Mean value of the image is %5d" % mean_value)
+            if beamline.upper() == "BL32XU":
+                mean_thresh = 230
+            elif beamline.upper() == "BL45XU":
+                mean_thresh = 250
+            if mean_value < 100:
                 self.logger.info("Background image seems to be bad with lower mean value than 100!")
                 continue
             elif self.isDark == True and mean_value < 35:
@@ -300,9 +275,6 @@ class ZooNavigator():
         self.logger.info("New background file has been replaced to %s" % self.backimg)
         self.dev.capture.disconnect()
         self.isCaptured = True
-        # set beamsize index to the initial one : this is especially for BL44XU
-        self.zoo.setBeamsize(1)
-
         return self.backimg
 
     def prepAttCondition(self, cond):
@@ -329,85 +301,9 @@ class ZooNavigator():
 
         return change_flag
 
-    def goAroundECHA(self, zoo_id):
-        # ECHA class 
-        # zoo_id is identical for each 'ZOOPREP' sheet.
-        from ECHA.ESAloaderAPI import ESAloaderAPI
-        self.echa_esa = ESAloaderAPI(zoo_id)
-
-        # Zoom out
-        self.dev.zoom.zoomOut()
-        # save the starting time for this data collection
-        self.stopwatch.setTime("start_data_collection")
-        # set the initial time for cleaning
-        self.stopwatch.setTime("last_cleaning")
-        while (1):
-            # Get a condition of the most important pin stored in a current zoo.db
-            try:
-                self.logger.info("Trying to get the prior pin")
-                # getNextPin
-                dict_next = self.echa_esa.getNextPin()
-                # dict_next がNoneの場合には測定を終了する
-                if dict_next is None:
-                    self.logger.info("All measurements have been finished.")
-                    return self.num_pins
-                # o_indexを抜き出す
-                o_index = dict_next['o_index']
-                p_index = dict_next['p_index']
-                # 'zoo_samplepin_id' 
-                zoo_samplepin_id = dict_next['zoo_samplepin_id']
-                # acquire condition
-                cond = self.echa_esa.getCond(zoo_samplepin_id)
-                # cond に o_index,p_indexを追加する
-                cond['o_index'] = o_index
-                cond['p_index'] = p_index
-                print(f"#########################################")
-                print(f"cond: {cond}")
-                print(f"#########################################")
-                self.processLoop(cond, checkEnergyFlag=True)
-                self.logger.info("ZN: processLoop has been finished for this pin.")
-
-            except MyException as ttt:
-                # Logging a caught exception message from modules.
-                exception_message = ttt.args[0]
-                self.logger.info("+++ Caught exception in a main loop.:%s +++" % exception_message)
-
-                if self.num_pins == 0:
-                    message = "Exception in ZN.processLoop: Please check CSV file or ZOODB file."
-                else:
-                    message = "All measurements have been finished."
-                self.logger.info(message)
-                return self.num_pins
-
-            # Checking points
-            # Check for total consumed time
-            lap_time = self.stopwatch.calcTimeFrom("start_data_collection") / 3600.0  # hours
-            residual_time_for_ds = self.time_limit_ds - lap_time
-
-            self.logger.info("Lap time for data collection: %5.2f hours (residual= %5.2f hours)" % (
-                lap_time, residual_time_for_ds))
-
-            if residual_time_for_ds < 0.0:
-                self.logger.info("Data collection has been finished due to the booked time finish.")
-                self.logger.info("Consumed time = %8.4f hours" % lap_time)
-                return self.num_pins
-
-            # Time from last cleaning
-            self.logger.info("Checking the cleaning interval time...")
-            time_from_last_cleaning = self.stopwatch.calcTimeFrom("last_cleaning")
-            residual_time_for_next_cleaning = self.cleaning_interval_hours * 3600 - time_from_last_cleaning
-            self.logger.info("Time from last cleaning: %s seconds (%s remains)" % (
-                time_from_last_cleaning, residual_time_for_next_cleaning))
-            if residual_time_for_next_cleaning < 0:
-                # cleaning
-                self.zoo.cleaning()
-                self.zoo.waitSPACE()
-                # Set the new 'last_cleaning' time
-                self.stopwatch.setTime("last_cleaning")
-
     def goAround(self, zoodb="none"):
         # Common settings
-        self.logger.info(f"ZooDB: {zoodb}")
+        print "goAround=", zoodb
         if zoodb == "none":
             self.prepESA()
         else:
@@ -418,18 +314,14 @@ class ZooNavigator():
         self.stopwatch.setTime("start_data_collection")
         # set the initial time for cleaning
         self.stopwatch.setTime("last_cleaning")
-        while (1):
+        while(1):
             # Get a condition of the most important pin stored in a current zoo.db
             try:
                 self.logger.info("Trying to get the prior pin")
                 cond = self.esa.getPriorPinCond()
                 self.processLoop(cond, checkEnergyFlag=True)
                 self.logger.info("ZN: processLoop has been finished for this pin.")
-            except MyException as ttt:
-                # Logging a caught exception message from modules.
-                exception_message = ttt.args[0]
-                self.logger.info("+++ Caught exception in a main loop.:%s +++" % exception_message)
-
+            except:
                 if self.num_pins == 0:
                     message = "Exception in ZN.processLoop: Please check CSV file or ZOODB file."
                 else:
@@ -438,11 +330,10 @@ class ZooNavigator():
                 return self.num_pins
             finally:
                 # Check for total consumed time
-                lap_time = self.stopwatch.calcTimeFrom("start_data_collection") / 3600.0  # hours
+                lap_time = self.stopwatch.calcTimeFrom("start_data_collection") / 3600.0 # hours
                 residual_time_for_ds = self.time_limit_ds - lap_time
 
-                self.logger.info("Lap time for data collection: %5.2f hours (residual= %5.2f hours)" % (
-                    lap_time, residual_time_for_ds))
+                self.logger.info("Lap time for data collection: %5.2f hours (residual= %5.2f hours)" % (lap_time, residual_time_for_ds))
 
                 if residual_time_for_ds < 0.0:
                     self.logger.info("Data collection has been finished due to the booked time finish.")
@@ -462,94 +353,14 @@ class ZooNavigator():
                     # Set the new 'last_cleaning' time
                     self.stopwatch.setTime("last_cleaning")
 
-    def checkSkipped(self,cond):
-        # ECHAを利用している場合
-        if self.isECHA == True:
-            zoo_samplepin_id = cond['zoo_samplepin_id']
-            # ECHAのデータベースからスキップされたかどうかを確認
-            if self.echa_esa.isSkipped(zoo_samplepin_id) == True:
-                self.logger.info("zoo_samplepin_id=%5d is skipped" % zoo_samplepin_id)
-                return True
-            else:
-                return False
-        else:
-            # ZOODBからスキップされたかどうかを確認
-            if self.esa.isSkipped(cond['o_index']) == True:
-                self.logger.info("o_index=%5d %s-%s is skipped" % (cond['o_index'], cond['puckid'], cond['pinid']))
-                return True
-            else:
-                return False
-
-        # isSkip が立っている場合にはTrueを返す
-
-    def updateDBinfo(self, cond, param_name, param_value):
-        # ECHAを利用している場合
-        if self.isECHA == True:
-            zoo_samplepin_id = cond['zoo_samplepin_id']
-            # param_name="isDone"の場合には zoo_samplepin を更新する必要がある
-            if param_name == "isDone":
-                p_index = cond['p_index']
-                self.echa_esa.setDone(p_index, zoo_samplepin_id, param_value)
-            else:
-                # JSON
-                param_json = {
-                    "data": [{
-                        param_name: param_value
-                    }]
-                }
-                self.logger.info(f"param_json: {param_json}")
-                self.echa_esa.postResult(zoo_samplepin_id, param_json)
-        # ZOODBを利用している場合
-        else:
-            self.esa.updateValueAt(cond['o_index'], param_name, param_value)
-
-    # 時間の記録をする
-    # event_name: "meas_start", "meas_end", "mount_start", "mount_end", 
-    # "cent_start", "cent_end", "raster_start", "raster_end", "ds_start", 
-    # "ds_end", "dismount_start", "dismount_end"
-    # ZOODBの方では "t_meas_start", "t_meas_end"のように読み替えて記録しているはず
-    # これに注意して読み勧めてください
-    # ECHAでは時間は登録時に勝手に記録するのでわかりやすいコメントを入れます。
-    def updateTime(self, cond, event_name, comment=""):
-        # 許容される時間文字列
-        list_event = ["meas_start", "meas_end", "mount_start", "mount_end",
-                        "cent_start", "cent_end", "raster_start", "raster_end",
-                        "ds_start", "ds_end", "dismount_start", "dismount_end"]
-        # event_nameがlist_eventに含まれているかどうか
-        if event_name not in list_event:
-            self.logger.error("event_name is not correct.")
-            return
-        # ECHAを利用している場合 (commentsを利用)
-        if self.isECHA == True:
-            zoo_samplepin_id = cond['zoo_samplepin_id']
-            # ECHA用のパラメータ名
-            echa_paramname = "t_" + event_name
-            # JSON
-            param_json = {
-                "data":[{
-                    echa_paramname: comment
-                }]
-            }
-            self.echa_esa.postResult(zoo_samplepin_id, param_json)
-        # ZOODBを利用している場合
-        else:
-            self.esa.addEventTimeAt(cond['o_index'], event_name)
-
     def processLoop(self, cond, checkEnergyFlag=False, measFlux=False):
         # Root directory
         root_dir = cond['root_dir']
-        # priority index 
+        # priority index
         o_index = cond['o_index']
-        # For ECHA: zoo_samplepin_idが必要なので取得しておく
-        if self.isECHA == True:
-            zoo_samplepin_id = cond['zoo_samplepin_id']
 
-        # Root directory : exisiting or not
-        if os.path.exists(root_dir):
-            self.logger.info("%s already exists" % root_dir)
-        else:
-            self.logger.info("%s is being made now..." % root_dir)
-            os.makedirs(root_dir)
+        # self.html_maker = ZooHtmlLog(root_dir, name, online=True)
+        # open(os.path.join(os.environ["HOME"], ".zoo_current"), "w").write("%s %s\n"%(name,root_dir))
 
         # For data processing
         dp_file_name = "%s/data_proc.csv" % root_dir
@@ -563,12 +374,16 @@ class ZooNavigator():
             # Flag for opening the data processing file
             self.isOpenDPfile = True
 
-        if self.checkSkipped(cond) == True:
+        # Check point of 'skipping' this loop
+        # check 'isSkip' in zoo.db
+        if self.esa.isSkipped(o_index) == True:
             self.logger.info("o_index=%5d %s-%s is skipped" % (o_index, cond['puckid'], cond['pinid']))
+            self.logger.info("Disconnecting capture")
+            self.lm.closeCapture()
             return
 
         # Write log string
-        self.logger.info(f">>>>>>>>>>>>>>>> Processing {cond['puckid']}-{cond['pinid']:02d} <<<<<<<<<<<<<<<<<")
+        self.logger.info(">>>>>>>>>>>>>>>> Processing %4s-%2s <<<<<<<<<<<<<<<<" % (cond['puckid'], cond['pinid']))
 
         # Making root directory
         if os.path.exists(root_dir):
@@ -592,7 +407,7 @@ class ZooNavigator():
             energy_change_flag = self.checkEnergy(cond)
             # When the energy was changed in checkEnergy function
             if energy_change_flag == True:
-                if self.beamline.upper() == "BL45XU":
+                if beamline.upper() == "BL45XU":
                     self.logger.info("Wavelength will be changed.")
                     self.zoo.setWavelength(cond['wavelength'])
                     self.logger.info("Wavelength has been changed. You should wait for 15 minutes")
@@ -611,21 +426,19 @@ class ZooNavigator():
         if self.doesBSSchangeBeamsize == True:
             # Beamsize setting
             current_beam_index = self.zoo.getBeamsize()
-            beamsizeconf = BeamsizeConfig.BeamsizeConfig()
-            self.logger.debug(
-                "Raster beam size = %5.2f(H) x %5.2f(V) [um]" % (cond['raster_hbeam'], cond['raster_vbeam']))
-            self.beamsize_index = beamsizeconf.getBeamIndexHV(cond['raster_hbeam'], cond['raster_vbeam'])
+            beamsizeconf = BeamsizeConfig.BeamsizeConfig(self.config_dir)
+            self.logger.debug("Raster beam size = %5.2f(H) x %5.2f(V) [um]" % (cond['raster_hbeam'], cond['raster_vbeam']))
+            beamsize_index = beamsizeconf.getBeamIndexHV(cond['raster_hbeam'], cond['raster_vbeam'])
             self.logger.info("Current beamsize index= %5d" % current_beam_index)
-            if current_beam_index != self.beamsize_index:
-                self.logger.info("Beamsize index = %5d" % self.beamsize_index)
-                self.zoo.setBeamsize(self.beamsize_index)
-                if self.beamline.upper() == "BL45XU":
+            if current_beam_index != beamsize_index:
+                self.logger.info("Beamsize index = %5d" % beamsize_index)
+                self.zoo.setBeamsize(beamsize_index)
+                if beamline.upper() == "BL45XU":
                     self.logger.info("Tuning a beam position starts....")
                     self.zoo.runScriptOnBSS("BLTune")
                     self.dev.zoom.zoomOut()
 
-        self.logger.info(
-            "Beam size for raster scan= %5.2f(H) x %5.2f(V) [um^2]" % (cond['raster_hbeam'], cond['raster_vbeam']))
+        self.logger.info("Beam size for raster scan= %5.2f(H) x %5.2f(V) [um^2]"% (cond['raster_hbeam'], cond['raster_vbeam']))
 
         # Making
         # try: self.html_maker.add_condition(cond)
@@ -640,7 +453,7 @@ class ZooNavigator():
             self.logger.debug("ZooNavigator.measureFlux is called from main routin")
             self.measureFlux(cond)
             # Recording flux value to ZOODB
-            self.updateDBinfo(cond, "flux", self.phosec_meas)
+            self.esa.updateValueAt(o_index, "flux", self.phosec_meas)
         elif self.helical_debug == True:
             self.phosec_meas = 1E13  # 2019/05/24 K.Hirata
 
@@ -648,6 +461,7 @@ class ZooNavigator():
         # Beamsize should be changed via BSS
         else:
             self.logger.info("Skipping measuring flux")
+            # self.measureFlux(cond)
 
         # Experiment
         trayid = cond['puckid']
@@ -657,42 +471,26 @@ class ZooNavigator():
         self.logger.info("Processing pin named %s" % prefix)
 
         # Loop measurement class initialization
-        self.lm = LoopMeasurement.LoopMeasurement(self.blf, root_dir, prefix)
-        self.logger.info("LoopMeasurement class has been initialized.")
+        self.lm = LoopMeasurement.LoopMeasurement(self.ms, root_dir, prefix)
 
         # Making directories
         # d_index was defined as 'the newest directory number' of scan??/data??.
         d_index = self.lm.prepDataCollection()
-        self.logger.info("Directory preparation finished.")
         # n_mount is not useful then 'directory index' is stored to 'n_mount'
 
-        # ラップタイムを記録
-        self.updateTime(cond, "meas_start", comment="Measurement start")
+        self.esa.updateValueAt(o_index, "n_mount", d_index)
+        self.esa.addEventTimeAt(o_index, "meas_start")
 
         # Setting wavelength for schedule file
         self.lm.setWavelength(cond['wavelength'])
 
         # Mount position of SPACE (copy from Loopmeasurement.INOCC)
-        # mount position is read from bssconfig
-        self.bssconfig = BSSconfig.BSSconfig()
-        # Read Cmount position from configure file
-        self.mx, self.my, self.mz = self.bssconfig.getCmount()
+        self.mx = self.lm.inocc.mx
+        self.my = self.lm.inocc.my
+        self.mz = self.lm.inocc.mz
 
         self.logger.info("[PROCESS] Mounting sample starts.")
-        # ラップタイムの記録
-        self.updateTime(cond, "mount_start", comment="Sample mounting started")
-
-        # ErrorCode module
-        """
-        SPACE_WARNING_SUSPECTED = 9001  # 存在が疑われるもの
-        SPACE_WARNING_LHEAD_PUSHED = 9002  # Lheadが過剰に押された場合
-        SPACE_WARNING_ROTATE_TOO_MUCH = 9003  # ヘッドが掴めなかった系
-    
-        # SPACE accidents
-        SPACE_ACCIDENT_LHEAD_PULLED = 9997  # Lheadが引っ張られた
-        SPACE_UNKNOWN_ACCIDENT = 9998  # 上記以外の未知の事故
-        SPACE_ACCIDENT = 9999  # SPACEアクシデント
-        """
+        self.esa.addEventTimeAt(o_index, "mount_start")
         try:
             self.zoo.mountSample(trayid, pinid)
         except MyException as ttt:
@@ -703,102 +501,60 @@ class ZooNavigator():
                 message = "SPACE accident occurred! Please contact a beamline scientist."
                 message += "Check if 'puckid' matches in CSV file and SPACE server."
                 self.logger.error(message)
-                log_message = message
-                # isDoneにエラーコードを持たせている→meas_record
-                error_code = ErrorCode.SPACE_ACCIDENT
-                # update
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                # isDoneもZOODB用に入れておくことに
-                self.updateDBinfo(cond, "isDone", error_code)
-                self.updateDBinfO(cond, "log_mount", log_message)
-                return
-
+                self.esa.updateValueAt(o_index, "log_mount", msg)
+                self.esa.addEventTimeAt(o_index, "meas_end")
+                self.logger.critical(message)
+                self.esa.updateValueAt(o_index, "isDone", 9999)
+                sys.exit()
             if exception_message.rfind('-1005000004') != -1:
                 message = "SPACE accident occurred! Please contact a beamline scientist.\n"
                 message += "L-head value is negative in picking up the designated pin."
                 self.logger.error(message)
-                log_message = message
-                error_code = ErrorCode.SPACE_WARNING_LHEAD_PUSHED
-                # update
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                # isDoneもZOODB用に入れておくことに
-                self.updateDBinfo(cond, "isDone", error_code)
-                self.updateDBinfO(cond, "log_mount", log_message)
-                return
-
+                self.esa.updateValueAt(o_index, "log_mount", msg)
+                self.esa.addEventTimeAt(o_index, "meas_end")
+                self.logger.critical(message)
+                self.esa.updateValueAt(o_index, "isDone", 9997)
+                sys.exit()
             elif exception_message.rfind('-1005100001') != -1:
                 message = "'SPACE_WARNING_existense_pin_%s_%s'" % (trayid, pinid)
                 self.logger.warning(message)
-                error_code = ErrorCode.SPACE_WARNING_SUSPECTED
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                # isDoneもZOODB用に入れておくことに
-                self.updateDBinfo(cond, "isDone", error_code)
-                self.updateDBinfo(cond, "log_mount", message)
-                # Let BSS know about this should be skipped. (reset SPACE)
+                self.esa.updateValueAt(o_index, "log_mount", message)
                 self.zoo.skipSample()
-                self.logger.info("SPACE output a warning message. Next sample")
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
-                self.updateDBinfO(cond, "log_mount", message)
+                self.logger.info("Go to the next sample...")
+                self.esa.addEventTimeAt(o_index, "meas_end")
+                self.esa.updateValueAt(o_index, "isDone", 5001)
                 self.logger.info("Breaking the loop of %s-%02d" % (trayid, pinid))
                 return
             elif exception_message.rfind('-1005100002') != -1:
                 message = "'SPACE_WARNING_push_too_much_%s_%s'" % (trayid, pinid)
-                # ここも特殊
                 self.logger.warning(message)
+                self.esa.updateValueAt(o_index, "log_mount", message)
                 self.zoo.skipSample()
-                error_code = ErrorCode.SPACE_WARNING_SUSPECTED
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                self.updateDBinfo(cond, "log_mount", message)
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
-                self.logger.info("SPACE output a warning message. Next sample")
+                self.logger.info("Go to the next sample...")
+                self.esa.addEventTimeAt(o_index, "meas_end")
+                self.esa.updateValueAt(o_index, "isDone", 5001)
                 self.logger.info("Breaking the loop of %s-%02d" % (trayid, pinid))
                 return
             elif exception_message.rfind('-1005100003') != -1:
                 message = "'SPACE_WARNING_rotate_too_much_%s_%s'" % (trayid, pinid)
                 self.logger.warning(message)
-                error_code = ErrorCode.SPACE_WARNING_ROTATE_TOO_MUCH
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
-                self.updateDBinfo(cond, "log_mount", message)
+                self.esa.updateValueAt(o_index, "log_mount", message)
                 self.zoo.skipSample()
                 self.logger.info("Go to the next sample...")
-                self.logger.info("SPACE output a warning message. Next sample")
-                self.logger.info("Breaking the loop of %s-%02d" % (trayid, pinid))
-                return
-            # 220629 K.Hirata added from BSS log.
-            elif exception_message.rfind('-1005100007') != -1:
-                message = "'Failed to pickup the sample pin from the tray. %s_%s'" % (trayid, pinid)
-                self.logger.warning(message)
-                error_code = ErrorCode.SPACE_WARNING_SUSPECTED
-                self.zoo.skipSample()
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                self.updateDBinfo(cond, "log_mount", message)
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
-                self.logger.info("SPACE output a warning message. Next sample")
+                self.esa.addEventTimeAt(o_index, "meas_end")
+                self.esa.updateValueAt(o_index, "isDone", 5001)
                 self.logger.info("Breaking the loop of %s-%02d" % (trayid, pinid))
                 return
             else:
                 message = "Unknown Exception: %s. Program terminates" % ttt
                 self.logger.error(message)
-                error_code = ErrorCode.SPACE_UNKNOWN_ACCIDENT
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                self.updateDBinfo(cond, "log_mount", message)
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
+                self.esa.updateValueAt(o_index, "isDone", 9998)
                 sys.exit()
             return
-
         # Succeeded
         self.logger.info("Mount is finished")
-        # isMount was not used in other python scripts (2025/02/13)
-        # This can be obsoleted but currently kept for compatibility
-        # isMount = d_index + 1
-        isMount = d_index + 1
-        self.updateDBinfo(cond, "isMount", isMount)
-        self.updateTime(cond, "mount_end", comment="Sample mounting finished")
+        self.esa.incrementInt(o_index, "isMount")
+        self.esa.addEventTimeAt(o_index, "mount_end")
 
         # Time for waiting for the elongation
         time.sleep(self.time_for_elongation)
@@ -816,18 +572,16 @@ class ZooNavigator():
             self.sy = self.my
 
         # Check point of 'skipping' this loop
-        if self.checkSkipped(cond) == True:
+        # check 'isSkip' in zoo.db
+        if self.esa.isSkipped(o_index) == True:
             self.logger.info("o_index=%5d %s-%s is skipped" % (o_index, cond['puckid'], cond['pinid']))
+            self.logger.info("Disconnecting capture")
             self.lm.closeCapture()
             return
 
         # The goniometer moves to the saved position
-        # self.num_pins が 0 の場合には、self.sx = self.mx, self.sy = self.my, self.sz = self.mz
-        if self.num_pins == 0:
-            self.sx, self.sy, self.sz = self.mx, self.my, self.mz
-
         self.logger.info("move to the save point (%9.4f %9.4f %9.4f)" % (self.sx, self.sy, self.sz))
-        self.dev.gonio.moveXYZPhi(self.sx, self.sy, self.sz, 0.0)
+        self.lm.moveGXYZphi(self.sx, self.sy, self.sz, 0.0)
 
         # Waiting warming up the pin
         if cond['warm_time'] > 0.0:
@@ -842,8 +596,8 @@ class ZooNavigator():
             self.logger.info("ZOO starts warming up the loop.")
             # Recording start time
             self.stopwatch.setTime("start_warming")
-            time_from_start = 1.0  # sec
-            while (1):
+            time_from_start = 1.0 # sec
+            while(1):
                 if time_from_start <= cond['warm_time']:
                     self.dev.gonio.rotatePhi(0.0)
                     time.sleep(0.5)
@@ -864,8 +618,9 @@ class ZooNavigator():
 
         #### Centering
         # 2015/11/21 Loop size can be set
-        self.updateTime(cond, "cent_start", comment="Centering starts")
+        self.esa.addEventTimeAt(o_index, "center_start")
         try:
+
             self.logger.info("ZooNavigator starts centering procedure...")
             height_add = 0.0
             self.rwidth, self.rheight = self.lm.centering(
@@ -873,24 +628,15 @@ class ZooNavigator():
                 height_add=height_add)
             self.center_xyz = self.dev.gonio.getXYZmm()
             self.logger.info("ZooNavigator finished centering procedure...")
-            # isLoopCenter = 1
-            self.updateDBinfo(cond, "isLoopCenter", 1)
-            self.updateDBinfo(cond, "scan_height", self.rheight)
-            self.updateDBinfo(cond, "scan_width", self.rwidth)
+            self.esa.incrementInt(o_index, "isLoopCenter")
+            self.esa.updateValueAt(o_index, "scan_height", self.rheight)
+            self.esa.updateValueAt(o_index, "scan_width", self.rwidth)
 
-        # exception reason
-        except MyException as ttt:
+        except:
             self.logger.error("ZOO detects exception in centering")
-            # reason
-            exception_message = ttt.args[0]
-            self.logger.error("Exception message: %s" % exception_message)
             self.logger.error("Go to next sample")
-            # isLoopCenter = 9999
-            self.updateDBinfo(cond, "isLoopCenter", 9999)
-            self.updateTime(cond, "cent_end", comment="Centering failed")
-            error_code = ErrorCode.CENTERING_FAILED
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+            self.esa.updateValueAt(o_index, "isLoopCenter", -9999)
+            self.esa.updateValueAt(o_index, "isDone", 5002)
             # Disconnecting capture in this loop's 'capture' instance
             self.logger.info("close Capture instance")
             self.lm.closeCapture()
@@ -898,20 +644,22 @@ class ZooNavigator():
 
         #### /Centering
         # Succeeded
-        self.updateTime(cond, "cent_end", comment="Centering finished")
+        self.esa.addEventTimeAt(o_index, "center_end")
+        self.zooprog.flush()
 
         # Save Gonio XYZ to the previous pins
-        self.sx, self.sy, self.sz, sphi = self.dev.gonio.getXYZPhi()
+        self.sx, self.sy, self.sz, sphi = self.lm.saveGXYZphi()
 
         # Capture the crystal image before experiment
         self.logger.info("ZooNavigator is capturing the 'before.ppm'")
         capture_name = "before.ppm"
         self.lm.captureImage(capture_name)
 
-        if self.beamline.upper() == "BL45XU":
+        if beamline.upper() == "BL45XU":
             # LN2:ON -> ZoomCap:ON
             if cond['ln2_flag'] == 1:
-                self.dev.zoom.move(2000)
+                # self.dev.zoom.move(2000)
+                self.dev.zoom.move(3200) # by N.Mizuno @2021/03/30
                 capture_name = "loop_zoom.ppm"
                 self.lm.captureImage(capture_name)
                 # Bukkake
@@ -924,7 +672,8 @@ class ZooNavigator():
             # ZoomCap:ON only (withough LN2 bukkake)
             elif cond['zoomcap_flag'] == 1:
                 self.logger.info("Zoom capture will be conducted from now...")
-                self.dev.zoom.move(2000)
+                # self.dev.zoom.move(2000)
+                self.dev.zoom.move(3200) # by N.Mizuno @2021/03/30
                 capture_name = "loop_zoom.ppm"
                 self.lm.captureImage(capture_name)
                 self.dev.zoom.zoomOut()
@@ -939,18 +688,15 @@ class ZooNavigator():
             if self.dump_recov.checkAndRecover(cond['wavelength']) == False:
                 # 2019/04/21 K.Hirata Skipped at BL45XU
                 # self.bsc.changeBeamsizeHV(cond['raster_hbeam'],cond['raster_vbeam'])
-                self.logger.info("skipping change beam size")
+                print "skipping change beam size"
 
         # Check point of 'skipping' this loop
-        if self.checkSkipped(cond) == True:
+        # check 'isSkip' in zoo.db
+        if self.esa.isSkipped(o_index) == True:
             self.logger.info("o_index=%5d %s-%s is skipped" % (o_index, cond['puckid'], cond['pinid']))
+            self.logger.info("Disconnecting capture")
             self.lm.closeCapture()
             return
-
-        # BL44XU: recover beamsize
-        # DO NOT GET THE INFORMATION FROM BSS 
-        if self.beamline.upper() == "BL44XU":
-            self.zoo.setBeamsize(self.beamsize_index)
 
         self.logger.info("ZooNavigator starts MODE=%s" % (cond['mode']))
         if cond['mode'] == "multi":
@@ -963,26 +709,30 @@ class ZooNavigator():
             self.collectSingle(trayid, pinid, prefix, cond, sphi)
         elif cond['mode'] == "ssrox":
             self.collectSSROX(cond, sphi)
-        elif cond['mode'] == "quick":
-            self.collectQuick(trayid, pinid, prefix, cond, sphi)
         elif cond['mode'] == "screening":
             self.collectScreen(cond, sphi)
-        else:
-            self.logger.error("Unknown mode: %s" % cond['mode'])
-            error_code = ErrorCode.UNKNOWN_MODE
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            self.updateTime(cond, "meas_end", comment="Unknown mode in a condition")
-            return
 
         self.num_pins += 1
 
-        # 正常終了したときの処理 (isDone, meas_endは各関数内で管理する)
-        self.logger.info("End of data collection from this 'cond'")
+        self.esa.addEventTimeAt(o_index, "meas_end")
+        self.logger.info("Adding 'meas_end' time information has been finished.")
+        self.zooprog.flush()
 
     def finishZoo(self):
         open(os.path.join(os.environ["HOME"], ".zoo_current"), "w").write("%s %s finished\n" \
                                                                           % (self.name, self.root_dir))
+
+    def setSpecialRasterStepFromBeamsize(self, cond):
+        if cond['raster_vbeam'] >= self.beamsize_thresh_special_raster and \
+                cond['raster_hbeam'] >= self.beamsize_thresh_special_raster:
+            self.logger.info("Special raster scan step setting is activated.")
+            self.logger.info("Current step size = %8.3f um" % self.special_raster_step)
+            self.lm.setSpecialRasterStep(self.special_raster_step)
+        else:
+            self.logger.info("Special raster scan step setting is activated.")
+            self.logger.info("But step is not changed now. beam size = V%5.2f x H%5.2f " %
+                             (cond['raster_vbeam'], cond['raster_hbeam']))
+            return
 
     def collectMulti(self, trayid, pinid, prefix, cond, sphi):
         o_index = cond['o_index']
@@ -1000,35 +750,27 @@ class ZooNavigator():
         hstep_um = cond['raster_hbeam']
 
         # 10um raster for BL45XU
-        if self.flag10um_raster == True:
-            self.lm.setMinBeamsize10umRaster(self.min_beamsize_10um_raster)
+        if self.isSpecialRasterStep: self.setSpecialRasterStepFromBeamsize(cond)
 
         raster_schedule, raster_path = self.lm.rasterMaster(scan_id, scan_mode, self.center_xyz,
                                                             scanv_um, scanh_um, vstep_um, hstep_um,
                                                             sphi, cond)
-        # To catch a detailed exception
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
-        try:
-            self.zoo.doRaster(raster_schedule)
-            self.zoo.waitTillReady()
-        except:
-            error_code = ErrorCode.RASTER_SCAN_FAILURE_MEASUREMENT
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            self.updateTime(cond, "raster_end", comment="Raster scan failed in unknown exception.")
-            self.updateTime(cond, "meas_end", comment="Raster scan failed in unknown exception.")
-            raise Exception("Raster scan by BSS failed.")
-
-        # Recording time
-        isRaster = 1
-        self.updateDBinfo(cond, "isRaster", isRaster)
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
+        raster_start_time = time.localtime()
+        self.esa.addEventTimeAt(o_index, "raster_start")
+        self.zoo.doRaster(raster_schedule)
+        self.zoo.waitTillReady()
+        self.esa.addEventTimeAt(o_index, "raster_end")
+        # Flag on
+        self.esa.incrementInt(o_index, "isRaster")
 
         # Analyzing raster scan results
         try:
             glist = []
             cxyz = self.sx, self.sy, self.sz
             scan_id = self.lm.prefix
+            # Crystal size setting
+            raster_hbeam = cond['raster_hbeam']
+            raster_vbeam = cond['raster_vbeam']
 
             # getSortedCryList copied from HEBI.py
             # Size of crystals?
@@ -1052,7 +794,7 @@ class ZooNavigator():
 
             # number of found crystals
             n_crystals = len(glist)
-            self.updateDBinfo(cond, "nds_multi", n_crystals)
+            self.esa.updateValueAt(o_index, "nds_multi", n_crystals)
 
             # Writing down the goniometer coordinate list
             gfile = open("%s/collected.dat" % self.lm.raster_dir, "w")
@@ -1060,37 +802,37 @@ class ZooNavigator():
             for gxyz in glist:
                 x, y, z = gxyz
                 gfile.write("%8.4f %8.4f %8.4f\n" % (x, y, z))
-
             gfile.close()
 
-        # Raster scan analysis failed.
-        except MyException as tttt:
-            logstring = tttt.args[0]
-            self.logger.warning(f"Raster scan failed: {logstring}")
-            # isDone, meas_record にエラーコードを入れる
-            error_code = ErrorCode.RASTER_SCAN_FAILURE_ANALYSIS
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            # end_time も入れておく
-            self.updateTime(cond, "raster_end", comment="Exception in analyzing raster scan result")
-            self.updateTime(cond, "meas_end", comment="Exception in analyzing raster scan result")
+            self.zooprog.flush()
+
+        except MyException, tttt:
+            print "Skipping this loop!!"
+            self.esa.updateValueAt(o_index, "isDone", 4002)
+            self.zooprog.write("\n")
+            self.zooprog.flush()
             # Disconnecting capture in this loop's 'capture' instance
-            self.logger.info("Disconnecting capture")
+            print "Disconnecting capture"
             self.lm.closeCapture()
             return
 
-        # No crystal was found
+        finally:
+            try:
+                print "FINALLY"
+                # nhits = len(glist)
+                # self.html_maker.add_result(puckname=trayid, pin=pinid,
+                # h_grid=self.lm.raster_n_width, v_grid=self.lm.raster_n_height,
+                # nhits=nhits, shika_workdir=os.path.join(self.lm.raster_dir, "_spotfinder"),
+                # prefix=self.lm.prefix, start_time=raster_start_time)
+                # self.html_maker.write_html()
+            except:
+                print traceback.format_exc()
+
         if len(glist) == 0:
-            self.logger.warning("Skipping this loop!!")
-            # isDone, meas_record にエラーコードを入れる
-            error_code = ErrorCode.RASTER_SCAN_NO_CRYSTAL
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            # end_time も入れておく
-            self.updateTime(cond, "raster_end", comment="No crystal was found")
-            self.updateTime(cond, "meas_end", comment="No crystals were found after the analysis")
+            print "Skipping this loop!!"
+            self.esa.updateValueAt(o_index, "isDone", 4001)
             # Disconnecting capture in this loop's 'capture' instance
-            self.logger.warning("Disconnecting capture")
+            print "Disconnecting capture"
             self.lm.closeCapture()
             return
 
@@ -1100,35 +842,28 @@ class ZooNavigator():
 
         # Photon flux is extracted from beamsize.config
         if self.phosec_meas == 0.0:
-            beamsizeconf = BeamsizeConfig.BeamsizeConfig()
+            beamsizeconf = BeamsizeConfig.BeamsizeConfig(self.config_dir)
             flux = beamsizeconf.getFluxAtWavelength(cond['ds_hbeam'], cond['ds_vbeam'], cond['wavelength'])
-            self.logger.info("Flux value is read from beamsize.conf: %5.2e" % flux)
+            self.zooprog.write("Flux value is read from beamsize.conf: %5.2e\n"% flux)
         else:
             flux = self.phosec_meas
-            # loggerにbeam size と Fluxを書き込む
-            self.logger.info(f"Flux value is read from phosec: {flux:5.2e}")
-            # beam size はそれぞれ小数点以下1桁まで記載する
-            # cond['ds_hbeam], cond['ds_vbeam'] は小数点以下1桁まで記載する
-            self.logger.info(f"Beam size is read from config: {cond['ds_hbeam']:.1f} x {cond['ds_vbeam']:.1f} um")
-            
+            self.zooprog.write("Multi: Beam size = %5.2f %5.2f um Measured flux : %5.2e\n" % (cond['ds_hbeam'], cond['ds_vbeam'], flux))
+
         # For dose estimation
-        # self.loggerにbeam size と Fluxを書き込む
-        self.logger.info(f"Flux value is read from phosec: {flux:5.2e}")
-        # beam size はそれぞれ小数点以下1桁まで記載する
-        # cond['ds_hbeam], cond['ds_vbeam'] は小数点以下1桁まで記載する
-        self.logger.info(f"Beam size is read from config: {cond['ds_hbeam']:.1f}um x {cond['ds_vbeam']:.1f} um")
+        print "Beam size = ", cond['ds_hbeam'], cond['ds_vbeam'], " [um]"
+        print "Photon flux=%8.3e" % flux
 
         # Generate Schedule file
         multi_sch = self.lm.genMultiSchedule(sphi, glist, cond, flux, prefix=data_prefix)
 
         time.sleep(0.1)
 
-        # ds_start
-        self.updateTime(cond, "ds_start", comment="Data collection started")
+        self.esa.addEventTimeAt(o_index, "ds_start")
         self.zoo.doDataCollection(multi_sch)
         self.zoo.waitTillReady()
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
-        self.updateDBinfo(cond, "isDS", 1)
+        self.esa.addEventTimeAt(o_index, "ds_end")
+        self.esa.incrementInt(o_index, "isDS")
+        self.esa.updateValueAt(o_index, "isDone", 1)
 
         # Writing CSV file for data processing
         sample_name = cond['sample_name']
@@ -1137,72 +872,12 @@ class ZooNavigator():
         self.data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
         self.data_proc_file.flush()
 
-        # end of measurement
-        self.updateDBinfo(cond, "isDone", 1)
-        self.updateTime(cond, "meas_end", comment="Measurement normally finished")
-        self.logger.info("Disconnecting capture")
-        self.lm.closeCapture()
-        # end of collectMulti
-
-    # Collect quick
-    # めっちゃ速い測定
-    def collectQuick(self, trayid, pinid, prefix, cond, sphi):
-        o_index = cond['o_index']
-
-        # Current position
-        self.sx, self.sy, self.sz, sphi = self.dev.gonio.getXYZPhi()
-
-        # Data collection
-        time.sleep(0.1)
-        data_prefix = "%s-%02d-quick" % (trayid, pinid)
-
-        # Photon flux is extracted from beamsize.config
-        if self.phosec_meas == 0.0:
-            beamsizeconf = BeamsizeConfig.BeamsizeConfig()
-            flux = beamsizeconf.getFluxAtWavelength(cond['ds_hbeam'], cond['ds_vbeam'], cond['wavelength'])
-            self.logger.info("Flux value is read from beamsize.conf: %5.2e" % flux)
-        else:
-            flux = self.phosec_meas
-            # loggerにbeam size と Fluxを書き込む
-            self.logger.info(f"Flux value is read from phosec: {flux:5.2e}")
-            # beam size はそれぞれ小数点以下1桁まで記載する
-            # cond['ds_hbeam], cond['ds_vbeam'] は小数点以下1桁まで記載する
-            self.logger.info(f"Beam size is read from config: {cond['ds_hbeam']:.1f} x {cond['ds_vbeam']:.1f} um")
-            
-        # For dose estimation
-        # self.loggerにbeam size と Fluxを書き込む
-        self.logger.info(f"Flux value is read from phosec: {flux:5.2e}")
-        # beam size はそれぞれ小数点以下1桁まで記載する
-        # cond['ds_hbeam], cond['ds_vbeam'] は小数点以下1桁まで記載する
-        self.logger.info(f"Beam size is read from config: {cond['ds_hbeam']:.1f}um x {cond['ds_vbeam']:.1f} um")
-
-        # Generate Schedule file
-        glist=[]
-        # current position をglistに追加
-        glist.append([self.sx, self.sy, self.sz])
-        multi_sch = self.lm.genMultiSchedule(sphi, glist, cond, flux, prefix=data_prefix)
-
-        time.sleep(0.1)
-
-        # ds_start
-        self.updateTime(cond, "ds_start", comment="Data collection started")
-        self.zoo.doDataCollection(multi_sch)
-        self.zoo.waitTillReady()
-        # ds_end
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
-        self.updateDBinfo(cond, "isDS", 1)
-        self.updateDBinfo(cond, "isDone", 1)
-        # measurement finished
-        self.updateTime(cond, "meas_end", comment="Measurement normally finished")
-
-        # Writing CSV file for data processing
-        sample_name = cond['sample_name']
-        prefix = "%s-%02d" % (trayid, pinid)
-        root_dir = cond['root_dir']
-        self.data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
-        self.data_proc_file.flush()
-
-        self.logger.info("Disconnecting capture")
+        # Writing Time table for this data collection
+        # logstr="%6.1f "%(t_for_ds)
+        # self.zooprog.write("%s\n"%logstr)
+        # self.zooprog.flush()
+        # Disconnecting capture in this loop's 'capture' instance
+        print "Disconnecting capture"
         self.lm.closeCapture()
 
     # Collect single
@@ -1220,21 +895,19 @@ class ZooNavigator():
         vstep_um = cond['raster_vbeam']
         hstep_um = cond['raster_hbeam']
 
-        # 10um step scan for larger beam
-        # 10um raster for BL45XU
-        if self.flag10um_raster == True:
-            self.lm.setMinBeamsize10umRaster(self.min_beamsize_10um_raster)
+        # preferred raster scan step
+        if self.isSpecialRasterStep: self.setSpecialRasterStepFromBeamsize(cond)
+
         schfile, raspath = self.lm.rasterMaster(scan_id, scan_mode, self.center_xyz,
                                                 scanv_um, scanh_um, vstep_um, hstep_um, sphi, cond)
 
-        # time for start raster scan
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
+        self.esa.addEventTimeAt(o_index, "raster_start")
         self.logger.debug("[PROCESS] ZOO starts raster scan..")
         self.zoo.doRaster(schfile)
         self.zoo.waitTillReady()
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
+        self.esa.addEventTimeAt(o_index, "raster_end")
         # Flag on
-        self.updateDBinfo(cond, "isRaster", 1)
+        self.esa.incrementInt(o_index, "isRaster")
         self.logger.info("Raster scan has been finished. Analyzing the result...")
 
         # Raster scan results and determine the vertical scan point
@@ -1255,13 +928,7 @@ class ZooNavigator():
             if len(crystal_array) == 0:
                 self.logger.info("No crystals were found on this loop. Break a main loop.")
                 self.logger.info("Skipping this loop: diffraction based centering loop.")
-                # isDone, meas_record にエラーコードを入れる
-                error_code = ErrorCode.DATA_COLLECTION_NO_CRYSTAL
-                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                # end_time
-                self.updateTime(cond, "raster_end", comment="No crystal was found")
-                self.updateTime(cond, "meas_end", comment="No crystals were found after the analysis")
+                self.esa.updateValueAt(o_index, "isDone", 4005)
                 # Disconnecting capture in this loop's 'capture' instance
                 self.logger.info("Disconnecting capture")
                 self.lm.closeCapture()
@@ -1283,7 +950,6 @@ class ZooNavigator():
             initial_left_y = raster_cxyz[1]
             vertical_index = 0
             final_cxyz = 0, 0, 0
-            # Vertical scan loop till the crystal is found
             n_try = 5
             while (True):
                 self.logger.info("Vertical scan loop..")
@@ -1315,18 +981,18 @@ class ZooNavigator():
                 if factor_increase_exp != 1.0:
                     # DB information should be overwritten
                     cond['exp_raster'] = exp_mod
-                    self.logger.info(
-                        "Exposure time is changed from %8.3f [sec] to %8.3f [sec]\n" % (exp_origin, exp_mod))
+                    self.logger.info("Exposure time is changed from %8.3f [sec] to %8.3f [sec]\n" % (exp_origin, exp_mod))
                     # Attenuation factor in [%]
                     att_raster = att_origin / factor_increase_exp
                     self.logger.info(
-                        "Attenuation %8.3f [percent] is replaced by %8.3f [percent]\n" % (att_origin, att_raster))
+                    "Attenuation %8.3f [percent] is replaced by %8.3f [percent]\n" % (att_origin, att_raster))
                     cond['att_raster'] = att_raster
                 # Now preparation of raster scan
                 schfile, raspath = self.lm.rasterMaster(v_prefix, "Vert", mod_xyz,
                                                         scanv_um, scanh_um, vstep_um, hstep_um, phi_lv, cond)
                 self.zoo.doRaster(schfile)
                 self.zoo.waitTillReady()
+                self.esa.addEventTimeAt(o_index, "raster_end")
 
                 try:
                     # Final analysis for vertical scan
@@ -1342,24 +1008,15 @@ class ZooNavigator():
 
                     crystals = CrystalList.CrystalList(crystal_array)
                     final_cxyz = crystals.getBestCrystalCode()
-                # もしかしてここもExceptionで結晶が検出されないことを判定しているのか。
-                # いつか修正したい
-                except Exception as e:
-                    self.logger.warning("Analyze vertical scans failed.\n")
-                    self.logger.warning("ZN.collectSingle: Left vertical scan analysis failed.")
+                except Exception, e:
+                    print "Analyze vertical scans failed.\n"
+                    self.logger.info("ZN.collectSingle: Left vertical scan analysis failed.")
                     self.logger.error("ERROR", exc_info=True)
                     vertical_index += 1
                     if vertical_index > n_try:
                         self.logger.info("Failed to find crystal in vertical scan.")
                         self.logger.info("Skipping this loop: diffraction based centering loop.")
-                        # isDone, meas_record にエラーコードを入れる
-                        error_code = ErrorCode.DATA_COLLECTION_NO_CRYSTAL
-                        self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                        self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                        # end_time
-                        comment=f"Vertical scan failed after {n_try} trials..."
-                        self.updateTime(cond, "raster_end", comment)
-                        self.updateTime(cond, "meas_end", comment)
+                        self.esa.updateValueAt(o_index, "isDone", 4006)
                         # Disconnecting capture in this loop's 'capture' instance
                         self.logger.info("Disconnecting capture")
                         self.lm.closeCapture()
@@ -1369,8 +1026,6 @@ class ZooNavigator():
                 if final_cxyz[0] != 0.0:
                     break
 
-            # raster_end
-            self.updateTime(cond, "raster_end", comment="3D centering with raster scans finished")
             glist.append(final_cxyz)
             # Writing down the goniometer coordinate list
             gfile = open("%s/final_code.dat" % self.lm.raster_dir, "w")
@@ -1379,16 +1034,9 @@ class ZooNavigator():
 
         # Raster scan failed
         except MyException as message:
-            self.logger.info("Caught error: %s " % message)
+            self.logger.info("Caught error: %s "% message)
             self.logger.info("Skipping this loop: diffraction based centering loop.")
-            # isDone, meas_record にエラーコードを入れる
-            error_code = ErrorCode.RASTER_SCAN_UNKNOWN_ERROR
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            # comment
-            comment = f"Raster scan failed in inknown reasons: {message}"
-            self.updateTime(cond, "raster_end", comment)
-            self.updateTime(cond, "meas_end", comment)  
+            self.esa.updateValueAt(o_index, "isDone", 4002)
             # Disconnecting capture in this loop's 'capture' instance
             self.logger.info("Disconnecting capture")
             self.lm.closeCapture()
@@ -1401,17 +1049,17 @@ class ZooNavigator():
 
         # Dose to limit exposure time
         self.logger.info("KUMA will be called from now!!")
+        kuma = KUMA.KUMA()
 
         # Photon flux is extracted from beamsize.config
         if self.phosec_meas == 0.0:
-            beamsizeconf = BeamsizeConfig.BeamsizeConfig()
+            beamsizeconf = BeamsizeConfig.BeamsizeConfig(self.config_dir)
             flux = beamsizeconf.getFluxAtWavelength(cond['ds_hbeam'], cond['ds_vbeam'], cond['wavelength'])
-            self.logger.info("Flux value is read from beamsize.conf: %5.2e." % flux)
-            # self.logger.info()
+            self.logger.info("Flux value is read from beamsize.conf: %5.2e."% flux)
+            #self.logger.info()
         else:
             flux = self.phosec_meas
-            self.logger.info(
-                "Single: Beam size = %5.2f %5.2f um Measured flux : %5.2e" % (cond['ds_hbeam'], cond['ds_vbeam'], flux))
+            self.logger.info("Single: Beam size = %5.2f %5.2f um Measured flux : %5.2e" % (cond['ds_hbeam'], cond['ds_vbeam'], flux))
 
         # Generate Schedule file
         self.logger.info("Preparing the schedule file for a single data collection.")
@@ -1421,16 +1069,13 @@ class ZooNavigator():
         # For waiting the schedule file???
         time.sleep(0.1)
 
-        # ds_start
-        self.updateTime(cond, "ds_start", comment="Data collection started")
+        self.esa.addEventTimeAt(o_index, "ds_start")
         self.logger.info("Now ZOO starts single data collection.")
         self.zoo.doDataCollection(multi_sch)
         self.zoo.waitTillReady()
-        # ds_end
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
-        self.updateDBinfo(cond, "isDS", 1)
-        self.updateDBinfo(cond, "isDone", 1)
-        self.updateDBinfo(cond, "meas_end", "Measurement normally finished")
+        self.esa.addEventTimeAt(o_index, "ds_end")
+        self.esa.incrementInt(o_index, "isDS")
+        self.esa.updateValueAt(o_index, "isDone", 1)
         self.logger.info("Now ZOO finishes single data collection.")
         # Data proc
         sample_name = cond['sample_name']
@@ -1440,7 +1085,7 @@ class ZooNavigator():
         self.data_proc_file.flush()
 
         # Disconnecting capture in this loop's 'capture' instance
-        self.logger.info("Disconnecting capture")
+        print "Disconnecting capture"
         self.lm.closeCapture()
 
     # collectSingle
@@ -1450,8 +1095,8 @@ class ZooNavigator():
     def collectHelical(self, trayid, pinid, prefix, cond, sphi):
         o_index = cond['o_index']
         # Beamsize
-        self.logger.info("now moving to the beam size to raster scan...")
-        self.logger.info("beam size should be changed by BSS")
+        print "now moving to the beam size to raster scan..."
+        print "Liar: beam size should be changed by BSS"
         # self.bsc.changeBeamsizeHV(cond['raster_hbeam'],cond['raster_vbeam'])
 
         # Initial 2D scan
@@ -1466,31 +1111,26 @@ class ZooNavigator():
         hstep_um = cond['raster_hbeam']
 
         # 10um raster for BL45XU
-        if self.flag10um_raster == True:
-            self.lm.setMinBeamsize10umRaster(self.min_beamsize_10um_raster)
+        if self.isSpecialRasterStep: self.setSpecialRasterStepFromBeamsize(cond)
 
         schfile, raspath = self.lm.rasterMaster(scan_id, scan_mode, self.center_xyz,
                                                 scanv_um, scanh_um, vstep_um, hstep_um,
                                                 sphi, cond)
 
-        # raster_start
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
+        self.esa.addEventTimeAt(o_index, "raster_start")
         self.zoo.doRaster(schfile)
         self.zoo.waitTillReady()
-        # raster_end
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
-        # Flag on
-        self.updateDBinfo(cond, "isRaster", 1)
+        self.esa.incrementInt(o_index, "isRaster")
+        self.esa.addEventTimeAt(o_index, "raster_end")
 
         # photon flux
         if self.phosec_meas == 0.0:
-            beamsizeconf = BeamsizeConfig.BeamsizeConfig()
+            beamsizeconf = BeamsizeConfig.BeamsizeConfig(self.config_dir)
             flux = beamsizeconf.getFluxAtWavelength(cond['ds_hbeam'], cond['ds_vbeam'], cond['wavelength'])
             self.logger.info("Flux value is read from beamsize.conf: %5.2e" % flux)
         else:
             flux = self.phosec_meas
-            self.logger.info("Helical: Beam size = %5.2f %5.2f um Measured flux : %5.2e" % (
-                cond['ds_hbeam'], cond['ds_vbeam'], flux))
+            self.logger.info("Helical: Beam size = %5.2f %5.2f um Measured flux : %5.2e" % (cond['ds_hbeam'], cond['ds_vbeam'], flux))
 
         # HEBI instance
         hebi = HEBI.HEBI(self.zoo, self.lm, self.stopwatch, flux)
@@ -1499,44 +1139,28 @@ class ZooNavigator():
         self.logger.info("Dose limit  = %3.1f[MGy]" % cond['dose_ds'])
         n_crystals = 0
         try:
-            self.updateTime(cond, "ds_start", comment="Data collection started")
+            self.esa.addEventTimeAt(o_index, "ds_start")
             # Processing all found crystals for helical data collections
             n_crystals = hebi.mainLoop(raspath, scan_id, sphi, cond, precise_face_scan=False)
             if n_crystals > 0:
-                self.updateDBinfo(cond, "nds_helical", n_crystals)
+                self.esa.incrementInt(o_index, "isDS")
+                self.esa.updateValueAt(o_index, "isDone", 1)
+                # Update the database
+                self.esa.updateValueAt(o_index, "nds_helical", n_crystals)
                 # Data proc
                 sample_name = cond['sample_name']
                 root_dir = cond['root_dir']
                 self.data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
                 self.data_proc_file.flush()
-                # Log file for time stamp
-                self.updateTime(cond, "ds_end", comment="Helical data collection finished")
-                self.logger.info("Helical data collection ended.")
-                # meas_end
-                self.updateDBinfo(cond, "isDS", 1)
-                self.updateDBinfo(cond,"isDone", 1)
-                self.updateTime(cond, "meas_end", comment="Helical data collection finished")
             else:
                 self.logger.info("No crystals were found in HEBI.")
-                # isDone, meas_record にエラーコードを入れる
-                error_code = ErrorCode.DATA_COLLECTION_NO_CRYSTAL
-                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                self.updateTime(cond, "ds_end", comment="No crystals were found in HEBI.")
-                # meas_end
-                self.updateTime(cond, "meas_end", comment="No crystals were found in HEBI.")
-        # Unknown exception captured
+                self.esa.updateValueAt(o_index, "isDone", 4003)
+            # Log file for time stamp
+            self.esa.addEventTimeAt(o_index, "ds_end")
+            self.logger.info("[PROCESS] Helical data collection ended.")
         except:
             self.logger.info("ZooNavigator.collectHelical failed.")
-            # isDone, meas_record にエラーコードを入れる
-            error_code = ErrorCode.DATA_COLLECTION_UNKNOWN_ERROR
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value()) 
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            # end_time
-            self.updateTime(cond, "ds_end", comment="Helical data collection failed in unknown reasons.")
-            # meas_end
-            #self.updateTime(cond, "meas_end", comment="Helical data collection failed in unknown reasons.")
-
+            self.esa.updateValueAt(o_index, "isDone", 4004)
         self.lm.closeCapture()
         self.logger.info("Return to the main loop of 'process'")
 
@@ -1544,12 +1168,11 @@ class ZooNavigator():
         # Pin index
         o_index = cond['o_index']
         # Beamsize
-        self.logger.info("now moving to the beam size to raster scan...")
-        # Specific code for BL41XU and obsoleted temporally on 2019/06/03
-        # self.bsc.changeBeamsizeHV(cond['raster_hbeam'], cond['raster_vbeam'])
+        print "now moving to the beam size to raster scan..."
 
-        # Initial 2D scan 
+        # Initial 2D scan
         scan_id = "2d"
+        # is this required? 2021/06/02 K.Hirata
         gxyz = self.sx, self.sy, self.sz
 
         # Scan step is set to the same to the beam size
@@ -1562,52 +1185,39 @@ class ZooNavigator():
 
         # 10um step scan for larger beam
         # 10um raster for BL45XU
-        if self.flag10um_raster == True:
-            self.lm.setMinBeamsize10umRaster(self.min_beamsize_10um_raster)
-        self.lm.setMinBeamsize10umRaster(self.min_beamsize_10um_raster)
+        if self.isSpecialRasterStep: self.setSpecialRasterStepFromBeamsize(cond)
+
         schfile, raspath = self.lm.rasterMaster(scan_id, scan_mode, self.center_xyz,
                                                 scanv_um, scanh_um, vstep_um, hstep_um,
                                                 sphi, cond)
         # Raster start
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
+        self.esa.addEventTimeAt(o_index, "raster_start")
         self.zoo.doRaster(schfile)
         self.zoo.waitTillReady()
-        self.updateDBinfo(cond, "isRaster", 1)
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
+        self.esa.incrementInt(o_index, "isRaster")
+        self.esa.addEventTimeAt(o_index, "raster_end")
 
         # HITO instance
         hito = DiffscanMaster.NOU(self.zoo, self.lm, sphi, self.phosec_meas)
         # Set the time limit for data collection from a pin.
-        self.updateTime(cond, "ds_start", comment="Data collection started")
-        # HITO data collection time [mins] -> currently limited to 15 minutes.
         hito.setTimeLimit(15.0)
         try:
             n_datasets = hito.sokuteiSuru(raspath, cond, prefix)
-            # isDS = 1
-            self.updateDBinfo(cond, "isDS", 1)
-            self.updateDBinfo(cond, "isDone", 1)
+            self.esa.incrementInt(o_index, "isDS")
+            self.esa.updateValueAt(o_index, "isDone", 1)
         except Exception as e:
             self.logger.info(e.args[0])
-            message = f"Data collection failed in unknown reasons: {e.args[0]}"
-            self.updateTime(cond, "ds_end", comment=message)
-            error_code = ErrorCode.DATA_COLLECTION_UNKNOWN_ERROR
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+            self.esa.addEventTimeAt(o_index, "ds_end")
 
         # Wrong information but update the zoo.db
-        # hitoから情報を得るか、あちらで登録することにする
-        self.updateDBinfo(cond, "nds_multi", n_datasets)
-        self.updateDBinfo(cond, "nds_helical", n_datasets)
-        self.updateDBinfo(cond, "nds_helpart", n_datasets)
+        self.esa.updateValueAt(o_index, "nds_multi", n_datasets)
+        self.esa.updateValueAt(o_index, "nds_helical", n_datasets)
 
         # Ending procedure of 'mixed' mode.
         self.lm.closeCapture()
 
         # Log file for time stamp
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
-        if n_datasets == 0:
-            self.updateTime(cond, "meas_end", comment="No data was collected")
-        else:
-            self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+        self.esa.addEventTimeAt(o_index, "ds_end")
         self.logger.info("mixed end")
 
     # 2020/06/02 Major revision in order to activate this function for BL45XU.
@@ -1623,23 +1233,17 @@ class ZooNavigator():
         self.logger.info("SSROX schedule file preparation")
         raster_schedule, raster_path = self.lm.prepSSROX(scan_id, self.center_xyz, sphi, cond, self.phosec_meas)
         self.logger.info("ZOO has finished SSROX preparation.")
-        # ds_start
-        self.updateTime(cond, "ds_start", comment="Data collection started")
+        self.esa.addEventTimeAt(o_index, "ds_start")
 
         # Do the raster scan with rotation
         self.zoo.doRaster(raster_schedule)
         self.zoo.waitTillReady()
-        # ds_end
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
-        self.updateDBinfo(cond, "isDS", 1)
-        self.updateDBinfo(cond, "isDone", 1)
-        # meas_end
-        #self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+        self.esa.addEventTimeAt(o_index, "ds_end")
+        self.esa.incrementInt(o_index, "isDS")
         self.logger.info("Disconnecting capture")
         self.lm.closeCapture()
 
-    # この関数はほぼ使っていないので適当に修正した 2025/02/13
-    def collectScreen(self, cond, sphi): 
+    def collectScreen(self, cond, sphi):
         # Pin index
         o_index = cond['o_index']
         trayid = cond['puckid']
@@ -1662,15 +1266,14 @@ class ZooNavigator():
                                                             cond['raster_hbeam'], scanv_um,
                                                             scanh_um, vstep_um, hstep_um, self.center_xyz, sphi,
                                                             att_idx=self.att_idx, distance=cond['dist_raster'],
-                                                            exptime=cond['exp_raster'], roi_index=0)
+                                                            exptime=cond['exp_raster'], roi_index = 0)
 
-        # raster_start
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
+        self.esa.addEventTimeAt(o_index, "raster_start")
         self.zoo.doRaster(raster_schedule)
         self.zoo.waitTillReady()
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
+        self.esa.addEventTimeAt(o_index, "raster_end")
         # Flag on
-        self.updateDBinfo(cond, "isRaster", 1)
+        self.esa.incrementInt(o_index, "isRaster")
 
         # Analyzing raster scan results
         try:
@@ -1703,29 +1306,23 @@ class ZooNavigator():
                 x, y, z = gxyz
                 gfile.write("%8.4f %8.4f %8.4f\n" % (x, y, z))
             gfile.close()
-            # isDS, meas_record, isDone
-            n_crystals = len(glist)
-            self.updateDBinfo(cond, "nds_multi", n_crystals)
-            self.updateDBinfo(cond, "isDS", 1)
-            # error code
-            error_code = ErrorCode.SUCCESS
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            self.updateDBinfo(cond, "isDone", 1)
-            # end_time
-            #self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+            self.zooprog.flush()
 
-        except MyException as tttt:
-            self.logger.warning("Skipping this loop!!")
-            # logging
-            logstr = f"Raster scan failed during analysis: {tttt.args[0]}"
-            # isDone, meas_record にエラーコードを入れる
-            self.updateDBinfo(cond, "isDone", 4444)
-            self.updateDBinfo(cond, "meas_record", 4444)
-            # end_time
-            self.updateTime(cond, "raster_end", comment="Raster scan failed during analysis")
-            #self.updateTime(cond, "meas_end", comment="Raster scan failed during analysis")
-
+        except MyException, tttt:
+            print "Skipping this loop!!"
+            self.zooprog.write("\n")
+            self.zooprog.flush()
             # Disconnecting capture in this loop's 'capture' instance
-            self.logger.warning("Disconnecting capture")
+            print "Disconnecting capture"
             self.lm.closeCapture()
             return
+
+        finally:
+            try:
+                print "FINALLY"
+                # Disconnecting capture in this loop's 'capture' instance
+                print "Disconnecting capture"
+                self.lm.closeCapture()
+                return
+            except:
+                print traceback.format_exc()

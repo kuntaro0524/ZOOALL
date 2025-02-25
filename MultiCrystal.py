@@ -2,18 +2,19 @@
 import sys, os
 import logging
 
+sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs/")
 from AttFactor import *
-# ConfigParser is used for reading beamline.ini
-from configparser import ConfigParser, ExtendedInterpolation
+
 
 # 2014/05/28 K.Hirata
 # For multi-crystal data collection
 # 2015/07/02 K.Hirata modified
 # For automated data collection
 # 2019/04/23 K.Hirata for BL45XU (PILATUS 3 6M)
-# 2019/07/04 K.Hirata for BL32XU 
+# 2019/07/04 K.Hirata for BL32XU
 
 # Version 2.0.0. K.Hirata 2019/07/04
+beamline = "BL45XU"
 
 class MultiCrystal:
     def __init__(self):
@@ -43,16 +44,11 @@ class MultiCrystal:
         self.isSlow = False
         self.isReadBeamSize = False
         self.isShutterless = False
-        # Read 'beamline' name from beamline.ini  
-        config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        config.read(config_path)
-        self.beamline = config.get("beamline", "beamline")
-
-        if self.beamline == "BL32XU" or "BL41XU" or "BL44XU":
+        if beamline == "BL32XU" or "BL41XU":
             self.data_suffix = "h5"
-        if self.beamline == "BL45XU":
-            self.data_suffix = "cbf"
+        if beamline == "BL45XU":
+            self.data_suffix = "h5"
+        self.trans = None
 
         # Is this valid only for BL32XU? K.Hirata 190412
         self.oscillation_delay = 100 #msec
@@ -89,15 +85,16 @@ class MultiCrystal:
     def setCameraLength(self, cl):
         self.cl = cl
 
+    # Transmission in ESA is in unit of [%]
+    def setTrans(self, trans):
+        self.trans = trans / 100.0
+
     def setAttIdx(self, index):
         self.att_index = index
 
     def setAttThickness(self, thickness):
         # thickness [um]
         self.att_index = self.getAttIndex(thickness)
-
-    def setTrans(self, transmission):
-        self.trans = transmission / 100.0
 
     def setScanInt(self, scan_interval):
         self.scan_interval = scan_interval
@@ -213,7 +210,9 @@ class MultiCrystal:
         ofile.write("Anomalous Nuclei: Mn  # Mn-K\n")
         ofile.write("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
         # 2020/10/30 Seamless transmission of BSS
-        if self.beamline == "BL32XU" or self.beamline=="BL41XU":
+        if self.trans is None:
+            schstr.append("Attenuator: %5d\n" % self.att_index)
+        elif beamline == "BL32XU" or beamline=="BL41XU" or beamline=="BL45XU":
             ofile.write("Attenuator transmission: %9.7f\n" % self.trans)
         else:
             ofile.write("Attenuator: %5d\n" % self.att_index)
@@ -263,7 +262,7 @@ class MultiCrystal:
         ofile.close()
 
     # 2020/01/23 This code was debugged and will be used as general function
-    # to generate dose slicing measurements also. 
+    # to generate dose slicing measurements also.
     # The name of function should be modified.
     def makeMultiDoseSlicingAtSamePoint(self, schedule_file, gonio_list, ntimes):
         schstr = []
@@ -295,7 +294,7 @@ class MultiCrystal:
         i_xyz = 1
         schstr = []
 
-        print("makeAdvancedSchStrEach:", gonio_list)
+        print "makeAdvancedSchStrEach:", gonio_list
 
         schstr.append("Job ID: 0\n")
         schstr.append(
@@ -350,7 +349,9 @@ class MultiCrystal:
         schstr.append("Anomalous Nuclei: Mn  # Mn-K\n")
         schstr.append("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
         # 2020/10/30 Seamless transmission of BSS
-        if self.beamline == "BL32XU" or self.beamline=="BL41XU":
+        if self.trans is None:
+            schstr.append("Attenuator: %5d\n" % self.att_index)
+        elif beamline == "BL32XU" or beamline=="BL41XU" or beamline=="BL45XU":
             schstr.append("Attenuator transmission: %9.7f\n" % self.trans)
         else:
             schstr.append("Attenuator: %5d\n" % self.att_index)
@@ -390,20 +391,24 @@ class MultiCrystal:
 
         return schstr
 
-    # 2020/12/01 K.Hirata seamless attenuator
-    def makeGUI(self, outdir, wavelength, gonio_list, distance, startphi, endphi, osc_width, trans_percent, beamsize_index=0):
+    def makeGUI(self, outdir, wavelength, gonio_list, distance, startphi, endphi, osc_width, att_thick, beamsize_index=0):
         phirange = endphi - startphi
         nframe = int(phirange / osc_width)
         # print nframe
 
         if beamsize_index != 0:
             self.beamsize_idx = beamsize_index
+        # exptime T[sec]: meaning
+        # Full flux x T[sec] exposure = 20 MGy
+        # Attenuator thickness
+        attfac = AttFactor()
+        att_idx = attfac.getAttIndexConfig(att_thick)
 
         self.wavelength = wavelength
         self.setCameraLength(distance)
         self.setScanCondition(startphi, endphi, osc_width)
         self.setDir(outdir)
-        self.setTrans(trans_percent)
+        self.setAttIdx(att_idx)
 
         # Schedule file
         home_dir = os.environ['HOME']
@@ -428,21 +433,15 @@ class MultiCrystal:
 if __name__ == "__main__":
     t = MultiCrystal()
 
-    schedule_file = "/isilon/users/target/target/ikekekeke.sch"
+    schedule_file = "/isilon/users/admin45/admin45/190627-ZOOtest/CPS2355-10/data99/multi.sch"
 
+    #lines = open(sys.argv[1], "r").readlines()
     gonio_list = []
-    initial_y = -10.0000
-    dy = 0.005
-    index=0
-    for index in range(0,10):
-        y_value = initial_y + dy * index
-        gonio_list.append((0.9829, y_value, -0.8553))
-        index+=1
+    gonio_list.append((-0.0879, 9.3245, 0.7027))
     ntimes = 1
-    t.setDir("/isilon/users/target/target/Staff/2019B/200120/04.BSStest/02/")
-    t.setScanCondition(0, 5, 0.1)
-    t.setCameraLength(300.0)
-    t.setExpTime(0.02)
+    t.setDir("/isilon/users/admin45/admin45/190627-ZOOtest/CPS2355-10/data99/")
+    t.setScanCondition(0, 360, 0.1)
+    t.setCameraLength(380.0)
     t.setAttThickness(1800)
-
-    t.makeMultiDoseSlicingAtSamePoint(schedule_file, gonio_list, ntimes = 10)
+    #t.makeMultiCrystalAdvanced(schedule_file, gonio_list, ntimes)
+    t.makeMultiDoseSlicing(schedule_file, gonio_list, ntimes = 1)

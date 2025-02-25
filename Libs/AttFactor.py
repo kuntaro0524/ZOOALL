@@ -1,79 +1,26 @@
-import sys,os
+import sys
 import socket
 import time
 import math
 from numpy import *
-from Libs import BSSconfig
+import BSSconfig
 import logging
-from configparser import ConfigParser, ExtendedInterpolation
 
 class AttFactor:
-    def __init__(self):
+    def __init__(self, config_file="/isilon/blconfig/bl45xu/bss/bss.config"):
         dummy = 1
         self.isInit = False
+        self.beamline_config=config_file
         self.logger = logging.getLogger('ZOO').getChild("AttFactor")
 
-        # BSS config path is read from beamline.ini
-        conf_file_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read(conf_file_path)
-        self.bssconfig_path = self.config.get("files", "bssconfig_file")
-
     def cnFactor(self, wl):
-        cnfac = 0.028 * math.pow(wl, 5) - 0.188 * math.pow(wl, 4) + 0.493 * math.pow(wl, 3) - 0.633 * math.pow(wl, 2) + 0.416 * math.pow( wl, 1) + 0.268
+        cnfac = 0.028 * math.pow(wl, 5) - 0.188 * math.pow(wl, 4) + 0.493 * math.pow(wl, 3) - 0.633 * \
+                math.pow(wl,2) + 0.416 * math.pow(wl, 1) + 0.268
         return cnfac
 
     def calcMu(self, wl, cnfac):
         mu = 38.851 * math.pow(wl, 3) - 2.166 * math.pow(wl, 4) + 1.3 * cnfac
         return mu
-
-    def newAtt(self, wl, thick_mm, material="Al"):
-        rho = 2.70 # Alminuim
-
-        # Thick to [cm]
-        thick_cm = thick_mm / 10.0
-
-        # ZbyA
-        Zbya=0.4818
-        C=14.4
-        D=0.803
-
-        # Internatinal table vol.3 (1968 Table 3.2.2D)
-        fitting_wave_kn = {
-            ([0.20, 0.329],
-             [0.30, 0.350],
-             [0.40, 0.361],
-             [0.50, 0.368],
-             [0.60, 0.374],
-             [0.70, 0.378],
-             [0.80, 0.381],
-             [0.90, 0.383],
-             [1.00, 0.385],
-             [1.10, 0.386],
-             [1.20, 0.388],
-             [1.30, 0.389],
-             [1.40, 0.390],
-             [1.50, 0.391],
-             [1.60, 0.392],
-             [1.70, 0.393],
-             [1.80, 0.394],
-             [1.90, 0.394],
-             [2.00, 0.394],
-             [2.10, 0.395],
-             [2.20, 0.395],
-             [2.30, 0.395],
-             [2.40, 0.395],
-             [2.50, 0.396],
-             [2.60, 0.396],
-             [2.70, 0.396])
-
-        }
-
-        mu_by_rho = C*wl*wl*wl - D * wl*wl*wl*wl + KN * ZbyA
-
-
-
-        transmission = exp(-mu_by_rho * rho * thickness_cm)
 
     def calcAttFac(self, wl, thickness, material="Al"):
         # thickness [um]
@@ -131,7 +78,7 @@ class AttFactor:
 
     def calcThickness(self, wl, transmission, material="Al"):
         # thickness [um]
-        # print("Trans=", transmission)
+        print "Trans=", transmission
         if material == "Al":
             cnfac = self.cnFactor(wl)
             mu = self.calcMu(wl, cnfac)
@@ -141,7 +88,7 @@ class AttFactor:
             return -1
 
     def getBestAtt(self, wl, transmission):
-        print(transmission)
+        print transmission
         if self.isInit == False:
             self.readAttConfig()
 
@@ -149,7 +96,7 @@ class AttFactor:
         mu = self.calcMu(wl, cnfac)
         thickness = (-1.0 * math.log(transmission) / mu) * 10000
 
-        print("IDEAL thickness: %8.3f[um]" % thickness)
+        print "IDEAL thickness: %8.3f[um]" % thickness
 
         if thickness <= 0.0:
             return 0.0
@@ -172,72 +119,74 @@ class AttFactor:
         while (1):
             # The first estimation of the transmission by the defined 'exptime'
             thickness = self.calcThickness(wl, real_transmission)
-            print(thickness, exptime)
+            print thickness, exptime
 
             if thickness < 0.0:
                 exptime += 0.01
-                print("Exptime=", exptime)
+                print "Exptime=", exptime
             else:
                 break
 
-        print("Exposure time:", exptime)
+        print "Exposure time:", exptime
         bestatt = self.getBestAtt(wl, real_transmission)
         attfac = self.calcAttFac(wl, bestatt)
-        print("BESTATT/ATTFAC=", bestatt, attfac)
+        print "BESTATT/ATTFAC=", bestatt, attfac
 
         ppp = real_transmission / attfac
         final_exptime = exptime * ppp
-        print("Final exposure time:", final_exptime)
+        print "Final exposure time:", final_exptime
 
-        print(attfac * final_exptime, real_transmission)
+        print attfac * final_exptime, real_transmission
 
     # for att in self.att_thick:
     # if thickness < att:
     # return att
 
     def readAttConfig(self):
-        confile = open(self.bssconfig_path, "r")
+        self.bssconfig = "/isilon/blconfig/bl45xu/bss/bss.config"
+        # self.bssconfig="./bss.config"
+        confile = open(self.bssconfig, "r")
         lines = confile.readlines()
         confile.close()
 
-        self.att_material=[]
         self.att_idx = []
         self.att_thick = []
 
         for line in lines:
-            if line.find("Attenuator_Menu_Label") != -1 and line.find("#") == -1:
-                # print(line)
+            if line.find("Attenuator_Menu_Label") != -1:
                 line = line.replace("[", "").replace("]", "").replace("{", "").replace("}", "")
                 cols = line.split()
                 ncols = len(cols)
                 if ncols == 4:
-                    # Attenuator material type
-                    material = cols[1]
-                    if cols[2].find("mm") != -1:
-                        # Unit [um]
-                        tmp_thick = float(cols[2].replace("mm", "")) * 1000.0
+                    if cols[2].find("um") != -1:
+                        tmp_thick = float(cols[2].replace("um", ""))
                         tmp_attidx = int(cols[3])
                         # storage
-                        self.att_material.append(material)
                         self.att_idx.append(tmp_attidx)
                         self.att_thick.append(tmp_thick)
 
-        self.att_material = array(self.att_material)
         self.att_idx = array(self.att_idx)
         self.att_thick = array(self.att_thick)
+
+        # DEBUG
+        #for i,thick in zip(self.att_idx,self.att_thick):
+            #print i,thick
 
         # flag on
         self.isInit = True
 
     def getAttIndexConfig(self, t):
+        print "AttFactor.getAttIndexConfig Thickness=", t
         if self.isInit == False:
             self.readAttConfig()
+            #print "AttFactor.readAttConfig finished."
         if t <= 0.0:
             return 0
         for i, thick in zip(self.att_idx, self.att_thick):
+            #print "DEBUG: getAttIndexConfig=",i, thick
             if thick == t:
                 return i
-        print("Something wrong: No attenuator at this beamline")
+        print "Something wrong: No attenuator at this beamline"
         return -9999
 
     # 2020/10/30
@@ -253,7 +202,7 @@ class AttFactor:
 
         self.logger.info("READING....")
 
-        self.bssconfig_class = BSSconfig.BSSconfig()
+        self.bssconfig_class = BSSconfig.BSSconfig(self.beamline_config)
         thinnest_att_um = self.bssconfig_class.getThinnestAtt()
 
         self.logger.info("thinnest=%9.5f " % thinnest_att_um)
@@ -279,15 +228,15 @@ class AttFactor:
 
 if __name__ == "__main__":
     att = AttFactor()
-    att.readAttConfig()
-    print(att.att_material)
-    print(att.att_idx)
-    print(att.att_thick)
 
-    thick=att.getBestAtt(1.0, 0.015)
-    print(thick)
-    # exptime = 0.05
-    # transmission = 1.5
-    # transmission,newExptime = att.checkThinnestAtt(1.0, exptime, transmission)
-    # print(("New exposure time=", newExptime))
-    # print(("New transmission time=", transmission))
+    #print att.getAttFacObs(1.0, 700)
+    best_thick=att.getBestAtt(1.0, 0.22)
+    #print "getBestAtt:",best_thick
+    print att.getAttIndexConfig(450)
+#attfac.getAttIndexConfig(best_thick)
+# print best_thick
+# def calcThickness(self,wl,transmission,material="Al"):
+# print best_thick,att.calcAttFac(1.0,best_thick)
+# def calcAttFac(self,wl,thickness,material="Al"):
+# def getBestAtt(self,wl,transmission):
+# print ick,att.getAttIndexConfig(best_thick)

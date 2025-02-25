@@ -1,1 +1,1 @@
-ensoku_ver3.25.py
+ensoku_ver3.26.py

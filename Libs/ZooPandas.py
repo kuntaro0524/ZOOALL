@@ -1,4 +1,6 @@
 import sys
+sys.path.append("/isilon/BL32XU/BLsoft/PPPP/Libs")
+sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
 import pandas as pd
 import numpy as np
 import ESA
@@ -136,15 +138,15 @@ class ZooPandas():
 
                     # Dictionary
                     if d_index == n_mount:
-                        for key in list(time_dict.keys()):
+                        for key in time_dict.keys():
                             if key.rfind(time_type) != -1:
                                 time_dict[key]=pd.to_datetime(time_str)
-                                if self.isDebug: print(("TIME: %s is found %s " % (time_type, time_dict[key])))
+                                if self.isDebug: print("TIME: %s is found %s " % (time_type, time_dict[key]))
                                 break
 
             if self.isDebug: 
                 print("<<<<<<<<<<<<<<LOOP ENDS>>>>>>>>>>>>>>")
-                print(("TIME_DICT=", time_dict))
+                print("TIME_DICT=", time_dict)
             # Convert dictionary to panda.DataFrame
             time_series = pd.Series(time_dict)
             #time_series['meas_start_to_meas_end']=(time_series['t_meas_end'] - time_series['t_meas_start']).astype('timedelta64[s]')
@@ -159,13 +161,13 @@ class ZooPandas():
 
             # Merging the 'time_series' to the original row(index)
             df_concat = pd.concat([row, time_series])
-            if self.isDebug: print(("df_concat gyousu=",type(df_concat),len(df_concat.index)))
+            if self.isDebug: print("df_concat gyousu=",type(df_concat),len(df_concat.index))
             if index == 0:
                 new_df = pd.DataFrame(df_concat)
-                if self.isDebug: print(("NEW_DF: gyou,retsu=", len(new_df.index), len(new_df.columns)))
+                if self.isDebug: print("NEW_DF: gyou,retsu=", len(new_df.index), len(new_df.columns))
             else:
                 new_df = pd.concat([new_df, df_concat],axis=1)
-                if self.isDebug: print(("NEW_DF: gyou,retsu=", len(new_df.index), len(new_df.columns)))
+                if self.isDebug: print("NEW_DF: gyou,retsu=", len(new_df.index), len(new_df.columns))
 
             time_dict = {"t_mount_start":np.nan, "t_mount_end":False, "t_center_start":np.nan,
                       "t_center_end":np.nan, "t_raster_start":np.nan, "t_raster_end":np.nan,
@@ -199,8 +201,8 @@ class ZooPandas():
             mean_nds = selected_df['nds_multi'].mean()
         if mode == "helical":
             mean_nds = selected_df['nds_helical'].mean()
-        print(("Average: mode=%s,n_ok_loops=%5d, raster_area=%8.1f x %8.1f, %8.1f datasets, meas_time=%5.2f sec"
-              %(mode, len(selected_df), mean_raster_height, mean_raster_width, mean_nds, mean_time)))
+        print("Average: mode=%s,n_ok_loops=%5d, raster_area=%8.1f x %8.1f, %8.1f datasets, meas_time=%5.2f sec"
+              %(mode, len(selected_df), mean_raster_height, mean_raster_width, mean_nds, mean_time))
 
         return selected_df
 
@@ -215,19 +217,19 @@ class ZooPandas():
         # Group by
         print("Grouping by sample_name")
         indices = self.pandadf.groupby('sample_name').groups
-        print(("Grouping indices=", indices))
+        print("Grouping indices=", indices)
         # Extracting grouping information like this
         sample_name_list = []
         for sample_name, group_df in self.pandadf.groupby('sample_name'):
-            print(("#################### SAMPLE_NAME=",sample_name))
-            print(("MODE=",group_df['sample_name']))
+            print("#################### SAMPLE_NAME=",sample_name)
+            print("MODE=",group_df['sample_name'])
             sample_name_list.append(group_df)
 
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.")
         for l in sample_name_list:
             print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
             for puck,pin,root,sample in zip(l['puckid'], l['pinid'],l['root_dir'],l['sample_name']):
-                print((puck,pin,root,sample))
+                print(puck,pin,root,sample)
 
     """
     new_pan=[]

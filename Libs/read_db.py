@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     def str2time(esa_time):
         if esa_time == None:
-            print("No information")
+            print "No information"
             raise MyException("No information")
         #print "ESA_TIME=",esa_time
         try:
@@ -31,12 +31,12 @@ if __name__ == "__main__":
             timestr = "%s-%s-%s %s:%s:%s" % (year, month, date, hour, mins, secs)
             ttime=datetime.datetime.strptime(timestr, '%Y-%m-%d %H:%M:%S')
             return ttime
-        except MyException as tttt:
-            print("Something wrong")
+        except MyException,tttt:
+            print "Something wrong"
             raise MyException(ttt)
 
     def getTimeSeries(timestr, newest_index):
-        print("##################")
+        print "##################"
         times = timestr.split(",")
         rtn_array = []
         for each_time in times:
@@ -64,37 +64,38 @@ if __name__ == "__main__":
                 if start_or_end == "end":
                     mount_end_time = str2time(time_str)
                     mount_time = (mount_end_time - mount_start_time).seconds
-                    print("Mount: %8d sec" % mount_time)
+                    print "Mount: %8d sec" % mount_time
             if exp_seq == "center":
                 if start_or_end == "start":
                     center_start_time = str2time(time_str)
                 if start_or_end == "end":
                     center_end_time = str2time(time_str)
                     center_time = (center_end_time - center_start_time).seconds
-                    print("Center: %8d sec" % center_time)
+                    print "Center: %8d sec" % center_time
             if exp_seq == "raster":
                 if start_or_end == "start":
                     center_start_time = str2time(time_str)
                 if start_or_end == "end":
                     center_end_time = str2time(time_str)
                     center_time = (center_end_time - center_start_time).seconds
-                    print("raster: %8d sec" % center_time)
+                    print "raster: %8d sec" % center_time
             if exp_seq == "ds":
                 if start_or_end == "start":
                     ds_start_time = str2time(time_str)
                 if start_or_end == "end":
                     ds_end_time = str2time(time_str)
                     ds_time = (ds_end_time - ds_start_time).seconds
-                    print("ds: %8d sec" % ds_time)
+                    print "ds: %8d sec" % ds_time
             if exp_seq == "meas":
                 if start_or_end == "start":
                     meas_start_time = str2time(time_str)
                 if start_or_end == "end":
                     meas_end_time = str2time(time_str)
                     meas_time = (meas_end_time - meas_start_time).seconds
-                    print("meas: %8.2f min" % (meas_time/60.0))
+                    print "meas: %8.2f min" % (meas_time/60.0)
         return rtn_array
 
+    print len(ppp)
     for p in ppp:
         pindex = p['p_index']
         mode = p['mode']
@@ -108,30 +109,15 @@ if __name__ == "__main__":
         isRaster=p['isRaster'] 
         isMount=p['isMount'] 
         flux = p['flux']
-        roi_raster = p['raster_roi']
 
         # Complete done
         if isDone == 1:
             newest_index = n_mount
-            print(getTimeSeries(timestr, newest_index))
+            print getTimeSeries(timestr, newest_index)
         #print pindex,mode,root_dir,puck,pin,p['cry_max_size_um'],p['cry_min_size_um'],timestr, n_mount, "isCenter=",isCenter, "isDone=", isDone, "isRaster=",isRaster,"FLUX=%e"%flux
-            print(pindex,mode,root_dir,puck,pin, "n_mount=",n_mount, "isCenter=",isCenter, "isDone=", isDone, "isRaster=",isRaster,"FLUX=%e"%flux)
+            print pindex,mode,root_dir,puck,pin, "n_mount=",n_mount, "isCenter=",isCenter, "isDone=", isDone, "isRaster=",isRaster,"FLUX=%e"%flux
 
-    for p in ppp:
-        pindex = p['p_index']
-        mode = p['mode']
-        root_dir = p['root_dir']
-        puck = p['puckid']
-        pin = p['pinid']
-        isCenter = p['isLoopCenter']
-        isDone = p['isDone']
-        n_mount = p['n_mount']
-        timestr = p['t_meas_start']
-        isRaster=p['isRaster'] 
-        isMount=p['isMount'] 
-        flux = p['flux']
-        roi_raster = p['raster_roi']
-        if isDone != 1:
-            print("%s-%02d failed. isDone:%5d: isMount %5d %5d" % (puck,pin,isDone,isMount,roi_raster))
+        else:
+            print "%s-%02d failed. %5d: isMount %5d" % (puck,pin,isDone,isMount)
         #print "isCenter",isCenter
         #getTimeSeries(timestr)

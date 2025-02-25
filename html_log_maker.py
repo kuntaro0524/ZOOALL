@@ -15,7 +15,7 @@ class ZooHtmlLog:
         if self.online:
             self.htmlout = os.path.join(root_dir, time.strftime("report_%y%m%d_%H%M%S.html", self.start_time))
         else:
-            self.htmlout = os.path.join(root_dir, "report.html")
+            self.htmlout = os.path.join("./", "report.html")
 
         self.make_header()
         self.conditions = []
@@ -74,8 +74,8 @@ root dir: %(root_dir)s<br>
     # make_header()
 
     def add_condition(self, condition):
-        samples = ["%s (%d pins)" % (x[0], len(x[1])) for x in condition.pucks_and_pins]
-        totalpins = sum([len(x[1]) for x in condition.pucks_and_pins])
+        samples = map(lambda x: "%s (%d pins)" % (x[0], len(x[1])), condition.pucks_and_pins)
+        totalpins = sum(map(lambda x: len(x[1]), condition.pucks_and_pins))
         info = dict(samples=", ".join(samples),
                     totalpins=totalpins)
         info.update(condition.__dict__)
@@ -110,7 +110,8 @@ root dir: %(root_dir)s<br>
 
         max_score = read_max_score(os.path.join(shika_workdir, "summary.dat"))
         shika_workdir = os.path.relpath(shika_workdir, self.root_dir)
-        phid = "%d-%d" % (len(self.conditions)-1, len(self.conditions[-1])-1)
+        #phid = "%d-%d" % (len(self.conditions)-1, len(self.conditions[-1])-1)
+        phid = 9999999999
         s = """
  <tr>
   <td>%(puckname)s</td> <td>%(pin).2d</td> <td>%(h_grid)d&times;%(v_grid)d</td> <td>%(nhits)d</td> <td>%(max_score).1f</td>
@@ -205,7 +206,7 @@ def make_offline(module_name, root_dir, name):
         zhl.add_condition(cond)
         for trayid, pin_list in cond.pucks_and_pins:
             for pinid in pin_list:
-                print("doing", trayid, pinid)
+                print "doing", trayid, pinid
                 scan_dir = os.path.join(root_dir, "%s-%s-%.2d" % (cond.uname, trayid, pinid), "scan")
                 shika_workdir = os.path.join(scan_dir, "_spotfinder")
                 raster_log = os.path.join(scan_dir, "diffscan.log")
@@ -229,4 +230,8 @@ if __name__ == "__main__":
     module_name = sys.argv[3]
 
     sys.path.append(os.path.dirname(module_name))
+
     make_offline(module_name, root_dir, name)
+
+
+

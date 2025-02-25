@@ -33,11 +33,11 @@ class SearchEdge:
 		tds="%s"%(datetime.datetime.now().strftime("%y%m%d"))
 		self.todaydir="%s/%s"%(self.logdir,tds)
                 if os.path.exists(self.todaydir):
-                        print("%s already exists"%self.todaydir)
+                        print "%s already exists"%self.todaydir
                 else:
                         os.makedirs(self.todaydir)
 		self.ff=File(self.todaydir)
-		print("Coax camera information will be acquired!")
+		print "Coax camera information will be acquired!"
 		self.cip=CryImageProc.CryImageProc("test.ppm")
 		self.coi.set_zoom(14.0)
 		# This is for Zoom -48000, 4x4 binning image
@@ -51,7 +51,7 @@ class SearchEdge:
 		# Force to remove the existing "test.ppm"
                 try:
 			os.system("\\rm -Rf %s"%self.fname)
-                except MyException as ttt:
+                except MyException,ttt:
                         raise MyException("Centering:init fails to remove the previous 'test.ppm'")
 			return
 
@@ -61,7 +61,7 @@ class SearchEdge:
 		self.ddist_thresho=largest_movement
 
 	def setBack(self,backimg):
-		print("setting back ground image to %s"%backimg)
+		print "setting back ground image to %s"%backimg
 		self.backimg=backimg
 
 	def capture(self,image_name_abs_path):
@@ -91,10 +91,10 @@ class SearchEdge:
 
 			try:
 				area=self.cip.getArea(self.fname,self.debug)
-				print("PHI=",phi," AREA=",area)
+				print "PHI=",phi," AREA=",area
 				area_list.append(area)
 
-			except MyException as ttt:
+			except MyException,ttt:
 				raise MyException("fitAndFace: self.cip.getArea failed")
 
 		# Fitting
@@ -109,7 +109,7 @@ class SearchEdge:
 			self.init()
 		phi_area_list=[]
 		n_good=0
-		if self.debug: print("DEBUG LOOP in coreCentering")
+		if self.debug: print "DEBUG LOOP in coreCentering"
 		for phi in phi_list:
 			self.coi.rotatePhi(phi)
 			# Gonio current coordinate
@@ -119,10 +119,10 @@ class SearchEdge:
 			try:
 				for repetition in range(0,3):
 					# Capture
-					print("Capturing %s"%self.fname)
+					print "Capturing %s"%self.fname
 					self.coi.get_coax_image(self.fname, 200)
 					grav_x,grav_y,xwidth,ywidth,area,xedge=self.cip.getCenterInfo(self.fname,self.debug,loop_size=loop_size)
-					print("RECENTERING XEDGE=",repetition,xedge)
+					print "RECENTERING XEDGE=",repetition,xedge
 					if xedge==200:
 						gx,gy,gz,phi=self.coi.getGXYZphi()
 						cy=gy+0.5
@@ -132,13 +132,13 @@ class SearchEdge:
 					if self.isFoundEdge==True:
 						break
 					time.sleep(1.0)
-			except MyException as ttt:
+			except MyException,ttt:
 				#raise MyException("edgeCentering failed")
-				print("Go to next phi")
+				print "Go to next phi"
 				continue
 
 			#self.coi.get_coax_image(self.fname, 200)
-			print("########### FINAL XEDGE=",xedge)
+			print "########### FINAL XEDGE=",xedge
 			x,y,z=self.coi.calc_gxyz_of_pix_at(xedge,grav_y,cx,cy,cz,phi)
 			self.coi.moveGXYZphi(x,y,z,phi)
 			l=phi,area
@@ -150,28 +150,28 @@ class SearchEdge:
 
 	def isYamagiwaSafe(self,gx,gy,gz):
 		# Distance from mount position
-		print(gx,gy,gz)
-		print(self.mx,self.my,self.mz)
+		print gx,gy,gz
+		print self.mx,self.my,self.mz
 		dista=math.sqrt(pow((gx-self.mx),2.0)+pow((gy-self.my),2.0)+pow(gz-self.mz,2.0))
 		if dista > self.ddist_thresh:
-			print("deltaDistance=%5.2f mm"%dista)
+			print "deltaDistance=%5.2f mm"%dista
 			return False
 		else:
 			return True
 
 	def edgeCentering(self,phi_list,ntimes,challenge=False,loop_size="small"):
-		print("################### EDGE CENTERING ######################")
+		print "################### EDGE CENTERING ######################"
 		n_good=0
 		for i in range(0,ntimes):
 			try:
 				n_good,grav_x,grav_y,xwidth,ywidth,area,xedge=self.coreCentering(phi_list,loop_size=loop_size)
-				print("NGOOD=",n_good)
+				print "NGOOD=",n_good
 				# Added 160514 	
 				# A little bit dangerous modification
 				if challenge==True and n_good == len(phi_list):
 					break
-			except MyException as tttt:
-				print("Moving Y 2000um")
+			except MyException,tttt:
+				print "Moving Y 2000um"
 				gx,gy,gz,phi=self.coi.getGXYZphi()
 				newgy=gy-2.0
 				self.coi.moveGXYZphi(gx,newgy,gz,phi)
@@ -187,7 +187,7 @@ class SearchEdge:
 			img_log="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ec_debug.jpg"
                 	cv2.imwrite(img_log,im)
 
-		print("################### EDGE CENTERING ENDED ######################")
+		print "################### EDGE CENTERING ENDED ######################"
 		return n_good,grav_x,grav_y,xwidth,ywidth,area,xedge
 
 	def facing(self,phi_list):
@@ -205,8 +205,8 @@ class SearchEdge:
 			try:
 				grav_x,grav_y,xwidth,ywidth,area,xedge= \
 					self.cip.getCenterInfo(self.fname,debug=False)
-				print("PHI AREA=",phi,area)
-			except MyException as ttt:
+				print "PHI AREA=",phi,area
+			except MyException,ttt:
 				#print ttt.args[1]
 				continue
 			if min_area > area:
@@ -257,7 +257,7 @@ class SearchEdge:
 	def doAll(self,ntimes=3,skip=False,loop_size="small",offset_angle=0.0):
 		if self.isInit==False:
 			self.init()
-		print("Centering.doAll: self.cip.setBck!! backimage=%s"% self.backimg)
+		print "Centering.doAll: self.cip.setBck!! backimage=%s"% self.backimg
 		self.cip.setBack(self.backimg)
 		phi_face=0.0
 		
@@ -272,10 +272,10 @@ class SearchEdge:
 			# ROI should be wider 
 			try:
 				self.edgeCentering(phi_list,2,challenge=True,loop_size="large")
-			except MyException as ttt:
+			except MyException,ttt:
 				try:
 					self.edgeCentering(phi_list,2,challenge=True,loop_size="large")
-				except MyException as tttt:
+				except MyException,tttt:
 					raise MyException("Loop cannot be found")
 
 			phi_list=[0,45,90,135]
@@ -305,9 +305,9 @@ class SearchEdge:
 		raster_width=pix_size_um*float(xwidth)
 		raster_height=pix_size_um*float(ywidth)
 
-		print("Width  = %8.1f[um]"%raster_width)
-		print("Height = %8.1f[um]"%raster_height)
-		print("Centering.doAll finished.")
+		print "Width  = %8.1f[um]"%raster_width
+		print "Height = %8.1f[um]"%raster_height
+		print "Centering.doAll finished."
 
 		return raster_width,raster_height,phi_face,gonio_info
 

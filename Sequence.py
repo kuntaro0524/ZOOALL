@@ -11,7 +11,7 @@ import Beamsize
 class Condition:
 	def __init__(self, uname, pucks_and_pins, h_beam, v_beam, raster_exp, osc_width, total_osc, exp_henderson, exp_time, distance, att_raster, shika_minscore, shika_mindist, loop_size):
 		# adopt init args
-		for k, v in list(locals().items()):
+		for k, v in locals().items():
 			if k == "self": continue
 			setattr(self, k, v)
 
@@ -23,16 +23,16 @@ class Condition:
 		assert not prohibit_chars.intersection(self.uname)
 
 		assert type(self.pucks_and_pins) == list
-		assert all([len(x)==2 for x in self.pucks_and_pins])
+		assert all(map(lambda x: len(x)==2, self.pucks_and_pins))
 		for puck, pins in self.pucks_and_pins:
 			assert type(puck) == str
 			assert not prohibit_chars.intersection(puck)
-			assert all([1 <= x <= 16 for x in pins])
+			assert all(map(lambda x: 1 <= x <= 16, pins))
 	# _check_errors()
 
 	def customized_copy(self, **kwds):
 		c = copy.copy(self)
-		for k, v in list(kwds.items()):
+		for k, v in kwds.items():
 			assert hasattr(c, k)
 			setattr(c, k, v)
 		self._check_errors()
@@ -50,15 +50,15 @@ class Condition:
 		
 
 def check_abort(lm):
-	print("Abort check")
+	print "Abort check"
 	ret = lm.isAbort()
-	if ret: print("ABORTABORT")
+	if ret: print "ABORTABORT"
 	return ret
 # check_abort()
 
 def run(zoo, ms, root_dir, name, sx, sy, sz, sphi, conditions):
 	if os.path.exists(root_dir):
-		print("%s already exists"%root_dir)
+		print "%s already exists"%root_dir
 	else:
 		os.makedirs(root_dir)
 
@@ -74,7 +74,7 @@ def run(zoo, ms, root_dir, name, sx, sy, sz, sphi, conditions):
 		bsc.changeBeamsizeHV(cond.h_beam,cond.v_beam)
 	
 		prefix="%s-%s-%02d"%(cond.uname,1,1)
-		print("Doing %s"%prefix)
+		print "Doing %s"%prefix
 
 		lm=LoopMeasurement.LoopMeasurement(ms,root_dir,prefix)
 
@@ -117,8 +117,8 @@ def run(zoo, ms, root_dir, name, sx, sy, sz, sphi, conditions):
 		"""
 		try:
 			glist,phi_mid=lm.shikaTalk()
-		except MyException as tttt:
-			print("Skipping this loop!!")
+		except MyException, tttt:
+			print "Skipping this loop!!"
 			continue
 
 		if check_abort(lm): return # Abort check
@@ -151,10 +151,10 @@ def run(zoo, ms, root_dir, name, sx, sy, sz, sphi, conditions):
 			#cond.make_shika_direction(lm.raster_dir)
 			raster_dir_cry="%s/%s/"%(lm.raster_dir,cryname)
 			lm.prepDirectory(raster_dir_cry)
-			print("Raster for this crystal in %s"%raster_dir_cry)
+			print "Raster for this crystal in %s"%raster_dir_cry
 			sc_name="%s/vert.sch"%raster_dir_cry
-			print("Raster dire:",raster_dir_cry)
-			print("Crystal schedule %s"%sc_name)
+			print "Raster dire:",raster_dir_cry
+			print "Crystal schedule %s"%sc_name
 			rs.setPrefix("vraster")
 			rs.setCL(cond.distance)
 			rs.setImgDire(raster_dir_cry)
@@ -172,10 +172,10 @@ def run(zoo, ms, root_dir, name, sx, sy, sz, sphi, conditions):
 
 			try:
 				new_glist,phi_mid=lm.shikaTalkCry(raster_dir_cry,"vraster")
-				print("########## CRYSTL %5d ###########3")
-				print(new_glist)
-			except MyException as tttt:
-				print("Skipping this loop!!")
+				print "########## CRYSTL %5d ###########3"
+				print new_glist
+			except MyException, tttt:
+				print "Skipping this loop!!"
 				continue
 
 		# Capture the crystal image after experiment
@@ -199,7 +199,7 @@ if __name__ == "__main__":
 	
 	# Puck number
 	conditions = [Condition(uname="test",
-	                        pucks_and_pins=[["001", list(range(1,2))],
+	                        pucks_and_pins=[["001", range(1,2)],
 	                                       ],
 	                        h_beam=10.0, #[um square shaped]
 	                        v_beam=18.0, #[um square shaped]

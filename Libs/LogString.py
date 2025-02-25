@@ -6,9 +6,9 @@ class LogString:
         self.isStart = False
 
     def knowTypeOfObjects(self, objects):
-        print(type(objects))
+        print type(objects)
         if type(objects) == 'tuple':
-            print("DDDDDDDDDDDDDDDDDDDDDDDDDD")
+            print "DDDDDDDDDDDDDDDDDDDDDDDDDD"
 
     def list2str(self, str_list):
         rtn_str = ""
@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     params = ('test', 'test2', 'test3')
     ls.knowTypeOfObjects(params)
-    print(ls.list2str(params))
+    print ls.list2str(params)
 
     dimension = [35, 55]
-    print(ls.intArray2str(dimension))
+    print ls.intArray2str(dimension)

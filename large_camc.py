@@ -23,5 +23,5 @@ dt=datetime.datetime.now()
 
 endtime=datetime.datetime.now()
 
-print(starttime)
-print(endtime)
+print starttime
+print endtime
