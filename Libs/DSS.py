@@ -25,11 +25,18 @@ class DSS:
         else:
             return False
 
+    # String to bytes
+    def communicate(self, comstr):
+        sending_command = comstr.encode()
+        print(type(sending_command))
+        self.s.sendall(sending_command)
+        recstr = self.s.recv(8000)
+        return repr(recstr)
+
     def getStatus(self):
         com = "get/bl_32in_plc_dss_1/status"
         # counter clear
-        self.s.sendall(com)
-        recbuf = self.s.recv(8000)
+        recbuf = self.communicate(com)
         # print recbuf
         status = self.anaRes(recbuf)
         # return value: lock/moving/open/close
@@ -38,8 +45,7 @@ class DSS:
     def open(self):
         com = "put/bl_32in_plc_dss_1/open"
         # counter clear
-        self.s.sendall(com)
-        recbuf = self.s.recv(8000)
+        recbuf = self.communicate(com)
         # 30 sec trials
         for i in range(0, 10):
             if self.getStatus() == "open":
