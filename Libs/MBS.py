@@ -13,7 +13,11 @@ class MBS:
         self.s = server
 
     def anaRes(self, recbuf):
+<<<<<<< HEAD
         #	bl_32in_plc_mbs/get/1128_blrs_root_blanc4deb/open/0
+=======
+        #	bl_45in_plc_mbs/get/1128_blrs_root_blanc4deb/open/0
+>>>>>>> zoo45xu/main
         cols = recbuf.split("/")
         ncol = len(cols)
         status = cols[ncol - 2]
@@ -26,21 +30,36 @@ class MBS:
         else:
             return False
 
+<<<<<<< HEAD
+    # String to bytes
+    def communicate(self, comstr):
+        sending_command = comstr.encode()
+        print(type(sending_command))
+        self.s.sendall(sending_command)
+        recstr = self.s.recv(8000)
+        return repr(recstr)
+
     def getStatus(self):
         com = "get/bl_32in_plc_mbs/status"
+        # counter clear
+        recbuf = self.communicate(com)
+=======
+    def getStatus(self):
+        com = "get/bl_45in_plc_mbs/status"
         # counter clear
         self.s.sendall(com)
         recbuf = self.s.recv(8000)
         # print recbuf
+>>>>>>> zoo45xu/main
         status = self.anaRes(recbuf)
         # return value: lock/moving/open/close
         return status
 
     def open(self):
+<<<<<<< HEAD
         com = "put/bl_32in_plc_mbs/open"
         # counter clear
-        self.s.sendall(com)
-        recbuf = self.s.recv(8000)
+        recbuf = self.communicate(com)
         # 30 sec trials
         for i in range(0, 10):
             if self.getStatus() == "open":
@@ -52,6 +71,23 @@ class MBS:
 
     def close(self):
         com = "put/bl_32in_plc_mbs/close"
+=======
+        com = "put/bl_45in_plc_mbs/open"
+        # counter clear
+        self.s.sendall(com)
+        recbuf = self.s.recv(8000)
+        # 30 sec trials
+        for i in range(0, 10):
+            if self.getStatus() == "open":
+                print "OPEN Okay"
+                return True
+            time.sleep(3.0)
+        print "Remote control is okay?"
+        return False
+
+    def close(self):
+        com = "put/bl_45in_plc_mbs/close"
+>>>>>>> zoo45xu/main
         # counter clear
         self.s.sendall(com)
         recbuf = self.s.recv(8000)
@@ -59,10 +95,17 @@ class MBS:
         # 30 sec trials
         for i in range(0, 10):
             if self.getStatus() == 0:
+<<<<<<< HEAD
                 print("CLOSE Okay")
                 return True
             time.sleep(3.0)
         print("Remote control is okay?")
+=======
+                print "CLOSE Okay"
+                return True
+            time.sleep(3.0)
+        print "Remote control is okay?"
+>>>>>>> zoo45xu/main
         return False
 
     # wait_interval [sec]
@@ -70,7 +113,11 @@ class MBS:
         for i in range(0, ntrial):
             if self.isLocked() == True:
                 tstr = datetime.datetime.now()
+<<<<<<< HEAD
                 print("MBS %s: waiting for 'unlocked'" % tstr)
+=======
+                print "MBS %s: waiting for 'unlocked'" % tstr
+>>>>>>> zoo45xu/main
                 time.sleep(wait_interval)
             else:
                 self.open()
@@ -85,16 +132,27 @@ class MBS:
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     # host = '192.168.163.1'
     host = '172.24.242.41'
+=======
+    host = '172.24.242.59'
+>>>>>>> zoo45xu/main
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
     mbs = MBS(s)
+<<<<<<< HEAD
     print(mbs.getStatus())
     print(mbs.isLocked())
     # mbs.openTillOpen(wait_interval=10,ntrial=30)
+=======
+    print mbs.getStatus()
+    print mbs.isLocked()
+    mbs.openTillOpen(wait_interval=10,ntrial=30)
+
+>>>>>>> zoo45xu/main
     # time.sleep(10)
     # print mbs.close()
     # time.sleep(15)

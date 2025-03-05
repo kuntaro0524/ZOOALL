@@ -27,4 +27,8 @@ if __name__ == "__main__":
         endtime=datetime.datetime.now()
         time_sec= (endtime-starttime).seconds
 
+<<<<<<< HEAD
 	print(time_sec,"sec")
+=======
+	print time_sec,"sec"
+>>>>>>> zoo45xu/main

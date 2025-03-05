@@ -237,7 +237,6 @@ class CoaxImage:
             return ret[0][1]
         else:
             return dict(ret)
-
     # calc_shift_by_img_px()
 
     def move_by_img_px(self, sx, sy):

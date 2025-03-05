@@ -11,10 +11,15 @@ beamline = "BL32XU"
 sys.path.append("/isilon/%s/BLsoft/PPPP/10.Zoo/Libs" % beamline.upper())
 
 import ESA
+<<<<<<< HEAD
 import DBinfo
 
 dbfile = sys.argv[1]
 esa = ESA.ESA(dbfile)
+=======
+
+esa = ESA.ESA(sys.argv[1])
+>>>>>>> zoo45xu/main
 esa.listDB()
 ppp = esa.getSortedDict()
 
@@ -144,7 +149,11 @@ class Repository(wx.Frame):
         rightPanel = wx.Panel(panel, -1)
 
         self.command_window = wx.TextCtrl(rightPanel, -1, 'Commandline here', size = (1000,-1), style=wx.TE_MULTILINE)
+<<<<<<< HEAD
         self.sss = wx.Button(rightPanel, -1, '!!Change!!', size=(100, -1))
+=======
+        self.sss = wx.Button(rightPanel, -1, 'SSS button', size=(100, -1))
+>>>>>>> zoo45xu/main
         self.Bind(wx.EVT_BUTTON, self.pushChangeAllButton, id=self.sss.GetId())
         self.log_window = wx.TextCtrl(rightPanel, -1, 'Commandline here', size = (1000,-1), style=wx.TE_MULTILINE)
         #self.Bind(wx.EVT_BUTTON, self.pushQQQ, id=self.qqq.GetId())
@@ -226,7 +235,10 @@ class Repository(wx.Frame):
     def pushChangeAllButton(self, event):
         command = self.command_window.GetValue()
 
+<<<<<<< HEAD
         print "########### push change all button #########"
+=======
+>>>>>>> zoo45xu/main
         cols = command.split()
         if len(cols) >= 2:
             param_name = cols[0]
@@ -240,7 +252,11 @@ class Repository(wx.Frame):
             n_checked = 0
             if self.list.IsChecked(line_index):
                 o_index = int(self.list.GetItemText(line_index, 1))
+<<<<<<< HEAD
                 print "Modifying O_INDEX= %5d Param=%s Value is changed to [%s] (new value)" % (o_index, param_name, param_value)
+=======
+                print "Modifying O_INDEX= %5d" % o_index
+>>>>>>> zoo45xu/main
                 print esa.updateValueAt(o_index, param_name, param_value)
                 #self.list.SetItemBackgroundColour(line_index, 'Grey')
                 n_checked += 1
@@ -370,6 +386,7 @@ class Repository(wx.Frame):
             esa.updateValueAt(o_index, "dist_ds", dist_ds)
         self.PushUpdate(event)
 
+<<<<<<< HEAD
     def calcTime(self):
         conds_dict = esa.getSortedDict()
 
@@ -429,6 +446,8 @@ class Repository(wx.Frame):
         if n_remain <= 1:
             logline += "Finished\n"
 
+=======
+>>>>>>> zoo45xu/main
     def UnsetSkip(self, event):
         num = self.list.GetItemCount()
         for line_index in range(num):

@@ -1,18 +1,26 @@
 #!/bin/env python 
+<<<<<<< HEAD
 import sys,os
+=======
+import sys
+>>>>>>> zoo45xu/main
 import socket
 import time
 import datetime
 
+<<<<<<< HEAD
 from configparser import ConfigParser, ExtendedInterpolation
 import BSSconfig
 
+=======
+>>>>>>> zoo45xu/main
 # from Count import *
 # My library
 
 class Shutter:
     def __init__(self, server):
         self.s = server
+<<<<<<< HEAD
 
         # configure file "beamline.ini"
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
@@ -74,6 +82,27 @@ class Shutter:
     def query(self):
         # self.s.sendall(self.qmsg)
         recbuf=self.communicate(self.qmsg)
+=======
+        self.openmsg = "put/bl_45in_st2_shutter_1/on"
+        self.clsmsg = "put/bl_45in_st2_shutter_1/off"
+        self.qmsg = "get/bl_45in_st2_shutter_1/status"
+
+    def open(self):
+        self.s.sendall(self.openmsg)
+        print self.s.recv(8000)  # dummy buffer
+
+    # self.query()
+
+    def close(self):
+        self.s.sendall(self.clsmsg)
+        print self.s.recv(8000)  # dummy buffer
+
+    # self.query()
+
+    def query(self):
+        self.s.sendall(self.qmsg)
+        return self.s.recv(8000)  # dummy buffer
+>>>>>>> zoo45xu/main
 
     def isOpen(self):
         strstr = self.query()
@@ -87,7 +116,11 @@ class Shutter:
 
 if __name__ == "__main__":
     # host = '192.168.163.1'
+<<<<<<< HEAD
     host = '172.24.242.57'
+=======
+    host = '172.24.242.59'
+>>>>>>> zoo45xu/main
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
@@ -96,6 +129,7 @@ if __name__ == "__main__":
 
     shutter = Shutter(s)
     # print shutter.isOpen()
+<<<<<<< HEAD
     shutter.close()
     shutter.open()
     time.sleep(5.0)
@@ -104,4 +138,20 @@ if __name__ == "__main__":
     # time.sleep(10.0)
     # shutter.open()
     # shutter.close()
+=======
+    # shutter.open()
+    print shutter.isOpen()
+    # time.sleep(10.0)
+    # shutter.open()
+    #shutter.close()
+    #shutter.close()
+    shutter.open()  
+    print shutter.isOpen()
+    #time.sleep(10.0)
+    #shutter.close()
+    print shutter.isOpen()
+    shutter.close()
+    print shutter.isOpen()
+    # time.sleep(10.0)
+>>>>>>> zoo45xu/main
     s.close()

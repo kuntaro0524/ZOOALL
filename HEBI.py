@@ -130,7 +130,7 @@ class HEBI():
             exp_raster = vstep_um / self.limit_of_vert_velocity
             # Attenuation factor should be more for 'longer' exposure time
             factor_increase_exp = exp_raster / exp_origin
-            self.logger.info("Vertical scan velocity is too fast. Limit = %8.2f[um/s]" % vert_velocity)
+            self.logger.info("Vertical scan velocity is too fast. Limit = %8.2f[um/s]" % self.limit_of_vert_velocity)
             # Attenuation factor
             hebi_att_mod = hebi_att_origin / factor_increase_exp
             self.logger.info(

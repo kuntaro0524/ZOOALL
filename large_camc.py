@@ -23,5 +23,10 @@ dt=datetime.datetime.now()
 
 endtime=datetime.datetime.now()
 
+<<<<<<< HEAD
 print(starttime)
 print(endtime)
+=======
+print starttime
+print endtime
+>>>>>>> zoo45xu/main

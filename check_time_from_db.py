@@ -1,6 +1,10 @@
 #!/usr/bin/python
 import sys
+<<<<<<< HEAD
 sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs")
+=======
+sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs")
+>>>>>>> zoo45xu/main
 import Date
 import sqlite3,time,numpy
 import ESA
@@ -62,7 +66,11 @@ nowtime = datetime.datetime.now()
 exp_finish_time = nowtime + datetime.timedelta(hours = residual_time)
 logline+="Expected finishing time: %s\n"%(exp_finish_time)
 
+<<<<<<< HEAD
 print(logline)
+=======
+print logline
+>>>>>>> zoo45xu/main
 
 if n_remain <= 1:
     logline+="Finished\n"

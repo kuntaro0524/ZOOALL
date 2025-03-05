@@ -1,0 +1,15 @@
+import os,sys,glob
+import time
+import numpy as np
+import socket
+sys.path.append("/isilon/BL45XU/BLsoft/PPPP/10.Zoo/Libs/")
+from MyException import *
+import Zoo
+
+if __name__ == "__main__":
+    zoo=Zoo.Zoo()
+    zoo.connect()
+    # file should have 'absolute path'
+    zoo.doRaster(sys.argv[1])
+    zoo.waitTillReady()
+    zoo.disconnect()

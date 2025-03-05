@@ -53,23 +53,21 @@ class LoopMeasurement:
         # True for including beamsize index in 'schedule file'
         self.isBeamsizeIndexOnScheduleFile = True
 
-        # beamline name 
-        self.beamline = self.blf.beamline
-
         # Kuntaro Log file
         self.logger = logging.getLogger('ZOO').getChild("LoopMeasurement")
 
-        # 10um step raster scan
-        self.beamsize_thresh_10um = 20.0 #[um]
-        self.flag10um = False
+        # Special step of raster scan
+        self.isSpecialRasterStep = False
+        self.special_raster_step = 10.0 # [um]
+        self.maximum_scan_speed = 1000.0 # [um]
 
     # 2015/11/21 horizontal, vertical beamsize
     def setPhotonDensityLimit(self, photon_density_limit):
         self.photon_density_limit = photon_density_limit
 
-    def setMinBeamsize10umRaster(self, beamsize_thresh):
-        self.flag10um = True
-        self.beamsize_thresh_10um = beamsize_thresh
+    def setSpecialRasterStep(self, raster_step_um):
+        self.isSpecialRasterStep = True
+        self.special_raster_step = raster_step_um
 
     # 2015/11/21 horizontal, vertical beamsize
     # Penging 2019/04/20 at BL45XU K.Hirata
@@ -103,7 +101,7 @@ class LoopMeasurement:
         if os.path.exists(pathname) == False:
             os.makedirs(pathname)
 
-    # 2018/04/13 'n_mount' parameter was added 
+    # 2018/04/13 'n_mount' parameter was added
     # 2019/05/19 K. Hirata
     def prepDataCollection(self):
         self.logger.info("prepDataCollection started.")
@@ -224,6 +222,9 @@ class LoopMeasurement:
 
         self.logger.info("LM.SSROX starts...")
         rss = RasterSchedule.RasterSchedule()
+
+        # Maximum rotation for a horizontal line is set to 90.0 deg
+        max_rotation = 90.0 # [deg.]
 
         # 2020/01/31 For abe experiments: vertical step = 4.0 um
         # This is enough for almost sample (2019/12/05 results)
@@ -431,16 +432,15 @@ class LoopMeasurement:
             # Schedule setting (attenuator index)
             rss.setAttIndex(self.att_idx)
 
-        # 2020/11/02 Coded for BL45XU
-        # If this flag is 'True', raster scan is always conducted by using 10 um step.
-        if raster_hbeam >= self.beamsize_thresh_10um or raster_vbeam >= self.beamsize_thresh_10um:
-            if self.flag10um:
-                vstep_um = 10.0
-                hstep_um = 10.0
-                exp_raster = 1/100.0 # 100 Hz is fixed now
+        # 2020/11/18 K. Hirata modified.
+        if self.isSpecialRasterStep:
+            vstep_um = self.special_raster_step
+            hstep_um = self.special_raster_step
+            # exposure time for this raster scan will be fixed
+            exp_raster = self.special_raster_step / self.maximum_scan_speed
 
         # Scan points for vertical and horizontal
-        if scan_mode == "2D" or scan_mode=="2d":
+        if scan_mode == "2D":
             if isAdd == True:
                 self.raster_n_height = int(vscan_um / vstep_um) + self.raster_n_add
                 self.raster_n_width = int(hscan_um / hstep_um) + self.raster_n_add
@@ -806,7 +806,6 @@ class LoopMeasurement:
         # mc.makeMulti(multi_sch,glist)
 
         return multi_sch
-
 
     # 2020/07/09 K.Hirata coded.
     # multi_sch = self.lm.genMultiSchedule(phi_start, phi_end, center_xyz, cond, self.phosec_meas, prefix=prefix)

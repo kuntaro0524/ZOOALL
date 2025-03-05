@@ -1,11 +1,22 @@
 #!/usr/bin/python
 import wx
+<<<<<<< HEAD
 import sys
+=======
+import sys, requests, numpy, cv2, threading, time
+from PIL import Image
+from io import BytesIO
+>>>>>>> zoo45xu/main
 from wx.lib.mixins.listctrl import CheckListCtrlMixin, ListCtrlAutoWidthMixin
 import wx.lib.mixins.listctrl as listmix
 #import logger, logger.config
 import logging
 
+<<<<<<< HEAD
+=======
+import subprocess
+
+>>>>>>> zoo45xu/main
 # Version 3.22 2019/10/25 : 
 beamline = "BL32XU"
 
@@ -25,6 +36,19 @@ if narg < 2:
         print("ERROR:Cant't select ZooDB File.")
         dlg.Destroy()
         sys.exit()
+<<<<<<< HEAD
+=======
+if "--remote" in sys.argv:
+    subprocess.call("yamtbx.python /isilon/Common/mizuno/Making/webcam.py &", shell=True)
+    dlg = wx.FileDialog(None, message="Choose ZooDB File", wildcard="Files(."+"db"+")|*."+"db"+"|All Files (*.*)|*.*", style=wx.FD_OPEN)
+    if dlg.ShowModal() == wx.ID_OK:
+        dbfile = dlg.GetPath()
+        dlg.Destroy()
+    else:
+        print("ERROR:Cant't select ZooDB File.")
+        dlg.Destroy()
+        sys.exit()    
+>>>>>>> zoo45xu/main
 else:
     dbfile = sys.argv[1]
 
@@ -59,7 +83,10 @@ for p in ppp:
     packages.append(ttt)
     gui_index += 1
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> zoo45xu/main
 class Logger():
     def __init__(self, debug=None, name="main", stream=None, file=None, wxtxt=None):
         global logger
@@ -257,6 +284,18 @@ class Repository(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.PushUpdate, id=updateButton.GetId())
         self.Bind(wx.EVT_BUTTON, self.PushStartMod, id=startModButton.GetId())
 
+<<<<<<< HEAD
+=======
+##### Insert by N.Mizuno at 2020/06/09 #####
+#        btn_webcam1 = wx.Button(leftPanel, -5001, "Cam 1", size=(100, -1))
+#        btn_webcam2 = wx.Button(leftPanel, -5002, "Cam 2", size=(100, -1))
+#        btn_closecam = wx.Button(leftPanel, -1, "Close Cam", size=(100, -1))
+#        self.Bind(wx.EVT_BUTTON, self.StartWebCam, btn_webcam1)
+#        self.Bind(wx.EVT_BUTTON, self.StartWebCam, btn_webcam2)
+#        self.Bind(wx.EVT_BUTTON, self.CloseWebCam, btn_closecam)
+##### #####
+
+>>>>>>> zoo45xu/main
         vbox2.Add(sel, 0, wx.TOP, 5)
         vbox2.Add(des)
         vbox2.Add(apply)
@@ -265,6 +304,15 @@ class Repository(wx.Frame):
         vbox2.Add(updateButton)
         vbox2.Add(startModButton)
 
+<<<<<<< HEAD
+=======
+##### Insert by N.Mizuno at 2020/06/09 #####
+#        vbox2.Add(btn_webcam1, 0, wx.TOP, 30)
+#        vbox2.Add(btn_webcam2)
+#        vbox2.Add(btn_closecam)
+##### #####
+
+>>>>>>> zoo45xu/main
         leftPanel.SetSizer(vbox2)
 
         hbox_key = wx.BoxSizer(wx.HORIZONTAL)
@@ -291,10 +339,21 @@ class Repository(wx.Frame):
         self.Centre()
         self.Show(True)
 
+<<<<<<< HEAD
         #import Log
         global logger
         logger = Logger(debug=True, name="ensoku", stream=True, wxtxt=self.log_window).Run()
 
+=======
+#        import Log
+        global logger
+        logger = Logger(debug=True, name="ensoku", stream=True, wxtxt=self.log_window).Run()
+
+        self.webcam  = ["192.168.231.23", "192.168.231.24"]
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.on_webcam)
+
+>>>>>>> zoo45xu/main
     def pushView(self, event):
         param_name = self.cbox_keys.GetValue()
         if not param_name in db_keys:
@@ -544,6 +603,28 @@ class Repository(wx.Frame):
     def PushStartMod(self, event):
         print "UNKO SHIYOU"
 
+<<<<<<< HEAD
+=======
+##### Insert by N.Mizuno at 2020/06/09 #####
+    def StartWebCam(self, event):
+        camid = (event.GetId() + 5001) * -1
+        self.cammsg = "http://%s/cgi-bin/camera?resolution=640"%self.webcam[camid]
+        self.timer.Start(500)
+
+    def on_webcam(self, event):
+        req = requests.get(self.cammsg)
+        img = Image.open(BytesIO(req.content))
+        cvimg = numpy.asarray(img)
+        cvimg = cv2.cvtColor(cvimg, cv2.COLOR_RGB2BGR)
+        cv2.imshow("web camera capture", cvimg)
+
+    def CloseWebCam(self, event):
+        self.timer.Stop()
+        cv2.destroyWindow("web camera capture")
+        print("Stop")
+##### #####
+
+>>>>>>> zoo45xu/main
 #app = wx.App()
 eTitle = "ENSOKU %s" % dbfile
 Repository(None, -1, eTitle)

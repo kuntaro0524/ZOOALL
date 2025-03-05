@@ -6,8 +6,12 @@ title=$2
 echo $dbfile
 
 # At the data collection directory
+<<<<<<< HEAD
 #yamtbx.python ~/ZOO32XU/Libs/ZOOhtmlMaker.py $dbfile $2
 yamtbx.python /isilon/users/target/target/PPPP/10.Zoo/Libs/ZOOreporter.py $dbfile $title
+=======
+yamtbx.python ~/ZOO45XU/Libs/ZOOhtmlMaker.py $dbfile $2
+>>>>>>> zoo45xu/main
 
 # For _kamoproc
 cd _kamoproc/
@@ -23,6 +27,7 @@ echo "making $arcfile"
 # archive a file
 tar cvfz $arcfile ./*html _kamoproc/*html _kamoproc/contents/
 
+<<<<<<< HEAD
 # Copy this file to /isilon/BL32XU/TMP/
 cp $arcfile /isilon/BL32XU/TMP/
 
@@ -36,3 +41,11 @@ echo "You can check data quality of crystals by using correct.html on WEB browse
 
 #xxxxcat message.txt | mailx -a $arcfile -s "ZOO report .tgz is attached [$arcfile]" kunio.hirata@riken.jp << message.tx
 cat message.txt | mailx -a $arcfile -s "ZOO report .tgz is attached [$arcfile]" kunio.hirata@riken.jp
+=======
+# Copy this file to /isilon/BL45XU/TMP/
+#cp $arcfile /isilon/BL45XU/TMP/
+
+echo "Running directory: $PWD" > message.txt
+#xxxxcat message.txt | mailx -a $arcfile -s "ZOO report .tgz is attached [$arcfile]" kunio.hirata@riken.jp << message.tx
+cat message.txt | mailx -a $arcfile -s "ZOO report .tgz is attached [$arcfile]" y-nakamu@spring8.or.jp
+>>>>>>> zoo45xu/main

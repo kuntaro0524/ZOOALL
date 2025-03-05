@@ -43,21 +43,36 @@ if __name__ == "__main__":
         # horizontal resolution -0.00684848
         # vertical resolution -0.00915152
         h_diff_um,v_diff_um,max_2d=inocc.moveToCenter()
+<<<<<<< HEAD
         print("2D=",max_2d)
         h_diff_um,v_diff_um,max_2d=inocc.moveToCenter()
         print("2D=",max_2d)
+=======
+        print "2D=",max_2d
+        h_diff_um,v_diff_um,max_2d=inocc.moveToCenter()
+        print "2D=",max_2d
+>>>>>>> zoo45xu/main
 
        	# preparation
        	dev.prepCenteringLargeHolderCam2()
        	#((316, 143), 0.97274786233901978)
        	# um/pixel=0.0135
        	move_um,max_pint= inocc.moveToCenterPint()
+<<<<<<< HEAD
 	print("PINT=",max_pint)
 	print("Moving=",move_um)
+=======
+	print "PINT=",max_pint
+	print "Moving=",move_um
+>>>>>>> zoo45xu/main
        	#move_um,max_pint= inocc.moveToCenterPint()
 	#print "PINT=",max_pint
 	#print "Moving=",move_um
 
         x,y,z=dev.gonio.getXYZmm()
+<<<<<<< HEAD
 	print("GONIO=",x,y,z)
+=======
+	print "GONIO=",x,y,z
+>>>>>>> zoo45xu/main
         #dev.gonio.moveXYZmm(sx,sy,sz)

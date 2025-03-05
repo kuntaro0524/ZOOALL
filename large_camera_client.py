@@ -10,10 +10,17 @@ b_blanc = 10101
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((blanc,b_blanc))
 
+<<<<<<< HEAD
 print("OKAY")
 
 def anaim(pinfile,backfile,prefix):
 	print("Start calcEdge")
+=======
+print "OKAY"
+
+def anaim(pinfile,backfile,prefix):
+	print "Start calcEdge"
+>>>>>>> zoo45xu/main
 	im = cv2.imread(pinfile)
 	bk = cv2.imread(backfile)
 
@@ -31,7 +38,11 @@ def anaim(pinfile,backfile,prefix):
 	th = cv2.threshold(blur,20,150,0)[1]
 	cv2.imwrite("./%s.jpg"%prefix,th)
 	
+<<<<<<< HEAD
 	print("Image subtraction in calcEdge finished")
+=======
+	print "Image subtraction in calcEdge finished"
+>>>>>>> zoo45xu/main
 
 gonio=Gonio.Gonio(s)
 
@@ -44,7 +55,11 @@ for phi in [0,45,90]:
 	client.send("from nadechin")
 	response=client.recv(4096)
 	dt=datetime.datetime.now()
+<<<<<<< HEAD
 	print(dt,response)
+=======
+	print dt,response
+>>>>>>> zoo45xu/main
 	
 	pinimg="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/large.jpg"
 	backimg="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/large_empty.jpg"
@@ -53,5 +68,10 @@ for phi in [0,45,90]:
 
 endtime=datetime.datetime.now()
 
+<<<<<<< HEAD
 print(starttime)
 print(endtime)
+=======
+print starttime
+print endtime
+>>>>>>> zoo45xu/main

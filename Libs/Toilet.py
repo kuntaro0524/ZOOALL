@@ -62,7 +62,11 @@ class EachESA():
         t_dismount_start = cond['t_dismount_start']
         t_dismount_end = cond['t_dismount_end']
 
+<<<<<<< HEAD
         print("%10s-%02d"%(puckid,pinid), end=' ')
+=======
+        print "%10s-%02d"%(puckid,pinid),
+>>>>>>> zoo45xu/main
         #print "MOUNT ENDS " , t_mount_end,
         #print "Measure start= %10d" % t_meas_start,
         #print "isMount=", isMount,
@@ -75,6 +79,7 @@ class EachESA():
         str_start = "%s" % t_meas_start
         #print "str_start =", str_start
         if isSkip != 0:
+<<<<<<< HEAD
             print("skipped.")
             return
         if t_meas_start == "none":
@@ -96,6 +101,29 @@ class EachESA():
         if isDS != 0:
             print("data collected.", end=' ')
         print("")
+=======
+            print "skipped."
+            return
+        if t_meas_start == "none":
+            print "Not measured."
+            return
+        else:
+            print "started. %-10s:  %15s " % (mode, t_meas_start),
+        if isMount == 0:
+            print "Mount failed"
+            return
+        if t_mount_end !=0:
+            print "Mounted. ",
+        if isLoopCenter != 0:
+            print "Loop centered.",
+        if isRaster != 0:
+            print "raster scanned. ",
+        if isRaster != 0 and isDS ==0:
+            print "crystal cannot be found.",
+        if isDS != 0:
+            print "data collected.",
+        print ""
+>>>>>>> zoo45xu/main
 
     def init(self):
         # Flag for mount
@@ -129,7 +157,11 @@ class EachESA():
 
     def str2time(self, esa_time):
         if esa_time == None:
+<<<<<<< HEAD
             print("No information")
+=======
+            print "No information"
+>>>>>>> zoo45xu/main
             raise MyException("No information")
         #print "ESA_TIME=",esa_time
         try:
@@ -145,10 +177,17 @@ class EachESA():
             timestr = "%s-%s-%s %s:%s:%s" % (year, month, date, hour, mins, secs)
             #print year, month, date, hour, mins
             ttime=datetime.datetime.strptime(timestr, '%Y-%m-%d %H:%M:%S')
+<<<<<<< HEAD
             print("RETURN",type(ttime))
             return ttime
         except MyException as tttt:
             print("Something wrong")
+=======
+            print "RETURN",type(ttime)
+            return ttime
+        except MyException,tttt:
+            print "Something wrong"
+>>>>>>> zoo45xu/main
             raise MyException(ttt)
 
     def calcTime(self):
@@ -170,6 +209,7 @@ class EachESA():
         
                 if self.isMount:
                     self.t_mount = (self.t_mount_end - self.t_meas_start).seconds
+<<<<<<< HEAD
                     print("MOUNT:", self.t_mount)
                 if self.isCenter:
                     self.t_center = (self.t_center_end - self.t_center_start).seconds
@@ -183,6 +223,21 @@ class EachESA():
                 #t_dismount = t_dismount_end - t_dismount_start
             except MyException as tttt:
                 print("EEEEEEEEEEEEEEEEEERRRRRRRRRRRRRRRR")
+=======
+                    print "MOUNT:", self.t_mount
+                if self.isCenter:
+                    self.t_center = (self.t_center_end - self.t_center_start).seconds
+                    print "centering", self.t_center
+                if self.isRaster:
+                    self.t_raster = (self.t_raster_end - self.t_raster_start).seconds
+                    print "Raster consumed time:", self.t_raster, "sec"
+                if self.isDS:
+                    self.t_ds = (self.t_ds_end - self.t_ds_start).seconds
+                    print "DS",self.t_ds
+                #t_dismount = t_dismount_end - t_dismount_start
+            except MyException,tttt:
+                print "EEEEEEEEEEEEEEEEEERRRRRRRRRRRRRRRR"
+>>>>>>> zoo45xu/main
                 raise MyException(tttt)
 
 class Toilet():
@@ -201,10 +256,17 @@ class Toilet():
             self.init()
         for cond in self.conds:
             unko = EachESA(cond)
+<<<<<<< HEAD
             print(unko.getPuckPin())
             try:
                 print(unko.calcTime())
             except MyException as tttt:
+=======
+            print unko.getPuckPin()
+            try:
+                print unko.calcTime()
+            except MyException, tttt:
+>>>>>>> zoo45xu/main
                 raise MyException   
             
             """

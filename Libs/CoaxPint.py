@@ -8,6 +8,7 @@ import datetime
 from Received import *
 from Motor import *
 
+<<<<<<< HEAD
 
 #
 class CoaxPint:
@@ -45,3 +46,38 @@ if __name__ == "__main__":
     #print coa.getPosition()
 
     s.close()
+=======
+#
+class CoaxPint:
+	def __init__(self,server):
+		self.s=server
+    		self.coaxx=Motor(self.s,"bl_45in_st2_coax_1_x","pulse")
+		self.sense=-1
+		
+        def move(self,pls):
+		value=self.sense*int(pls)
+                self.coaxx.move(value)
+
+        def relmove(self,pls):
+		value=int(self.sense*pls)
+                self.coaxx.relmove(pls)
+
+	def getPosition(self):
+                curr_value=self.sense*self.coaxx.getPosition()[0]
+		return curr_value
+
+if __name__=="__main__":
+	host = '172.24.242.59'
+	port = 10101
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	s.connect((host,port))
+
+	coa=CoaxPint(s)
+	print coa.getPosition()
+	#coa.relmove(10)
+	#coa.move(22819)
+	print coa.getPosition()
+
+	s.close()
+>>>>>>> zoo45xu/main

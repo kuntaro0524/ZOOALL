@@ -213,7 +213,9 @@ class MultiCrystal:
         ofile.write("Anomalous Nuclei: Mn  # Mn-K\n")
         ofile.write("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
         # 2020/10/30 Seamless transmission of BSS
-        if self.beamline == "BL32XU" or self.beamline=="BL41XU":
+        if self.trans is None:
+            schstr.append("Attenuator: %5d\n" % self.att_index)
+        elif self.beamline == "BL32XU" or self.beamline=="BL41XU" or self.beamline=="BL45XU":
             ofile.write("Attenuator transmission: %9.7f\n" % self.trans)
         else:
             ofile.write("Attenuator: %5d\n" % self.att_index)
@@ -350,7 +352,9 @@ class MultiCrystal:
         schstr.append("Anomalous Nuclei: Mn  # Mn-K\n")
         schstr.append("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
         # 2020/10/30 Seamless transmission of BSS
-        if self.beamline == "BL32XU" or self.beamline=="BL41XU":
+        if self.trans is None:
+            schstr.append("Attenuator: %5d\n" % self.att_index)
+        elif self.beamline == "BL32XU" or self.beamline=="BL41XU" or self.beamline=="BL45XU":
             schstr.append("Attenuator transmission: %9.7f\n" % self.trans)
         else:
             schstr.append("Attenuator: %5d\n" % self.att_index)
@@ -398,12 +402,19 @@ class MultiCrystal:
 
         if beamsize_index != 0:
             self.beamsize_idx = beamsize_index
+        # exptime T[sec]: meaning
+        # Full flux x T[sec] exposure = 20 MGy
+        # Attenuator thickness
+        attfac = AttFactor()
+        att_idx = attfac.getAttIndexConfig(att_thick)
 
         self.wavelength = wavelength
         self.setCameraLength(distance)
         self.setScanCondition(startphi, endphi, osc_width)
         self.setDir(outdir)
+        # Beamline dependent : should be corrected for BL32XU
         self.setTrans(trans_percent)
+        #self.setAttIdx(att_idx)
 
         # Schedule file
         home_dir = os.environ['HOME']

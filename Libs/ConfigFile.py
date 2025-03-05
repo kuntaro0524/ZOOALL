@@ -2,10 +2,20 @@ import os
 import sys
 from MyException import *
 
+<<<<<<< HEAD
 
 class ConfigFile:
     def __init__(self):
         self.ourconf = "/isilon/BL32XU/BLsoft/PPPP/bl32xu.conf"
+=======
+class ConfigFile:
+    def __init__(self, beamline_name):
+        self.beamline = beamline_name.lower()
+        self.confdir = self.beamline.upper()
+        self.ourconf = "/isilon/%s/BLsoft/PPPP/%s.conf" % (self.confdir, self.beamline)
+
+        print self.beamline, self.ourconf
+>>>>>>> zoo45xu/main
         self.isReady = False
 
     def readFile(self):
@@ -21,7 +31,11 @@ class ConfigFile:
             if x.find("fed"):
                 defend += 1
         if defstart != defend:
+<<<<<<< HEAD
             print(" 'def' and 'fed' statement must be same!\n")
+=======
+            print " 'def' and 'fed' statement must be same!\n"
+>>>>>>> zoo45xu/main
             sys.exit(1)
         return 1
 
@@ -31,12 +45,20 @@ class ConfigFile:
 
         return tmpdic
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> zoo45xu/main
     def prep(self):
         self.readFile()
         self.checkConfig()
         self.storeBlock()
         self.isReady = True
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> zoo45xu/main
     def storeBlock(self):
         self.block = {}
         self.each_dict = {}
@@ -62,6 +84,10 @@ class ConfigFile:
                 # print header
                 self.block.update({header: tmpblock})
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> zoo45xu/main
     # print self.block
     # print len(self.block)
 
@@ -75,6 +101,10 @@ class ConfigFile:
         else:
             raise MyException("getCondition:No such a key!\n")
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> zoo45xu/main
     def getCondition2(self, key1, key2):
         if self.isReady != True:
             self.prep()
@@ -90,14 +120,25 @@ class ConfigFile:
 
 if __name__ == "__main__":
 
+<<<<<<< HEAD
     conf = ConfigFile()
+=======
+    conf = ConfigFile("bl45xu")
+>>>>>>> zoo45xu/main
     # print conf.getCondition("TCS_SCAN")
     # print conf.getCondition2("TCS_SCAN","vstart")
     # print conf.getCondition2("TCS_SCAN","vend")
     # print conf.getCondition(sys.argv[1])
 
     try:
+<<<<<<< HEAD
         tmp = conf.getCondition2(sys.argv[1], sys.argv[2])
         print(tmp)
     except MyException as ttt:
         print(ttt.args[0])
+=======
+        tmp = conf.getCondition2("DTSCAN_NORMAL", sys.argv[2])
+        print tmp
+    except MyException, ttt:
+        print ttt.args[0]
+>>>>>>> zoo45xu/main

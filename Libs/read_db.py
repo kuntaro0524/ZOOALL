@@ -17,7 +17,11 @@ if __name__ == "__main__":
 
     def str2time(esa_time):
         if esa_time == None:
+<<<<<<< HEAD
             print("No information")
+=======
+            print "No information"
+>>>>>>> zoo45xu/main
             raise MyException("No information")
         #print "ESA_TIME=",esa_time
         try:
@@ -31,12 +35,21 @@ if __name__ == "__main__":
             timestr = "%s-%s-%s %s:%s:%s" % (year, month, date, hour, mins, secs)
             ttime=datetime.datetime.strptime(timestr, '%Y-%m-%d %H:%M:%S')
             return ttime
+<<<<<<< HEAD
         except MyException as tttt:
             print("Something wrong")
             raise MyException(ttt)
 
     def getTimeSeries(timestr, newest_index):
         print("##################")
+=======
+        except MyException,tttt:
+            print "Something wrong"
+            raise MyException(ttt)
+
+    def getTimeSeries(timestr, newest_index):
+        print "##################"
+>>>>>>> zoo45xu/main
         times = timestr.split(",")
         rtn_array = []
         for each_time in times:
@@ -64,37 +77,60 @@ if __name__ == "__main__":
                 if start_or_end == "end":
                     mount_end_time = str2time(time_str)
                     mount_time = (mount_end_time - mount_start_time).seconds
+<<<<<<< HEAD
                     print("Mount: %8d sec" % mount_time)
+=======
+                    print "Mount: %8d sec" % mount_time
+>>>>>>> zoo45xu/main
             if exp_seq == "center":
                 if start_or_end == "start":
                     center_start_time = str2time(time_str)
                 if start_or_end == "end":
                     center_end_time = str2time(time_str)
                     center_time = (center_end_time - center_start_time).seconds
+<<<<<<< HEAD
                     print("Center: %8d sec" % center_time)
+=======
+                    print "Center: %8d sec" % center_time
+>>>>>>> zoo45xu/main
             if exp_seq == "raster":
                 if start_or_end == "start":
                     center_start_time = str2time(time_str)
                 if start_or_end == "end":
                     center_end_time = str2time(time_str)
                     center_time = (center_end_time - center_start_time).seconds
+<<<<<<< HEAD
                     print("raster: %8d sec" % center_time)
+=======
+                    print "raster: %8d sec" % center_time
+>>>>>>> zoo45xu/main
             if exp_seq == "ds":
                 if start_or_end == "start":
                     ds_start_time = str2time(time_str)
                 if start_or_end == "end":
                     ds_end_time = str2time(time_str)
                     ds_time = (ds_end_time - ds_start_time).seconds
+<<<<<<< HEAD
                     print("ds: %8d sec" % ds_time)
+=======
+                    print "ds: %8d sec" % ds_time
+>>>>>>> zoo45xu/main
             if exp_seq == "meas":
                 if start_or_end == "start":
                     meas_start_time = str2time(time_str)
                 if start_or_end == "end":
                     meas_end_time = str2time(time_str)
                     meas_time = (meas_end_time - meas_start_time).seconds
+<<<<<<< HEAD
                     print("meas: %8.2f min" % (meas_time/60.0))
         return rtn_array
 
+=======
+                    print "meas: %8.2f min" % (meas_time/60.0)
+        return rtn_array
+
+    print len(ppp)
+>>>>>>> zoo45xu/main
     for p in ppp:
         pindex = p['p_index']
         mode = p['mode']
@@ -108,11 +144,15 @@ if __name__ == "__main__":
         isRaster=p['isRaster'] 
         isMount=p['isMount'] 
         flux = p['flux']
+<<<<<<< HEAD
         roi_raster = p['raster_roi']
+=======
+>>>>>>> zoo45xu/main
 
         # Complete done
         if isDone == 1:
             newest_index = n_mount
+<<<<<<< HEAD
             print(getTimeSeries(timestr, newest_index))
         #print pindex,mode,root_dir,puck,pin,p['cry_max_size_um'],p['cry_min_size_um'],timestr, n_mount, "isCenter=",isCenter, "isDone=", isDone, "isRaster=",isRaster,"FLUX=%e"%flux
             print(pindex,mode,root_dir,puck,pin, "n_mount=",n_mount, "isCenter=",isCenter, "isDone=", isDone, "isRaster=",isRaster,"FLUX=%e"%flux)
@@ -133,5 +173,13 @@ if __name__ == "__main__":
         roi_raster = p['raster_roi']
         if isDone != 1:
             print("%s-%02d failed. isDone:%5d: isMount %5d %5d" % (puck,pin,isDone,isMount,roi_raster))
+=======
+            print getTimeSeries(timestr, newest_index)
+        #print pindex,mode,root_dir,puck,pin,p['cry_max_size_um'],p['cry_min_size_um'],timestr, n_mount, "isCenter=",isCenter, "isDone=", isDone, "isRaster=",isRaster,"FLUX=%e"%flux
+            print pindex,mode,root_dir,puck,pin, "n_mount=",n_mount, "isCenter=",isCenter, "isDone=", isDone, "isRaster=",isRaster,"FLUX=%e"%flux
+
+        else:
+            print "%s-%02d failed. %5d: isMount %5d" % (puck,pin,isDone,isMount)
+>>>>>>> zoo45xu/main
         #print "isCenter",isCenter
         #getTimeSeries(timestr)

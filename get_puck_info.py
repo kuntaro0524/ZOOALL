@@ -5,4 +5,8 @@ if __name__ == "__main__":
     puck_list=zoo.getSampleInformation()
 
     for puck in puck_list:
+<<<<<<< HEAD
         print(puck, end=' ')
+=======
+        print puck,
+>>>>>>> zoo45xu/main

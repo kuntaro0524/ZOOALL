@@ -131,7 +131,6 @@ class KUMA:
         return exp_time, mod_transmission
 
     def getBestCondsHelical(self, cond, flux, dist_vec_mm):
-        # type: (condition dictionary, flux value) -> exp_time, best_transmission
         self.logger.info("getBestCondsHelical starts\n")
 
         photon_density_limit = self.convDoseToDensityLimit(cond['dose_ds'], cond['wavelength'])

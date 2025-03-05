@@ -329,7 +329,10 @@ class Repository(wx.Frame):
             esa.updateValueAt(o_index, "cry_max_size_um", cry_max_size)
             esa.updateValueAt(o_index, "loopsize", loop_size)
             esa.updateValueAt(o_index, "isDone", isDone)
+<<<<<<< HEAD
             esa.updateValueAt(o_index, "dist_ds", dist_ds)
+=======
+>>>>>>> zoo45xu/main
         self.PushUpdate(event)
 
     def UnsetSkip(self, event):
