@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 from Libs import MyException
 import sys,os
@@ -26,16 +25,6 @@ class BSSconfig:
         self.isPrep = False
         self.debug = False
 
-=======
-from MyException import *
-
-class BSSconfig:
-    def __init__(self, config_file="/isilon/blconfig/bl45xu/bss/bss.config"):
-        self.confile = config_file
-        self.isRead = False
-        self.isPrep = False
-
->>>>>>> zoo45xu/main
     def storeLines(self):
         ifile = open(self.confile, "r")
         self.lines = ifile.readlines()
@@ -43,7 +32,6 @@ class BSSconfig:
         ifile.close()
         self.isRead = True
 
-<<<<<<< HEAD
     def is_integer(self, number):
         try:
             float(number)
@@ -394,8 +382,6 @@ class BSSconfig:
                 print("Intensity monitor position: ON/OFF %s/%s"% (self.on_pulse, self.off_pulse))
                 return self.on_pulse, self.off_pulse
 
-=======
->>>>>>> zoo45xu/main
     def get(self, confstr):
         if self.isRead == False:
             self.storeLines()
@@ -416,11 +402,7 @@ class BSSconfig:
 
         # strip after "#"
         if fstr.rfind("#") != -1:
-<<<<<<< HEAD
             print(fstr)
-=======
-            print fstr
->>>>>>> zoo45xu/main
             fstr = fstr[:fstr.rfind("#") - 1]
 
         # ":" treatment
@@ -431,7 +413,6 @@ class BSSconfig:
         # print strvalue
         return float(strvalue)
 
-<<<<<<< HEAD
     def getCmount(self):
         try:
             self.mx = self.getValue("Cmount_Gonio_X_Magnet")
@@ -442,31 +423,6 @@ class BSSconfig:
         except:
             self.mz = self.getValue("Cmount_Gonio_Z")
         self.my = self.getValue("Cmount_Gonio_Y_Magnet")
-=======
-    def readEvacuate(self):
-        try:
-            print self.confile
-            self.cryo_on = self.getValue("Cryostream_1_On_Position")
-            self.cryo_off = self.getValue("Cryostream_1_Off_Position")
-            self.colli_on = self.getValue("Collimator_1_On_Position")
-            self.colli_off = self.getValue("Collimator_1_Off_Position:")
-            self.bs_on = self.getValue("Beam_Stop_1_On_Position")
-            self.bs_off = self.getValue("Beam_Stop_1_Off_Position:")
-
-            self.mx = self.getValue("Cmount_Gonio_X:")
-            # self.my=self.getValue("Cmount_Gonio_Y:")
-            self.mz = self.getValue("Cmount_Gonio_Z:")
-            self.my = self.getValue("Cmount_Gonio_Y_Magnet")
-
-        except MyException, ttt:
-            print ttt.args[0]
-
-        self.isPrep = True
-
-    def getCmount(self):
-        if self.isPrep == False:
-            self.readEvacuate()
->>>>>>> zoo45xu/main
         return self.mx, self.my, self.mz
 
     def getCryo(self):
@@ -490,20 +446,14 @@ class BSSconfig:
         # list of thickness
         thick_list=[]
 
-<<<<<<< HEAD
         min_thick = -9999
 
-=======
->>>>>>> zoo45xu/main
         for line in self.lines:
             if line.rfind("Seamless_Min_Thickness:") != -1:
                 cols=line.split()
                 min_thick=float(cols[1])
-<<<<<<< HEAD
         if min_thick < 0.0:
             min_thick = 0.0
-=======
->>>>>>> zoo45xu/main
 
         return min_thick
 
@@ -541,14 +491,16 @@ class BSSconfig:
 
 if __name__ == "__main__":
     bssconf = BSSconfig()
-<<<<<<< HEAD
     #bssconf.getThinnestAtt()
     # axis_name="st1_col_1_z"
     # print(bssconf.getPulseInfo(axis_name))
-    # e,a,b=bssconf.getEvacuateInfo("collimator")
+    #e,a,b=bssconf.getEvacuateInfo("collimator")
     # print(e,a,b)
 
-    print(bssconf.getPulse4MinZoomRatio())
+    #print(bssconf.readZoomOption())
+    axis_name = "st2_coax_1_x"
+
+    bssconf.getSense(axis_name)
 
     """
     # collimator evacuation parameters
@@ -572,18 +524,3 @@ if __name__ == "__main__":
     print(bssconf.getHomeValue("st2_detector_1_x"))
 
     """
-=======
-    bssconf.getThinnestAtt()
-
-    """
-    try:
-        # This is for Zoom -48000, 4x4 binning image
-        print bssconf.getCmount()
-        print bssconf.getCryo()
-        print bssconf.getColli()
-        print bssconf.getBS()
-
-    except MyException, ttt:
-        print ttt.args[0]
-    """
->>>>>>> zoo45xu/main
