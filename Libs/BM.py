@@ -100,16 +100,9 @@ if __name__ == "__main__":
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
-<<<<<<< HEAD
     print("Moving Scintillator Monitor")
     moni = BM(s)
     # moni.onPika()
     moni.offXYZ()
-=======
-    moni = BM(s)
-    print moni.getPos()
-    moni.on()
-    moni.off()
->>>>>>> zoo45xu/main
 
     s.close()
