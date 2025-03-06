@@ -6,7 +6,7 @@ import datetime
 import ZooNavigator
 from MyException import *
 import socket
-import Date
+import MyDate
 import logging
 import logging.config
 import subprocess
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     ms.connect(("172.24.242.59", 10101))
 
     # Logging setting
-    d = Date.Date()
+    d = MyDate.MyDate()
     time_str = d.getNowMyFormat(option="date")
     logname = "/isilon/BL45XU/BLsoft/PPPP/10.Zoo/ZooLogs/zoo_%s.log" % time_str
     print "changing mode of %s" % logname

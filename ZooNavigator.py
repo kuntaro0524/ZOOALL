@@ -43,6 +43,7 @@ def check_abort(lm):
 # Version 2.1.1 modified on 2019/07/23 K.Hirata
 # Version 2.1.2 modified on 2019/10/26 K.Hirata at BL45XU
 # Version 5.0.0 modified on 2025/02/14 K.Hirata at BL32XU www
+# Version 5.0.1 modified on 2025/02/26 K.Hirata at C10 to merge BL45XU codes to ZOOALL repository
 
 class ZooNavigator():
     def __init__(self, blf, esa_csv="", is_renew_db=False):
@@ -140,9 +141,11 @@ class ZooNavigator():
         # Time limit
         self.time_limit_ds = 9999  # [hours]
 
-        # Flag for 10um raster scan at BL45XU
-        self.flag10um_raster = False
-        self.min_beamsize_10um_raster = 20.0
+        # Detailed raster scan with smaller step
+        # derived from "ZOO45XU" 2025/02/27 10:00 K. Hirata
+        self.isSpecialRasterStep = False
+        self.beamsize_thresh_special_raster = 50.0
+        self.special_raster_step = 25.0 # [um]
 
         # isDark flag : read from 'beamline.ini'
         # section: special_setting, option: isDark, value: boolean
@@ -155,11 +158,18 @@ class ZooNavigator():
     def setTimeLimit(self, time_hours):
         self.time_limit_ds = time_hours
 
-    def setRasterStep(self, step_size_um, beamsize_thresh):
-        self.logger.info("Step size for 2D raster scan has been changed to %8.2f um" % step_size_um)
-        self.isSpecialRasterStep = True
-        self.beamsize_thresh_special_raster = beamsize_thresh
-        self.special_raster_step = step_size_um
+    # This function was copied from ZOO45XU 2025/02/27 10:00 K. Hirata
+    def setSpecialRasterStepFromBeamsize(self, cond):
+        if cond['raster_vbeam'] >= self.beamsize_thresh_special_raster and \
+                cond['raster_hbeam'] >= self.beamsize_thresh_special_raster:
+            self.logger.info("Special raster scan step setting is activated.")
+            self.logger.info("Current step size = %8.3f um" % self.special_raster_step)
+            self.lm.setSpecialRasterStep(self.special_raster_step)
+        else:
+            self.logger.info("Special raster scan step setting is activated.")
+            self.logger.info("But step is not changed now. beam size = V%5.2f x H%5.2f " %
+                             (cond['raster_vbeam'], cond['raster_hbeam']))
+            return
 
     def prepESA(self, doesExist = False):
         self.logger.info("Preparation of ZOO database file from input CSV file. %s" % self.esa_csv)
@@ -168,7 +178,6 @@ class ZooNavigator():
         if os.path.exists(root_dir) == False:
             os.makedirs(root_dir)
         # zoo.db file check and remake and save
-        d = Date.Date()
         d = MyDate.MyDate()
         time_str = d.getNowMyFormat(option="sec")
         dbfile = "%s/zoo_%s.db" % (root_dir, time_str)
@@ -910,7 +919,7 @@ class ZooNavigator():
         capture_name = "before.ppm"
         self.lm.captureImage(capture_name)
 
-        if beamline.upper() == "BL45XU":
+        if self.beamline.upper() == "BL45XU":
             # LN2:ON -> ZoomCap:ON
             if cond['ln2_flag'] == 1:
                 # self.dev.zoom.move(2000)
@@ -988,18 +997,6 @@ class ZooNavigator():
         open(os.path.join(os.environ["HOME"], ".zoo_current"), "w").write("%s %s finished\n" \
                                                                           % (self.name, self.root_dir))
 
-    def setSpecialRasterStepFromBeamsize(self, cond):
-        if cond['raster_vbeam'] >= self.beamsize_thresh_special_raster and \
-                cond['raster_hbeam'] >= self.beamsize_thresh_special_raster:
-            self.logger.info("Special raster scan step setting is activated.")
-            self.logger.info("Current step size = %8.3f um" % self.special_raster_step)
-            self.lm.setSpecialRasterStep(self.special_raster_step)
-        else:
-            self.logger.info("Special raster scan step setting is activated.")
-            self.logger.info("But step is not changed now. beam size = V%5.2f x H%5.2f " %
-                             (cond['raster_vbeam'], cond['raster_hbeam']))
-            return
-
     def collectMulti(self, trayid, pinid, prefix, cond, sphi):
         o_index = cond['o_index']
 
@@ -1015,7 +1012,7 @@ class ZooNavigator():
         vstep_um = cond['raster_vbeam']
         hstep_um = cond['raster_hbeam']
 
-        # 10um raster for BL45XU
+        # preferred raster scan step
         if self.isSpecialRasterStep: self.setSpecialRasterStepFromBeamsize(cond)
 
         raster_schedule, raster_path = self.lm.rasterMaster(scan_id, scan_mode, self.center_xyz,
@@ -1235,12 +1232,13 @@ class ZooNavigator():
         vstep_um = cond['raster_vbeam']
         hstep_um = cond['raster_hbeam']
 
-        # preferred raster scan step
+        # copied from ZOO45XU
         if self.isSpecialRasterStep: self.setSpecialRasterStepFromBeamsize(cond)
 
         schfile, raspath = self.lm.rasterMaster(scan_id, scan_mode, self.center_xyz,
                                                 scanv_um, scanh_um, vstep_um, hstep_um, sphi, cond)
 
+        # time for start raster scan
         self.updateTime(cond, "raster_start", comment="Raster scan started")
         self.logger.debug("[PROCESS] ZOO starts raster scan..")
         self.zoo.doRaster(schfile)
@@ -1296,6 +1294,7 @@ class ZooNavigator():
             initial_left_y = raster_cxyz[1]
             vertical_index = 0
             final_cxyz = 0, 0, 0
+            # Vertical scan loop till the crystal is found
             n_try = 5
             while (True):
                 self.logger.info("Vertical scan loop..")
@@ -1327,7 +1326,8 @@ class ZooNavigator():
                 if factor_increase_exp != 1.0:
                     # DB information should be overwritten
                     cond['exp_raster'] = exp_mod
-                    self.logger.info("Exposure time is changed from %8.3f [sec] to %8.3f [sec]\n" % (exp_origin, exp_mod))
+                    self.logger.info(
+                        "Exposure time is changed from %8.3f [sec] to %8.3f [sec]\n" % (exp_origin, exp_mod))
                     # Attenuation factor in [%]
                     att_raster = att_origin / factor_increase_exp
                     self.logger.info(
@@ -1476,9 +1476,9 @@ class ZooNavigator():
         vstep_um = cond['raster_vbeam']
         hstep_um = cond['raster_hbeam']
 
-        # 10um raster for BL45XU
-        if self.flag10um_raster == True:
-            self.lm.setMinBeamsize10umRaster(self.min_beamsize_10um_raster)
+        # Detailed raster with larger beam size
+        # copied from ZOO45XU 2025/02/27 10:00AM K. Hirata
+        if self.isSpecialRasterStep: self.setSpecialRasterStepFromBeamsize(cond)
 
         schfile, raspath = self.lm.rasterMaster(scan_id, scan_mode, self.center_xyz,
                                                 scanv_um, scanh_um, vstep_um, hstep_um,
@@ -1571,8 +1571,7 @@ class ZooNavigator():
         vstep_um = cond['raster_vbeam']
         hstep_um = cond['raster_hbeam']
 
-        # 10um step scan for larger beam
-        # 10um raster for BL45XU
+        # copied from ZOO45XU 2025/02/27 10:00AM K. Hirata
         if self.isSpecialRasterStep: self.setSpecialRasterStepFromBeamsize(cond)
 
         schfile, raspath = self.lm.rasterMaster(scan_id, scan_mode, self.center_xyz,

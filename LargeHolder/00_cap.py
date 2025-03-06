@@ -4,7 +4,7 @@ sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/")
 
 import Device
 import IboINOCC
-import Date
+import MyDate
 
 if __name__ == "__main__":
     import Gonio
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     dev.init()
     inocc=IboINOCC.IboINOCC(dev.gonio)
 
-    dtdt = Date.Date()
+    dtdt = MyDate.MyDate()
     dtstr = dtdt.getNowMyFormat(option="min")
 
     inocc=IboINOCC.IboINOCC(dev.gonio)

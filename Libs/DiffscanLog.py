@@ -9,7 +9,6 @@ import numpy
 from pylab import *
 from MyException import *
 
-
 class DiffscanLog:
     def __init__(self, path, filename="diffscan.log"):
         self.filename = "%s/%s" % (path, filename)

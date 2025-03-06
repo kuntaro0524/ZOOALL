@@ -7,7 +7,7 @@ import socket
 import Zoo
 import Device
 import IboINOCC
-import Date
+import MyDate
 
 if __name__ == "__main__":
     blanc = '172.24.242.41'
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     dev=Device.Device(s)
     dev.init()
 
-    dt = Date.Date()
+    dt = MyDate.MyDate()
     timestr = dt.getNowMyFormat(option="sec")
 
     inocc=IboINOCC.IboINOCC(dev.gonio)

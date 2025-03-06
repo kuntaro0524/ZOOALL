@@ -1,4 +1,6 @@
 from GonioVec import *
+import os
+from configparser import ConfigParser, ExtendedInterpolation
 
 # 2013/10/11 K.Hirata
 # MX225HS readout mode is different from MX225HE
@@ -20,8 +22,7 @@ from GonioVec import *
 # 2015/12/19 Tranlated to here for Zoo
 # 2016/06/03 Crystal ID for KAMO
 # 2016/07/07 Multi helical schedule
-
-beamline = "BL32XU"
+# 2025/03/06 read beamline.ini to get the beamline name
 
 class ScheduleBSS:
     def __init__(self):
@@ -52,6 +53,10 @@ class ScheduleBSS:
         self.isSlow = False
         self.isReadBeamSize = False
         self.transmission = 1.0
+        # Read configure file
+        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        self.beamline = self.config.get("beamline", "beamline")
 
     def setBeamsizeIndex(self, index):
         self.beamsize_idx = index
@@ -195,9 +200,9 @@ class ScheduleBSS:
         schstr.append("Oscillation delay: 100.000000  # [msec]\n")
         schstr.append("Anomalous Nuclei: Mn  # Mn-K\n")
         schstr.append("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
-        if beamline == "BL45XU":
+        if self.beamline.upper() == "BL45XU":
             schstr.append("Attenuator: %5d\n" % self.att_index)
-        elif beamline == "BL41XU" or beamline == "BL32XU":
+        elif self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU":
             schstr.append("Attenuator transmission: %9.6f\n" % self.transmission)
         schstr.append("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]\n")
         schstr.append("XAFS Count time: 1.000000  # [sec]\n")
@@ -279,9 +284,9 @@ class ScheduleBSS:
         ofile.write("Anomalous Nuclei: Mn  # Mn-K\n")
         ofile.write("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
 
-        if beamline == "BL45XU":
+        if self.beamline.upper() == "BL45XU":
             ofile.write("Attenuator: %5d\n" % self.att_index)
-        elif beamline == "BL41XU" or beamline == "BL32XU":
+        elif self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU":
             ofile.write("Attenuator transmission: %9.6f\n" % self.transmission)
 
         ofile.write("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]\n")
