@@ -12,6 +12,7 @@ class BLFactory:
         # 'beamline.ini' を ConfigParser で読み込む
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+        print(config_path)
         self.config.read(config_path)
 
         # configureファイルから beamline を取得
@@ -59,9 +60,6 @@ if __name__=="__main__":
     blf = BLFactory()
     blf.initDevice()
     # gonio = blf.getGoniometer()
-    # print(gonio.getXYZmm())
-
-    print("OPEN")
-    import time
-
-    blf.gonio.rotatePhi(225.0)
+    print(gonio.getXYZmm())
+    #import time
+    #blf.gonio.rotatePhi(225.0)

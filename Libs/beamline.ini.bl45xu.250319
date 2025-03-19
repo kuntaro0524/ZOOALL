@@ -1,0 +1,134 @@
+[beamline]
+beamline = BL45XU
+[server]
+bss_server = 192.168.231.2
+bss_port = 5555
+blanc_address = 172.24.242.59
+
+[dirs]
+zooroot = /user/admin45/JunkZOO/
+logdir = ${dirs:zooroot}/Logs/
+libdir = ${dirs:zooroot}/Libs/
+zoologdir= ${dirs:zooroot}/ZooLogs/
+bssconfig_dir=/staff/config/bl45xu/bss/
+backimage_dir = ${dirs:zooroot}/BackImages/
+
+[files]
+bssconfig_file=${dirs:bssconfig_dir}/bss.config
+camera_inf=${dirs:bssconfig_dir}/e1/video/camera.inf
+beamsize_conf_file=${dirs:bssconfig_dir}/bss/beamsize.config
+inocc_image=/staff/config/bl32xu/bss/test.ppm
+logging_conf=${dirs:libdir}/logging.conf
+dose_csv=${dirs:libdir}/en_dose_lys.csv
+# Just a default background image file.
+backimg = ${dirs:zooroot}/BackImages/back.ppm
+
+[capture]
+bright_default=15400
+gain_default=1700
+contrast_default=18000
+# Dark mode
+bright_default_dark=5500
+gain_default_dark=5500
+# Beam stopper position during centering
+# True for BL41XU
+beamstopper_off=False
+
+[special_setting]
+# True: Dark mode, False: Normal mode
+isDark=False
+#isDark=True
+
+[coaximage]
+width=612.0
+height=480.0
+image_size=881295
+# 240627 BL41XU by K.Hirata
+#pix_size = 4.748
+# 250319 BL45XU by K.Hirata
+pix_size = 6.087
+
+[inocc]
+# 上下左右このピクセル分は削ってから解析をする
+delete_pix=5
+# 中央のROIを切る→センタリングのときに先端が入っているかどうかを見る
+# 上下左右、どのくらい隙間をとるかを決定している
+roi_len_um = 200.0
+# cv2で filteringするときのしきい値（経験的に決めた）
+filter_thresh_min=15
+filter_thresh_max=20
+# ２値化のときのしきい値
+# BL41XU:8
+bin_thresh=10
+# zoom valu read from bss.config & camera.inf -> minimum zoom for centering
+zoom=2.0
+# BL32XU specific (ignored at other beamlines)
+zoom_pintx=20693
+
+# Used in UserESA to generate ZOO csv file.
+[experiment]
+score_min = 10
+score_max = 100
+raster_dose = 0.1
+dose_ds = 10.0
+raster_roi = 1
+exp_raster = 0.01
+att_raster = 20
+hebi_att = 20
+cover_flag = 1
+exp_ds=0.02
+# Rasterのときの端分解能
+resol_raster=2.5
+# "" are not required to define 'character variable'
+gonio_direction = FROM_RIGHT
+# pin channel
+pin_channel = 3
+# pulse for non-attenuated beam
+pulse_for_noatt = 35
+# required at BL41XU only (2 units for attenuator)
+pulse_for_noatt2 = 0
+
+[detector]
+# カメラ長最短 [mm]
+min_camera_len=110.0
+# カメラの長さ（短て方向） [mm]
+min_camera_dim = 311.2
+
+[axes]
+# beam stopper axis
+bs_y_name = st2_bs_1_y
+bs_z_name = st2_bs_1_z
+bs_evacinfo = beam stop
+# gonio meter axes
+gonio_x_name = st2_gonio_1_x
+gonio_y_name = st2_gonio_1_y
+gonio_z_name = st2_gonio_1_z
+gonio_zz_name = st2_gonio_1_zz
+gonio_rot_name = st2_gonio_1_omega
+# zoom x axis
+zoom_x_axis = st2_coax_1_zoom
+# Cryo Z axis
+cryo_z_name = st2_cryo_1_x
+# Cryo evac info  to extract 'evacuation' information
+cryo_evacinfo = cryo
+# Collimator 
+col_y_name = st2_col_1_z
+col_z_name = st2_motor_1_5
+col_evacinfo = collimator
+# BL41XU specific : the second collimator evacuation 
+col_evacinfo2 = collimator
+# Camera distance
+ccdlen = st2_detector_1_x
+# Attenuator
+att = st2_att_1_rx
+# Attenuator 2 is required only at BL41XU
+att2 = 
+# Light
+light_z_name = st2_light_1_z
+# Shutter
+shutter = st2_shutter_1
+# counter 
+counter_pin = st2_counter_1
+# beam monitor
+beammonitor_y = st2_motor_1_2
+beammonitor_x = st2_motor_1_3
