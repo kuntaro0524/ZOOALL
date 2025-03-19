@@ -5,31 +5,21 @@ import datetime
 
 import ESA
 
-<<<<<<< HEAD
 # version 1.0
 
-=======
->>>>>>> zoo45xu/main
 # This class should treat 'one' information in ZOODB
 class DBinfo():
     def __init__(self, dbinfo):
         self.cond = dbinfo
     #print ppp
-<<<<<<< HEAD
         self.isRead = False
-=======
->>>>>>> zoo45xu/main
 
     def getConds(self):
         return self.conds
 
     def str2time(self, esa_timestr):
         if esa_timestr == None:
-<<<<<<< HEAD
             print("No information")
-=======
-            print "No information"
->>>>>>> zoo45xu/main
             raise MyException("No information")
         #print "esa_timestr=",esa_timestr
         try:
@@ -43,15 +33,9 @@ class DBinfo():
             timestr = "%s-%s-%s %s:%s:%s" % (year, month, date, hour, mins, secs)
             ttime=datetime.datetime.strptime(timestr, '%Y-%m-%d %H:%M:%S')
             return ttime
-<<<<<<< HEAD
         except MyException as tttt:
             message = "Something wrong to read %s" % esa_timestr
             print(message)
-=======
-        except MyException,tttt:
-            message = "Something wrong to read %s" % esa_timestr
-            print message
->>>>>>> zoo45xu/main
             raise MyException(ttt)
 
     # Extract time information from timestr at the designated index
@@ -79,7 +63,6 @@ class DBinfo():
             exp_seq, start_or_end, time_str = info
             if exp_seq == "mount":
                 if start_or_end == "start":
-<<<<<<< HEAD
                     self.mount_start_time = self.str2time(time_str)
                 if start_or_end == "end":
                     self.mount_end_time = self.str2time(time_str)
@@ -158,56 +141,6 @@ class DBinfo():
             return True,self.root_dir, self.prefix, self.sample_name
         else:
             return False,1,1,1,
-=======
-                    mount_start_time = self.str2time(time_str)
-                if start_or_end == "end":
-                    mount_end_time = self.str2time(time_str)
-                    mount_time = (mount_end_time - mount_start_time).seconds
-                    print "Mount: %8d sec" % mount_time
-            if exp_seq == "center":
-                if start_or_end == "start":
-                    center_start_time = self.str2time(time_str)
-                if start_or_end == "end":
-                    center_end_time = self.str2time(time_str)
-                    center_time = (center_end_time - center_start_time).seconds
-                    print "Center: %8d sec" % center_time
-            if exp_seq == "raster":
-                if start_or_end == "start":
-                    center_start_time = self.str2time(time_str)
-                if start_or_end == "end":
-                    center_end_time = self.str2time(time_str)
-                    center_time = (center_end_time - center_start_time).seconds
-                    print "raster: %8d sec" % center_time
-            if exp_seq == "ds":
-                if start_or_end == "start":
-                    ds_start_time = self.str2time(time_str)
-                if start_or_end == "end":
-                    ds_end_time = self.str2time(time_str)
-                    ds_time = (ds_end_time - ds_start_time).seconds
-                    print "ds: %8d sec" % ds_time
-            if exp_seq == "meas":
-                if start_or_end == "start":
-                    meas_start_time = self.str2time(time_str)
-                if start_or_end == "end":
-                    meas_end_time = self.str2time(time_str)
-                    meas_time = (meas_end_time - meas_start_time).seconds
-                    print "meas: %8.2f min" % (meas_time/60.0)
-        return rtn_array
-
-    def test(self, p):
-        pindex = p['p_index']
-        mode = p['mode']
-        root_dir = p['root_dir']
-        puck = p['puckid']
-        pin = p['pinid']
-        isCenter = p['isLoopCenter']
-        isDone = p['isDone']
-        n_mount = p['n_mount']
-        timestr = p['t_meas_start']
-        isRaster=p['isRaster']
-        isMount=p['isMount']
-        flux = p['flux']
->>>>>>> zoo45xu/main
 
 if __name__ == "__main__":
     esa = ESA.ESA(sys.argv[1])
@@ -216,7 +149,6 @@ if __name__ == "__main__":
     esa.listDB()
     conds = esa.getDict()
 
-<<<<<<< HEAD
     print("Number of crystals processed", len(conds))
     n_good = 0
     dpfile = open("automerge.csv","w")
@@ -233,19 +165,3 @@ if __name__ == "__main__":
     print("Number of crystals processed", len(conds))
     print("Number of datasets " ,n_good)
     print("Failed crystals")
-=======
-    for p in conds:
-        dbinfo = DBinfo(p)
-
-        # Complete done
-        if isDone == 1:
-            newest_index = n_mount
-            print zoodb.getTimeSeries(timestr, newest_index)
-        #print pindex,mode,root_dir,puck,pin,p['cry_max_size_um'],p['cry_min_size_um'],timestr, n_mount, "isCenter=",isCenter, "isDone=", isDone, "isRaster=",isRaster,"FLUX=%e"%flux
-            print pindex,mode,root_dir,puck,pin, "n_mount=",n_mount, "isCenter=",isCenter, "isDone=", isDone, "isRaster=",isRaster,"FLUX=%e"%flux
-
-        else:
-            print "%s-%02d failed. %5d: isMount %5d" % (puck,pin,isDone,isMount)
-        #print "isCenter",isCenter
-        #getTimeSeries(timestr)
->>>>>>> zoo45xu/main

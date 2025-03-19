@@ -8,6 +8,9 @@ blanc_address = 172.24.242.41
 [ECHA]
 isECHA=False
 
+[control]
+isWebSocket = False
+
 [dirs]
 zooroot = /staff/bl32xu/BLsoft/ZOO32XU/
 logdir = ${dirs:zooroot}/Logs/
@@ -107,6 +110,7 @@ min_camera_dim = 233.0
 # beam stopper axis
 bs_y_name = st2_bs_1_y
 bs_z_name = st2_bs_1_z
+# bss.configの中で evacuate axis　とされている軸を見つけるための文字列
 bs_evacinfo = beam stop
 # gonio meter axes
 gonio_x_name = st2_gonio_1_x
@@ -138,3 +142,21 @@ shutter = st2_shutter_1
 counter_pin = st2_counter_1
 # DSS
 dss = plc_dss_1
+# FES
+fes_height = fe_slit_1_height
+fes_width = fe_slit_1_width
+fes_vert = fe_slit_1_vertical
+fes_hori = fe_slit_1_horizontal
+# MBS
+mbs = plc_mbs
+# TCS
+tcs_height = tc1_slit_1_height
+tcs_width = tc1_slit_1_width
+tcs_vert = tcs1_slit_1_vertical
+tcs_hori = tcs1_slit_1_horizontal
+# Detector cover @ BL32XU
+det_cover = cover_1_z
+# Beam monitor @ BL32XU
+beammonitor_y = st2_monitor_1_y
+beammonitor_x = st2_monitor_1_x
+beammonitor_z = st2_monitor_1_z

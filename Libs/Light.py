@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #!/bin/env python import sys
 import socket
 import time
@@ -11,58 +10,33 @@ import WebSocketBSS
 
 import BSSconfig
 from configparser import ConfigParser, ExtendedInterpolation
-=======
-#!/bin/env python 
-import sys
-import socket
-import time
 
-# My library
-from Received import *
-from Motor import *
->>>>>>> zoo45xu/main
+import BaseAxis
 
 # information of collision between BM and Gonio
-class Light:
+class Light(BaseAxis.BaseAxis):
     def __init__(self, server):
-<<<<<<< HEAD
-        self.bssconf = BSSconfig.BSSconfig()
-        self.bl_object = self.bssconf.getBLobject()
-
-        # beamline.ini
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
-
-        self.s = server
-        # names of collimator axes
-        try:
-            self.light_z_name = self.config.get("axes", "light_z_name")
-        except:
-            # 軸情報が取得できないのでエラーで終了すべき
-            print("Light")
-            print("Error: cannot get axis information from beamline.ini")
-            sys.exit(1)
-        # 軸のインスタンスを作成する
-        self.light_name = "bl_%s_%s" % (self.bl_object, self.light_z_name)
-        print(self.light_name)
-        self.light_z = Motor.Motor(self.s, self.light_name, "pulse")
-        # 軸のパルス分解能を取得する
-        self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.light_z_name)
+        # Light axis
+        # axis name on 'beamline.ini'
+        conf_name = "light_z_name"
+        super().__init__(server, conf_name, axis_type="motor", isEvacuate=True)
+        self.light_z = self.motor
 
         # web socket or not
         self.isWebsocket = False
 
-        # Beamline name
-        self.beamline = self.config.get("beamline", "beamline")
-        if self.beamline == "BL41XU":
-            self.isWebsocket = True
-            self.websock = WebSocketBSS.WebSocketBSS()
+        # 250307: 今はまだBL41XUのみだが、ゆくゆくは WebSocketで退避制御などを
+        # 行いたいので、そのための準備
+        # beamlin.ini, [control] section: isWebsocket = True
+        if self.config.has_option("control", "isWebsocket"):
+            self.isWebsocket = self.config.getboolean("control", "isWebsocket")
+            if self.isWebsocket:
+                self.websock = WebSocketBSS.WebSocketBSS()
 
         # initialization flag
         self.isInit = False
 
     def getEvacuate(self):
-        self.on_pulse, self.off_pulse = self.bssconf.getLightEvacuateInfo(self.light_z_name)
         print("ON (VME value):",self.on_pulse)
         print("OFF(VME value):",self.off_pulse)
         # 退避軸を自動認識してそれをオブジェクトとして設定してしまう
@@ -101,57 +75,10 @@ if __name__ == "__main__":
     # host = config.get("server", "bss_server")
     host = config.get("server", "blanc_address")
     port = 10101
-=======
-        self.s = server
-        self.light_z = Motor(self.s, "bl_45in_st2_light_1_z", "pulse")
-
-        self.sense = -1
-
-        self.off_pos = -24000  # pulse
-        self.on_pos = -4000  # pulse
-
-    def getPosition(self):
-        curr_pos = self.sense*self.light_z.getPosition()[0]
-        return curr_pos
-
-    def goDown(self):
-        curr_pos = self.sense*self.light_z.getPosition()[0]
-        target_pos = curr_pos + self.sense*1000
-        self.light_z.move(target_pos)
-
-    def setPosition(self, def_position):
-        self.light_z.move(def_position*self.sense)
-
-    def relDown(self):
-        curr_pos = self.light_z.getPosition()[0]
-        target_pos = curr_pos - 100
-        self.light_z.move(target_pos)
-
-    def on(self):
-        self.light_z.move(self.on_pos*self.sense)
-
-    def off(self):
-        self.light_z.move(self.off_pos*self.sense)
-
-    def goOn(self):
-        self.light_z.nageppa(self.on_pos)
-
-    def go(self, value):
-        self.light_z.nageppa(value)
-
-    def goOff(self):
-        self.light_z.nageppa(self.off_pos)
-
-if __name__ == "__main__":
-    host = '172.24.242.59'
-    port = 10101
-
->>>>>>> zoo45xu/main
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
     light = Light(s)
-<<<<<<< HEAD
     light.getEvacuate()
     # print(light.getPos())
     light.on()
@@ -165,8 +92,5 @@ if __name__ == "__main__":
     # time.sleep(20.0)
     # light.on()
     # time.sleep(20.0)
-=======
-    print light.on()
->>>>>>> zoo45xu/main
 
     s.close()

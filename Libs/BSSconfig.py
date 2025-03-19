@@ -340,8 +340,8 @@ class BSSconfig:
                 off_pulse = int(val2pulse * (off_mm * sense + home_value))
                 return evac_axis, on_pulse, off_pulse
 
+    # Lightだけはなぜか特別 (2025/03/07) -> 退避軸としては設定されていないので要注意
     def getLightEvacuateInfo(self, axis_name):
-
         light_dic = self.getDictOf(axis_name)
         on_off_list = self.makeListOnOff()
         val2pulse, sense, homevalue = self.getPulseInfo(axis_name)
@@ -495,12 +495,20 @@ if __name__ == "__main__":
     # axis_name="st1_col_1_z"
     # print(bssconf.getPulseInfo(axis_name))
     #e,a,b=bssconf.getEvacuateInfo("collimator")
-    # print(e,a,b)
+    # beamline.ini を読む
+    from configparser import ConfigParser, ExtendedInterpolation
+    config = ConfigParser(interpolation=ExtendedInterpolation())
+    config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+    # 'bs_evacinfo'
+    info = config.get("axes", "bs_evacinfo")
+    
+    e,a,b=bssconf.getEvacuateInfo(info)
+    print(e,a,b)
 
     #print(bssconf.readZoomOption())
-    axis_name = "st2_coax_1_x"
+    #axis_name = "st2_coax_1_x"
 
-    bssconf.getSense(axis_name)
+    #bssconf.getSense(axis_name)
 
     """
     # collimator evacuation parameters

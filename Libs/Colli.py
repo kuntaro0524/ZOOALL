@@ -1,66 +1,25 @@
-<<<<<<< HEAD
 # -*- coding: utf-8 -*-
-=======
->>>>>>> zoo45xu/main
 #!/bin/env python 
 import sys
 import socket
 import time
 import datetime
-<<<<<<< HEAD
 import WebSocketBSS
 import os
-=======
->>>>>>> zoo45xu/main
 
 # My library
 from Received import *
 from Motor import *
-<<<<<<< HEAD
 import BSSconfig
 from MyException import *
 from configparser import ConfigParser, ExtendedInterpolation
+import BaseAxis
+import WebSocketBSS 
 
-class Colli:
+class Colli(BaseAxis.BaseAxis): 
     def __init__(self, server):
-        self.bssconf = BSSconfig.BSSconfig()
-        self.bl_object = self.bssconf.getBLobject()
-
-        # beamline.ini 
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
-        # beamline name
-        self.beamline = self.config.get("beamline", "beamline")
-
-        self.s = server
-        # names of collimator axes
-        self.coly_axis = ""
-        self.colz_axis = ""
-        # coly > section: axes, option: col_y_name
-        try:
-            self.coly_axis = self.config.get("axes", "col_y_name")
-        except:
-            # display 'warning' if the option is not found
-            print("WARNING: col_y_name is not found in beamline.ini")
-
-        try:
-            # colz > section: axes, option: col_z_name
-            self.colz_axis = self.config.get("axes", "col_z_name")
-        except:
-            # display 'warning' if the option is not found
-            print("WARNING: col_z_name is not found in beamline.ini")
-
-        # if 'coly' exists in the configuration file.
-        if self.coly_axis != "":
-            self.coly = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.coly_axis), "pulse")
-            # pulse information of each axis
-            self.v2p_y, self.sense_y, self.home_y = self.bssconf.getPulseInfo(self.coly_axis)
-        if self.colz_axis != "":
-            self.colz = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.colz_axis), "pulse")
-            print("Searching %s" % self.colz_axis)
-            # print("bl_%s_%s" %(self.bl_object, self.colz_axis))
-            # pulse information of each axis
-            self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.colz_axis)
+        # Collimator axis
+        super().__init__(server, "collimator", axis_type="pulse", isEvacuate=True)
 
         # BL41XU web socket system
         self.websock = WebSocketBSS.WebSocketBSS()
@@ -116,42 +75,6 @@ class Colli:
             tmp_evac_dict = {"name":self.evac_axis_name, "on":self.on_pulse, "off":self.off_pulse, "axis":self.evac_axis}
             self.evac_axes.append(tmp_evac_dict)
             self.isInit = True
-=======
-from BSSconfig import *
-from MyException import *
-
-#
-class Colli:
-    def __init__(self, server):
-        self.s = server
-        self.coly = Motor(self.s, "bl_45in_st2_col_1_y", "pulse")
-        self.colz = Motor(self.s, "bl_45in_st2_col_1_z", "pulse")
-
-        self.off_pos = -20000  # pulse
-        self.on_pos = 0  # pulse
-
-        self.y_v2p = 500  # pulse/mm
-        self.z_v2p = 2000  # pulse/mm
-
-        self.isInit = False
-
-    def go(self, pvalue):
-        self.colz.nageppa(pvalue)
-
-    def getEvacuate(self):
-        bssconf = BSSconfig()
-
-        try:
-            tmpon, tmpoff = bssconf.getColli()
-        except MyException, ttt:
-            print ttt.args[0]
-
-        self.on_pos = float(tmpon) * self.z_v2p
-        self.off_pos = float(tmpoff) * self.z_v2p
-
-        self.isInit = True
-        print self.on_pos, self.off_pos
->>>>>>> zoo45xu/main
 
     def getY(self):
         tmp = int(self.coly.getPosition()[0])
@@ -161,7 +84,6 @@ class Colli:
         tmp = int(self.colz.getPosition()[0])
         return tmp
 
-<<<<<<< HEAD
     def getEvacZ(self):
         tmp = self.evac_axis.getPosition()[0]
         return tmp
@@ -195,17 +117,6 @@ class Colli:
 
     def onY(self):
         self.coly.move(self.evac_y_axis_on)
-=======
-    def on(self):
-        if self.isInit == False:
-            self.getEvacuate()
-        self.colz.move(self.on_pos)
-
-    def off(self):
-        if self.isInit == False:
-            self.getEvacuate()
-        self.colz.move(self.off_pos)
->>>>>>> zoo45xu/main
 
     def goOn(self):
         if self.isInit == False:
@@ -238,11 +149,7 @@ class Colli:
         ofile = "%s_colliz.scn" % prefix
         before_zp = self.colz.getPosition()[0]
         before_zm = before_zp
-<<<<<<< HEAD
         print("Current value=%8d\n" % before_zp)
-=======
-        print "Current value=%8d\n" % before_zp
->>>>>>> zoo45xu/main
 
         ###
         # Scan setting
@@ -286,32 +193,19 @@ class Colli:
 
         try:
             fwhm, center = ana.analyzeAll("colliZ[pulse]", "Intensity", outfig, strtime, "OBS", "JJJJ")
-<<<<<<< HEAD
             print(fwhm, center)
             fwhm_z = fwhm / 2.0  # [um]
         except MyException as ttt:
-=======
-            print fwhm, center
-            fwhm_z = fwhm / 2.0  # [um]
-        except MyException, ttt:
->>>>>>> zoo45xu/main
             self.colz.move(0)
             err_log01 = "%s\n" % ttt.args[0]
             err_log02 = "Collimetor Z scan failed\n"
             err_all = err_log01 + err_log02
             raise MyException(err_all)
 
-<<<<<<< HEAD
         print("setting collimeter Z")
         self.colz.move(center)
         self.colz.preset(0)
         print("setting collimeter Z")
-=======
-        print "setting collimeter Z"
-        self.colz.move(center)
-        self.colz.preset(0)
-        print "setting collimeter Z"
->>>>>>> zoo45xu/main
 
         cenz = float(center)
 
@@ -347,11 +241,7 @@ class Colli:
         try:
             fwhm, center = ana.analyzeAll("colliY[pulse]", "Intensity", outfig, strtime, "OBS", "JJJJ")
             fwhm_y = fwhm * 2.0  # [um]
-<<<<<<< HEAD
         except MyException as ttt:
-=======
-        except MyException, ttt:
->>>>>>> zoo45xu/main
             self.coly.move(0)
             err_log01 = "%s\n" % ttt.args[0]
             err_log02 = "Collimetor Y scan failed\n"
@@ -362,11 +252,7 @@ class Colli:
         self.coly.preset(0)
         ceny = float(center)
 
-<<<<<<< HEAD
         print("FWHM Z:%8.2f[um] Y:%8.2f[um]" % (fwhm_z, fwhm_y))
-=======
-        print "FWHM Z:%8.2f[um] Y:%8.2f[um]" % (fwhm_z, fwhm_y)
->>>>>>> zoo45xu/main
         return fwhm_y, fwhm_z, ceny, cenz
 
     def scanWithoutPreset(self, prefix, ch, width_mm):
@@ -374,11 +260,7 @@ class Colli:
 
         before_zp = self.colz.getPosition()[0]
         before_zm = before_zp
-<<<<<<< HEAD
         print("Current value=%8d\n" % before_zp)
-=======
-        print "Current value=%8d\n" % before_zp
->>>>>>> zoo45xu/main
 
         ###
         # Scan setting
@@ -388,11 +270,7 @@ class Colli:
 
         before_zp = self.colz.getPosition()[0]
         before_zm = before_zp
-<<<<<<< HEAD
         print("Current value=%8d\n" % before_zp)
-=======
-        print "Current value=%8d\n" % before_zp
->>>>>>> zoo45xu/main
 
         ###
         # Scan setting
@@ -476,11 +354,7 @@ class Colli:
         self.coly.preset(0)
         ceny = float(center)
 
-<<<<<<< HEAD
         print("FWHM Z:%8.2f[um] Y:%8.2f[um]" % (fwhm_z, fwhm_y))
-=======
-        print "FWHM Z:%8.2f[um] Y:%8.2f[um]" % (fwhm_z, fwhm_y)
->>>>>>> zoo45xu/main
         return ceny, cenz
 
     def scanWithoutPreset(self, prefix, ch, width_mm):
@@ -488,11 +362,7 @@ class Colli:
 
         before_zp = self.colz.getPosition()[0]
         before_zm = before_zp
-<<<<<<< HEAD
         print("Current value=%8d\n" % before_zp)
-=======
-        print "Current value=%8d\n" % before_zp
->>>>>>> zoo45xu/main
 
         ###
         # Scan setting
@@ -533,15 +403,9 @@ class Colli:
         try:
             fwhm, center = ana.analyzeAll("colliZ[pulse]", "Intensity", outfig, strtime, "OBS", "JJJJ")
             fwhm_z = fwhm / 2.0  # [um]
-<<<<<<< HEAD
         except MyException as ttt:
             print("Collimeter scan failed")
             print(ttt.args[0])
-=======
-        except MyException, ttt:
-            print "Collimeter scan failed"
-            print ttt.args[0]
->>>>>>> zoo45xu/main
             return 0, 0, 30, 30
 
         self.colz.move(center)
@@ -585,15 +449,9 @@ class Colli:
         try:
             fwhm, center = ana.analyzeAll("colliY[pulse]", "Intensity", outfig, strtime, "OBS", "JJJJ")
             fwhm_y = fwhm * 2.0  # [um]
-<<<<<<< HEAD
         except MyException as ttt:
             print("Collimeter scan failed")
             print(ttt.args[0])
-=======
-        except MyException, ttt:
-            print "Collimeter scan failed"
-            print ttt.args[0]
->>>>>>> zoo45xu/main
             return 0, 0, 30, 30
 
         return ceny, cenz, fwhm_z, fwhm_y
@@ -614,11 +472,7 @@ class Colli:
         save_y = self.getY()
         save_z = self.getZ()
 
-<<<<<<< HEAD
         print(save_y, save_z)
-=======
-        print save_y, save_z
->>>>>>> zoo45xu/main
 
         for z in arange(startz, endz + stepz, stepz):
             self.moveZ(z)
@@ -644,7 +498,6 @@ class Colli:
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     import configparser
     # read IP address for BSS connection from beamline.config 
     config = ConfigParser(interpolation=ExtendedInterpolation())
@@ -652,42 +505,17 @@ if __name__ == "__main__":
     print(config_path)
     config.read(config_path)
     host = config.get("server", "blanc_address")
-=======
-    host = '172.24.242.59'
->>>>>>> zoo45xu/main
     port = 10101
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
     coli = Colli(s)
-<<<<<<< HEAD
     coli.getEvacuate()
 
     coli.on()
     coli.off()
     # coli.off()
-=======
-
-    coli.getY()
-    coli.getZ()
-    
-    #coli.compareOnOff(1)
-    coli.on()
-    #coli.off()
-
-    #coli.getY()
-    #coli.getZ()
-    # coli.scan("colllli",0)
-
-    # print coli.getY()
-    # coli.moveZ(1000)
-    # coli.moveZ(0)
-    # coli.scan2D()
-    # coli.scanCore("test",3)
-    # coli.on()
-    #coli.off()
->>>>>>> zoo45xu/main
     # def scan2D(self,prefix,startz,endz,stepz,starty,endy,stepy):
     # coli.goOff()
     s.close()

@@ -8,36 +8,26 @@ from Received import *
 from Motor import *
 from AnalyzePeak import *
 from AxesInfo import *
+import BaseAxis
 
 class TCS:
-<<<<<<< HEAD
     def __init__(self,server):
-        self.s=server
-        self.tcs_height=Motor(self.s,"bl_32in_tc1_slit_1_height","mm")
-        self.tcs_width=Motor(self.s,"bl_32in_tc1_slit_1_width","mm")
-        self.tcs_vert=Motor(self.s,"bl_32in_tc1_slit_1_vertical","mm")
-        self.tcs_hori=Motor(self.s,"bl_32in_tc1_slit_1_horizontal","mm")
-=======
-    # tcslit in opt hutch
-    def __init__(self, server):
-        self.s = server
-        self.tcs_width = Motor(self.s, "bl_45in_tc1_slit_2_width", "mm")
-        self.tcs_hori = Motor(self.s, "bl_45in_tc1_slit_2_horizontal", "mm")
-        self.tcs_x = Motor(self.s, "bl_45in_tc1_slit_2_x", "pulse")
+        # TCS axis
+        # axis name on 'beamline.ini'
+        tcs_height_class = BaseAxis.BaseAxis(server, "tcs_height", axis_type="motor")
+        tcs_width_class = BaseAxis.BaseAxis(server, "tcs_width", axis_type="motor")
+        tcs_vert_class = BaseAxis.BaseAxis(server, "tcs_vert", axis_type="motor")
+        tcs_hori_class = BaseAxis.BaseAxis(server, "tcs_hori", axis_type="motor")
 
-        # each blade
-        self.tcs_ring = Motor(self.s, "bl_45in_tc1_slit_2_ring", "mm")
-        self.tcs_hall = Motor(self.s, "bl_45in_tc1_slit_2_hall", "mm")
-
-        # pulse2mm
-        self.p2mm_tcsx = 1000.0
->>>>>>> zoo45xu/main
+        self.tcs_height=tcs_height_class.motor
+        self.tcs_width=tcs_width_class.motor
+        self.tcs_vert=tcs_vert_class.motor
+        self.tcs_hori=tcs_hori_class.motor
 
     def saveInit(self):
         self.getApert()
         self.getPosition()
 
-<<<<<<< HEAD
     def getApert(self):
         # get values
         self.ini_height=self.tcs_height.getApert()
@@ -59,47 +49,6 @@ class TCS:
         self.tcs_height.move(height)
         self.tcs_width.move(width)
         print("current tcs aperture : %8.5f %8.5f\n" %(height,width))
-=======
-    def getTest(self):
-        ring_pos = self.tcs_ring.getPosition()[0]
-        hall_pos = self.tcs_hall.getPosition()[0]
-
-        print ring_pos, hall_pos
-
-    def setTest2(self):
-        # RING BLADE
-        self.tcs_ring.move(-15000)
-        self.tcs_ring.move(-16000)
-
-    def getApert(self):
-        # get values
-        self.ini_width=self.tcs_width.getApert()
-        return float(self.ini_width[0])
-
-    def getPosition(self):
-        # get values
-        hori = self.tcs_hori.getPosition()[0]
-        return hori
-
-    def getTrans(self):
-        x=self.tcs_x.getPosition()[0]/self.p2mm_tcsx
-        return x
-
-    def setTrans(self,abspos_mm):
-        abs_pulse = abspos_mm * self.p2mm_tcsx
-        self.tcs_x.move(abs_pulse)
-        self.getTrans()
-        return True
-
-    def setPosition(self,vert,hori):
-        # get values
-        self.tcs_hori.move(vert)
-        self.tcs_x.move(hori)
-
-    def setApert(self,width):
-        self.tcs_width.move(width)
-        print "current tcs aperture : %8.5f\n" %(width)
->>>>>>> zoo45xu/main
 
     def scanBoth(self,prefix,scan_width,another_width,start,end,step,cnt_ch1,cnt_ch2,time):
         vfwhm,vcenter=self.scanV(prefix,scan_width,another_width,start,end,step,cnt_ch1,cnt_ch2,time)
@@ -108,11 +57,7 @@ class TCS:
         return vcenter,hcenter
 
     def scanVrel(self,prefix,height,width,swidth,step,cnt_ch1,cnt_ch2,time):
-<<<<<<< HEAD
         curr_pos=self.tcs_vert.getPosition()[0]
-=======
-        curr_pos=self.tcs_hori.getPosition()[0]
->>>>>>> zoo45xu/main
         half_width=fabs(float(swidth))/2.0
 
         start=curr_pos-half_width
@@ -122,17 +67,12 @@ class TCS:
         return fwhm,center
 
     def scanHrel(self,prefix,height,width,swidth,step,cnt_ch1,cnt_ch2,time):
-<<<<<<< HEAD
         curr_pos=self.tcs_hori.getPosition()[0]
-=======
-        curr_pos=self.tcs_x.getPosition()[0]
->>>>>>> zoo45xu/main
         half_width=fabs(float(swidth))/2.0
 
         start=curr_pos-half_width
         end=curr_pos+half_width
         fwhm,center=self.scanH(prefix,height,width,start,end,step,cnt_ch1,cnt_ch2,time)
-<<<<<<< HEAD
         
         return fwhm,center
 
@@ -159,23 +99,15 @@ class TCS:
 
         self.tcs_vert.move(center)
         print("Final position: %smm" % (center))
-=======
-
->>>>>>> zoo45xu/main
         return fwhm,center
 
     def scanH(self,prefix,height,width,start,end,step,cnt_ch1,cnt_ch2,time):
         # Horizontal scan setting
-<<<<<<< HEAD
         ofile=prefix+"_tcs_hori.scn"
-=======
-        ofile=prefix+"_tcs_x.scn"
->>>>>>> zoo45xu/main
 
         # Aperture setting
         self.setApert(height,width)
 
-<<<<<<< HEAD
         # Scan setting 
         self.tcs_hori.setStart(start)
         self.tcs_hori.setEnd(end)
@@ -186,42 +118,19 @@ class TCS:
         # AnalyzePeak
         ana=AnalyzePeak(ofile)
         outfig=prefix+"_tcs_hori.png"
-=======
-        # Scan setting
-        self.tcs_x.setStart(start)
-        self.tcs_x.setEnd(end)
-        self.tcs_x.setStep(step)
-
-        self.tcs_x.axisScan(ofile,cnt_ch1,cnt_ch2,time)
-
-        # AnalyzePeak
-        ana=AnalyzePeak(ofile)
-        outfig=prefix+"_tcs_x.png"
->>>>>>> zoo45xu/main
 
         comment=AxesInfo(self.s).getLeastInfo()
         fwhm,center=ana.analyzeAll("TCS hori[mm]","Intensity",outfig,comment,"OBS")
 
-<<<<<<< HEAD
         self.tcs_hori.move(center)
 
-=======
-        self.tcs_x.move(center)
->>>>>>> zoo45xu/main
         return fwhm,center
 
     def checkZeroV(self,prefix,start,end,step,cnt_ch1,cnt_ch2,time):
         # Counter
         counter=Count(self.s,cnt_ch1,cnt_ch2)
-<<<<<<< HEAD
         # Setting aperture
         self.setApert(1.00,1.00)
-=======
-
-        # Setting aperture
-        self.setApert(1.00,1.00)
-
->>>>>>> zoo45xu/main
         ofile=prefix+"_vert_zero.scn"
 
         scan_start=start
@@ -231,11 +140,7 @@ class TCS:
 
         ndata=int((scan_end-scan_start)/scan_step)+1
         if ndata <=0 :
-<<<<<<< HEAD
             print("Set correct scan step!!\n")
-=======
-            print "Set correct scan step!!\n"
->>>>>>> zoo45xu/main
             return 1
 
         outfile=open(ofile,"w")
@@ -256,11 +161,7 @@ class TCS:
         counter=Count(self.s,cnt_ch1,cnt_ch2)
 
         # Setting aperture
-<<<<<<< HEAD
         self.setApert(1.0,1.0)
-=======
-        self.setApert(1.0)
->>>>>>> zoo45xu/main
 
         ofile=prefix+"_hori_zero.scn"
 
@@ -272,52 +173,29 @@ class TCS:
 
         ndata=int((scan_end-scan_start)/scan_step)+1
         if ndata <=0 :
-<<<<<<< HEAD
             print("Something wrong")
-=======
-            print "Something wrong"
->>>>>>> zoo45xu/main
             return 1
 
         outfile=open(ofile,"w")
 
         for x in range(0,ndata):
             value=scan_start+x*scan_step
-<<<<<<< HEAD
             self.setApert(1.0,value)
-=======
-            self.setApert(value)
->>>>>>> zoo45xu/main
             count1,count2=counter.getCount(cnt_time)
             count1=float(count1)
             count2=float(count2)
             outfile.write("%12.5f %12.5f %12.5f\n"%(value,count1,count2))
 
-<<<<<<< HEAD
         self.setApert(1.0,1.0)
-=======
-        self.setApert(1.0)
->>>>>>> zoo45xu/main
         return 1
 
     def scan2d(self,prefix,width,step,cnt_ch1,cnt_ch2,time):
         # save current position
         self.saveCurr()
-<<<<<<< HEAD
         counter=Count(self.s,cnt_ch1,cnt_ch2)
         # Setting aperture
         self.setApert(0.05,0.05)
         ofile=prefix+"_test.scn"
-=======
-        # Counter
-        counter=Count(self.s,cnt_ch1,cnt_ch2)
-
-        # Setting aperture
-        self.setApert(0.05,0.05)
-
-        ofile=prefix+"_test.scn"
-
->>>>>>> zoo45xu/main
         minus=-width/2.0
         plus=width/2.0
 
@@ -330,11 +208,7 @@ class TCS:
 
         ndata=int((scan_end-scan_start)/scan_step)+1
         if ndata <=0 :
-<<<<<<< HEAD
             print("Something wrong")
-=======
-            print "Something wrong"
->>>>>>> zoo45xu/main
             return 1
 
         outfile=open(ofile,"w")
@@ -351,7 +225,6 @@ class TCS:
         return 1
 
 if __name__=="__main__":
-<<<<<<< HEAD
     host = '172.24.242.41'
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -381,19 +254,3 @@ if __name__=="__main__":
     #def checkZeroH(self,prefix,start,end,step,time,cnt_ch1):
 
     s.close()
-=======
-        host = '172.24.242.59'
-        port = 10101
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((host,port))
-
-        tcs=TCS(s)
-        apert= tcs.getApert()
-        hori = tcs.getPosition()
-        x= tcs.getTrans()
-        tcs.setApert(6.0)
-        #tcs.setTrans(10.0)
-        print hori,apert,x
-
-        s.close()
->>>>>>> zoo45xu/main

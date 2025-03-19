@@ -9,8 +9,6 @@ from Received import *
 from Motor import *
 from BSSconfig import *
 
-
-#
 class Cover:
     def __init__(self, server):
         self.s = server

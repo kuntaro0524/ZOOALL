@@ -8,23 +8,17 @@ import datetime
 from Received import *
 from Motor import *
 from BSSconfig import *
+import BaseAxis
 
-
-#
-class DetectorCover:
+class DetectorCover(BaseAxis.BaseAxis):
     def __init__(self, server):
-        self.s = server
-        self.cov_z = Motor(self.s, "bl_32in_st2_cover_1_z", "pulse")
-
-        #		self.off_pos=245000 # pulse
-        self.off_pos = 210000  # pulse
-        self.on_pos = 0  # pulse
+        super.__init__(server, "det_cover", axis_type="pulse", isEvacuate=False)
+        self.cov_z = self.motor
 
         self.isInit = False
 
     def isCover(self):
         pos = self.getPos()
-        print pos
         if pos == 0:
             return True
         else:
@@ -41,16 +35,6 @@ class DetectorCover:
 
     def off(self):
         self.cov_z.move(self.off_pos)
-
-    def isMoved(self):
-        isY = self.coly.isMoved()
-        isZ = self.colz.isMoved()
-
-        if isY == 0 and isZ == 0:
-            return True
-        if isY == 1 and isZ == 1:
-            return False
-
 
 if __name__ == "__main__":
     host = '172.24.242.41'
