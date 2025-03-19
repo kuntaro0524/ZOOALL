@@ -8,7 +8,7 @@ from Received import *
 from Motor import *
 import BaseAxis
 
-class DSS(BaseAxis):
+class DSS(BaseAxis.BaseAxis):
     def __init__(self, server):
         # axis name for DSS
         axis_config = "dss"

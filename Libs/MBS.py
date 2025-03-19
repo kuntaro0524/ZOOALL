@@ -9,7 +9,7 @@ from Motor import *
 
 import BaseAxis
 
-class MBS(BaseAxis):
+class MBS(BaseAxis.BaseAxis):
     def __init__(self, server):
         # axis name for MBS
         axis_config = "mbs"

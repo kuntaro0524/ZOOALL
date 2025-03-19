@@ -17,13 +17,14 @@ class BSSconfig:
         self.blini = ConfigParser(interpolation=ExtendedInterpolation())
         self.blini.read(self.inifile_path)
         self.confile = self.blini.get("files", "bssconfig_file")
+        print(self.confile)
 
         # camera.inf
         self.camerainf_path = self.blini.get("files", "camera_inf")
 
         self.isRead = False
         self.isPrep = False
-        self.debug = False
+        self.debug = True
 
     def storeLines(self):
         ifile = open(self.confile, "r")
@@ -158,6 +159,7 @@ class BSSconfig:
 
     # 格納した辞書のリストから指定した軸名のパラメータ辞書をもらう
     def getDictOf(self, axis_name):
+        print(f"axis_name:{axis_name}")
         if self.isPrepDict==False:
             self.storeAxesBlocks()
 
