@@ -80,13 +80,33 @@ class WebSocketBSS:
         response = requests.post(self.api_url, headers=self.headers, json=command)
         return response.json()
 
+    def cryoStage(self, switch):
+        if switch == "on":
+            command = {
+                "command":"bss_function",
+                "function":"CryoStream.on",
+                "param":"0"
+            }
+        elif switch == "off":
+            command = {
+                "command":"bss_function",
+                "function":"CryoStream.off",
+                "param":"0"
+            }
+        response = requests.post(self.api_url, headers=self.headers, json=command)
+        return response.json()
+
 if __name__ == "__main__":
     ws = WebSocketBSS()
-    print(ws.beamstopper("on"))
-    print(ws.collimator("on"))
-    print(ws.intensityMonitor("on"))
-    print(ws.light("on"))
-    print("######################")
-    print(ws.beamstopper("off"))
-    print(ws.collimator("off"))
-    print(ws.intensityMonitor("off"))
+    #print(ws.beamstopper("on"))
+    #print(ws.beamstopper("off"))
+    #print(ws.collimator("on"))
+    #print(ws.collimator("off"))
+    #print(ws.intensityMonitor("on"))
+    #print(ws.intensityMonitor("off"))
+    #print(ws.light("on"))
+    #print(ws.beamstopper("off"))
+    #print(ws.collimator("off"))
+    #print(ws.intensityMonitor("off"))
+    print(ws.cryoStage("off"))
+    print(ws.cryoStage("on"))
