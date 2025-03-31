@@ -15,7 +15,7 @@ backimage_dir = ${dirs:zooroot}/BackImages/
 
 [files]
 bssconfig_file=${dirs:bssconfig_dir}/bss/bss.config
-camera_inf=${dirs:bssconfig_dir}/e1/video/camera.inf
+camera_inf=${dirs:bssconfig_dir}/video/camera.inf
 beamsize_conf_file=${dirs:bssconfig_dir}/bss/beamsize.config
 inocc_image=/staff/config/bl32xu/bss/test.ppm
 logging_conf=${dirs:libdir}/logging.conf
@@ -24,8 +24,8 @@ dose_csv=${dirs:libdir}/en_dose_lys.csv
 backimg = ${dirs:zooroot}/BackImages/back.ppm
 
 [capture]
-bright_default=3800
-gain_default=9000
+bright_default=2000
+gain_default=8000
 contrast_default=3800
 # Dark mode only for BL32XU special setting
 # Nipawa had gone and this will not be used by anyone
@@ -81,7 +81,7 @@ exp_ds=0.02
 # Rasterのときの端分解能
 resol_raster=2.5
 # "" are not required to define 'character variable'
-gonio_direction = FROM_RIGHT
+gonio_direction = FROM_LEFT
 # pin channel
 pin_channel = 3
 # pulse for non-attenuated beam @BL45XU 250331 K.Hirata
@@ -129,3 +129,5 @@ light_z_name = st2_light_1_z
 shutter = st2_shutter_1
 # counter 
 counter_pin = st2_counter_1
+# MBS
+

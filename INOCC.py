@@ -679,7 +679,8 @@ if __name__ == "__main__":
     start_time = datetime.datetime.now()
 
     # back image path read from 'beamline.ini'
-    backimg = config.get('files', 'backimg')
+    #backimg = config.get('files', 'backimg')
+    backimg = "/user/admin45/JunkZOO/Libs/back.ppm"
     inocc.setBack(backimg)
     # inocc.setBack("/staff/bl41xu/BLsoft/ZOOALL/BackImages/back-2406271411.ppm")
     # For each sample raster.png

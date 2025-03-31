@@ -58,6 +58,9 @@ class Gonio:
         self.v2p_x, self.sense_x, self.home_x = self.bssconf.getPulseInfo(self.x_name)
         self.v2p_y, self.sense_y, self.home_y = self.bssconf.getPulseInfo(self.y_name)
         self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.z_name)
+        print(self.v2p_x, self.sense_x, self.home_x)
+        print(self.v2p_y, self.sense_y, self.home_y)    
+        print(self.v2p_z, self.sense_z, self.home_z)
         self.v2p_zz, self.sense_zz, self.home_zz = self.bssconf.getPulseInfo(self.zz_name)
         self.v2p_rot, self.sense_phi, self.home_phi = self.bssconf.getPulseInfo(self.rot_name)
         self.isPrep = True
@@ -350,9 +353,9 @@ class Gonio:
 
     def moveXYZmm(self,movex,movey,movez):
         # UNIT: [pulse]
-        self.goniox.move(movex)
-        self.gonioy.move(movey)
-        self.gonioz.move(movez)
+        self.moveXmm(movex)
+        self.moveYmm(movey)
+        self.moveZmm(movez)
 
     def moveXYZPhi(self,movex,movey,movez,phi):
         # convertion
@@ -895,7 +898,8 @@ class Gonio:
 
 if __name__ == "__main__":
     # host = '192.168.163.1'
-    host = '172.24.242.41'
+    #host = '172.24.242.41'
+    host = '172.24.242.59'
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
@@ -906,5 +910,7 @@ if __name__ == "__main__":
     #gonio.rotatePhi(135.0)
     #gonio.moveUpDown(100.0)
     #print(gonio.getPhi())
-
+    gonio.moveXYZmm(-1.55, 5.99, -0.14)
+    gonio.rotatePhi(135.0)
+    print((gonio.getXYZmm()))
     s.close()

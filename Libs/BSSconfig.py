@@ -24,7 +24,7 @@ class BSSconfig:
 
         self.isRead = False
         self.isPrep = False
-        self.debug = True
+        self.debug = False
 
     def storeLines(self):
         ifile = open(self.confile, "r")

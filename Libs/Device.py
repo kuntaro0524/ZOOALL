@@ -9,26 +9,20 @@ from numpy import *
 # My library
 import Singleton
 import File
-import BM
 import Capture
 import Count
 import Mono
 import ConfigFile
-import Att
 import Zoom
-import BS
-import Shutter
-import Cryo
 import ExSlit1
-import Light
 import ID
 import AnalyzePeak
 import Colli
 import Cover
 import CCDlen
 import CoaxPint
-import MBS
-import DSS
+#import MBS
+#import DSS
 import BeamsizeConfig
 import Flux
 import PreColli
@@ -86,23 +80,18 @@ class Device(Singleton.Singleton):
         # settings
         print("Initialization starts")
         self.mono=Mono.Mono(self.s)
-        self.bm=BM.BM(self.s)
         self.f=File.File("./")
         self.capture=Capture.Capture()
-        self.att=Att.Att(self.s)
         self.zoom=Zoom.Zoom(self.s)
-        self.bs=BS.BS(self.s)
-        self.cryo=Cryo.Cryo(self.s)
         self.id=ID.ID(self.s)
-        self.light=Light.Light(self.s)
-        self.colli=Colli.Colli(self.s)
-        self.coax_pint=CoaxPint.CoaxPint(self.s)
+        #self.colli=Colli.Colli(self.s)
+        if self.beamline.lower() == "bl32xu":
+            self.coax_pint=CoaxPint.CoaxPint(self.s)
         self.clen=CCDlen.CCDlen(self.s)
         self.covz=Cover.Cover(self.s)
-        self.shutter=Shutter.Shutter(self.s)
         # Optics
-        self.mbs=MBS.MBS(self.s)
-        self.dss=DSS.DSS(self.s)
+        #self.mbs=MBS.MBS(self.s)
+        #self.dss=DSS.DSS(self.s)
         # BL32XU specific
         # BL44XU specific
         if self.beamline.lower() == "bl44xu":
@@ -165,18 +154,18 @@ class Device(Singleton.Singleton):
                 # Finally, it should be read from 'bss.config'
                 self.coax_pint.move(self.coax_pintx_pulse)
         if self.config.getboolean("capture", "beamstopper_off"):
-            self.bs.off()
+            self.websock.beamstopper("off")
         else:
-            self.bs.on()
+            self.websock.beamstopper("on")
 
         print("Collimator Off")
-        self.colli.off()
+        self.websock.collimator("off")
 
         # BL44XU PreColli off
         # PreColli: beam defining aperture related to 'beamsize.conf'
         if self.beamline.lower() == "bl44xu":
             self.precolli.setEvacuate()
-        self.light.on()
+        self.websock.light("on")
 
     def prepCenteringBackCamera(self,zoom_out=True):
         if zoom_out==True:
@@ -213,49 +202,49 @@ class Device(Singleton.Singleton):
         self.light.on()
 
     def prepScan(self):
-        # Prep scan
-        self.clen.evac()
         ## Cover on
         if self.beamline=="BL32XU":
             self.covz.on()
+            self.clen.evac()
             time.sleep(2.0)
         ## Cover check
         if self.beamline=="BL32XU":
             self.covz.isCover()
 
-        self.light.off()
-        self.shutter.open()
+        self.websock.light("off")
+        self.websock.shutter("open")
 
         # intensity monitor on
-        if self.beamline=="BL41XU":
-            self.websock.intensityMonitor("on")
-
         if self.beamline == "BL32XU":
             self.slit1.openV()
+        elif self.beamline=="BL41XU" or self.beamline=="BL45XU":
+            self.websock.intensityMonitor("on")
+        elif self.beamline=="BL44XU":
+            print("What do we do?")
 
         ## Attenuator
-        self.att.setNoAtt()
+        self.websock.removeAtt()
         # collimator on
-        self.colli.on()
+        self.websock.collimator("on")
         # Beamstopper off
-        self.bs.off()
+        self.websock.beamstopper("off")
 
     def finishScan(self,cover_off=True):
+        self.websock.shutter("close")
         if self.beamline=="BL32XU":
             self.slit1.closeV()
-        self.shutter.close()
         # collimator on
-        self.colli.off()
+        self.websock.collimator("off")
+
         if self.beamline=="BL32XU" and cover_off==True:
             ## Cover off
             self.covz.off()
-
         # intensity monitor off
-        if self.beamline == "BL41XU":
+        if self.beamline == "BL41XU" or self.beamline=="BL45XU":
             self.websock.intensityMonitor("off")
 
     def closeAllShutter(self):
-        self.shutter.close()
+        self.websock.shutter("close")
         self.slit1.closeV()
 
     def countPin(self,pin_ch=3):
@@ -359,9 +348,11 @@ if __name__=="__main__":
     dev.init()
 
     #dev.prepCentering()
-    dev.gonio.rotatePhi(225.0)
+    #dev.gonio.rotatePhi(225.0)
     #dev.bs.on()
     #dev.bs.off()
     #dev.measureFlux()
-    # dev.prepScan()
-    # dev.finishScan()
+    #dev.prepScan()
+    #dev.finishScan()
+    #dev.prepScan()
+    dev.prepCentering()
