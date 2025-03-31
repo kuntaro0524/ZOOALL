@@ -180,7 +180,7 @@ yamtbx.python /isilon/BL45XU/videosrv0.py
 
 #########For BSS (all beamline)###########
 #/usr/local/bss/bss --admin --notune
-echo "\n\n" | /usr/local/bss/bss --server --console 
+echo "\n\n" | /usr/local/bss/bss --server --console  --websocket
 
 ps auxww | grep videosrv | grep -v grep | awk '{print $2}'| xargs kill
 

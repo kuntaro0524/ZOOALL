@@ -228,7 +228,7 @@ if __name__ == "__main__":
     config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
     config.read(config_path)
     host = config.get("server", "blanc_address")
-    port = config.getint("server", "blanc_port")
+    port = 10101
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     # print att.getAttIndexConfig(5000)
 
     print(att.getPosition())
-    # att.setNoAtt()
+    att.setNoAtt()
     # print(att.getPosition())
 
     s.close()
