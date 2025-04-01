@@ -81,8 +81,8 @@ for i in {1..10}
 do
  sleep 1
  cheetah_ok=0
- ssh 192.168.163.34 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && \
- ssh 192.168.163.31 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
+ ssh 10.178.163.34 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && \
+ ssh 10.178.163.31 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
  notify-send "BSS startup" "Cheetah not up. retrying (${i})."
  notify-send "BSS startup" "`/usr/local/bss/startcheetah.sh`"
  cheetah_ok=1
@@ -97,7 +97,7 @@ fi
 
 # Download server test
  #if ! ssh -oBatchMode=yes 192.168.163.10 hostname
- if ! ssh -oBatchMode=yes 192.168.163.9 hostname
+ if ! ssh -oBatchMode=yes 10.178.163.9 hostname
  then
   notify-send "BSS startup ERROR" "SSH to local-raid NOT configured!!" -i gnome-log -t 10000
   aplay /usr/lib64/libreoffice/share/gallery/sounds/falling.wav > /dev/null 2>&1
@@ -106,23 +106,39 @@ fi
 
 
 # Hit-extract server test
-if ! ssh -oBatchMode=yes 192.168.163.34 hostname
+if ! ssh -oBatchMode=yes 10.178.163.34 hostname
 then
- notify-send "BSS startup ERROR" "SSH to 192.168.163.34 NOT configured!!" -i gnome-log -t 10000
+ notify-send "BSS startup ERROR" "SSH to 10.178.163.34 NOT configured!!" -i gnome-log -t 10000
  aplay /usr/lib64/libreoffice/share/gallery/sounds/falling.wav > /dev/null 2>&1
  exit
 fi
 
-# 171114 changed
-echo "\n\n" | /usr/local/bss/bss --server --console  --admin
-#echo "\n\n" | /usr/local/bss/bss --server --console
-
+# 250401 changed
+echo "\n\n" | /usr/local/bss/bss --server --console  --admin --websocket
 
 # After BSS shutdown
 sleep 1
-##ssh 192.168.163.6 "killall $VIDEOSRV"    # for ARTRAY
 killall $VIDEOSRV      # for DFK72 YK@190315
 sleep 1
 killall bss
 
 END:
+=======
+#!/bin/tcsh
+
+if ($$ != `pgrep -fo $0`) then
+    notify-send "`basename $0` is aleady running."
+    exit 1
+endif
+
+videosrv &
+sleep 10
+yamtbx.python /isilon/BL45XU/videosrv0.py
+
+# Cheetah
+/usr/local/bss/startcheetah.sh
+
+#########For BSS (all beamline)###########
+echo "\n\n" | /usr/local/bss/bss --server --console --websocket
+
+ps auxww | grep videosrv | grep -v grep | awk '{print $2}'| xargs kill
