@@ -9,246 +9,226 @@ from AnalyzePeak import *
 from AxesInfo import *
 from Count import *
 
-class FES:
+import BaseAxis
 
-	def __init__(self,server):
-		self.s=server
-    		self.fes_height=Motor(self.s,"bl_32in_fe_slit_1_height","mm")
-    		self.fes_width=Motor(self.s,"bl_32in_fe_slit_1_width","mm")
-    		self.fes_vert=Motor(self.s,"bl_32in_fe_slit_1_vertical","mm")
-    		self.fes_hori=Motor(self.s,"bl_32in_fe_slit_1_horizontal","mm")
+class FES():
+    def __init__(self, server):
+        # height axis "fes_height"
+        self.fes_height_class = BaseAxis.BaseAxis(server, "fes_height", axis_type="motor")
+        # width axis "fes_width"
+        self.fes_width_class = BaseAxis.BaseAxis(server, "fes_width", axis_type="motor")
+        # vertical axis "fes_vert"
+        self.fes_vert_class = BaseAxis.BaseAxis(server, "fes_vert", axis_type="motor")
+        # horizontal axis "fes_hori"
+        self.fes_hori_class = BaseAxis.BaseAxis(server, "fes_hori", axis_type="motor")
 
-	def getApert(self):
-		# get values
-		self.ini_height=self.fes_height.getApert()
-		self.ini_width=self.fes_width.getApert()
-		return self.ini_height,self.ini_width
+        self.fes_height = self.fes_height_class.motor
+        self.fes_width = self.fes_width_class.motor
+        self.fes_vert = self.fes_vert_class.motor
+        self.fes_hori = self.fes_hori_class.motor
 
-	def getPosition(self):
-		curr_vert=self.fes_vert.getPosition()
-		curr_hori=self.fes_hori.getPosition()
-		return curr_vert,curr_hori
+    def getApert(self):
+        # get values
+        self.ini_height = self.fes_height.getApert()
+        self.ini_width = self.fes_width.getApert()
+        return self.ini_height, self.ini_width
 
-	def setPosition(self,vert,hori):
-		# get values
-    		self.fes_vert.move(vert)
-    		self.fes_hori.move(hori)
+    def getPosition(self):
+        curr_vert = self.fes_vert.getPosition()
+        curr_hori = self.fes_hori.getPosition()
+        return curr_vert, curr_hori
 
-	def setApert(self,height,width):
-		self.fes_height.move(height)
-		self.fes_width.move(width)
-		print("current fes aperture : %8.5f %8.5f\n" %(height,width))
+    def setPosition(self, vert, hori):
+        # get values
+        self.fes_vert.move(vert)
+        self.fes_hori.move(hori)
 
-	def scanBothNoAnal(self,prefix,scan_width,another_width,start,end,step,cnt_ch1,cnt_ch2,time):
-		self.scanVNoAnal(prefix,scan_width,another_width,start,end,step,cnt_ch1,cnt_ch2,time)
-		self.scanHNoAnal(prefix,another_width,scan_width,start,end,step,cnt_ch1,cnt_ch2,time)
+    def setApert(self, height, width):
+        self.fes_height.move(height)
+        self.fes_width.move(width)
+        print("current fes aperture : %8.5f %8.5f\n" % (height, width))
 
-	def scanBoth(self,prefix,scan_width,another_width,start,end,step,cnt_ch1,cnt_ch2,time):
-		self.scanV(prefix,scan_width,another_width,start,end,step,cnt_ch1,cnt_ch2,time)
-		self.scanH(prefix,another_width,scan_width,start,end,step,cnt_ch1,cnt_ch2,time)
+    def scanBothNoAnal(self, prefix, scan_width, another_width, start, end, step, cnt_ch1, cnt_ch2, time):
+        self.scanVNoAnal(prefix, scan_width, another_width, start, end, step, cnt_ch1, cnt_ch2, time)
+        self.scanHNoAnal(prefix, another_width, scan_width, start, end, step, cnt_ch1, cnt_ch2, time)
 
-	def dummy(self):
-		ax=AxesInfo(self.s)
-		comment=ax.getLeastInfo()
-		sys.exit(1)
+    def scanBoth(self, prefix, scan_width, another_width, start, end, step, cnt_ch1, cnt_ch2, time):
+        self.scanV(prefix, scan_width, another_width, start, end, step, cnt_ch1, cnt_ch2, time)
+        self.scanH(prefix, another_width, scan_width, start, end, step, cnt_ch1, cnt_ch2, time)
 
-	def scanV(self,prefix,height,width,start,end,step,cnt_ch1,cnt_ch2,time):
-		# Vertical scan setting
-    		ofile=prefix+"_fes_vert.scn"
-	
-		# Aperture setting
-		self.setApert(height,width)
+    def dummy(self):
+        ax = AxesInfo(self.s)
+        comment = ax.getLeastInfo()
+        sys.exit(1)
 
-		# Scan setting 
-		self.fes_vert.setStart(start)
-		self.fes_vert.setEnd(end)
-		self.fes_vert.setStep(step)
+    def scanV(self, prefix, height, width, start, end, step, cnt_ch1, cnt_ch2, time):
+        # Vertical scan setting
+        ofile = prefix + "_fes_vert.scn"
 
-    		self.fes_vert.axisScan(ofile,cnt_ch1,cnt_ch2,time)
+        # Aperture setting
+        self.setApert(height, width)
 
-		# Analysis and Plot
-        	ana=AnalyzePeak(ofile)
-		comment=AxesInfo(self.s).getLeastInfo()
-		#comment="during debugging : sorry...\n"
-                outfig=prefix+"_fes_vert.png"
+        # Scan setting
+        self.fes_vert.setStart(start)
+        self.fes_vert.setEnd(end)
+        self.fes_vert.setStep(step)
 
-		fwhm,center=ana.analyzeAll("FES-v[mm]","Intensity",outfig,comment)
-		center=round(center,4)
-        	self.fes_vert.move(center)
+        self.fes_vert.axisScan(ofile, cnt_ch1, cnt_ch2, time)
 
-        	print("Final position: %smm" % center)
-		# Aperture setting
-		self.setApert(0.3,0.3)
+        # Analysis and Plot
+        ana = AnalyzePeak(ofile)
+        comment = AxesInfo(self.s).getLeastInfo()
+        outfig = prefix + "_fes_vert.png"
 
-		return fwhm,center
+        fwhm, center = ana.analyzeAll("FES-v[mm]", "Intensity", outfig, comment)
+        center = round(center, 4)
+        self.fes_vert.move(center)
 
-	def scanH(self,prefix,height,width,start,end,step,cnt_ch1,cnt_ch2,time):
-		# Horizontal scan setting
-    		ofile=prefix+"_fes_hori.scn"
+        print("Final position: %smm" % center)
+        # Aperture setting
+        self.setApert(0.3, 0.3)
 
-		# Aperture setting
-		self.setApert(height,width)
+        return fwhm, center
 
-		# Scan setting 
-		self.fes_hori.setStart(start)
-		self.fes_hori.setEnd(end)
-		self.fes_hori.setStep(step)
-		
-    		self.fes_hori.axisScan(ofile,cnt_ch1,cnt_ch2,time)
+    def scanH(self, prefix, height, width, start, end, step, cnt_ch1, cnt_ch2, time):
+        # Horizontal scan setting
+        ofile = prefix + "_fes_hori.scn"
 
-                # Analysis and Plot
-                ana=AnalyzePeak(ofile)
-		#comment="during debugging : sorry...\n"
-                comment=AxesInfo(self.s).getLeastInfo()
-                outfig=prefix+"_fes_hori.png"
+        # Aperture setting
+        self.setApert(height, width)
 
-                fwhm,center=ana.analyzeAll("FES-h[mm]","Intensity",outfig,comment)
-                center=round(center,4)
-                self.fes_hori.move(center)
+        # Scan setting
+        self.fes_hori.setStart(start)
+        self.fes_hori.setEnd(end)
+        self.fes_hori.setStep(step)
 
-                print("Final position: %smm" % center)
-		self.setApert(0.3,0.3)
+        self.fes_hori.axisScan(ofile, cnt_ch1, cnt_ch2, time)
 
-		return fwhm,center
-		
-	def scanVNoAnal(self,prefix,height,width,start,end,step,cnt_ch1,cnt_ch2,time):
-		# Vertical scan setting
-    		ofile=prefix+"_fes_vert.scn"
+        # Analysis and Plot
+        ana = AnalyzePeak(ofile)
+        comment = AxesInfo(self.s).getLeastInfo()
+        outfig = prefix + "_fes_hori.png"
 
-		# Get Current Position
-		curr_vert,curr_hori = self.getPosition()
-	
-		# Aperture setting
-		self.setApert(height,width)
+        fwhm, center = ana.analyzeAll("FES-h[mm]", "Intensity", outfig, comment)
+        center = round(center, 4)
+        self.fes_hori.move(center)
 
-		# Scan setting 
-		self.fes_vert.setStart(start)
-		self.fes_vert.setEnd(end)
-		self.fes_vert.setStep(step)
+        print("Final position: %smm" % center)
+        self.setApert(0.3, 0.3)
 
-    		self.fes_vert.axisScan(ofile,cnt_ch1,cnt_ch2,time)
+        return fwhm, center
 
-		# Analysis and Plot
-#        	ana=AnalyzePeak(ofile)
-#		comment=AxesInfo(self.s).getLeastInfo()
-		#comment="during debugging : sorry...\n"
-#                outfig=prefix+"_fes_vert.png"
+    def scanVNoAnal(self, prefix, height, width, start, end, step, cnt_ch1, cnt_ch2, time):
+        # Vertical scan setting
+        ofile = prefix + "_fes_vert.scn"
 
-#		fwhm,center=ana.analyzeAll("FES-v[mm]","Intensity",outfig,comment)
-#		center=round(center,4)
-#        	self.fes_vert.move(center)
+        # Get Current Position
+        curr_vert, curr_hori = self.getPosition()
 
-#        	print "Final position: %smm" % center
-		# Aperture setting
-		self.setApert(0.3,0.3)
+        # Aperture setting
+        self.setApert(height, width)
 
-#		return fwhm,center
+        # Scan setting
+        self.fes_vert.setStart(start)
+        self.fes_vert.setEnd(end)
+        self.fes_vert.setStep(step)
 
-	def scanHNoAnal(self,prefix,height,width,start,end,step,cnt_ch1,cnt_ch2,time):
-		# Horizontal scan setting
-    		ofile=prefix+"_fes_hori.scn"
+        self.fes_vert.axisScan(ofile, cnt_ch1, cnt_ch2, time)
 
-		# Get Current Position
-		curr_vert,curr_hori = self.getPosition()
+        # Aperture setting
+        self.setApert(0.3, 0.3)
 
-		# Aperture setting
-		self.setApert(height,width)
+    def scanHNoAnal(self, prefix, height, width, start, end, step, cnt_ch1, cnt_ch2, time):
+        # Horizontal scan setting
+        ofile = prefix + "_fes_hori.scn"
 
-		# Scan setting 
-		self.fes_hori.setStart(start)
-		self.fes_hori.setEnd(end)
-		self.fes_hori.setStep(step)
-		
-    		self.fes_hori.axisScan(ofile,cnt_ch1,cnt_ch2,time)
+        # Get Current Position
+        curr_vert, curr_hori = self.getPosition()
 
-                # Analysis and Plot
-#                ana=AnalyzePeak(ofile)
-		#comment="during debugging : sorry...\n"
-#                comment=AxesInfo(self.s).getLeastInfo()
-#                outfig=prefix+"_fes_hori.png"
+        # Aperture setting
+        self.setApert(height, width)
 
-#                fwhm,center=ana.analyzeAll("FES-h[mm]","Intensity",outfig,comment)
-#                center=round(center,4)
-#         	self.fes_hori.move(center)
+        # Scan setting
+        self.fes_hori.setStart(start)
+        self.fes_hori.setEnd(end)
+        self.fes_hori.setStep(step)
 
-#                print "Final position: %smm" % center
-		self.setApert(0.3,0.3)
+        self.fes_hori.axisScan(ofile, cnt_ch1, cnt_ch2, time)
 
-#		return fwhm,center
-		
-	def checkZeroV(self,prefix,start,end,step,cnt_ch1,cnt_ch2,time):
-		# Counter
-		counter=Count(self.s,cnt_ch1,cnt_ch2)
+        # Aperture setting
+        self.setApert(0.3, 0.3)
 
-		# Setting aperture
-		self.setApert(0.50,0.50)
+    def checkZeroV(self, prefix, start, end, step, cnt_ch1, cnt_ch2, time):
+        # Counter
+        counter = Count(self.s, cnt_ch1, cnt_ch2)
 
-		ofile=prefix+"_vert_zero.scn"
+        # Setting aperture
+        self.setApert(0.50, 0.50)
 
-    		scan_start=start
-    		scan_end=end
-    		scan_step=step
-    		cnt_time=time
+        ofile = prefix + "_vert_zero.scn"
 
-		ndata=int((scan_end-scan_start)/scan_step)+1
-		if ndata <=0 :
-			print("Set correct scan step!!\n")
-			return 1
+        scan_start = start
+        scan_end = end
+        scan_step = step
+        cnt_time = time
 
-		outfile=open(ofile,"w")
+        ndata = int((scan_end - scan_start) / scan_step) + 1
+        if ndata <= 0:
+            print("Set correct scan step!!\n")
+            return 1
 
-		for x in range(0,ndata):
-			value=scan_start+x*scan_step
-			self.setApert(value,0.5)
-			count1,count2=counter.getCount(cnt_time)
-			count1=float(count1)
-			count2=float(count2)
-			outfile.write("%12.5f %12.5f %12.5f\n"%(value,count1,count2))
+        outfile = open(ofile, "w")
 
-		self.setApert(0.5,0.5)
-		return 1
+        for x in range(0, ndata):
+            value = scan_start + x * scan_step
+            self.setApert(value, 0.5)
+            count1, count2 = counter.getCount(cnt_time)
+            count1 = float(count1)
+            count2 = float(count2)
+            outfile.write("%12.5f %12.5f %12.5f\n" % (value, count1, count2))
 
-	def checkZeroH(self,prefix,start,end,step,cnt_ch1,cnt_ch2,time):
+        self.setApert(0.5, 0.5)
+        return 1
 
-		# Counter
-		counter=Count(self.s,cnt_ch1,cnt_ch2)
+    def checkZeroH(self, prefix, start, end, step, cnt_ch1, cnt_ch2, time):
+        # Counter
+        counter = Count(self.s, cnt_ch1, cnt_ch2)
 
-		self.setApert(0.5,0.5)
+        self.setApert(0.5, 0.5)
 
-		ofile=prefix+"_hori_zero.scn"
-    		scan_start=start
-    		scan_end=end
-    		scan_step=step
-    		cnt_time=time
-    		unit="mm"
+        ofile = prefix + "_hori_zero.scn"
+        scan_start = start
+        scan_end = end
+        scan_step = step
+        cnt_time = time
+        unit = "mm"
 
-		ndata=int((scan_end-scan_start)/scan_step)+1
-		if ndata <=0 :
-			print("Something wrong")
-			return 1
+        ndata = int((scan_end - scan_start) / scan_step) + 1
+        if ndata <= 0:
+            print("Something wrong")
+            return 1
 
-		outfile=open(ofile,"w")
+        outfile = open(ofile, "w")
 
-		for x in range(0,ndata):
-			value=scan_start+x*scan_step
-			self.setApert(0.5,value)
-			count1,count2=counter.getCount(cnt_time)
-			count1=float(count1)
-			count2=float(count2)
-			outfile.write("%12.5f %12.5f %12.5f\n"%(value,count1,count2))
+        for x in range(0, ndata):
+            value = scan_start + x * scan_step
+            self.setApert(0.5, value)
+            count1, count2 = counter.getCount(cnt_time)
+            count1 = float(count1)
+            count2 = float(count2)
+            outfile.write("%12.5f %12.5f %12.5f\n" % (value, count1, count2))
 
-		self.setApert(0.5,0.5)
-		return 1
+        self.setApert(0.5, 0.5)
+        return 1
 
-if __name__=="__main__":
-        host = '172.24.242.41'
-        port = 10101
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((host,port))
+if __name__ == "__main__":
+    host = '172.24.242.41'
+    port = 10101
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((host, port))
 
-        fes=FES(s)
+    fes = FES(s)
 
-	fes.setPosition(0.42917, 0.22554)
+    fes.setPosition(0.42917, 0.22554)
 
-
-        s.close()
+    s.close()

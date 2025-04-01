@@ -1,5 +1,5 @@
 #!/bin/env python 
-import sys
+import sys,os
 import socket
 import time
 import datetime
@@ -7,14 +7,26 @@ import datetime
 # My library
 from Received import *
 from Motor import *
+from configparser import ConfigParser, ExtendedInterpolation
+import BSSconfig
 
-
-#
 class CoaxPint:
     def __init__(self, server):
+        self.bssconf = BSSconfig.BSSconfig()
+        self.bl_object = self.bssconf.getBLobject()
+
         self.s = server
-        self.coaxx = Motor(self.s, "bl_32in_st2_coax_1_x", "pulse")
-        self.sense = -1
+        # beamline.ini 
+        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH']) 
+
+        # axis name of CoaxPint
+        self.coax_name = self.config.get("axes", "coax_x_axis")
+        axis_name = "bl_%s_%s" % (self.bl_object, self.coax_name)
+        self.coaxx = Motor(self.s, axis_name, "pulse")
+
+        # get pulse information from bss.config
+        self.v2p, self.sense, self.home = self.bssconf.getPulseInfo(self.coax_name)
 
     def move(self, pls):
         value = self.sense * int(pls)

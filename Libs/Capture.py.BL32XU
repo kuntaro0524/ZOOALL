@@ -1,0 +1,233 @@
+#!/bin/env python 
+import errno
+import sys
+import socket
+import time
+import datetime
+import os
+import numpy
+from socket import error as socket_error
+from MyException import *
+
+# My library
+# For BL41XU modified 160604
+from BeamCenter import *
+
+class Capture:
+	def __init__(self):
+		#self.host='192.168.163.6' # for BL32XU videosrv 
+		self.host='127.0.0.1' # for BL41XU videosrv  160704
+		self.port = 10101
+		self.open_sig=0 # network connection to videoserv
+		self.isPrep=0
+		self.user=os.environ["USER"]
+		self.videosrv="videosrv --v4l2"
+
+	def checkConnection(self):
+		interval=30.0 #[sec]
+		s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+		for x in range(10):
+			try:
+				s.connect((self.host,self.port))
+				s.close()
+				return True
+
+			except socket.error as e:
+				time.sleep(interval)
+		s.close()
+		return False
+
+	def checkCarefully(self):
+		for i in range(10):
+			if self.checkRunning() == True:
+				if self.checkConnection() == True:
+					print "Connection OK"
+					time.sleep(0.5)
+					self.connect()
+					return True
+				else:
+					self.restartVideoSrv()
+					time.sleep(3.0)
+			else:
+				print "videoserv is not running now"
+				self.restartVideoSrv()
+				time.sleep(3.0)
+
+	def checkRunning(self):
+		command="ssh %s \"ps aux | grep videosrv\" > ./tmp"%self.host
+		os.system(command)
+		lines=open("./tmp","r").readlines()
+
+		for line in lines:
+			if line.rfind(self.videosrv)!=-1:
+				return True
+		return False
+
+	def prep(self):
+		print "prep: starts"
+		if self.connect():
+			self.isPrep = 1
+			return
+		else:
+			print "Restarting video sev in prep:"
+			self.restartVideoSrv()
+			time.sleep(3.0)
+			self.connect()
+			self.isPrep = 1
+			return
+
+	def restartVideoSrv(self):
+		print "restarting VideoSrv"
+		com="%s &"%(self.videosrv)
+		print com
+		os.system(com)
+
+	def connect(self):
+		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		try:
+			print "connecting the video server PC"
+			self.s.connect((self.host,self.port))
+			self.open_sig=1
+			self.isPrep=1
+		except socket_error as serr:
+			return False
+		return True
+
+	def disconnect(self):
+		if self.open_sig==1:
+			self.open_sig=0
+			self.isPrep=0
+			self.s.close()
+			command="ssh -l %s %s \"killall -9 videosrv\" &"%(self.user,self.host)
+			os.system(command)
+
+	def setBright(self,bright=7500):
+		# set brightness
+		com_bright="put/video_brightness/%d"%bright
+		self.s.sendall(com_bright)
+		recbuf=self.s.recv(8000)
+		print recbuf
+
+	def setCross(self):
+		com1="put/video_cross/on"
+		self.s.sendall(com1)
+		recbuf=self.s.recv(8000)
+		#print recbuf
+
+	def unsetCross(self):
+		com1="put/video_cross/off"
+		self.s.sendall(com1)
+		recbuf=self.s.recv(8000)
+		print recbuf
+
+	def capture(self,filename,speed=600,cross=False):
+		if self.isPrep==0:
+			print "Preparation in capture"
+			self.prep()
+		if self.open_sig==0:
+			while (1):
+				if self.connect()==True:
+					break
+				else:
+					self.isPrep=0
+					print "self.isPrep is set to 0.0"
+					print "Retry Connection"
+					time.sleep(5)
+		# 2016/06/24 all of images are captured with
+		# get/bl_32in_st_1_video_grabnocross/filename
+		# Skip
+		"""
+		if cross==False:
+			#print "Unset cross"
+			self.unsetCross()
+		else:
+			self.setCross()
+		"""
+		# 140528
+		if speed is not None:
+			self.setShutterSpeed(speed)
+			time.sleep(0.1)
+		# Set brightness to 7500
+		self.setBright()
+
+		#print "CAPPPPPPPPPPPPPPPPPPPPPPPPPP"
+		com1="get/bl_41in_st_1_video_grabnocross/%s"%filename
+		#com1="get/video_grabnocross/%s"%filename
+		try:
+			self.s.sendall(com1)
+			recbuf=self.s.recv(8000)
+                except socket.error as e:
+			raise MyException("capture failed!")
+
+	def setShutterSpeed(self,speed):
+		command="ssh -l %s %s \"echo %d > /sys/class/video4linux/video0/shutter_width\""%(self.user,self.host,speed)
+		os.system(command)
+
+	def setBinning(self, binning):
+		if self.isPrep==0:
+			self.prep()
+		if self.open_sig==0:
+			while (1):
+				if self.connect()==True:
+					break
+				else:
+					print "Retry Connection"
+					time.sleep(5)
+
+		com1="put/video_prompt/on"
+		self.s.sendall(com1)
+		recbuf=self.s.recv(8000)
+		#print "debug::",recbuf
+		com1="put/video_binning/%d"%binning
+		self.s.sendall(com1)
+		recbuf=self.s.recv(8000)
+		#print "debug::",recbuf
+
+	def getBinning(self):
+		if self.isPrep==0:
+			self.prep()
+		if self.open_sig==0:
+			while (1):
+				if self.connect()==True:
+					break
+				else:
+					print "Retry Connection"
+					time.sleep(5)
+
+		com1="get/video_binning/"
+		self.s.sendall(com1)
+		recbuf=self.s.recv(8000)
+		print "debug::",recbuf
+		sp = recbuf.split("/")
+		if len(sp) == 5:
+			return int(sp[-2])
+
+        def aveCenter(self,prefix,gain,nave=5,speed=4000):
+                totx=toty=0
+
+                for i in range(0,nave):
+                        filename="%s_%03d.ppm"%(prefix,i)
+                        self.capture(filename,speed)
+                        time.sleep(0.5)
+                        pp=BeamCenter(filename)
+                        #x,y=pp.find()
+                        x,y=pp.findRobust()
+
+                        totx+=x
+                        toty+=y
+
+                cenx=totx/float(nave)
+                ceny=toty/float(nave)
+
+                return cenx,ceny
+
+if __name__=="__main__":
+	cap=Capture()
+
+	cappath="/isilon/BL45XU/BLsoft/PPPP/"
+	picpath="%s/capture.ppm"%cappath
+
+	cap.capture(picpath)
+	cap.disconnect()
+	print "Disconnect!!"
+

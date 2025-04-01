@@ -123,22 +123,3 @@ sleep 1
 killall bss
 
 END:
-=======
-#!/bin/tcsh
-
-if ($$ != `pgrep -fo $0`) then
-    notify-send "`basename $0` is aleady running."
-    exit 1
-endif
-
-videosrv &
-sleep 10
-yamtbx.python /isilon/BL45XU/videosrv0.py
-
-# Cheetah
-/usr/local/bss/startcheetah.sh
-
-#########For BSS (all beamline)###########
-echo "\n\n" | /usr/local/bss/bss --server --console --websocket
-
-ps auxww | grep videosrv | grep -v grep | awk '{print $2}'| xargs kill

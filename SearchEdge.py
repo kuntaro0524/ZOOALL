@@ -15,11 +15,11 @@ import matplotlib.pyplot as plt
 class SearchEdge:
 	def __init__(self,ms,sample_name="sample"):
 		self.coi=CoaxImage.CoaxImage(ms)
-        	self.fname="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/test.ppm"
+		self.fname="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/test.ppm"
 		self.isInit=False
 		self.debug=False
 		self.logdir="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Log/"
-		self.backimg="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/BackImages/back-1710240005.ppm"
+		self.backimg="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/BackImages/back-1710240004.ppm"
 		self.bssconfig_file="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ZooConfig/bss/bss.config"
 
 		self.sample_name=sample_name
@@ -32,10 +32,10 @@ class SearchEdge:
 		# Log directory is making for Today
 		tds="%s"%(datetime.datetime.now().strftime("%y%m%d"))
 		self.todaydir="%s/%s"%(self.logdir,tds)
-                if os.path.exists(self.todaydir):
-                        print("%s already exists"%self.todaydir)
-                else:
-                        os.makedirs(self.todaydir)
+		if os.path.exists(self.todaydir):
+			print("%s already exists"%self.todaydir)
+		else:
+			os.makedirs(self.todaydir)
 		self.ff=File(self.todaydir)
 		print("Coax camera information will be acquired!")
 		self.cip=CryImageProc.CryImageProc("test.ppm")
@@ -49,10 +49,10 @@ class SearchEdge:
 		self.mx,self.my,self.mz=self.bssconfig.getCmount()
 
 		# Force to remove the existing "test.ppm"
-                try:
+		try:
 			os.system("\\rm -Rf %s"%self.fname)
-                except MyException as ttt:
-                        raise MyException("Centering:init fails to remove the previous 'test.ppm'")
+		except MyException as ttt:
+			raise MyException("Centering:init fails to remove the previous 'test.ppm'")
 			return
 
 		self.isInit=True
@@ -166,7 +166,7 @@ class SearchEdge:
 			try:
 				n_good,grav_x,grav_y,xwidth,ywidth,area,xedge=self.coreCentering(phi_list,loop_size=loop_size)
 				print("NGOOD=",n_good)
-				# Added 160514 	
+				# Added 160514     
 				# A little bit dangerous modification
 				if challenge==True and n_good == len(phi_list):
 					break
@@ -182,10 +182,10 @@ class SearchEdge:
 
 		if self.debug==True:
 			im = cv2.imread(self.fname)
-                	cv2.circle(im,(xedge,grav_y),2,(0,0,255),2)
-                	#img_log="edgeCentering_debug.jpg"
+			cv2.circle(im,(xedge,grav_y),2,(0,0,255),2)
+			#img_log="edgeCentering_debug.jpg"
 			img_log="/isilon/BL32XU/BLsoft/PPPP/10.Zoo/ec_debug.jpg"
-                	cv2.imwrite(img_log,im)
+			cv2.imwrite(img_log,im)
 
 		print("################### EDGE CENTERING ENDED ######################")
 		return n_good,grav_x,grav_y,xwidth,ywidth,area,xedge

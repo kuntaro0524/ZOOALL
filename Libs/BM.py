@@ -3,16 +3,18 @@ import socket
 import time
 
 # My library
-from Motor import *
-
+import BaseAxis
 
 #
 class BM:
     def __init__(self, server):
-        self.s = server
-        self.moni_y = Motor(self.s, "bl_32in_st2_monitor_1_y", "pulse")
-        self.moni_z = Motor(self.s, "bl_32in_st2_monitor_1_z", "pulse")
-        self.moni_x = Motor(self.s, "bl_32in_st2_monitor_1_x", "pulse")
+        #bm_x_class = BaseAxis.BaseAxis(server, "beammonitor_x", "pulse")
+        bm_y_class = BaseAxis.BaseAxis(server, "beammonitor_y", "pulse")
+        bm_z_class = BaseAxis.BaseAxis(server, "beammonitor_z", "pulse")
+
+        self.moni_x = bm_x_class.motor
+        self.moni_y = bm_y_class.motor
+        self.moni_z = bm_z_class.motor
 
         self.z_on_pos = 0  # pulse
         self.z_off_pos = -84500  # pulse

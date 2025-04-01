@@ -7,7 +7,6 @@ from configparser import ConfigParser, ExtendedInterpolation
 import os
 
 from Motor import *
-
 class Zoom:
     def __init__(self, server):
         self.bssconf = BSSconfig.BSSconfig()
@@ -18,12 +17,13 @@ class Zoom:
         self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH']) 
 
         self.s = server
-        self.axis = "bl_44in_st1_video_2_zoom"
+        #self.axis = "bl_44in_st1_video_2_zoom"
         zoom_name = self.config.get("axes", "zoom_x_axis")
-        zoom_vme_name = "bl_%s_%s" % (self.bl_object, zoom_name)
-        self.zoom = Motor(self.s, zoom_vme_name, "pulse")
+        #zoom_vme_name = "bl_%s_%s" % (self.bl_object, zoom_name)
+        self.axis_name = "bl_%s_%s" % (self.bl_object, zoom_name)
+        self.zoom = Motor(self.s, self.axis_name, "pulse")
 
-        self.qcommand = "get/" + self.axis + "/" + "query"
+        self.qcommand = "get/" + self.axis_name + "/" + "query"
 
         # Minimum zoom ratio
         self.pulse_minzoom = self.bssconf.getPulse4MinZoomRatio()
@@ -75,4 +75,3 @@ if __name__ == "__main__":
     zoom.zoomOut()
 
     s.close()
-

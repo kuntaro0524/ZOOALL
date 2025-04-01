@@ -239,7 +239,5 @@ class Toilet():
             ofile.write("%s\n"%logline)
             """
 
-
-               
 toilet = Toilet(sys.argv[1]) 
 toilet.listAll()

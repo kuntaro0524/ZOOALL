@@ -60,8 +60,21 @@ class Repository(wx.Frame):
 
         # Priority index
         ichar = "%s" % p_index
+<<<<<<< HEAD
         self.start_index = sys.maxint
         index = self.list.InsertStringItem(sys.maxint, ichar)
+=======
+
+        if isInitial == True:
+            self.start_index = sys.maxint
+            print "START_INDEX=",self.start_index
+        else:
+            self.list.DeleteItem(index)
+
+        print "INDEX=",index
+        #index = self.list.InsertStringItem(self.start_index, ichar)
+        index = self.list.InsertStringItem(index, ichar)
+>>>>>>> zoo45xu/main
 
         # o_index
         ichar = "%s" % o_index
@@ -207,11 +220,14 @@ class Repository(wx.Frame):
         gui_index = 0
         index_list = []
 
+<<<<<<< HEAD
         for i in packages:
             p_index, isSkip, isDS, puckid, pinid, mode, score_min, \
             score_max, maxhits, dist_ds, cry_min_size_um, cry_max_size_um, loopsize, n_mount, isDone, o_index = i
             self.setValues(line_index, i)
             line_index += 1
+=======
+>>>>>>> zoo45xu/main
 
         for p in conds:
             ttt = (p['p_index'], p['isSkip'], p['isDS'], p['puckid'], p['pinid'], p['mode'],
@@ -221,6 +237,16 @@ class Repository(wx.Frame):
             index_list.append((p['p_index'], gui_index))
             packages.append(ttt)
             gui_index += 1
+<<<<<<< HEAD
+=======
+
+        line_index = 0
+        for i in packages:
+            p_index, isSkip, isDS, puckid, pinid, mode, score_min, \
+            score_max, maxhits, dist_ds, cry_min_size_um, cry_max_size_um, loopsize, n_mount, isDone, o_index = i
+            self.setValues(line_index, i, isInitial=False)
+            line_index += 1
+>>>>>>> zoo45xu/main
         print "updated."
 
     def readCurrentSkipList(self):
@@ -309,6 +335,7 @@ class Repository(wx.Frame):
                 i)
             esa.updateValueAt(o_index, "isSkip", isSkip)
             esa.updateValueAt(o_index, "p_index", p_index)
+<<<<<<< HEAD
             esa.updateValueAt(o_index, "mode", mode)
             esa.updateValueAt(o_index, "score_min", score_min)
             esa.updateValueAt(o_index, "score_max", score_max)
@@ -316,6 +343,8 @@ class Repository(wx.Frame):
             esa.updateValueAt(o_index, "cry_min_size", cry_min_size)
             esa.updateValueAt(o_index, "cry_max_size", cry_max_size)
             esa.updateValueAt(o_index, "loop_size", loop_size)
+=======
+>>>>>>> zoo45xu/main
 
     def UnsetSkip(self, event):
         num = self.list.GetItemCount()

@@ -96,6 +96,9 @@ class NOU():
     def sokuteiSuru(self, scan_path, cond, prefix):
         # Prepare 'data collection blocks'
         dc_blocks = self.junbiSuru(scan_path, cond, prefix)
+        # number of all data collection blocks to be collected
+        n_dc_blocks = len(dc_blocks)
+        self.logger.info(">> All of DC blocks: %5d" % n_dc_blocks)
         # The number of collected datasets (log)
         n_datasets = 0
 
@@ -110,6 +113,8 @@ class NOU():
             except Exception as e:
                 self.logger.info(self.commentException(e.args))
                 self.logger.info(">> DC_INDEX=%5d data collection failed." % dc_index)
+            # This logger is quite important to investigate the exception sequence.
+            self.logger.info("Go to the next sample.")
             # Check the time for data collection
             consumed_minutes = self.sw.calcTimeFrom("start") / 60.0  # [mins]
             if consumed_minutes > self.time_limit:
@@ -294,7 +299,6 @@ class NOU():
             self.logger.info(self.commentException(e.args))
             raise Exception("during doSingle in do_single_part")
 
-
     # Single partial data collection
     # Rotation range ends at 90 deg.
     def do_single_noalign(self, cond, dc_block, dc_index):
@@ -311,7 +315,6 @@ class NOU():
             self.logger.info(self.commentException(e.args))
             raise Exception("during 'doSingle' in do_single_noalign")
 
-
     def do_multi(self, cond, dc_block, dc_index):
         # Header information for this data collection
         center_xyz = dc_block['cxyz']
@@ -325,7 +328,6 @@ class NOU():
             self.logger.info("multi:do_multi failed.")
             self.logger.info(self.commentException(e.args))
             raise Exception("during 'doSingle' in do_multi")
-
 
     # 2020/07/10 modified from HEBI
     def doVscan(self, prefix, center, cond, scan_length, phi):
@@ -384,7 +386,6 @@ class NOU():
 
         return raspath
 
-
     # method "peak_xyz" : return xyz coordinate from the heatmap
     def anaVscan(self, diffscan_path, prefix, phi_center, method="peak_xyz", isWeakScan=False):
         sorted_crystal_list = self.getSortedCryList(diffscan_path, prefix, phi_center, isWeakScan)
@@ -399,7 +400,6 @@ class NOU():
 
         return peak_xyz
 
-
     # All ID beamlines here can share this directions 2019/07/11 K.Hirata
     def getRescanDist(self, index, option):
         gaburiyoru_mm = self.gaburiyoru_h_length / 1000.0  # [mm]
@@ -409,7 +409,6 @@ class NOU():
             return -1.0 * y_abs
         else:
             return +1.0 * y_abs
-
 
     def doSingle(self, center_xyz, cond, osc_start, osc_end, prefix):
         try:
@@ -421,7 +420,6 @@ class NOU():
         except Exception as e:
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("doSingle: ERRors occured in data collection loop.\n")
-
 
     # 2020/07/09 coded by K. Hirata
     def startHelical(self, left_xyz, right_xyz, cond, osc_start, osc_end, prefix):

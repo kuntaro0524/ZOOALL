@@ -7,10 +7,13 @@ import time
 from Received import *
 from Motor import *
 
+import BaseAxis
 
-class MBS:
+class MBS(BaseAxis.BaseAxis):
     def __init__(self, server):
-        self.s = server
+        # axis name for MBS
+        axis_config = "mbs"
+        super().__init__(server, axis_config, axis_type="plc")
 
     def anaRes(self, recbuf):
         #	bl_32in_plc_mbs/get/1128_blrs_root_blanc4deb/open/0
@@ -35,7 +38,7 @@ class MBS:
         return repr(recstr)
 
     def getStatus(self):
-        com = "get/bl_32in_plc_mbs/status"
+        com = "get/{self.full_axis_name}/status"
         # counter clear
         recbuf = self.communicate(com)
         status = self.anaRes(recbuf)
@@ -43,7 +46,7 @@ class MBS:
         return status
 
     def open(self):
-        com = "put/bl_32in_plc_mbs/open"
+        com = "put/{self.full_axis_name}/open"
         # counter clear
         recbuf = self.communicate(com)
         # 30 sec trials
@@ -56,7 +59,7 @@ class MBS:
         return False
 
     def close(self):
-        com = "put/bl_32in_plc_mbs/close"
+        com = "put/{self.full_axis_name}/close"
         # counter clear
         self.s.sendall(com)
         recbuf = self.s.recv(8000)
@@ -87,7 +90,6 @@ class MBS:
             else:
                 time.sleep(5)
         return False
-
 
 if __name__ == "__main__":
     # host = '192.168.163.1'

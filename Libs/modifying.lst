@@ -1,0 +1,90 @@
+~~AttFactor.py~~
+~~Att.py~~
+~~AxesInfo.py~~
+~~BeamsizeConfig.py~~
+~~BLFactory.py~~
+
+<不要なのではないか？>
+Date.py　ふような気がします→MyDate.pyにしたのでは？システム関数と一致しているのでしょう。
+MXserver.py　→不要
+FindNeedle.py　→不要
+ScanAxis.py　→不要な気がする
+MirrorTuneUnit.py　→不要
+File.py　→不要な気がするのでチェック
+DynamicTable.py　→不要なのでは
+
+
+<共通コードのはず＞
+CryImageProc.py　→ビームライン共通のはず
+CrystalList.py　→ビームライン共通にするべき
+Crystal.py　→ビームライン共通にするべき
+CrystalSpot.py　→ビームライン共通にするべき
+DiffscanLog.py →ビームライン共通
+DirectoryProc.py　→ビームライン共通
+Gonio.py　→共通コードで制御→これはコマンドを叩くほうが良い（WebSocketではなく）
+GonioVec.py　→共通コードのはず
+LoopCrystals.py　→共通コード
+Motor.py　→共通コード
+PixelCrystal.py→共通コード
+Received.py　→共通コード
+ScheduleBSS.py　→共通になるはずだが
+Shutter.py　→共通コードになるようにしておく
+StopWatch.py　→共通コード
+SummaryDat.py　→共通コード
+TCSsimple.py　→共通で使えるようになればよいが、おそらく使っていない
+UserESA.py　→共通コードにしたいところ。たぶん難しい。
+WebSocketBSS.py　→共通コードにする
+Zoom.py　→共通コードを利用したい。できればWebSocketだが。
+Capture.py　→ビームラインで共通な気がするが
+CoaxImage.py　→ビームライン共通
+MyDate.py　→これだけ残す→Date.pyのimportを排除。
+Mono.py　→どこでも使えるように（波長変更だけかも）
+
+＜BL32XUだけ良ければまずはOK>
+CoaxPint.py　→ピントはBL32XUでしか動かさないかも
+DSS.py　→よくわからないので確認。BL32XUでは使えていたように思うが。→WebSocketで動くの？
+DumpRecover.py→これもBL32XUでこないだ改変したような気がするので見ておく
+FES.py　→BL32XUだけでは？
+MBS.py　→BL32XUで動くように改変（他では使っていない）
+TCS.py　→BL32XUで使えるようにしておく
+RingCurrent.py　→BL32XUだけで使えるようにしておく
+
+<no touch>
+MyException.py　→このままのこす
+Gonio44.py　→BL44XU用なのでこのままおいとく
+ErrorCode.py →今のママ
+ESA.py　→今のまま
+EigerLog.py　→今のまま（ZOOALL.main)
+ExposureConditioner.py　→今のまま
+ShikaDB.py　→このままおいておく
+Singleton.py　→このまま
+Spline.py　→このまま
+Stage.py　→使っていない→このまま
+TemplateMatch.py　→このまま
+Toilet.py　→このまま
+ZOODB.py　→不要。このまま
+DBinfo.py →いじらなくても良い
+PuckExchanger.py　→BL45XUだけ
+
+<On/Off> WebSocket実装を検討
+Light.py　→On/OffでOK
+BS.py　→　どこのビームラインもOn/OffがあればOK
+Colli.py　→　On/Offのみで大丈夫
+DetectorCover.py　→フラックスを測定するときにいじるかどうか？ On/Offで良い
+Cryo.py　→使っていないのではないかと思うが　On/Offだけで良いはず。
+
+<要調査＞
+Pin.py　→？？？
+Cover.py　→　フラックスを測定するときに利用するビームラインが多いはず（BL32XUはそう。BL45XUもそう？）
+BSSconfig41.py　
+BSSconfig.py　
+BM.py　→　BL32XUでは特殊な動き、BL45XUでは単に入れるだけ
+Mirror.py　→どっかで使っている？要調査
+M1.py　→BL45XUのみかも
+PreColli.py　→BL44XUだけな気がするが
+ExSlit1.py　→BL32XUだけではないのか確認する
+Flux.py　→係数をビームラインで比較して分岐が必要ならする
+CCDlen.py　→カメラ長を動かすことってあるん！？
+Count.py　→　カウンターなので特殊（ビームラインによってはフラックス計算の係数が異なる）
+CoaxYZ.py　→？？？？
+Device.py　→　ビームラインごとに分岐を考えてできればWebSocketで動かせるようにする

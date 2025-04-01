@@ -64,13 +64,12 @@ class RasterSchedule:
         # BL45XU 1: 2M mode
         self.roi_index = 1
 
-        # for PILATUS BL45XU
-        if self.beamline == "BL45XU":
-            self.img_suffix = "cbf"
-        if self.beamline == "BL41XU" or self.beamline == "BL32XU" or self.beamline == "BL44XU":
+        # All ID beamlines now use h5 format.
+        if self.beamline == "BL41XU" or self.beamline == "BL32XU" or self.beamline == "BL44XU" or self.beamline == "BL45XU":
             self.img_suffix = "h5"
 
         self.isSSROX = False
+        self.isCoverScan = False
 
     def setExpTime(self, exptime):
         self.exptime = exptime
@@ -90,6 +89,9 @@ class RasterSchedule:
 
     def setWL(self, wavelength):
         self.wavelength = wavelength
+
+    def setCoverScan(self):
+        self.isCoverScan = True
 
     def setSSROX(self):
         self.isSSROX = True
@@ -165,6 +167,8 @@ class RasterSchedule:
         self.rot_angle = rot
         self.rot_flag = 1
 
+    # making a list of strings for each job.
+    # If you call this function once, this returns descriptions for 'one' raster scan.
     def getSchestr(self):
         schstr = []
         schstr.append("Job ID: 1")
@@ -219,10 +223,11 @@ class RasterSchedule:
         schstr.append("Oscillation delay: 100.000000  # [msec]")
         schstr.append("Anomalous Nuclei: Mn  # Mn-K")
         schstr.append("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual")
-        if self.beamline == "BL41XU" or self.beamline == "BL32XU":
+        if self.beamline == "BL41XU" or self.beamline == "BL32XU" or self.beamline == "BL45XU":
             schstr.append("Attenuator transmission: %8.4f\n" % self.trans)
-        elif self.beamline == "BL45XU" or self.beamline=="BL44XU":
+        else:
             schstr.append("Attenuator: %d  # None" % self.att_idx)
+            
         schstr.append("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]")
         schstr.append("XAFS Count time: 1.000000  # [sec]")
         schstr.append("XAFS Wait time: 30  # [msec]")
@@ -242,6 +247,11 @@ class RasterSchedule:
         # Mode is vertical
         else:
             schstr.append("Raster Scan Type: 2 # 0:vertical, 1:horizontal, 2: 2D")
+
+        # Cover scan
+        if self.isCoverScan == True and beamline.upper() == "BL45XU":
+            schstr.append("Raster Close Cover Flag: 1")
+
         schstr.append("Raster Vertical Points: %d" % self.v_points)
         schstr.append("Raster Horizontal Points: %d" % self.h_points)
         schstr.append("Raster Vertical Step: %8.4f # [mm]" % self.v_step_mm)

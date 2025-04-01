@@ -8,14 +8,21 @@ from Received import *
 from Motor import *
 from AnalyzePeak import *
 from AxesInfo import *
+import BaseAxis
 
 class TCS:
     def __init__(self,server):
-        self.s=server
-        self.tcs_height=Motor(self.s,"bl_32in_tc1_slit_1_height","mm")
-        self.tcs_width=Motor(self.s,"bl_32in_tc1_slit_1_width","mm")
-        self.tcs_vert=Motor(self.s,"bl_32in_tc1_slit_1_vertical","mm")
-        self.tcs_hori=Motor(self.s,"bl_32in_tc1_slit_1_horizontal","mm")
+        # TCS axis
+        # axis name on 'beamline.ini'
+        tcs_height_class = BaseAxis.BaseAxis(server, "tcs_height", axis_type="motor")
+        tcs_width_class = BaseAxis.BaseAxis(server, "tcs_width", axis_type="motor")
+        tcs_vert_class = BaseAxis.BaseAxis(server, "tcs_vert", axis_type="motor")
+        tcs_hori_class = BaseAxis.BaseAxis(server, "tcs_hori", axis_type="motor")
+
+        self.tcs_height=tcs_height_class.motor
+        self.tcs_width=tcs_width_class.motor
+        self.tcs_vert=tcs_vert_class.motor
+        self.tcs_hori=tcs_hori_class.motor
 
     def saveInit(self):
         self.getApert()

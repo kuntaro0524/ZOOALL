@@ -11,7 +11,6 @@ import copy
 import logging
 import LogString
 
-
 class AnaHeatmap:
     def __init__(self, scan_path):
         self.scan_path = scan_path

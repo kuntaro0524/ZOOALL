@@ -8,7 +8,7 @@ import time
 from AnalyzePeak import *
 from Motor import *
 from AxesInfo import *
-from ConfigFile import *
+#from ConfigFile import *
 from TCS import *
 from MyException import *
 
@@ -167,43 +167,6 @@ class Mono:
 
         return fwhm, center
 
-    def scanDt1Config(self, prefix, confchar, tcs):
-        conf = ConfigFile()
-        try:
-            ## Dtheta 1
-            ch1 = int(conf.getCondition2(confchar, "ch1"))
-            ch2 = int(conf.getCondition2(confchar, "ch2"))
-            start = int(conf.getCondition2(confchar, "start"))
-            end = int(conf.getCondition2(confchar, "end"))
-            step = int(conf.getCondition2(confchar, "step"))
-            time = conf.getCondition2(confchar, "time")
-            tcsv = conf.getCondition2(confchar, "tcsv")
-            tcsh = conf.getCondition2(confchar, "tcsh")
-            detune_pls = int(conf.getCondition2(confchar, "detune"))
-
-        except MyException as ttt:
-            print(ttt.args[0])
-            print("Check your config file carefully.\n")
-
-        # Setting tcs
-        tcs.setApert(tcsv, tcsh)
-
-        # Setting
-        ofile = prefix + "_dtheta1.scn"
-
-        # Condition
-        self.m_dtheta1.setStart(start)
-        self.m_dtheta1.setEnd(end)
-        self.m_dtheta1.setStep(step)
-
-        backlash = 2000 + detune_pls
-
-        maxval = self.m_dtheta1.axisScan(ofile, ch1, ch2, time)
-
-        counter_1_max = maxval[0] + detune_pls
-        print("Peak: %5d\n" % counter_1_max)
-
-        return counter_1_max
 
     def scanNEW(self, prefix, confchar, tcs):
         conf = ConfigFile()

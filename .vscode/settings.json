@@ -1,3 +1,4 @@
 {
-    "editor.suggestLineHeight": 2
+    "editor.suggestLineHeight": 2,
+    "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }

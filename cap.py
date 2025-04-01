@@ -16,7 +16,11 @@ class IboINOCC:
 		self.ysize=self.roi_y1-self.roi_y0
 
 	def anaim(self,prefix):
+<<<<<<< HEAD
 		print("Start calcEdge")
+=======
+		print "Start calcEdge"
+>>>>>>> zoo45xu/main
 		im = cv2.imread(self.pinimg)
 		bk = cv2.imread(self.backimg)
 	
@@ -35,12 +39,20 @@ class IboINOCC:
 		cv2.imwrite("./%s.jpg"%prefix,th)
 
 		#ROI
+<<<<<<< HEAD
 		print(im.shape)
+=======
+		print im.shape
+>>>>>>> zoo45xu/main
 		#roi=th[self.roi_x0:self.roi_x1,self.roi_y0:self.roi_y1]
 		self.roi=th[self.roi_y0:self.roi_y1,self.roi_x0:self.roi_x1]
 		cv2.imwrite("%s_roi.jpg"%(prefix),self.roi)
 		
+<<<<<<< HEAD
 		print("Image subtraction in calcEdge finished")
+=======
+		print "Image subtraction in calcEdge finished"
+>>>>>>> zoo45xu/main
 
 	# This analyzes x line for detecting line bunch 
 	def lineAnalysis(self,x_line):
@@ -85,7 +97,11 @@ class IboINOCC:
                                 y_len_max_each=ylength
 				n_max_each=ycenter
                                 n_found+=1
+<<<<<<< HEAD
                                 print("FIND!",y_len_max_each)
+=======
+                                print "FIND!",y_len_max_each
+>>>>>>> zoo45xu/main
 
 		if n_found==0:
 			y_cen_max_each=-99.9999
@@ -105,7 +121,11 @@ class IboINOCC:
 		y_len_max_cen=0.0
 		none_x=150
 
+<<<<<<< HEAD
 		print("STARTING PHI=",phi)
+=======
+		print "STARTING PHI=",phi
+>>>>>>> zoo45xu/main
                 for xline in [0,10,20,30,40,50,60,70,80,90,100,110,120,130,140]:
 			#print "XLINE=",xline
                         find_flag=False
@@ -122,10 +142,17 @@ class IboINOCC:
                 	# Line not found
                 	elif n_found==0:
                         	if none_x > xline:
+<<<<<<< HEAD
 					print("NOT FOUND",xline,none_x)
                                 	none_x=xline
 
 		print("NONE X=",none_x)
+=======
+					print "NOT FOUND",xline,none_x
+                                	none_x=xline
+
+		print "NONE X=",none_x
+>>>>>>> zoo45xu/main
 		#good_index=none_x-20
 		hashi_index1=none_x-20
 		hashi_index2=none_x-10
@@ -145,7 +172,11 @@ class IboINOCC:
 		client.connect((self.capture_host,self.capture_port))
 		client.send("from nadechin")
 		response=client.recv(4096)
+<<<<<<< HEAD
 		print(response)
+=======
+		print response
+>>>>>>> zoo45xu/main
 		return True
 
 	def captureROI(self,phi):
@@ -163,7 +194,11 @@ class IboINOCC:
 			self.anaim(prefix)
 		
 		endtime=datetime.datetime.now()
+<<<<<<< HEAD
 		print(starttime,endtime)
+=======
+		print starttime,endtime
+>>>>>>> zoo45xu/main
 	
 if __name__ == "__main__":
 	import Gonio

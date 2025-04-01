@@ -6,15 +6,25 @@ import sys
 import traceback
 import numpy
 
+<<<<<<< HEAD
 beamline = "BL32XU"
 
 if beamline.upper() == "BL45XU":
     y_left_sign = -1.0
+=======
+beamline = "BL45XU"
+if beamline.upper() == "BL45XU":
+    y_left_sign = 1.0
+>>>>>>> zoo45xu/main
     host = '172.24.242.59'
     detectordim = 423.6  # [mm in shorter dimension]
     det_area = 423.6 * 434.6
 elif beamline.upper() == "BL32XU":
+<<<<<<< HEAD
     y_left_sign = -1.0
+=======
+    y_left_sign = 1.0
+>>>>>>> zoo45xu/main
     host = '172.24.242.41'
     detectordim = 233.2  # [mm in shorter dimension]
     det_area = 233.2 * 245.2
@@ -29,7 +39,11 @@ sys.path.append("/isilon/%s/BLsoft/PPPP/10.Zoo/Libs/" % beamline.upper())
 
 import datetime
 import AttFactor
+<<<<<<< HEAD
 from BeamsizeConfig import *
+=======
+import BeamsizeConfig
+>>>>>>> zoo45xu/main
 from Gonio import *
 from Att import *
 from GonioVec import *
@@ -38,7 +52,11 @@ from Colli import *
 from File import *
 from BS import *
 from Cryo import *
+<<<<<<< HEAD
 import ScheduleBSS
+=======
+from ScheduleBSS import *
+>>>>>>> zoo45xu/main
 import KUMA
 # from RDprop import *
 from MyException import *
@@ -48,6 +66,13 @@ import MultiCrystal
 # from wxPython.wx import *
 import kuma_shika_commu
 
+<<<<<<< HEAD
+=======
+#
+# 2013/10/11 temporally adopted MX225HS low noise mode
+#
+
+>>>>>>> zoo45xu/main
 class MyMenuBar(wx.MenuBar):
     def __init__(self, *args, **kwds):
         # Content of this block not found. Did you rename this class?
@@ -64,6 +89,10 @@ class MyMenuBar(wx.MenuBar):
 
 # end of class MyMenuBar
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> zoo45xu/main
 class MyPanel(wx.Panel):
     def __init__(self, *args, **kwds):
         # Content of this block not found. Did you rename this class?
@@ -104,7 +133,11 @@ class ExpCondDialog(wx.Dialog):
         pass
 
     def __set_properties(self):
+<<<<<<< HEAD
         # Content of this block not found. Did you rename)
+=======
+        # Content of this block not found. Did you rename this class?
+>>>>>>> zoo45xu/main
         pass
 
     def __do_layout(self):
@@ -165,7 +198,11 @@ class MyFrame2(wx.Frame):
         self.checkbox_2_copy = wx.CheckBox(self.notebook_1_pane_1, wx.ID_ANY, "with Back Light[Evac]")
         self.evacManual = wx.Button(self.notebook_1_pane_1, wx.ID_ANY, "Evacuate [manual mount]")
         self.bitmap_1 = wx.StaticBitmap(self.notebook_1_pane_1, wx.ID_ANY,
+<<<<<<< HEAD
                                         wx.Bitmap("/user/target/ZOO32XU/KUMAGUI/a.png",
+=======
+                                        wx.Bitmap("/isilon/BL32XU/BLsoft/PPPP/03.GUI/98.Factory/Honki/a.png",
+>>>>>>> zoo45xu/main
                                                   wx.BITMAP_TYPE_ANY))
         self.notebook_1_pane_4 = wx.Panel(self.notebook_1, wx.ID_ANY)
         self.label_1_copy_1 = wx.StaticText(self.notebook_1_pane_4, wx.ID_ANY, "Data directory", style=wx.ALIGN_CENTER)
@@ -179,10 +216,15 @@ class MyFrame2(wx.Frame):
         self.label_1_copy_copy_copy = wx.StaticText(self.notebook_1_pane_4, wx.ID_ANY, "Beam size",
                                                     style=wx.ALIGN_CENTER)
         config_dir = "/isilon/blconfig/%s/" % beamline.lower()
+<<<<<<< HEAD
         print "CONFIG_DIR = %s" % config_dir
         bsconf = BeamsizeConfig(config_dir)
         blist = bsconf.getBeamsizeListForKUMA()
         print "=========================",blist
+=======
+        bsconf = BeamsizeConfig.BeamsizeConfig(config_dir)
+        blist = bsconf.getBeamsizeListForKUMA()
+>>>>>>> zoo45xu/main
         self.beamsizePullDown = wx.Choice(self.notebook_1_pane_4, wx.ID_ANY, choices=blist)
         self.static_line_2 = wx.StaticLine(self.notebook_1_pane_4, wx.ID_ANY)
         self.label_3_copy = wx.StaticText(self.notebook_1_pane_4, wx.ID_ANY, "Oscillation from ")
@@ -328,7 +370,11 @@ class MyFrame2(wx.Frame):
         self.label_1_copy_copy_copy_copy = wx.StaticText(self.notebook_1_pane_5, wx.ID_ANY, "Beam size",
                                                          style=wx.ALIGN_CENTER)
         config_dir = "/isilon/blconfig/%s/" % beamline.lower()
+<<<<<<< HEAD
         bsconf = BeamsizeConfig(config_dir)
+=======
+        bsconf = BeamsizeConfig.BeamsizeConfig(config_dir)
+>>>>>>> zoo45xu/main
         blist = bsconf.getBeamsizeListForKUMA()
         self.beamsizePullDown2 = wx.Choice(self.notebook_1_pane_5, wx.ID_ANY, choices=blist)
         self.button_11_copy = wx.Button(self.notebook_1_pane_5, wx.ID_ANY, "Check")
@@ -381,10 +427,17 @@ class MyFrame2(wx.Frame):
         self.totalExpMultiBox_copy = wx.TextCtrl(self.notebook_1_pane_5, wx.ID_ANY, "0.35",
                                                  style=wx.TE_CENTRE | wx.TE_READONLY)
         self.label_21_copy_1_copy_copy_1 = wx.StaticText(self.notebook_1_pane_5, wx.ID_ANY, "[sec]")
+<<<<<<< HEAD
         self.label_20_copy_2 = wx.StaticText(self.notebook_1_pane_5, wx.ID_ANY, "Att/Trans")
         self.att_thick_multi = wx.TextCtrl(self.notebook_1_pane_5, wx.ID_ANY, "-",
                                            style=wx.TE_CENTRE | wx.TE_READONLY)
         self.label_21_copy_2 = wx.StaticText(self.notebook_1_pane_5, wx.ID_ANY, "")
+=======
+        self.label_20_copy_2 = wx.StaticText(self.notebook_1_pane_5, wx.ID_ANY, "Att thick")
+        self.att_thick_multi = wx.TextCtrl(self.notebook_1_pane_5, wx.ID_ANY, "600",
+                                           style=wx.TE_CENTRE | wx.TE_READONLY)
+        self.label_21_copy_2 = wx.StaticText(self.notebook_1_pane_5, wx.ID_ANY, "[um]")
+>>>>>>> zoo45xu/main
         self.label_20_copy_1_copy_copy = wx.StaticText(self.notebook_1_pane_5, wx.ID_ANY, "Flux/rot")
         self.phsPerDegBoxMulti = wx.TextCtrl(self.notebook_1_pane_5, wx.ID_ANY, "1.0",
                                              style=wx.TE_CENTRE | wx.TE_READONLY)
@@ -428,7 +481,11 @@ class MyFrame2(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.pushSetPhi, self.setCurrentPhiButton)
         self.Bind(wx.EVT_CHECKBOX, self.setAdvTrue, self.checkbox_1)
         self.Bind(wx.EVT_BUTTON, self.pushSetVec1, self.setVec1Button)
+<<<<<<< HEAD
         self.Bind(wx.EVT_BUTTON, self.calc_and_display, self.checkButton)
+=======
+        self.Bind(wx.EVT_BUTTON, self.pushCheck, self.checkButton)
+>>>>>>> zoo45xu/main
         self.Bind(wx.EVT_BUTTON, self.pushSetVec2, self.setVec2Button)
         self.Bind(wx.EVT_BUTTON, self.pushOutput, self.makeOutput)
         self.Bind(wx.EVT_BUTTON, self.pushOrigVec, self.setOrigVecButton)
@@ -470,7 +527,11 @@ class MyFrame2(wx.Frame):
         # Parameters
         self.confdir = "/isilon/blconfig/%s/" % beamline.lower()
 
+<<<<<<< HEAD
         self.bsconf = BeamsizeConfig(self.confdir)
+=======
+        self.bsconf = BeamsizeConfig.BeamsizeConfig(self.confdir)
+>>>>>>> zoo45xu/main
         self.flux_list = self.bsconf.getFluxListForKUMA()
         print self.flux_list
 
@@ -502,13 +563,22 @@ class MyFrame2(wx.Frame):
         self.light = Light(s)
         self.bs = BS(s)
         self.cryo = Cryo(s)
+<<<<<<< HEAD
         self.scheFile = ScheduleBSS.ScheduleBSS()
+=======
+        self.scheFile = ScheduleBSS()
+>>>>>>> zoo45xu/main
         self.att = Att(s)
         self.mono = Mono(s)
         self.attfac = AttFactor.AttFactor()
 
         # LOG FILE
+<<<<<<< HEAD
         logname = "/user/target/ZOO32XU/KUMAGUI/Logs/kuma_%s.log" % datetime.datetime.now().strftime('%Y%m%d%H%M')
+=======
+        logname = "/isilon/%s/BLsoft/PPPP/10.Zoo/KUMAGUI/Log/kuma_%s.log" % \
+                  (beamline.upper(), datetime.datetime.now().strftime('%Y%m%d%H%M'))
+>>>>>>> zoo45xu/main
         self.logfile = open(logname, "w")
 
         # SHIKA
@@ -1347,15 +1417,22 @@ class MyFrame2(wx.Frame):
         self.transUpdate()
 
     def leftButton(self, event):  # wxGlade: MyFrame2.<event_handler>
+<<<<<<< HEAD
         dist = y_left_sign * float(self.distBox.GetValue())
         print "dist=",dist
+=======
+        dist = y_left_sign*float(self.distBox.GetValue())
+>>>>>>> zoo45xu/main
         self.gonio.moveTrans(dist)
         self.transUpdate()
 
     def rightButton(self, event):  # wxGlade: MyFrame2.<event_handler>
         dist = -y_left_sign*float(self.distBox.GetValue())
         self.gonio.moveTrans(dist)
+<<<<<<< HEAD
         print "dist=",dist
+=======
+>>>>>>> zoo45xu/main
         self.transUpdate()
 
     def downButton(self, event):  # wxGlade: MyFrame2.<event_handler>
@@ -1689,9 +1766,14 @@ class MyFrame2(wx.Frame):
             self.vec2YBox.Enable(False)
             self.vec2ZBox.Enable(False)
 
+<<<<<<< HEAD
     # mode: tab for each scheme
     def getFlux(self, wavelength, mode = "helical_and_single"):
         if mode == "helical_and_single":
+=======
+    def getFlux(self, wavelength, mode = "helical"):
+        if mode == "helical":
+>>>>>>> zoo45xu/main
             # New beam parameters
             bs_index_for_bss = self.beamsizePullDown.GetCurrentSelection() + 1
         elif mode == "multi":
@@ -1716,6 +1798,7 @@ class MyFrame2(wx.Frame):
         aimed_dose = float(self.dsDoseBox.GetValue())  # [MGy]
         exptime = float(self.exptimeBox.GetValue())
 
+<<<<<<< HEAD
         # Beamsize index
         bs_index = self.beamsizePullDown.GetCurrentSelection()
         flux = self.getFlux(wavelength, mode="helical_and_single")
@@ -1758,6 +1841,17 @@ class MyFrame2(wx.Frame):
         start_phi = float(self.oscStartBox.GetValue())
         end_phi = float(self.oscEndBox.GetValue())
         print "HEIHEI", start_phi, end_phi
+=======
+        # Beamsize index get
+        bs_index = self.beamsizePullDown.GetCurrentSelection()
+        flux = self.getFlux(wavelength, mode="helical")
+        flux_str = "%5.3e" % flux
+        self.FluxBox.SetValue(flux_str)
+
+        # Rotation speed
+        start_phi = float(self.oscStartBox.GetValue())
+        end_phi = float(self.oscEndBox.GetValue())
+>>>>>>> zoo45xu/main
         osc_step = float(self.oscStepBox.GetValue())
         phi_total = end_phi - start_phi
         nframes = int(phi_total / osc_step)
@@ -1765,6 +1859,7 @@ class MyFrame2(wx.Frame):
         rotspstr = "%8.2f" % rot_speed
         self.rotSpeedBox.SetValue(rotspstr)
 
+<<<<<<< HEAD
         # Dose [MGy] box was generated
         aimed_dose = float(self.dsDoseBox.GetValue())  # [MGy]
 
@@ -1836,11 +1931,19 @@ class MyFrame2(wx.Frame):
 
         # photons/frame simulation
         phs_per_frame = flux * mod_trans * mod_exp
+=======
+        # Exposure condition -> Flux should be defined after 'attenuator thickness' or 'transmission'
+        #trans = float(self.dispARDbox.GetValue().replace("%", "")) / 100.0
+        #print trans
+        """
+        phs_per_frame = flux * trans_percent / 100.0 * exptime
+>>>>>>> zoo45xu/main
         flstr = "%5.2e" % phs_per_frame
         self.photonsPerFrameBox.SetValue(flstr)
         flux_per_angle = phs_per_frame / osc_step
         fpa_str = "%5.2e" % flux_per_angle
         self.phsPerRotBox.SetValue(fpa_str)
+<<<<<<< HEAD
         self.numFrameBox.SetValue("%d" % nframes)
 
         # Optimism count rate
@@ -1851,6 +1954,43 @@ class MyFrame2(wx.Frame):
             self.countRateBox.SetBackgroundColour(wx.Colour(150, 0, 0))
         else:
             self.countRateBox.SetBackgroundColour(wx.Colour(186, 186, 186))
+=======
+        self.numFrameBox.SetValue("%04d" % nframes)
+
+        total_exp = exptime * nframes
+        te_str = "%5.1f" % total_exp
+        self.totalExpBox.SetValue(te_str)
+
+        # Optimism count rate
+        # EIGER 233.2 x 245.2 mm2
+        optimism_count_rate = flux * transmission / 423.6 / 434.6
+        ocr_str = "%5.1e" % optimism_count_rate
+        self.countRateBox.SetValue(ocr_str)
+        if optimism_count_rate > 5E8:
+            self.countRateBox.SetBackgroundColour(wx.Colour(150, 0, 0))
+        else:
+            self.countRateBox.SetBackgroundColour(wx.Colour(186, 186, 186))
+        """
+        return nframes, phi_total
+
+    def pushCheck(self, event):  # wxGlade: MyFrame2.<event_handler>
+        # common simulation
+        self.commonSimulation()
+
+        # Helical data collection flag is True
+        state = self.checkbox_1.GetValue()
+        if state:
+            print "Helical"
+            phi_total, nframes = self.checkAdvanced()
+        else:
+            print "single"
+            phi_total, nframes = self.checkSingle()
+        # Beamsize is set to "advancedLength box"
+
+    # beamh_um,beamv_um=self.bsconf.getBeamsizeAtIndex(bs_index)
+    # self.advancedLength.SetValue("-")
+    # self.transSpeedBox.SetValue("-")
+>>>>>>> zoo45xu/main
 
     def selectAttList(self, event):  # wxGlade: MyFrame2.<event_handler>
         print "obsoleted"
@@ -1913,6 +2053,7 @@ class MyFrame2(wx.Frame):
 
         return datadir, dataname, offset, exptime, wavelength, startphi, endphi, stepphi, cl, trans, bs_index
 
+<<<<<<< HEAD
     # this is for generating a schedule file for designated helical data collection.
     def pushOutput(self, event):  # wxGlade: MyFrame2.<event_handler>
         # This function controls common part to estimate required informatin.
@@ -1985,10 +2126,82 @@ class MyFrame2(wx.Frame):
             bsssch.setScanCondition(startphi, endphi, stepphi)
             bsssch.unsetAdvanced()
         try:
+=======
+    def pushOutput(self, event):  # wxGlade: MyFrame2.<event_handler>
+        try:
+            # Constructor
+            bsssch = ScheduleBSS()
+
+            # Schedule file parameters
+            datadir, dataname, offset, exptime, wavelength, startphi, endphi, \
+            stepphi, cl, trans, bs_index = self.getScheduleParams()
+
+            # Setting Schedule
+            # directory
+            bsssch.setDir(datadir)
+            # dataname
+            bsssch.setDataName(dataname)
+            # Serial offset
+            bsssch.setOffset(offset)
+            # Exp time
+            bsssch.setExpTime(exptime)
+            # wavelength
+            bsssch.setWL(wavelength)
+            # distance
+            bsssch.setCameraLength(cl)
+            # attenuator
+            best_thick = self.attfac.getBestAtt(wavelength, trans)
+            att_index = self.attfac.getAttIndexConfig(best_thick)
+            print best_thick
+            bsssch.setAttIdx(att_index)
+            # Beamsize index
+            bsssch.setBeamsizeIndex(bs_index + 1)
+
+            # is it Helical mode?
+            state = self.checkbox_1.GetValue()
+            print state
+            if state:
+                #
+                # Advanced mode
+                # Check advanced condition
+                phi_total, nframes = self.checkAdvanced()
+
+                # crystal length [um->mm]
+                crylen = float(self.advancedLength.GetValue()) / 1000.0
+                astep_mm = crylen / float(nframes)
+                # frames/point
+                ainterval = 1
+                bsssch.setAdvanced(int(nframes), astep_mm, ainterval)
+                # startvec
+                sx = float(self.vec1XBox.GetValue())
+                sy = float(self.vec1YBox.GetValue())
+                sz = float(self.vec1ZBox.GetValue())
+                startxyz = [sx, sy, sz]
+                # end vec
+                ex = float(self.vec2XBox.GetValue())
+                ey = float(self.vec2YBox.GetValue())
+                ez = float(self.vec2ZBox.GetValue())
+                endxyz = [ex, ey, ez]
+                bsssch.setAdvancedVector(startxyz, endxyz)
+                # Schedule file parameters
+                datadir, dataname, offset, exptime, wavelength, startphi, endphi, stepphi, cl, trans, bs_idx = self.getScheduleParams()
+                # Scan condition
+                bsssch.setScanCondition(startphi, endphi, stepphi)
+            else:
+                # Crystal length is set to horizontal beam size
+                bs_index_for_bss = bs_index + 1
+
+                beamh_um, beamv_um = self.bsconf.getBeamsizeAtIndex(bs_index_for_bss)
+                crylen = beamh_um
+                # Scan condition
+                bsssch.setScanCondition(startphi, endphi, stepphi)
+
+>>>>>>> zoo45xu/main
             home_dir = os.environ['HOME']
             ofile = "%s/yaruzo.sch" % home_dir
             bsssch.make(ofile)
         except:
+<<<<<<< HEAD
             wx.MessageDialog(None, traceback.format_exc(), "Error", style=wx.OK).ShowModal()
 
         # LOG FILE
@@ -1997,6 +2210,18 @@ class MyFrame2(wx.Frame):
         self.logfile.write("%s: crylen=%8.5f startphi=%5.1f endphi=%5.1f stepphi=%5.1f\n" % \
                            (nowt, crylen, startphi, endphi, stepphi))
         #self.logfile.write("%s: beamh=%5.1f um beamv=%5.1f um\n" % (nowt, beamh_um, beamv_um))
+=======
+            wx.MessageDialog(None, traceback.format_exc(),
+                             "Error", style=wx.OK).ShowModal()
+
+        # LOG FILE
+        nowt = datetime.datetime.now()
+        beamh_um, beamv_um = self.bsconf.getBeamsizeAtIndex(bs_index)
+        self.logfile.write("%s: Helical Directory= %s\n" % (nowt, datadir))
+        self.logfile.write("%s: crylen=%8.5f startphi=%5.1f endphi=%5.1f stepphi=%5.1f\n" % \
+                           (nowt, crylen, startphi, endphi, stepphi))
+        self.logfile.write("%s: beamh=%5.1f um beamv=%5.1f um\n" % (nowt, beamh_um, beamv_um))
+>>>>>>> zoo45xu/main
         trans = float(self.attSimuBox.GetValue())
         self.logfile.write("%s: exptime=%5.2f trans=%8.3f\n" % (nowt, exptime, trans))
         self.logfile.flush()
@@ -2043,7 +2268,12 @@ class MyFrame2(wx.Frame):
         print "Flux=", full_flux
 
         # KUMA dose estimation
+<<<<<<< HEAD
         kuma = KUMA.KUMA(self.logfile)
+=======
+#        kuma = KUMA.KUMA(self.logfile)
+        kuma = KUMA.KUMA()
+>>>>>>> zoo45xu/main
         aimed_dose = float(self.dsDoseBox.GetValue())  # [MGy]
         cond = dict(dose_ds=aimed_dose, wavelength=wavelength, exp_ds=exptime, total_osc=phi_total, osc_width=osc_step,
                     ds_vbeam=beamv_um, ds_hbeam=beamh_um, reduced_fact=1.0, ntimes=1)
@@ -2311,7 +2541,11 @@ class MyFrame2(wx.Frame):
         # push check2D
         self.pushCheck2D(event)
         # Constructor
+<<<<<<< HEAD
         bsssch = ScheduleBSS.ScheduleBSS()
+=======
+        bsssch = ScheduleBSS()
+>>>>>>> zoo45xu/main
         # Schedule file parameters
         datadir, dataname, offset, exptime, wavelength, startphi, endphi, stepphi, cl, attidx, bs_idx = self.getScheduleParams()
         ########
@@ -2609,6 +2843,7 @@ class MyFrame2(wx.Frame):
         # Conditions
         dist, midphi, oscwid, oscrange, exp_lifetime, wl, exp_time_each, bs_index = conditions
 
+<<<<<<< HEAD
         # For BL45XU -> Attenuator thickness
         if beamline == "BL45XU":
             # Set exposure time 160512 K.Hirata
@@ -2619,6 +2854,15 @@ class MyFrame2(wx.Frame):
             mlc.setExpTime(exp_time_each)
             trans_percent = best_trans * 100.0
             mlc.makeGUI(outdir, wl, gonio_list, dist, startphi, endphi, oscwid, trans_percent, beamsize_index=bs_index)
+=======
+        # Set exposure time 160512 K.Hirata
+        best_thick = self.attfac.getBestAtt(wl, best_trans)
+
+        mlc.setExpTime(exp_time_each)
+        mlc.makeGUI(outdir, wl, gonio_list, dist, startphi, endphi, oscwid, best_thick, bs_index + 1)
+
+        # def makeGUI(self, outdir, wavelength, info_list, distance, startphi, endphi, osc_width, att_thick):
+>>>>>>> zoo45xu/main
 
         # LOGFILE
         nowt = datetime.datetime.now()
@@ -2646,12 +2890,21 @@ class MyFrame2(wx.Frame):
         rad = Raddose()
         # Beamsize index get
         # Beam size
+<<<<<<< HEAD
         bs_index_gui = self.beamsizePullDown2.GetCurrentSelection()
         print "Beam size index on KUMA(pulldown2)=", bs_index_gui
         print "Beam size index for BSS(pulldown2)=", bs_index_gui + 1
         bs_index = bs_index_gui + 1
         flux = self.getFlux(wl, mode="multi")
         beamh_um, beamv_um = self.bsconf.getBeamsizeAtIndex(bs_index)
+=======
+        bs_index = self.beamsizePullDown2.GetCurrentSelection()
+        print "Beam size index on KUMA(pulldown2)=", bs_index
+        print "Beam size index for BSS(pulldown2)=", bs_index + 1
+        bs_index_for_bss = bs_index + 1
+        flux = self.getFlux(wl, mode="multi")
+        beamh_um, beamv_um = self.bsconf.getBeamsizeAtIndex(bs_index_for_bss)
+>>>>>>> zoo45xu/main
         print beamh_um, beamv_um
         # Flux values in different energies vary
         # In future, flux at each energy should be referred.
@@ -2727,6 +2980,7 @@ class MyFrame2(wx.Frame):
 
         # Transmission
         obj_trans = exp_per_frame_ideal / exp_time_each
+<<<<<<< HEAD
 
         # Al thickness
         if beamline == "BL45XU":
@@ -2743,6 +2997,20 @@ class MyFrame2(wx.Frame):
             att_fac_final = obj_trans
 
         # Around flux
+=======
+        print "OBJ TRANS=", obj_trans
+
+        best_thick = self.attfac.getBestAtt(wl, obj_trans)
+        print "Suggested Al thickness = %8.1f[um]" % best_thick
+        att_idx = attfac.getAttIndexConfig(best_thick)
+        attstr = "%5d" % int(best_thick)
+        self.att_thick_multi.SetValue(attstr)
+
+        # Around flux
+        att_fac_final = self.attfac.calcAttFac(wl, best_thick)
+        print "FINAL ATT=", att_fac_final
+        bs_index = self.beamsizePullDown2.GetCurrentSelection()
+>>>>>>> zoo45xu/main
         flux = self.getFlux(wl, mode="multi")
         print "FLUX=%e" % flux
         flux_per_deg = flux * total_exp_time / oscrange * att_fac_final
@@ -2759,6 +3027,10 @@ class MyFrame2(wx.Frame):
         # LOGFILE
         nowt = datetime.datetime.now()
         self.logfile.write("%s: Flux %5.2e\n" % (nowt, flux))
+<<<<<<< HEAD
+=======
+        self.logfile.write("%s: suggested Al thickness %8.1f\n" % (nowt, best_thick))
+>>>>>>> zoo45xu/main
         self.logfile.flush()
 
         return startphi, endphi, obj_trans

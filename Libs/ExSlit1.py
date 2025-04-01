@@ -10,7 +10,6 @@ from AnalyzePeak import *
 from File import *
 from AxesInfo import *
 
-
 class ExSlit1:
 
     def __init__(self, server):

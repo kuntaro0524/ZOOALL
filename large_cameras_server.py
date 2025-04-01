@@ -13,19 +13,31 @@ cap0="/home/bladmin/bin/video0_cap"
 #side
 cap1="/home/bladmin/bin/video1_cap -g 60"
 
+<<<<<<< HEAD
 print("waiting..")
+=======
+print "waiting.."
+>>>>>>> zoo45xu/main
 
 while True: 
 	clientsock,client_address=serversock.accept()
 	rcvmsg=clientsock.recv(1024)
+<<<<<<< HEAD
 	print("Received -> %s"%rcvmsg)
+=======
+	print "Received -> %s"%rcvmsg
+>>>>>>> zoo45xu/main
 	if rcvmsg=="":
 		break
 	# Command interpreter
 	cols=rcvmsg.split(",")
 	# command for capture
 	# "back" or "side"
+<<<<<<< HEAD
 	print(cols)
+=======
+	print cols
+>>>>>>> zoo45xu/main
 	view=cols[0]
 	filename=cols[1]
 	binning=int(cols[2])

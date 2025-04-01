@@ -80,6 +80,51 @@ class WebSocketBSS:
         response = requests.post(self.api_url, headers=self.headers, json=command)
         return response.json()
 
+    def cryoStage(self, switch):
+        if switch == "on":
+            command = {
+                "command":"bss_function",
+                "function":"CryoStream.on",
+                "param":"0"
+            }
+        elif switch == "off":
+            command = {
+                "command":"bss_function",
+                "function":"CryoStream.off",
+                "param":"0"
+            }
+        response = requests.post(self.api_url, headers=self.headers, json=command)
+        return response.json()
+
+    def removeAtt(self, trans=1.0):
+        trans_str = f"{trans:.5f}"
+        print(trans_str)
+        command = {
+            "command":"bss_function",
+            #"function":"Attenuator.set",
+            "function":"Attenuator.set",
+            "param": "0"
+        }
+        print(command)
+        response = requests.post(self.api_url, headers=self.headers, json=command)
+        return response.json()
+
+    def shutter(self, switch):
+        if switch == "open":
+            command = {
+                "command":"bss_function",
+                "function":"STShutter.open",
+                "param":""
+            }
+        elif switch == "close":
+            command = {
+                "command":"bss_function",
+                "function":"STShutter.close",
+                "param":""
+            }
+        response = requests.post(self.api_url, headers=self.headers, json=command)
+        return response.json()
+
 if __name__ == "__main__":
     ws = WebSocketBSS()
     print(ws.beamstopper("on"))

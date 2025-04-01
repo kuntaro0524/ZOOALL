@@ -13,47 +13,13 @@ from Motor import *
 import BSSconfig
 from MyException import *
 from configparser import ConfigParser, ExtendedInterpolation
+import BaseAxis
+import WebSocketBSS 
 
-class Colli:
+class Colli(BaseAxis.BaseAxis): 
     def __init__(self, server):
-        self.bssconf = BSSconfig.BSSconfig()
-        self.bl_object = self.bssconf.getBLobject()
-
-        # beamline.ini 
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
-        # beamline name
-        self.beamline = self.config.get("beamline", "beamline")
-
-        self.s = server
-        # names of collimator axes
-        self.coly_axis = ""
-        self.colz_axis = ""
-        # coly > section: axes, option: col_y_name
-        try:
-            self.coly_axis = self.config.get("axes", "col_y_name")
-        except:
-            # display 'warning' if the option is not found
-            print("WARNING: col_y_name is not found in beamline.ini")
-
-        try:
-            # colz > section: axes, option: col_z_name
-            self.colz_axis = self.config.get("axes", "col_z_name")
-        except:
-            # display 'warning' if the option is not found
-            print("WARNING: col_z_name is not found in beamline.ini")
-
-        # if 'coly' exists in the configuration file.
-        if self.coly_axis != "":
-            self.coly = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.coly_axis), "pulse")
-            # pulse information of each axis
-            self.v2p_y, self.sense_y, self.home_y = self.bssconf.getPulseInfo(self.coly_axis)
-        if self.colz_axis != "":
-            self.colz = Motor(self.s, "bl_%s_%s" %(self.bl_object, self.colz_axis), "pulse")
-            print("Searching %s" % self.colz_axis)
-            # print("bl_%s_%s" %(self.bl_object, self.colz_axis))
-            # pulse information of each axis
-            self.v2p_z, self.sense_z, self.home_z = self.bssconf.getPulseInfo(self.colz_axis)
+        # Collimator axis
+        super().__init__(server, "collimator", axis_type="pulse", isEvacuate=True)
 
         # BL41XU web socket system
         self.websock = WebSocketBSS.WebSocketBSS()

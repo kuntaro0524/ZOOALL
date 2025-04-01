@@ -1,4 +1,5 @@
 Log/
+<<<<<<< HEAD
 Logs/
 00.VideoSrvImageDelete/
 02.Iwata/
@@ -70,3 +71,10 @@ wget*
 *csv
 *.log
 *.swp
+=======
+Test/
+Log/
+Test/
+ZooLogs/
+BackImages/
+>>>>>>> zoo45xu/main

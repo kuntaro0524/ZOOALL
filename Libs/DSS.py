@@ -6,11 +6,13 @@ import time
 # My library
 from Received import *
 from Motor import *
+import BaseAxis
 
-
-class DSS:
+class DSS(BaseAxis.BaseAxis):
     def __init__(self, server):
-        self.s = server
+        # axis name for DSS
+        axis_config = "dss"
+        BaseAxis.__init__(self, server, axis_config, axis_type="plc")
 
     def anaRes(self, recbuf):
         cols = recbuf.split("/")
@@ -34,7 +36,7 @@ class DSS:
         return repr(recstr)
 
     def getStatus(self):
-        com = "get/bl_32in_plc_dss_1/status"
+        com = "get/{self.full_axis_name}/status"
         # counter clear
         recbuf = self.communicate(com)
         # print recbuf
@@ -43,7 +45,7 @@ class DSS:
         return status
 
     def open(self):
-        com = "put/bl_32in_plc_dss_1/open"
+        com = "put/{self.full_axis_name}/open"
         # counter clear
         recbuf = self.communicate(com)
         # 30 sec trials
@@ -56,7 +58,7 @@ class DSS:
         return False
 
     def close(self):
-        com = "put/bl_32in_plc_dss_1/close"
+        com = "put/{self.full_axis_name}/close"
         # counter clear
         self.s.sendall(com)
         recbuf = self.s.recv(8000)
