@@ -13,8 +13,6 @@ zenity --info --title="BSS" --text="BSS_startup.sh has been running" --width 150
 #  python3 /usr/local/bss/BSS_is_executing.py &
 # fi
 
-## K. Sakurai added at 2025.02.20
-ln -sf /blconfig/bss/beamsize_zoo.config /blconfig/bss/beamsize.config
 
 ## EIGER begin
 
@@ -26,8 +24,7 @@ for i in {1..10}
 do
  sleep 1
  cheetah_ok=0
- ssh $eiger_cheetah_node1 "/oys/xtal/cctbx/snapshots/dials-v1-14-13/build/bin2/yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
-# ssh $eiger_cheetah_node1 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
+ ssh $eiger_cheetah_node1 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
 # ssh $eiger_cheetah_node2 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
  notify-send "BSS startup" "Cheetah not up. retrying (${i})."
  notify-send "BSS startup" "`/usr/local/bss/startcheetah.sh`"
@@ -59,14 +56,17 @@ if [ "$cheetah_ok" == "1" ]
 
 
 ## EIGER end
+
+
+
 ############ For log copy daemon ############
 killall cp_config.com
 /staff/Common/SW/cp_config.com bl44xu 10 &
 
-# echo "\n\n" | /usr/local/bss/bss --console --server --admin --quick --notune
-#echo "\n\n" | /usr/local/bss/bss --console --server  --quick
-echo "\n\n" | /usr/local/bss/bss --console --server --admin --quick
-
+#/usr/local/bin/bss_jan23_2018a
+#/usr/local/bin/bss
+#/usr/local/bss/bss
+/usr/local/bss/bss --websocket --console --notune
 
 ####### for log copy daemeon ###########
 killall cp_config.com

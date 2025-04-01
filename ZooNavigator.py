@@ -30,6 +30,7 @@ from ErrorCode import ErrorCode
 import logging
 import logging.config
 
+import os
 from configparser import ConfigParser, ExtendedInterpolation
 
 def check_abort(lm):
@@ -96,14 +97,14 @@ class ZooNavigator():
 
         # Goniometer positions 
         # The values will be updated by the current pin position
-        self.sx = -1.5089
-        self.sy = 0.5714
-        self.sz = -0.3183
+        self.sx = 1.0
+        self.sy = -7.74
+        self.sz = -1.00
 
         # Goniometer mount position( will be read from BSS configure file)
-        self.mx = -1.5089
-        self.my = 0.5714
-        self.mz = -0.3183
+        self.mx = 1.0
+        self.my = -7.74
+        self.mz = -1.00
 
         # DB name
         self.phosec_meas = 0
@@ -214,11 +215,11 @@ class ZooNavigator():
         if self.doesBSSchangeBeamsize == True:
             current_beam_index = self.zoo.getBeamsize()
             beamsizeconf = BeamsizeConfig.BeamsizeConfig()
-            beamsize_index = beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
-            if current_beam_index != beamsize_index:
+            self.beamsize_index = beamsizeconf.getBeamIndexHV(cond['ds_hbeam'], cond['ds_vbeam'])
+            if current_beam_index != self.beamsize_index:
                 self.logger.info("Beam size will be changed from now.")
-                self.logger.info("Beamsize index = %5d" % beamsize_index)
-                self.zoo.setBeamsize(beamsize_index)
+                self.logger.info("Beamsize index = %5d" % self.beamsize_index)
+                self.zoo.setBeamsize(self.beamsize_index)
 
         # Measure the flux
         self.logger.info("Measuring photon flux....")
@@ -613,11 +614,11 @@ class ZooNavigator():
             beamsizeconf = BeamsizeConfig.BeamsizeConfig()
             self.logger.debug(
                 "Raster beam size = %5.2f(H) x %5.2f(V) [um]" % (cond['raster_hbeam'], cond['raster_vbeam']))
-            beamsize_index = beamsizeconf.getBeamIndexHV(cond['raster_hbeam'], cond['raster_vbeam'])
+            self.beamsize_index = beamsizeconf.getBeamIndexHV(cond['raster_hbeam'], cond['raster_vbeam'])
             self.logger.info("Current beamsize index= %5d" % current_beam_index)
-            if current_beam_index != beamsize_index:
-                self.logger.info("Beamsize index = %5d" % beamsize_index)
-                self.zoo.setBeamsize(beamsize_index)
+            if current_beam_index != self.beamsize_index:
+                self.logger.info("Beamsize index = %5d" % self.beamsize_index)
+                self.zoo.setBeamsize(self.beamsize_index)
                 if self.beamline.upper() == "BL45XU":
                     self.logger.info("Tuning a beam position starts....")
                     self.zoo.runScriptOnBSS("BLTune")
@@ -803,11 +804,6 @@ class ZooNavigator():
         time.sleep(self.time_for_elongation)
 
         # Preparation for centering
-        # BL44XU : get beamsize index here
-        if self.beamline.upper() == "BL44XU":
-            current_beam_index = self.zoo.getBeamsize()
-            self.logger.info("Current beamsize index= %5d" % current_beam_index)
-
         self.dev.prepCentering()
 
         # Move Gonio XYZ to the previous pin
@@ -954,7 +950,7 @@ class ZooNavigator():
         # BL44XU: recover beamsize
         # DO NOT GET THE INFORMATION FROM BSS 
         if self.beamline.upper() == "BL44XU":
-            self.zoo.setBeamsize(current_beam_index)
+            self.zoo.setBeamsize(self.beamsize_index)
 
         self.logger.info("ZooNavigator starts MODE=%s" % (cond['mode']))
         if cond['mode'] == "multi":

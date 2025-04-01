@@ -75,6 +75,10 @@ if __name__ == "__main__":
     blf = BLFactory.BLFactory()
     blf.initDevice()
 
+    # BL44XU specific
+    if beamline == "BL44XU":
+        blf.zoo.setBeamsize(1)
+
     total_pins = 0
     for input_file in sys.argv[1:]:
         logger.info("Start processing %s" % input_file)
