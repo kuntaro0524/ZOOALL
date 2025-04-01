@@ -207,20 +207,15 @@ class Device(Singleton.Singleton):
             self.covz.on()
             self.clen.evac()
             time.sleep(2.0)
-        ## Cover check
-        if self.beamline=="BL32XU":
             self.covz.isCover()
-
-        self.websock.light("off")
-        self.websock.shutter("open")
-
-        # intensity monitor on
-        if self.beamline == "BL32XU":
             self.slit1.openV()
         elif self.beamline=="BL41XU" or self.beamline=="BL45XU":
             self.websock.intensityMonitor("on")
         elif self.beamline=="BL44XU":
             print("What do we do?")
+
+        self.websock.light("off")
+        self.websock.shutter("open")
 
         ## Attenuator
         self.websock.removeAtt()
@@ -353,6 +348,7 @@ if __name__=="__main__":
     #dev.bs.off()
     #dev.measureFlux()
     #dev.prepScan()
-    #dev.finishScan()
+    dev.finishScan()
     #dev.prepScan()
-    dev.prepCentering()
+    #dev.prepCentering()
+    #dev.finishCentering()
