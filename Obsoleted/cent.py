@@ -15,25 +15,13 @@ if __name__ == "__main__":
 
 	skip=True
 
-	# Directory
-	root_dir="/isilon/users/target/target/iwata/150723_BL32XU/Auto/"
-	if os.path.exists(root_dir):
-		continue
-	else:
-		os.makedirs(root_dir)
-	# Experimental conditions
-	uname="toyoda"
+	root_dir="/isilon/users/target/target/Staff/ZooTest/"
 	beamsize=10.0
-	osc_width=0.5
-	total_osc=10.0
-	exp_henderson=0.7
-	exp_time=0.15
-	distance=350.0
 
-	for trayid in [2]:
-		for pinid in [4]:
-			prefix="%s-%02d-%02d"%(uname,trayid,pinid)
-			print("Doing %s"%prefix)
+	for trayid in [1]:
+		for pinid in [8,9,10,11,12,13,14,15,16]:
+			prefix="suno%02d-%02d"%(trayid,pinid)
+			print "Doing %s"%prefix
 
 			lm=LoopMeasurement.LoopMeasurement(ms,root_dir,prefix)
 
@@ -42,12 +30,8 @@ if __name__ == "__main__":
 
 			# mount
 			zoo.getSampleInformation()
-
-			try:
-				zoo.mountSample(trayid,pinid)
-			except MyException as ttt:
-				print("Sample mount failed!!")
-				break
+			zoo.mountSample(trayid,pinid)
+			zoo.waitTillReady()
 
 			# centering
 			lm.centering()
@@ -60,11 +44,16 @@ if __name__ == "__main__":
 
 			try:
 				glist,phi_mid=lm.shikaTalk()
-			except MyException as tttt:
-				print("Skipping this loop!!")
+			except MyException, tttt:
+				print "Skipping this loop!!"
 				continue
 
-			# Precise centering
+			osc_width=1.0
+			total_osc=10.0
+			exp_henderson=0.5
+			exp_time=0.15
+			distance=250.0
+
 			time.sleep(5.0)
 
 			multi_sch=lm.genMultiSchedule(phi_mid,glist,osc_width,total_osc,exp_henderson,exp_time,distance)

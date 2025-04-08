@@ -81,7 +81,7 @@ class CoaxImage:
 
         # zoom & coax_x pulse are read from 'beamline.ini'
         # section: inocc, option: zoom_pintx
-        if self.beamline.lower=="bl32xu":
+        if self.beamline.lower()=="bl32xu":
             self.coax_pintx_pulse = self.config.getint("inocc", "zoom_pintx")
             # Coaxial pint axis is derived from 'device' instance
             self.coax_pint = self.dev.coax_pint

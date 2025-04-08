@@ -5,8 +5,6 @@ import datetime
 from MyException import *
 import INOCC
 import RasterSchedule
-import Libs.Light
-import Libs.Colli
 import MultiCrystal
 import AttFactor
 import Beamsize
@@ -30,6 +28,9 @@ class LoopMeasurement:
         self.prefix = prefix
         self.inocc = INOCC.INOCC(blf, root_dir, sample_name=prefix)
         self.inocc.init()
+
+        # beamline name
+        self.beamline = self.blf.beamline
 
         self.h_beam = 10.0  # [um]
         self.v_beam = 10.0  # [um]

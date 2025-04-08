@@ -1,18 +1,9 @@
 import sys,os
-<<<<<<< HEAD
-import TCSsimple
-import socket
-
-class Beamsize:
-    def __init__(self,ms,config_dir):
-        self.ms=ms
-=======
 #import TCSsimple
 import socket
 
 class Beamsize:
     def __init__(self,config_dir):
->>>>>>> zoo45xu/main
         self.config_dir=config_dir
         self.beamsize=[]
         self.tcs_width=[]
@@ -22,11 +13,7 @@ class Beamsize:
         self.max_hsize=10.0
         self.max_vsize=10.0
 
-<<<<<<< HEAD
-        self.tcs=TCSsimple.TCSsimple(ms)
-=======
         #self.tcs=TCSsimple.TCSsimple(ms)
->>>>>>> zoo45xu/main
 
     # 2015/09/20 reading beam size config
     # Currently, only matching 'beam size' and 'beam size index on BSS'
@@ -38,11 +25,6 @@ class Beamsize:
         tmpstr=[]
         beam_params=[]
         for line in lines:
-<<<<<<< HEAD
-=======
-            if line[0] == "#":
-                continue
->>>>>>> zoo45xu/main
             if line.rfind("_beam_size_begin:")!=-1:
                 rflag=True
             if line.rfind("_beam_size_end:")!=-1:
@@ -59,11 +41,7 @@ class Beamsize:
                     cols=defstr.split()
                     h_beam=float(cols[2])*1000.0
                     v_beam=float(cols[3])*1000.0
-<<<<<<< HEAD
                     #print beam_index,h_beam,v_beam
-=======
-                    print beam_index,h_beam,v_beam
->>>>>>> zoo45xu/main
                     blist=beam_index,h_beam,v_beam
                     self.beamsize.append(blist)
                     # Searching max beam
@@ -99,19 +77,13 @@ class Beamsize:
     def getTCSapertureWithBeamHV(self,hsize,vsize):
         if self.isInit==False:
             self.readConfig()
-<<<<<<< HEAD
         print("OKAY")
         print(self.beamsize)
-=======
-        print "OKAY"
-        print self.beamsize
->>>>>>> zoo45xu/main
         for beam in self.beamsize:
             b_idx,h_beam,v_beam=beam
             if hsize==h_beam and vsize==v_beam:
                 return self.tcs_width[b_idx],self.tcs_height[b_idx]
 
-<<<<<<< HEAD
     def changeBeamsizeHV(self,hsize,vsize):
         hsize=float(hsize)
         vsize=float(vsize)
@@ -121,8 +93,6 @@ class Beamsize:
         self.tcs.setApert(tcs_vsize,tcs_hsize)
         print("OKOKOKOKOK")
 
-=======
->>>>>>> zoo45xu/main
     def getNumBeamsizeList(self):
         if self.isInit==False:
             self.readConfig()
@@ -139,7 +109,6 @@ class Beamsize:
 
 if __name__=="__main__":
     #host = '192.168.163.1'
-<<<<<<< HEAD
     host = '172.24.242.41'
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -153,21 +122,6 @@ if __name__=="__main__":
     #print bsc.getBeamIndexHV(3.0,3.0)
     #print bsc.getTCSapertureWithBeamHV(10.0,18.0)
     print(bsc.getTCSapertureWithBeamHV(3.0,3.0))
-=======
-    #host = '172.24.242.41'
-    #port = 10101
-    #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #s.connect((host,port))
-    #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #s.connect((host,port))
-    config_dir="/isilon/blconfig/bl45xu/"
-    bsc=Beamsize(config_dir)
-    bsc.readConfig()
-    print bsc.getBeamIndexHV(20,20)
-    #print bsc.getBeamIndexHV(3.0,3.0)
-    #print bsc.getTCSapertureWithBeamHV(10.0,18.0)
-    #print bsc.getTCSapertureWithBeamHV(3.0,3.0)
->>>>>>> zoo45xu/main
     #print bsc.changeBeamsizeHV(3.0,3.0)
     #print bsc.changeBeamsizeHV(10.0,18.0)
     #bsc.getMaxBeam()
