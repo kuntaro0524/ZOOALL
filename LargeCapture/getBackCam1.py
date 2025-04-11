@@ -16,11 +16,7 @@ if __name__ == "__main__":
 
 	# preparation
 	dev.prepCenteringLargeHolderCam1()
-<<<<<<< HEAD
 	print(dev.bs.getZ())
-=======
-	print dev.bs.getZ()
->>>>>>> zoo45xu/main
         inocc.getImage("bs_off_cam2_image.png")
 	
 	#for phi in range(0,360,10):

@@ -10,15 +10,9 @@ logging.getLogger().addHandler(logging.FileHandler("koba_make_schedule.log"))
 #logging.getLogger().addHandler(logging.StreamHandler())
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     gonio_xyz = [-1.6280, 0.1977, -0.8195]
     start_omega = -40
     end_omega = 40
-=======
-    gonio_xyz = [-1.9281, -0.3554, -0.8295]
-    start_omega = 0.0
-    end_omega = 60.0
->>>>>>> origin/main
     delta_omega = 1.0
 
     omega_centre = (start_omega + end_omega) / 2.0

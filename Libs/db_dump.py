@@ -31,27 +31,17 @@ if __name__ == "__main__":
 
         if good_flag == True:
             puckid,pinid = dbinfo.getPinInfo()
-<<<<<<< HEAD
-=======
-
->>>>>>> zoo45xu/main
             ds_time = dbinfo.getDStime()
             meas_time = dbinfo.getMeasTime()
             mount_time = dbinfo.getMountTime()
             raster_time = dbinfo.getRasterTime()
             center_time = dbinfo.getCenterTime()
-<<<<<<< HEAD
             wavelength = dbinfo.getWavelength()
             height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster = dbinfo.getRasterConditions()
             nds = dbinfo.getNDS()
             sample_name = dbinfo.sample_name
             csvfile.write("%10s,%02d,%s,%s" % (puckid,pinid,mode,sample_name))
             csvfile.write("%8.5f," % wavelength)
-=======
-            height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster = dbinfo.getRasterConditions()
-            nds = dbinfo.getNDS()
-            csvfile.write("%10s,%02d,%s," % (puckid,pinid,mode))
->>>>>>> zoo45xu/main
             csvfile.write("%5.1f, %5.1f, %5d, %5d, %5.1f, %5.1f, %5.2f,%5.3f," % (height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster))
             csvfile.write("%5.2f, %5.2f, %5.2f, %5d,%6.2f,%20s,\n" % (mount_time, center_time, raster_time, nds, meas_time,log_comment))
 
@@ -66,12 +56,8 @@ if __name__ == "__main__":
 
             n_ng += 1
             puckid, pinid = dbinfo.getPinInfo()
-<<<<<<< HEAD
             sample_name = dbinfo.sample_name
             csvfile.write("%10s,%02d,%s,%s" % (puckid,pinid,mode,sample_name))
-=======
-            csvfile.write("%10s,%02d,%s," % (puckid, pinid, mode))
->>>>>>> zoo45xu/main
             csvfile.write("%5.1f, %5.1f, %5d, %5d, %5.1f, %5.1f, %5.2f,%5.3f," % (height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster))
             csvfile.write("%5.2f, %5.2f, %5.2f, %5d,%6.2f,%20s,\n" % (mount_time, center_time, raster_time, nds, meas_time,log_comment))
 
@@ -82,15 +68,7 @@ if __name__ == "__main__":
             ds_time = 0.0
             #print "MEAS  =%6.2f min" % meas_time,
             #print "RASTER", height, width, nv_raster, nh_raster, raster_vbeam, raster_hbeam, att_raster, exp_raster
-<<<<<<< HEAD
             t_sukima_raster = (raster_time * 60.0 - nv_raster * exp_raster * nh_raster) / (nv_raster - 1)
             #print "SUKIMA = ", t_sukima_raster
 
     print("NDS processed = ", n_good)
-=======
-
-            t_sukima_raster = (raster_time * 60.0 - nv_raster * exp_raster * nh_raster) / (nv_raster - 1)
-            #print "SUKIMA = ", t_sukima_raster
-
-    print "NDS processed = ", n_good
->>>>>>> zoo45xu/main

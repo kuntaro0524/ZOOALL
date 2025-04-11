@@ -3,10 +3,6 @@ import datetime
 from MyException import *
 from PIL import Image
 from PIL import ImageDraw,ImageFont
-<<<<<<< HEAD
-=======
-from myfont import fontPath
->>>>>>> zoo45xu/main
 
 class BeamCenter:
 	def __init__(self,filename):
@@ -23,13 +19,8 @@ class BeamCenter:
 			for y in range(0,im.size[1]):
 				if pix[x,y]<200:
 					pix[x,y]=0
-<<<<<<< HEAD
 				print(x,y,pix[x,y])
 			print("")
-=======
-				print x,y,pix[x,y]
-			print ""
->>>>>>> zoo45xu/main
 
 	def countSaturated(self):
 		im=Image.open(self.filename)
@@ -78,11 +69,7 @@ class BeamCenter:
 		thresh=ave*3.0
 
 		if thresh > 240:
-<<<<<<< HEAD
 			print("THRESH > 240")
-=======
-			print "THRESH > 240"
->>>>>>> zoo45xu/main
 			thresh=ave
 
 		ithresh=0
@@ -114,11 +101,7 @@ class BeamCenter:
 		npix=im.size[0]*im.size[1]
 		perc=float(satcnt)/float(npix)*100.0
 
-<<<<<<< HEAD
 		print("SAT %5d SATURATED_AREA_PERCENT=%8.3f"%(satcnt,perc))
-=======
-		#print "SAT %5d %8.3f"%(satcnt,perc)
->>>>>>> zoo45xu/main
 		return satcnt,perc,isum_all
 		
 	def find2(self):
@@ -166,10 +149,7 @@ class BeamCenter:
 
 		# Date
 		dstr="%s"%datetime.datetime.now()
-<<<<<<< HEAD
 		fontPath="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono-Bold.ttf"
-=======
->>>>>>> zoo45xu/main
 		font=ImageFont.truetype(fontPath,14)
 
 		str2="Pixel    (Y,Z)=(%8.2f,%8.2f)[pix]"%(cenx,ceny)
@@ -238,10 +218,7 @@ class BeamCenter:
 
 		# Date
 		dstr="%s"%datetime.datetime.now()
-<<<<<<< HEAD
 		fontPath="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono-Bold.ttf"
-=======
->>>>>>> zoo45xu/main
 		font=ImageFont.truetype(fontPath,14)
 
 		str2="Pixel    (Y,Z)=(%8.2f,%8.2f)[pix]"%(cenx,ceny)
@@ -317,11 +294,7 @@ class BeamCenter:
 		# Test protocol 2
 		tx2,ty2=self.gravAbove(im,200,two_flag=True)
 
-<<<<<<< HEAD
 		print("Compare O:%5d%5d, T1:%5d%5d, T2:%5d%5d"%(ox,oy,tx1,ty1,tx2,ty2))
-=======
-		print "Compare O:%5d%5d, T1:%5d%5d, T2:%5d%5d"%(ox,oy,tx1,ty1,tx2,ty2)
->>>>>>> zoo45xu/main
 		cenx=tx1
 		ceny=ty1
 
@@ -333,11 +306,8 @@ class BeamCenter:
 
 		# Date
 		dstr="%s"%datetime.datetime.now()
-<<<<<<< HEAD
 		#fontPath="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono-Bold.ttf"
 		fontPath="/usr/share/fonts/dejavu/DejaVuSansMono.ttf"
-=======
->>>>>>> zoo45xu/main
 		font=ImageFont.truetype(fontPath,14)
 
 		str2="Pixel    (Y,Z)=(%8.2f,%8.2f)[pix]"%(cenx,ceny)
@@ -364,8 +334,4 @@ if __name__=="__main__":
 	#print p.getSummed()
 	#print p.find2()
 	#print p.damp()
-<<<<<<< HEAD
 	print(p.findRobust())
-=======
-	print p.check()
->>>>>>> zoo45xu/main

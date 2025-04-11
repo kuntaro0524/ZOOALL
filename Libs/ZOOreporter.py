@@ -165,19 +165,13 @@ class ZOOreporter:
 
 
             hel_cry_size = dbinfo.hel_cry_size
-<<<<<<< HEAD
             #raster_png = "%s-%02d/scan%02d/2d/_spotfinder/plot_2d_n_spots.png" % (puckid, pinid, data_index)
-=======
->>>>>>> zoo45xu/main
             if self.beamline == "BL45XU":
                 raster_png = "%s-%02d/scan%02d/2d/_spotfinder/plot_2d_n_spots.png" % (puckid, pinid, data_index)
             elif self.beamline == "BL32XU":
                 raster_png = "%s-%02d/scan%02d/2d/_spotfinder/2d_selected_map.png" % (puckid, pinid, data_index)
-<<<<<<< HEAD
                 if os.path.exists(raster_png) == False:
                     raster_png = "%s-%02d/scan%02d/2d/_spotfinder/plot_2d_n_spots.png" % (puckid, pinid, data_index)
-=======
->>>>>>> zoo45xu/main
 
             # Crystal capture
             cap_image = "%s-%02d/raster.jpg" % (puckid, pinid)
@@ -233,11 +227,8 @@ class ZOOreporter:
                 raster_png = "%s-%02d/scan%02d/2d/_spotfinder/plot_2d_n_spots.png" % (puckid, pinid, data_index)
             elif self.beamline == "BL32XU":
                 raster_png = "%s-%02d/scan%02d/2d/_spotfinder/2d_selected_map.png" % (puckid, pinid, data_index)
-<<<<<<< HEAD
                 if os.path.exists(raster_png) == False:
                     raster_png = "%s-%02d/scan%02d/2d/_spotfinder/plot_2d_n_spots.png" % (puckid, pinid, data_index)
-=======
->>>>>>> zoo45xu/main
 
             dichtml = dict(puckid=puckid, pinid=pinid, mount_time=mount_time, center_time=center_time,
                            raster_time=raster_time, total_time=meas_time,

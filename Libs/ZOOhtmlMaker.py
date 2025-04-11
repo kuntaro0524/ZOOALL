@@ -24,11 +24,7 @@ class ZOOhtmlLogMaker:
         else:
             self.htmlout = os.path.join(root_dir, "report_%s.html" % name)
 
-<<<<<<< HEAD
         print(self.htmlout)
-=======
-        print self.htmlout
->>>>>>> zoo45xu/main
 
         self.dbname = dbname
 
@@ -175,11 +171,7 @@ root dir: %(root_dir)s<br>
         saved_puckid = conds[0]['puckid']
         saved_pinid = conds[0]['pinid']
 
-<<<<<<< HEAD
         n_pins = [0]*8
-=======
-        n_pins = [0]*24
->>>>>>> zoo45xu/main
 
         for cond in conds:
             puck_id = cond['puckid']
@@ -187,11 +179,7 @@ root dir: %(root_dir)s<br>
             if len(puck_id_list) != 0:
                 for saved_puck in puck_id_list:
                     if saved_puck == puck_id:
-<<<<<<< HEAD
                         print("already saved")
-=======
-                        print "already saved"
->>>>>>> zoo45xu/main
                         saved_flag = True
                         break
                     else:
@@ -201,60 +189,33 @@ root dir: %(root_dir)s<br>
             else:
                 puck_id_list.append(puck_id)
 
-<<<<<<< HEAD
         print(puck_id_list)
         # counting each
         for cond in conds:
-=======
-        print puck_id_list
-        # counting each
-        for cond in conds:
-            print "CONDITION=", cond
->>>>>>> zoo45xu/main
             puck_id = cond['puckid']
             pin_id = cond['pinid']
             isDone = cond['isDone']
             if isDone == 0 or isDone > 1000:
-<<<<<<< HEAD
                 continue
             idx = 0
             print("CHECK ", puck_id, pin_id)
-=======
-                print "isDone is 0 or over 1000."
-                continue
-            idx = 0
-            print "CHECK ", puck_id, pin_id
->>>>>>> zoo45xu/main
             for index in range(0, len(puck_id_list)):
                 if puck_id == puck_id_list[index]:
                     n_pins[index] += 1
 
-<<<<<<< HEAD
         print(puck_id_list, pin_id_list)
         print(n_pins)
 
         logstr = ""
         for npin, puck_id in zip(n_pins, puck_id_list):
             print("%10s(%d)" % (puck_id, npin))
-=======
-        print puck_id_list, pin_id_list
-        print n_pins
-
-        logstr = ""
-        for npin, puck_id in zip(n_pins, puck_id_list):
-            print "%10s(%d)" % (puck_id, npin)
->>>>>>> zoo45xu/main
             logstr += "%10s(%d) " % (puck_id, npin)
 
         return logstr
 
     def add_condition(self, conds, uname):
         n_meas, wavelength, exp_ds, dist_ds, dose_ds, ds_vbeam, ds_hbeam, dist_raster, att_raster, exp_raster, score_min, score_max, cry_max_size_um = self.get_sample_info(conds)
-<<<<<<< HEAD
         print("EEEEEEEEEEEEEEEEEEEEEEEE")
-=======
-        print "EEEEEEEEEEEEEEEEEEEEEEEE"
->>>>>>> zoo45xu/main
         puck_pins = self.get_sample_list(conds)
 
         #samples = map(lambda x: "%s (%d pins)" % (x[0], len(x[1])), condition.pucks_and_pins)
@@ -402,13 +363,8 @@ def read_max_score(datf, kind="n_spots"):
     for l in open(datf):
         if " %s " % kind in l: scores.append(float(l.split()[4]))
 
-<<<<<<< HEAD
     print(scores)
     print("MMMMMM", max(scores))
-=======
-    print scores
-    print "MMMMMM", max(scores)
->>>>>>> zoo45xu/main
     if len(scores) > 0:
         return max(scores)
     else:
@@ -438,11 +394,7 @@ def make_offline(module_name, root_dir, name):
         zhl.add_condition(cond)
         for trayid, pin_list in cond.pucks_and_pins:
             for pinid in pin_list:
-<<<<<<< HEAD
                 print("doing", trayid, pinid)
-=======
-                print "doing", trayid, pinid
->>>>>>> zoo45xu/main
                 scan_dir = os.path.join(root_dir, "%s-%s-%.2d" % (cond.uname, trayid, pinid), "scan")
                 shika_workdir = os.path.join(scan_dir, "_spotfinder")
                 raster_log = os.path.join(scan_dir, "diffscan.log")

@@ -20,24 +20,15 @@ def getBestGrid(selefile):
 	idx=imgfile.rfind("_")
 	return int(imgfile[idx+1:].replace(".img",""))
 
-<<<<<<< HEAD
 print(dires)
-=======
-print dires
->>>>>>> zoo45xu/main
 pnglist=""
 for di in dires:
 	filepath="%s/%s"%(root_path,di)
 	#print filepath
 	selelist=glob.glob("%s/_spotfinder/*selected*.dat"%filepath)
 	masterlist=glob.glob("%s/*master*"%filepath)
-<<<<<<< HEAD
 	print("PNG file searching...")
 	print("%s/_spotfinder/ "%filepath)
-=======
-	print "PNG file searching..."
-	print "%s/_spotfinder/ "%filepath
->>>>>>> zoo45xu/main
 	pngfile=glob.glob("%s/_spotfinder/*map*png"%filepath)
 	pnglist+="%s "%pngfile[0]
 

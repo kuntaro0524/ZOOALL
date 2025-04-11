@@ -6,11 +6,7 @@ port=920920
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-<<<<<<< HEAD
 print("OKAY")
-=======
-print "OKAY"
->>>>>>> zoo45xu/main
 
 starttime=datetime.datetime.now()
 client=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -31,10 +27,5 @@ os.system(mv_command)
 
 endtime=datetime.datetime.now()
 
-<<<<<<< HEAD
 print(starttime)
 print(endtime)
-=======
-print starttime
-print endtime
->>>>>>> zoo45xu/main
