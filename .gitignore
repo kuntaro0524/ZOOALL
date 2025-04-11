@@ -5,3 +5,4 @@ Test/
 ZooLogs/
 BackImages/
 wget-log*
+*pyc
