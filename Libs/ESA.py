@@ -545,9 +545,19 @@ class ESA:
         return return_list
 
     def analyzePinList(self, pin_char):
-        pinid_list = []
-        # cols = pin_char.split(".+")
-        cols = re.split('[.+;]', pin_char)
+        print(f"received pin_char={pin_char}")
+        pinid_list=[]
+        # if 'pin_cha' contains 'dividing characters' 
+        # ';', '+', '.' 
+        if pin_char.find(";") == -1 and pin_char.find("+") == -1 and pin_char.find(".") == -1:
+            cols = re.split('[;]', pin_char)
+        # Case when a pin ID is single
+        else :
+            print(f"############## pin_char={pin_char}")
+            tmp_float=float(pin_char)
+            pinid_int = int(tmp_float)
+            return [pinid_int]
+
         for col in cols:
             if col.rfind("-") != -1:
                 #print "COL = ", col
@@ -568,8 +578,10 @@ class ESA:
             b = csv.reader(f)
             header = next(b)
             for t in b:
-                #print "PINID part=", t[4]
+                print(f"entire string={t}")
+                print("PINID part=", t[4])
                 pinid_list = self.analyzePinList(t[4])
+                print(pinid_list)
 
                 for pinid in pinid_list:
                     t[1] = process_index
@@ -640,14 +652,15 @@ class ESA:
 
 if __name__ == "__main__":
     esa = ESA(sys.argv[1])
-    # esa.readCSV(sys.argv[2])
+    condlist= esa.readCSV(sys.argv[2])
+    print(condlist)
     # esa.makeTable(sys.argv[2],force_to_make=True)
     # esa.prepReadDB()
     # esa.getTableName()
     # esa.listDB()
     # esa.fetchAll()
-    df = esa.getEcha()
-    esa.getPriorPinCond2()
+    #df = esa.getEcha()
+    #esa.getPriorPinCond2()
     # print("BEFORE")
     # ppp = esa.getDict()
     # print(("LNE=", len(ppp)))

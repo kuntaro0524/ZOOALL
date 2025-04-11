@@ -433,7 +433,55 @@ class UserESA():
         # 現時点でのデータ数をself.loggerに出力する
         self.logger.info("Number of data after polishment: %d"%len(self.df))
         self.isPrep = True
-        
+
+    def expandPinRange(self, pinstr):
+        # pinid_str = "1-4" のような文字列を受け取る
+        # 1-4 の場合は、1,2,3,4 のリストを返す
+        # 1+2+3 の場合は、1,2,3 のリストを返す
+        # 1;2;3 の場合は、1,2,3 のリストを返す
+        # それ以外はそのままの文字列を返す
+        if '-' in pinstr:
+            start, end = map(int, pinstr.split('-'))
+            return list(range(start, end + 1))
+        elif '+' in pinstr:
+            return list(map(int, pinstr.split('+')))
+        elif ';' in pinstr:
+            return list(map(int, pinstr.split(';')))
+        else:
+            return [pinstr]
+
+    def expandCompressedPinInfo(self):
+        # The new dataframe of expanded pins
+        new_df_list = []
+        for i, row in self.df.iterrows():
+            pinid_str = row['pinid']
+            # 1. divide charactr by '.' or '+' or ';'
+            if '.' in pinid_str:
+                pinid_list = pinid_str.split('.')
+            elif '+' in pinid_str:
+                pinid_list = pinid_str.split('+')
+            elif ';' in pinid_str:
+                pinid_list = pinid_str.split(';')
+            else:
+                pinid_list = [pinid_str]
+
+            print(f"divided strings= {pinid_list}")
+            for pinid_block in pinid_list:
+                # 2. expand pinid range
+                expanded_pinid = self.expandPinRange(pinid_block)
+                # 3. Simply: add the each pinid to the new dataframe
+                for pinid in expanded_pinid:
+                    new_row = row.copy()
+                    new_row['pinid'] = int(pinid)
+                    new_df_list.append(new_row)
+
+        # 4. Create a new dataframe from the list of expanded rows
+        new_df = pd.DataFrame(new_df_list)
+        # 5. Reset the index of the new dataframe
+        new_df.reset_index(drop=True, inplace=True)
+        # 6. Return the new dataframe
+        return new_df
+
     def calcDist(self, wavelength, resolution_limit, isROI=False):
         # beamline.ini　の experiment セクション　から min_camera_lim を読んで min_camera_len に代入する
         min_camera_len = self.config.getfloat("detector", "min_camera_len")
@@ -591,8 +639,11 @@ if __name__ == "__main__":
     root_dir = os.getcwd()
     u2db = UserESA(sys.argv[1], root_dir, beamline="BL32XU")
 
-    u2db.makeCondList()
+    u2db.read_new()
+    newdf = u2db.expandCompressedPinInfo()
+    # CSV ファイルに書き出す
+    newdf.to_csv("check.csv", index=False)
     # u2db.df['ppf_raster']を 指数表記で出力
-    pd.options.display.float_format = '{:.2e}'.format
+    #pd.options.display.float_format = '{:.2e}'.format
     #print(u2db.df['dist_raster'])
     #print(u2db.df['dist_ds'])
