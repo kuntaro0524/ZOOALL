@@ -450,30 +450,56 @@ class UserESA():
         else:
             return [pinstr]
 
+    def dividePinInfo0(self, pin_char):
+        if '+' in pin_char:
+            pinid_list = pin_char.split('+')
+            print(f"divided strings= {pinid_list}")
+            return pinid_list
+        elif ';' in pin_char:
+            pinid_list = pin_char.split(';')
+            print(f"divided strings= {pinid_list}")
+            return pinid_list
+        elif '.' in pin_char:
+            pinid_list = pin_char.split('.')
+            print(f"divided strings= {pinid_list}")
+            return pinid_list
+        else:
+            # if pin_char is not in the above conditions, return the original string
+            print(f"divided strings= {pin_char}")
+            return [pin_char]
+
+    def dividePinInfo(self, pin_char):
+        import re
+        # ステップ1: 区切り文字で分割
+        parts = re.split(r'[;+.]', pin_char)
+        
+        # ステップ2: 各部分を range に変換
+        ranges = []
+        for part in parts:
+            if '-' in part:
+                start, end = map(int, part.split('-'))
+                ranges.append(range(start, end + 1))
+            else:
+                num = int(part)
+                ranges.append(range(num, num + 1))
+        
+        # ステップ3: 必要ならすべての値をフラットなリストに
+        flattened = [i for r in ranges for i in r]
+        print(f"flattened={flattened}")  # [1, 2, 3, 4, 5, 10, 11, 12, 15, 16]
+        return flattened
+
     def expandCompressedPinInfo(self):
         # The new dataframe of expanded pins
         new_df_list = []
+        isFound=False
         for i, row in self.df.iterrows():
-            pinid_str = row['pinid']
-            # 1. divide charactr by '.' or '+' or ';'
-            if '.' in pinid_str:
-                pinid_list = pinid_str.split('.')
-            elif '+' in pinid_str:
-                pinid_list = pinid_str.split('+')
-            elif ';' in pinid_str:
-                pinid_list = pinid_str.split(';')
-            else:
-                pinid_list = [pinid_str]
-
-            print(f"divided strings= {pinid_list}")
-            for pinid_block in pinid_list:
-                # 2. expand pinid range
-                expanded_pinid = self.expandPinRange(pinid_block)
-                # 3. Simply: add the each pinid to the new dataframe
-                for pinid in expanded_pinid:
-                    new_row = row.copy()
-                    new_row['pinid'] = int(pinid)
-                    new_df_list.append(new_row)
+            pinid_str = str(row['pinid'])
+            print(f"##### pinid_str= {pinid_str}")
+            flattened_ids = self.dividePinInfo(pinid_str)
+            for pinid in flattened_ids:
+                new_row = row.copy()
+                new_row['pinid'] = int(pinid)
+                new_df_list.append(new_row)
 
         # 4. Create a new dataframe from the list of expanded rows
         new_df = pd.DataFrame(new_df_list)
