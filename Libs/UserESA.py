@@ -450,24 +450,6 @@ class UserESA():
         else:
             return [pinstr]
 
-    def dividePinInfo0(self, pin_char):
-        if '+' in pin_char:
-            pinid_list = pin_char.split('+')
-            print(f"divided strings= {pinid_list}")
-            return pinid_list
-        elif ';' in pin_char:
-            pinid_list = pin_char.split(';')
-            print(f"divided strings= {pinid_list}")
-            return pinid_list
-        elif '.' in pin_char:
-            pinid_list = pin_char.split('.')
-            print(f"divided strings= {pinid_list}")
-            return pinid_list
-        else:
-            # if pin_char is not in the above conditions, return the original string
-            print(f"divided strings= {pin_char}")
-            return [pin_char]
-
     def dividePinInfo(self, pin_char):
         import re
         # ステップ1: 区切り文字で分割
@@ -505,8 +487,8 @@ class UserESA():
         new_df = pd.DataFrame(new_df_list)
         # 5. Reset the index of the new dataframe
         new_df.reset_index(drop=True, inplace=True)
-        # 6. Return the new dataframe
-        return new_df
+        # 6. new_df -> self.df
+        self.df = new_df
 
     def calcDist(self, wavelength, resolution_limit, isROI=False):
         # beamline.ini　の experiment セクション　から min_camera_lim を読んで min_camera_len に代入する
@@ -581,6 +563,8 @@ class UserESA():
     def makeCondList(self):
         # DataFrameとしてExcelファイルを読み込む　 →　self.df
         self.read_new()
+        # self.dfの中にある 'puckid' の情報を展開する
+        self.expandCompressedPinInfo()
         # 液体窒素ぶっ掛けの情報を管理してCSV用の情報へ変換
         self.checkLN2flag()
         # カメラのZoomに関する情報を管理してCSV用の情報へ変換
@@ -664,11 +648,11 @@ class UserESA():
 if __name__ == "__main__":
     root_dir = os.getcwd()
     u2db = UserESA(sys.argv[1], root_dir, beamline="BL32XU")
-
-    u2db.read_new()
-    newdf = u2db.expandCompressedPinInfo()
+    u2db.makeCondList()
+    #u2db.read_new()
+    #newdf = u2db.expandCompressedPinInfo()
     # CSV ファイルに書き出す
-    newdf.to_csv("check.csv", index=False)
+    #newdf.to_csv("check.csv", index=False)
     # u2db.df['ppf_raster']を 指数表記で出力
     #pd.options.display.float_format = '{:.2e}'.format
     #print(u2db.df['dist_raster'])
