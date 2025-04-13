@@ -80,6 +80,9 @@ class ZooNavigator():
         # section:beamline, option: beamline
         self.beamline = self.config.get("beamline", "beamline")
 
+        # background mean value threshold
+        self.back_mean_thresh = self.config.getint("capture", "back_mean_thresh")
+
         # Attenuator index
         self.att = AttFactor.AttFactor()
 
@@ -292,7 +295,7 @@ class ZooNavigator():
                 mean_thresh = 200
 
             self.logger.debug("HERHERERERER")
-            if self.isDark == False and mean_value < 100:
+            if self.isDark == False and mean_value < self.back_mean_thresh:
                 self.logger.info("Mean value of the image is %5d" % mean_value)
                 self.logger.info("Background image seems to be bad with lower mean value than 100!")
                 continue
