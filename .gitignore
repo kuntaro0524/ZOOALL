@@ -8,3 +8,4 @@ wget-log*
 *pyc
 *ppm
 *png
+*.log
