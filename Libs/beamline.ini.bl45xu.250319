@@ -33,9 +33,9 @@ backimg = ${dirs:zooroot}/BackImages/back.ppm
 #gain_default=3000
 #bright_default=3000
 #gain_default=2500
-bright_default=2800
-gain_default=2000
-contrast_default=18000
+bright_default=3800
+gain_default=3800
+contrast_default=9000
 # Dark mode
 #bright_default_dark=7700
 #gain_default_dark=5400
@@ -54,7 +54,7 @@ width=612.0
 height=480.0
 image_size=881295
 # 240523 calibration 
-pix_size = 2.5957
+pix_size = 6.087 
 
 [inocc]
 # 上下左右このピクセル分は削ってから解析をする
@@ -94,7 +94,7 @@ raster_roi_edge_mm=40.0
 # Rasterのときの端分解能
 resol_raster=4.0
 # "" are not required to define 'character variable'
-gonio_direction =FROM_RIGHT
+gonio_direction =FROM_LEFT
 # pin channel
 pin_channel = 3
 # pulse for non-attenuated beam

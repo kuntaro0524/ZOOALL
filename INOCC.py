@@ -680,7 +680,7 @@ if __name__ == "__main__":
 
     # back image path read from 'beamline.ini'
     #backimg = config.get('files', 'backimg')
-    backimg = "/user/admin45/JunkZOO/Libs/back.ppm"
+    backimg = "/user/admin45/JunkZOO2/Libs/back.ppm"
     inocc.setBack(backimg)
     # inocc.setBack("/staff/bl41xu/BLsoft/ZOOALL/BackImages/back-2406271411.ppm")
     # For each sample raster.png
@@ -688,7 +688,7 @@ if __name__ == "__main__":
     inocc.setRasterPicture(raster_picpath)
 
     # def doAll(self, ntimes=3, skip=False, loop_size=600.0, offset_angle=0.0):
-    rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=400.0)
+    rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=800.0)
 
     print(("Loop width/height=", rwidth, rheight))
 
