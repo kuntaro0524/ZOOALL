@@ -1,9 +1,9 @@
 [beamline]
-beamline = BL32XU
+beamline = BL45XU
 [server]
-bss_server = 192.168.163.2
+bss_server = 192.168.231.2
 bss_port = 5555
-blanc_address = 172.24.242.41
+blanc_address = 172.24.242.59
 
 [ECHA]
 isECHA=False
@@ -12,18 +12,18 @@ isECHA=False
 isWebSocket = False
 
 [dirs]
-zooroot = /staff/bl32xu/BLsoft/ZOO32XU/
+zooroot = /user/admin45/JunkZOO2/
 logdir = ${dirs:zooroot}/Logs/
 zoologdir= ${dirs:zooroot}/ZooLogs/
-bssconfig_dir=/staff/config/bl32xu/
+bssconfig_dir=/staff/config/bl45xu/
 backimage_dir = ${dirs:zooroot}/BackImages/
 
 [files]
 bssconfig_file=${dirs:bssconfig_dir}/bss/bss.config
 camera_inf=${dirs:bssconfig_dir}/video/camera.inf
 beamsize_conf_file=${dirs:bssconfig_dir}/bss/beamsize.config
-inocc_image=/staff/config/bl32xu/bss/test.ppm
-logging_conf=/staff/bl32xu/BLsoft/NewZoo/Libs/logging.conf
+inocc_image=/staff/config/bl45xu/bss/test.ppm
+logging_conf=${dirs:zooroot}/Libs/logging.conf
 dose_csv=${dirs:zooroot}/Libs/en_dose_lys.csv
 # Just a default background image file.
 backimg = ${dirs:zooroot}/BackImages/back.ppm
@@ -117,7 +117,7 @@ gonio_x_name = st2_gonio_1_x
 gonio_y_name = st2_gonio_1_y
 gonio_z_name = st2_gonio_1_z
 gonio_zz_name = st2_gonio_1_zz
-gonio_rot_name = st2_gonio_1_phi
+gonio_rot_name = st2_gonio_1_omega
 # zoom x axis
 zoom_x_axis = st2_coax_1_zoom
 # Coax X axis
