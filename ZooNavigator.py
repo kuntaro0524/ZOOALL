@@ -288,22 +288,16 @@ class ZooNavigator():
             timg = cv2.imread(self.backimg)
             mean_value = timg.mean()
             self.logger.debug("Checking the file size and background level.")
-            if self.beamline.upper() == "BL32XU" or self.beamline.upper()=="BL44XU" or self.beamline.upper()=="BL41XU":
-                # mean_thresh = 230
-                mean_thresh = 240  # 2021/01/21 HM temporary setting
-            elif self.beamline.upper() == "BL45XU":
-                mean_thresh = 200
 
-            self.logger.debug("HERHERERERER")
             if self.isDark == False and mean_value < self.back_mean_thresh:
                 self.logger.info("Mean value of the image is %5d" % mean_value)
                 self.logger.info("Background image seems to be bad with lower mean value than 100!")
                 continue
-            elif self.isDark == True and mean_value < 35:
+            elif self.isDark == True and self.back_mean_thresh < 35:
                 self.logger.info("Dark experiments: mean value of the image is %5d" % mean_value)
                 self.logger.info("Background image seems to be bad with lower mean value than 50 in Dark!")
                 continue
-            elif mean_value > mean_thresh:
+            elif mean_value > self.back_mean_thresh:
                 self.logger.info("Mean value of the image is %5d" % mean_value)
                 self.logger.info("Background image seems to be bad with higher mean value than 200!")
                 continue

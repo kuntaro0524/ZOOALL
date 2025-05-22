@@ -4,6 +4,7 @@ import numpy as np
 import copy
 #from Libs import MyException
 from MyException import *
+from MyException import FatalCenteringError
 import logging
 import logging.config
 from Libs import File
@@ -37,9 +38,10 @@ class CryImageProc():
         # bin threshold for detecting the edge (section: inocc, option: bin_thresh)
         self.bin_thresh = self.config.getint("inocc", "bin_thresh")
         # filter threshold for detecting the edge (section: inocc, option: filter_thresh_min)
-        # filter threshold for detecting the edge (section: inocc, option: filter_thresh_max)
         self.filter_thresh_min = self.config.getint("inocc", "filter_thresh_min")
         self.filter_thresh_max = self.config.getint("inocc", "filter_thresh_max")
+        # threshold for 'mean' image to detect 'empty' one
+        self.back_mean_thresh = self.config.getfloat("capture", "back_mean_thresh")
 
         # ROI length [um]
         # 上下左右の方向からこの距離オフセットした中央のROIを設定するためのパラメータ
@@ -482,6 +484,11 @@ class CryImageProc():
     # 2021/01/21 Gamma correction and contour\
     def getContour(self):
         baseimg = cv2.imread(self.target_file)
+        # checking the mean value of the image
+        mean_image = np.mean(self.timg)
+        if mean_image < self.back_mean_thresh:
+            self.logger.error(f"Image is too dark. Mean = {mean_image:.2f} Thresh = {self.back_mean_thresh:.2f}")
+            raise FatalCenteringError("Image is too dark. Mean = %5.2f Thresh = %5.2f" % (mean_image, self.back_mean_thresh))
         # debugging file
         cv2.imwrite("%s/blur.png"%self.logdir, self.blur)
         # debugging file
