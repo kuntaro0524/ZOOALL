@@ -21,7 +21,7 @@ class Date:
         return timestr
 
     def getToday(self):
-        print datetime.datetime.now()
+        print(datetime.datetime.now())
         return self.today
 
     def getTodayDire(self):

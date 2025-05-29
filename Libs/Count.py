@@ -237,7 +237,7 @@ class Count:
         #flux=(3.6/energy)*(1/(1-exp(absorption)*2.33*0.03)*(currennt/1.602E-19)
 
 if __name__=="__main__":
-        host = '172.24.242.57'
+        host = '172.24.242.41'
         port = 10101
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((host,port))

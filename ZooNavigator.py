@@ -721,10 +721,9 @@ class ZooNavigator():
                 # isDoneにエラーコードを持たせている→meas_record
                 error_code = ErrorCode.SPACE_ACCIDENT
                 # update
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 # isDoneもZOODB用に入れておくことに
                 self.updateDBinfo(cond, "isDone", error_code)
-                self.updateDBinfO(cond, "log_mount", log_message)
+                self.updateDBinfo(cond, "log_mount", log_message)
                 return
 
             if exception_message.rfind('-1005000004') != -1:
@@ -734,25 +733,22 @@ class ZooNavigator():
                 log_message = message
                 error_code = ErrorCode.SPACE_WARNING_LHEAD_PUSHED
                 # update
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 # isDoneもZOODB用に入れておくことに
                 self.updateDBinfo(cond, "isDone", error_code)
-                self.updateDBinfO(cond, "log_mount", log_message)
+                self.updateDBinfo(cond, "log_mount", log_message)
                 return
 
             elif exception_message.rfind('-1005100001') != -1:
                 message = "'SPACE_WARNING_existense_pin_%s_%s'" % (trayid, pinid)
                 self.logger.warning(message)
                 error_code = ErrorCode.SPACE_WARNING_SUSPECTED
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 # isDoneもZOODB用に入れておくことに
-                self.updateDBinfo(cond, "isDone", error_code)
-                self.updateDBinfo(cond, "log_mount", message)
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 # Let BSS know about this should be skipped. (reset SPACE)
                 self.zoo.skipSample()
                 self.logger.info("SPACE output a warning message. Next sample")
                 self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
-                self.updateDBinfO(cond, "log_mount", message)
+                self.updateDBinfo(cond, "log_mount", message)
                 self.logger.info("Breaking the loop of %s-%02d" % (trayid, pinid))
                 return
             elif exception_message.rfind('-1005100002') != -1:
@@ -761,7 +757,6 @@ class ZooNavigator():
                 self.logger.warning(message)
                 self.zoo.skipSample()
                 error_code = ErrorCode.SPACE_WARNING_SUSPECTED
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "log_mount", message)
                 self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
@@ -772,7 +767,6 @@ class ZooNavigator():
                 message = "'SPACE_WARNING_rotate_too_much_%s_%s'" % (trayid, pinid)
                 self.logger.warning(message)
                 error_code = ErrorCode.SPACE_WARNING_ROTATE_TOO_MUCH
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
                 self.updateDBinfo(cond, "log_mount", message)
@@ -787,7 +781,6 @@ class ZooNavigator():
                 self.logger.warning(message)
                 error_code = ErrorCode.SPACE_WARNING_SUSPECTED
                 self.zoo.skipSample()
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "log_mount", message)
                 self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
@@ -798,7 +791,6 @@ class ZooNavigator():
                 message = "Unknown Exception: %s. Program terminates" % ttt
                 self.logger.error(message)
                 error_code = ErrorCode.SPACE_UNKNOWN_ACCIDENT
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "log_mount", message)
                 self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
@@ -902,7 +894,7 @@ class ZooNavigator():
             # isLoopCenter = 9999
             self.updateDBinfo(cond, "isLoopCenter", 9999)
             self.updateTime(cond, "cent_end", comment="Centering failed")
-            error_code = ErrorCode.CENTERING_FAILED
+            error_code = ErrorCode.CENTERING_FAILURE
             self.updateDBinfo(cond, "isDone", error_code.to_db_value())
             self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             # Disconnecting capture in this loop's 'capture' instance

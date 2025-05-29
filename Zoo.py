@@ -504,7 +504,8 @@ if __name__ == "__main__":
 
     zoo = Zoo()
     zoo.connect()
-    zoo.exposeLN2(15)
+    #zoo.exposeLN2(15)
+    zoo.stop()
     # zoo.setBeamsize(0)
     #print("BBBBBBBBBBBBBBBB")
     #print(zoo.getBeamsize())

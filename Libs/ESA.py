@@ -166,10 +166,13 @@ class ESA:
             cur = con.cursor()
             condition = "where o_index=%d" % o_index
             command = "update ESA set %s = %s %s" % (paramname, value, condition)
+            self.logger.info(f"command={command}")
             self.logger.debug("update-:%s" % command)
             cur.execute(command)
             con.commit()
         except:
+            # Exception error を表示
+            self.logger.error("Error in ESA.updateValueAt: %s" % sys.exc_info()[0])
             print("Something wrong in 'ESA.updateValueAt'")
             return False
         self.logger.debug("Update SUCCESS")
@@ -652,8 +655,9 @@ class ESA:
 
 if __name__ == "__main__":
     esa = ESA(sys.argv[1])
-    condlist= esa.readCSV(sys.argv[2])
-    print(condlist)
+    #condlist= esa.readCSV(sys.argv[2])
+    esa.updateValueAt(0, "isDone", 9999)
+    #print(condlist)
     # esa.makeTable(sys.argv[2],force_to_make=True)
     # esa.prepReadDB()
     # esa.getTableName()
