@@ -165,6 +165,7 @@ class Device(Singleton.Singleton):
         # PreColli: beam defining aperture related to 'beamsize.conf'
         if self.beamline.lower() == "bl44xu":
             self.precolli.setEvacuate()
+        
         self.websock.light("on")
 
     def prepCenteringBackCamera(self,zoom_out=True):
@@ -209,12 +210,15 @@ class Device(Singleton.Singleton):
             time.sleep(2.0)
             self.covz.isCover()
             self.slit1.openV()
+            self.websock.light("off")
         elif self.beamline=="BL41XU" or self.beamline=="BL45XU":
+            # BL45XU & BL41XU Light and Intensity monitor are on the same axis
+            print(f"{self.beamline} Light and Intensity monitor are on the same axis")
+            print(f"Intensity monitor is on")
             self.websock.intensityMonitor("on")
         elif self.beamline=="BL44XU":
             print("What do we do?")
 
-        self.websock.light("off")
         self.websock.shutter("open")
 
         ## Attenuator
@@ -336,19 +340,20 @@ if __name__=="__main__":
     config.read(config_path)
     host = config.get("server", "blanc_address")
     port = 10101
+    print(host,port)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
 
     dev=Device(s)
     dev.init()
 
-    #dev.prepCentering()
+    import time
+    dev.prepCentering()
+    #dev.prepScan()
     #dev.gonio.rotatePhi(225.0)
-    #dev.bs.on()
-    #dev.bs.off()
     #dev.measureFlux()
     #dev.prepScan()
-    dev.finishScan()
+    #dev.finishScan()
     #dev.prepScan()
     #dev.prepCentering()
     #dev.finishCentering()

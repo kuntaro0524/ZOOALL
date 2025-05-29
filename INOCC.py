@@ -332,8 +332,8 @@ class INOCC:
         self.logger.info("INOCC.coreCentering captures %s\n" % self.fname)
         self.gonio.rotatePhi(phi)
         cx, cy, cz, phi = self.gonio.getXYZPhi()
-        print("Capturing....")
         self.coi.get_coax_image(self.fname)
+            
         # This instance is for this centering process only
         cip = CryImageProc.CryImageProc(logdir=self.loop_dir)
         cip.setImages(self.fname, self.backimg)
@@ -341,7 +341,17 @@ class INOCC:
         cip.setROIpic(roi_image)
         self.roi_counter += 1
         # This generates exception if it could not find any centering information
-        xtarget, ytarget, area, hamidashi_flag = cip.getCenterInfo(loop_size=loop_size, option=option)
+        try:
+            xtarget, ytarget, area, hamidashi_flag = cip.getCenterInfo(loop_size=loop_size, option=option)
+        except FatalCenteringError as e:
+            self.logger.error(f"FatalCenteringError during simpleCenter at phi={phi:.2f}: {e}")
+            # 受け取った例外をそのまま再スローする
+            raise
+        except MyException as ttt:
+            # messageはそのまま継承して表示する
+            self.logger.info("Simple centering failed but not fatal")
+            raise MyException("Simple centering failed but not fatal")
+
         self.logger.info("PHI: %5.2f deg Option=%s Centering: (Xtarget, Ytarget) = (%5d, %5d) HAMIDASHI = %s\n"
                          % (phi, option, xtarget, ytarget, hamidashi_flag))
         x, y, z = self.coi.calc_gxyz_of_pix_at(xtarget, ytarget, cx, cy, cz, phi)
@@ -469,6 +479,11 @@ class INOCC:
                     n_good = 4
 
                     break
+                # Fatal error
+                except FatalCenteringError as ttt:
+                    self.logger.error(f"FatalCenteringError during coreCentering: {ttt}")
+                    # 受け取った例外をそのまま再スローする
+                    raise
                 # Case when the loop was not found in the trial section
                 except MyException as ttt:
                     # raise MyException("INOCC.coreCentering failed"
@@ -503,12 +518,17 @@ class INOCC:
         for i in range(0, ntimes):
             try:
                 n_good, phi_area_list = self.coreCentering(phi_list, loop_size=loop_size)
-                print("NGOOD=", n_good)
+                self.logger.info(f"good points = {n_good}")
                 # Added 160514     
                 # A little bit dangerous modification
                 # 190514 I cannot understand this code
                 if challenge == True and n_good == len(phi_list):
                     break
+            # Fatal error
+            except FatalCenteringError as ttt:
+                self.logger.error(f"FatalCenteringError during edgeCentering: {ttt}")
+                # 受け取った例外をそのまま再スローする
+                raise
             except MyException as tttt:
                 self.logger.info("INOCC.edgeCentering moves Y 2000um")
                 gx, gy, gz, phi = self.gonio.getXYZPhi()
@@ -603,32 +623,51 @@ class INOCC:
             try:
                 self.logger.debug("The first edge centering..")
                 n_good, phi_area_list = self.edgeCentering(phi_list, 2, challenge=True, loop_size=loop_size)
+            # fatal errorが起きたとき
+            except FatalCenteringError as ttt:
+                self.logger.debug(f"FatalCenteringError during edgeCentering: {ttt}")
+                # 受け取った例外をそのまま再スローする
+                raise
             except MyException as ttt:
                 self.logger.debug("The first edge centering failed..")
                 try:
                     self.logger.debug("The second edge centering..")
                     n_good, phi_area_list = self.edgeCentering(phi_list, 2, challenge=True, loop_size=loop_size)
+                # fatal errorが起きたとき
+                except FatalCenteringError as ttt:
+                    self.logger.debug(f"FatalCenteringError during edgeCentering: {ttt}")
+                    # 受け取った例外をそのまま再スローする
+                    raise
                 except MyException as tttt:
                     self.logger.debug("The second edge centering failed. Raise exception")
                     self.logger.debug("%s" % tttt)
                     raise MyException("Loop cannot be found after edgeCentering x 2 times. %s " % tttt)
 
-            phi_face = self.fitAndFace(phi_area_list)
-            self.logger.info(f"face_angle = {phi_face}deg")
+            try:
+                phi_face = self.fitAndFace(phi_area_list)
+                self.logger.info(f"face_angle = {phi_face}deg")
 
-            # adds offset angles for plate-like crystals
-            self.logger.info(">>>> offset angle setting <<<<<")
-            phi_face = phi_face + offset_angle
-            phi_small = phi_face + 90.0
-            self.logger.info(f">>>> Simple centering at {phi_small} <<<<<")
-            self.simpleCenter(phi_small, loop_size, option="gravity")
-            print("#################<FACE>ANGLE ####################3")
-            print("phi_face=", phi_face)  
-            area, hamidashi_flag = self.simpleCenter(phi_face, loop_size, option="gravity")
-            self.logger.info("Hamidashi_flag = %s" % hamidashi_flag)
-            # Re-centering if hamidashi_flag = True
-            if hamidashi_flag == True:
-                self.simpleCenter(phi_face, loop_size, option="gravity")
+                # adds offset angles for plate-like crystals
+                self.logger.info(">>>> offset angle setting <<<<<")
+                phi_face = phi_face + offset_angle
+                phi_small = phi_face + 90.0
+                self.logger.info(f">>>> Simple centering at {phi_small} <<<<<")
+                self.simpleCenter(phi_small, loop_size, option="gravity")
+                print("#################<FACE>ANGLE ####################3")
+                print("phi_face=", phi_face)  
+                area, hamidashi_flag = self.simpleCenter(phi_face, loop_size, option="gravity")
+                self.logger.info("Hamidashi_flag = %s" % hamidashi_flag)
+                # Re-centering if hamidashi_flag = True
+                if hamidashi_flag == True:
+                    self.simpleCenter(phi_face, loop_size, option="gravity")
+            # Fatal error
+            except FatalCenteringError as ttt:
+                self.logger.debug(f"FatalCenteringError during fitAndFace: {ttt}")
+                # 受け取った例外をそのまま再スローする
+                raise
+            except MyException as ttt:
+                self.logger.debug("fitAndFace failed")
+                raise MyException("fitAndFace failed")
 
         # Final centering
         cx, cy, cz, phi = self.gonio.getXYZPhi()
@@ -680,7 +719,8 @@ if __name__ == "__main__":
 
     # back image path read from 'beamline.ini'
     #backimg = config.get('files', 'backimg')
-    backimg = "/user/admin45/JunkZOO/Libs/back.ppm"
+    backimg = "/user/admin45/JunkZOO2/Libs/back.ppm"
+    backimg = "/user/admin41/JUNKZOO/Libs/back.ppm"
     inocc.setBack(backimg)
     # inocc.setBack("/staff/bl41xu/BLsoft/ZOOALL/BackImages/back-2406271411.ppm")
     # For each sample raster.png
@@ -688,7 +728,7 @@ if __name__ == "__main__":
     inocc.setRasterPicture(raster_picpath)
 
     # def doAll(self, ntimes=3, skip=False, loop_size=600.0, offset_angle=0.0):
-    rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=400.0)
+    rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=800.0)
 
     print(("Loop width/height=", rwidth, rheight))
 

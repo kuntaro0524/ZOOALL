@@ -4,6 +4,7 @@ import MyException
 import time
 import datetime
 import CrystalSpot
+import pandas as pd
 
 class AnaShika:
     def __init__(self,summary_dat_path,cxyz,phi):
@@ -72,6 +73,10 @@ class AnaShika:
                 else:
                     time.sleep(10.0)
         self.isRead=True
+
+    def readSummaryDF(self):
+        df = pd.read_csv(self.summary_file, sep=' ', header=None)
+        print(df)
 
     def extractKind(self,kind="n_spots"):
         if self.isRead==False:
@@ -523,7 +528,10 @@ class AnaShika:
         self.max_score=max_score
 
 if __name__=="__main__":
+    ashika = AnaShika(sys.argv[1],(0.0,0.0,0.0),0.0)
+    ashika.readSummaryDF()
 
+"""
 	cxyz=(0.7379,   -11.5623,    -0.0629)
 	phi=0.0
 	prefix="xi-KLaT006-12"
@@ -543,6 +551,7 @@ if __name__=="__main__":
 		#crystal.setDiffscanLog("~/AutoUsers/180521/test1/CPS0294-02/scan00/2d/")
 		#crystal.printAll()
         	#print crystal.getPeakCode()
+"""
 
 """
 	#def __init__(self,summary_dat_path,cxyz,phi):
