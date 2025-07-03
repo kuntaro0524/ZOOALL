@@ -10,7 +10,7 @@ from configparser import ConfigParser, ExtendedInterpolation
 class KUMA:
     def __init__(self):
         # Around 10 MGy
-        self.limit_dens = 1E10  # phs/um^2 this is for 1A wavelength
+        self.limit_dens = 0.00  # phs/um^2 this is for 1A wavelength
         # Kuntaro Log file
         self.logger = logging.getLogger('ZOO').getChild("KUMA")
         self.debug = False
@@ -21,13 +21,14 @@ class KUMA:
         # 左から順に、エネルギー、1フォトンあたりの線量、10MGyに到達するまでのリミット(photons/um2)
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        print(f"################ Config path: {config_path}")
+        self.logger.info(f"################ Config path: {config_path}")
         self.config.read(config_path)
         self.dose_limit_file = self.config.get("files", "dose_csv")
-        print(f"### dose limit file: {self.dose_limit_file}")
+        self.logger.info(f"### dose limit file: {self.dose_limit_file}")
 
     # 2023/05/10 coded by K.Hirata
-    def getDoseLimitParams(self, energy=12.3984):
+    # aimed_dose: float (aimed dose in MGy)
+    def getDoseLimitParams(self, aimed_dose, energy=12.3984):
         # CSVファイルを読んでdataframeにする
         df = pd.read_csv(self.dose_limit_file)
         # energy .vs. dose_mgy_per_photonのグラフについてスプライン補完を行い
@@ -38,8 +39,14 @@ class KUMA:
         dose_per_photon = en_dose_function(energy).flatten()[0]
         # density_limit: CSV 3rd column (10MGyに到達するまでの photon density)
         density_limit = interpolate.interp1d(df['energy'], df['density_limit_for10MGy'], kind='cubic')(energy).flatten()[0]
+        # aimed_dose_per_photon
+        aimed_dose_per_photon = aimed_dose / 10.0 * dose_per_photon
+        # aimed_density_limit
+        aimed_density_limit = aimed_dose / 10.0 * density_limit
+        # set self.limit_dens
+        self.limit_dens = aimed_density_limit
 
-        return dose_per_photon, density_limit
+        return aimed_dose_per_photon, aimed_density_limit
 
     def getDose1sec(self, beam_h, beam_v, flux, energy):
         # density_limit は tableにある数値 → 10 MGy に到達するまでの photon density
@@ -66,14 +73,14 @@ class KUMA:
         total_n_photons = total_exp_time * phosec
         density = total_n_photons / area
         tmp_att_fac = self.limit_dens / density
-        if self.debug == True:
-            print("att_factor=",tmp_att_fac)
-            print("Nframes = ", nframes)
-            print("total exp = ", total_exp_time)
-            print("total photons = %8.2e" % total_n_photons)
-            print("area = %8.2f  [um^2]" % area)
-            print("density = %8.3e" % density, "photons/um^2")
-            print("Limit   = %8.3e" % self.limit_dens, "photons/um^2")
+        # Logging
+        self.logger.info(f"Estimate Attenuation Factor:{tmp_att_fac:.3f}")
+        self.logger.info(f"Nframes = {nframes}")
+        self.logger.info(f"total exp = {total_exp_time:.3f} [sec]")
+        self.logger.info(f"total photons = {total_n_photons:.3e} [photons]")
+        self.logger.info(f"X-ray irradiated area = {area:.3f} [um^2]")
+        self.logger.info(f"density on a crystal= {density:.3e} [photons/um^2]")
+        self.logger.info(f"Density limit for aimed dose {self.limit_dens:.3e} [photons/um^2]")
 
         attfactor = self.limit_dens * (crylen * vbeam_um * osc) / (phosec * exp_per_frame * tot_phi)
         return attfactor
@@ -82,8 +89,8 @@ class KUMA:
         en = 12.3984 / wavelength
 
         # density limit for aimed dose
-        dose_per_photon, density_limit = self.getDoseLimitParams(energy=en)
-        self.logger.info(f"Energy={en:.3f}, dose_per_photon={dose_per_photon:.3f}, density_limit={density_limit:.3e}")
+        dose_per_photon, density_limit = self.getDoseLimitParams(aimed_dose=dose, energy=en)
+        self.logger.info(f"Energy={en:.3f}, dose_per_photon={dose_per_photon:.2e}, density_limit={density_limit:.3e}")
 
         # Actual photon flux density
         actual_density = flux / (beam_h * beam_v)
@@ -94,9 +101,9 @@ class KUMA:
     def convDoseToDensityLimit(self, dose, wavelength):
         en = 12.3984 / wavelength
         # dose_per_photon, density_limit
-        dose_per_photon, density_limit = self.getDoseLimitParams(energy=en)
+        dose_per_photon, density_limit = self.getDoseLimitParams(aimed_dose=dose, energy=en)
         self.limit_dens = density_limit
-        print("Limit density= %e [phs/um2]" % self.limit_dens)
+        self.logger.info(f"Limit density for {dose:.3f} MGy at {en:.3f} keV = {self.limit_dens:.3e} [photons/um^2]")
 
         return self.limit_dens
 
@@ -131,7 +138,9 @@ class KUMA:
         return exp_time, mod_transmission
 
     def getBestCondsHelical(self, cond, flux, dist_vec_mm):
-        self.logger.info("getBestCondsHelical starts\n")
+        self.logger.info("==================================")
+        self.logger.info("==> getBestCondsHelical starts <==")
+        self.logger.info("==================================")
 
         photon_density_limit = self.convDoseToDensityLimit(cond['dose_ds'], cond['wavelength'])
         dist_vec_um = dist_vec_mm * 1000.0  # [um]
@@ -141,7 +150,7 @@ class KUMA:
         best_transmission = self.estimateAttFactor(cond['exp_ds'], cond['total_osc'],
                                                    cond['osc_width'], dist_vec_um, flux, cond['ds_vbeam'])
         # Dose slicing is considered
-        self.logger.info("KUMA: Best attenuation factor=%8.5f" % best_transmission)
+        self.logger.info("KUMA: Best attenuation factor=%10.7f" % best_transmission)
         self.logger.info("Reduced factor for dose slicing: %8.5f" % cond['reduced_fact'])
         self.logger.info("The number of datasets to be collected: %5d" % cond['ntimes'])
         mod_transmission = cond['reduced_fact'] * best_transmission
@@ -169,18 +178,16 @@ class KUMA:
 if __name__ == "__main__":
     #import ESA
 
-    logfile = open("logfile.dat","w")
     kuma = KUMA()
 
-    #print(kuma.test())
-
-    #esa = ESA.ESA(sys.argv[1])
-    #conds = esa.getDict()
-
-    #def estimateAttFactor(self, exp_per_frame, tot_phi, osc, crylen, phosec, vbeam_um):
-
-    exptime_limit=kuma.convDoseToExptimeLimit(10.0,10,15,9.4E12,1.0000)
-    print(kuma.estimateAttFactor(0.02,360,0.1,100,9E12,15.0))
+    # logger setting
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s %(levelname)s: %(message)s')
+    #kuma.logger.setLevel(logging.DEBUG)
+    kuma.logger.setLevel(logging.INFO)
+    kuma.debug = True
+    
+    #exptime_limit=kuma.convDoseToExptimeLimit(10.0,10,15,9.4E12,1.0000)
+    #print(kuma.estimateAttFactor(0.02,360,0.1,100,9E12,15.0))
 
     # 10 x 18 um beam 12.3984 keV 
     # Photon flux = 1.2E13 phs/s
@@ -198,13 +205,14 @@ if __name__ == "__main__":
     # print("hbeam = ", conds[0]['ds_hbeam'])
     # kuma.getBestCondsHelical(conds[0], flux, dist_vec)
 
-
     flux = 5E12
     dist_vec=0.1
     # cond dictionaryを作成する
-    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':10.0, 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':10.0, 'osc_width': 0.1, 'reduced_fact':1.0, 'ntimes':1}
+    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':5.0, 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
     exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
-    print(exp_time, mod_transmission)
+    print(f"suitable exposure time: {exp_time:.4f} sec, modified transmission: {mod_transmission:.5f}")
+
+    """
 
     print("#########################################")
     exptime = 0.02
@@ -231,19 +239,4 @@ if __name__ == "__main__":
         print(f"density limit={photon_density_limit:8.3e}")
         limit_time = kuma.convDoseToExptimeLimit(dose,10,15,phosec_meas,wl)
         print(f"Wavelength:{wl:.3f} LIMIT_TIME={limit_time:.4f}")
-
     """
-    for dist_vec in range(50,500,10.0):
-        transmission=kuma.estimateAttFactor(exptime,total_osc,stepphi,dist_vec,phosec_meas,beam_vert)
-        #print "%e"%photon_density_limit
-        print "%5.2f [um] crystal Trans =" % dist_vec, transmission
-    """
-    # Flux constant is overrided to   8.2e+11
-    # Beam size =  10.0 15.0  [um]
-    # Photon flux=9.412e+12
-    # EXP_LIMIT=     0.0621118012422
-
-
-    # Helical estimation demo
-
-    # con
