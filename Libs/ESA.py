@@ -19,7 +19,7 @@ class ESA:
         self.debug = False
         # ZOO schemes
         # 2019/04/17
-        self.scheme_list = ["multi", "helical", "single", "mixed", "screening", "quick","ssrox"]
+        self.scheme_list = ["multi", "helical", "single", "mixed", "screening", "quick","ssrox","dose_slice"]
 
         # my log file
         self.logger = logging.getLogger('ZOO').getChild("ESA")
@@ -99,6 +99,12 @@ class ESA:
         results = []
         for row in cur.fetchall():
             x = dict(list(zip([d[0] for d in cur.description], row)))
+            # dose_dsの補足処理
+            if 'dose_ds' in x and isinstance(x['dose_ds'], str):
+                try:
+                    x['dose_ds_list']=[float(v) for v in x['dose_ds'].split("+")]
+                except Exception:
+                    x['dose_ds_list'] = []
             results.append(x)
         return results
 
@@ -411,7 +417,7 @@ class ESA:
         ds_hbeam float,
         exp_ds float,
         dist_ds float,
-        dose_ds float,
+        dose_ds char,
         offset_angle float,
         reduced_fact float,
         ntimes int,
@@ -654,9 +660,15 @@ class ESA:
         con.commit()
 
 if __name__ == "__main__":
-    esa = ESA(sys.argv[1])
+    esa = ESA("zoo.db")
+    esa.makeTable(sys.argv[1],force_to_make=True)
+    ppp=esa.getDict()
+    
+    for p in ppp:
+        print(p['dose_ds_list'])
+
     #condlist= esa.readCSV(sys.argv[2])
-    esa.updateValueAt(0, "isDone", 9999)
+    #esa.updateValueAt(0, "isDone", 9999)
     #print(condlist)
     # esa.makeTable(sys.argv[2],force_to_make=True)
     # esa.prepReadDB()
