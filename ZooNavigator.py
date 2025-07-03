@@ -291,15 +291,11 @@ class ZooNavigator():
 
             if self.isDark == False and mean_value < self.back_mean_thresh:
                 self.logger.info("Mean value of the image is %5d" % mean_value)
-                self.logger.info("Background image seems to be bad with lower mean value than 100!")
+                self.logger.info(f"Background image seems to be bad with lower mean value than {self.back_mean_thresh} in Light!")
                 continue
             elif self.isDark == True and self.back_mean_thresh < 35:
                 self.logger.info("Dark experiments: mean value of the image is %5d" % mean_value)
                 self.logger.info("Background image seems to be bad with lower mean value than 50 in Dark!")
-                continue
-            elif mean_value > self.back_mean_thresh:
-                self.logger.info("Mean value of the image is %5d" % mean_value)
-                self.logger.info("Background image seems to be bad with higher mean value than 200!")
                 continue
             else:
                 self.logger.info("Background image seems to be good!")

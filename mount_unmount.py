@@ -29,8 +29,9 @@ if __name__ == "__main__":
     num = 0
     while num < 5:
         #for trayid in ["1", "2", "3", "4", "5", "6", "7", "8"]:
-        for trayid in ["CPS1125"]:
-            for pinid in range(1, 17):
+        for trayid in ["NAGAE002"]:
+            #for pinid in range(1, 17):
+            for pinid in [6,7,8,9,10]:
                 logger.info("Tray %s - Pin %02d mount started." % (trayid, pinid))
                 try:
                     zoo.mountSample(trayid, pinid)

@@ -284,7 +284,7 @@ if __name__ == "__main__":
     print(att.att_idx)
     print(att.att_thick)
 
-    thick=att.getBestAtt(1.0, 0.015)
+    thick=att.getBestAtt(0.775, 0.0005)
     print(thick)
     # exptime = 0.05
     # transmission = 1.5

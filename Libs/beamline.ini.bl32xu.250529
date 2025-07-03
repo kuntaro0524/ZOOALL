@@ -44,7 +44,8 @@ gain_default_dark=5500
 # Beam stopper position during centering
 beamstopper_off=False
 # back ground image mean threshold
-back_mean_thresh=90
+#back_mean_thresh=90
+back_mean_thresh=30
 
 [special_setting]
 # True: Dark mode, False: Normal mode
