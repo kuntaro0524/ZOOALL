@@ -493,7 +493,13 @@ class BSSconfig:
 
 if __name__ == "__main__":
     bssconf = BSSconfig()
+
+    # Cmount position
+    x,y,z=bssconf.getCmount()
+    print(f"{x:.5f} {y:.5f} {z:.5f}")
     #bssconf.getThinnestAtt()
+
+    """
     # axis_name="st1_col_1_z"
     # print(bssconf.getPulseInfo(axis_name))
     #e,a,b=bssconf.getEvacuateInfo("collimator")
@@ -504,15 +510,14 @@ if __name__ == "__main__":
     # 'bs_evacinfo'
     info = config.get("axes", "bs_evacinfo")
     
-    e,a,b=bssconf.getEvacuateInfo(info)
-    print(e,a,b)
+    #e,a,b=bssconf.getEvacuateInfo(info)
+    #print(e,a,b)
 
     #print(bssconf.readZoomOption())
     #axis_name = "st2_coax_1_x"
 
     #bssconf.getSense(axis_name)
 
-    """
     # collimator evacuation parameters
     print("#####################3")
     e,a,b=bssconf.getEvacuateInfo("collimator")
