@@ -50,7 +50,8 @@ class KUMA:
 
     def getDose1sec(self, beam_h, beam_v, flux, energy):
         # density_limit は tableにある数値 → 10 MGy に到達するまでの photon density
-        dose_per_photon, density_limit = self.getDoseLimitParams(energy=energy)
+        # aimed_doseはここは 10.0 MGy でOK
+        dose_per_photon, density_limit = self.getDoseLimitParams(aimed_dose=10.0, energy=energy)
         # このビームの flux density を計算する
         flux_density = flux / (beam_h * beam_v)
         # このビームの 1 sec あたりの dose を計算する
@@ -137,14 +138,72 @@ class KUMA:
             print("Exposure time is input value: %8.3f [sec]" % exp_orig)
         return exp_time, mod_transmission
 
+    # dose_stringは単体の場合には dose_ds で10.0など
+    def checkDoseString(self, dose_string, mode):
+        if mode != "dose_slice":
+            dose_value = float(dose_string[0])
+            return dose_value
+        else:
+            # "0.1+1+1+1"
+            dose_list = dose_string.split('+')
+            print(dose_list)
+            print(f"dose_string={dose_string}")
+
     def getBestCondsHelical(self, cond, flux, dist_vec_mm):
         self.logger.info("==================================")
         self.logger.info("==> getBestCondsHelical starts <==")
         self.logger.info("==================================")
+        print(f"dose_ds = {cond['dose_ds']}")
 
-        photon_density_limit = self.convDoseToDensityLimit(cond['dose_ds'], cond['wavelength'])
+        dose_value = self.checkDoseString(cond['dose_ds'], mode="helical")
+
+        photon_density_limit = self.convDoseToDensityLimit(dose_value, cond['wavelength'])
         dist_vec_um = dist_vec_mm * 1000.0  # [um]
-        self.logger.info("Flux density limit for dose %5.2f MGy= %5.2e " % (cond['dose_ds'], photon_density_limit))
+        self.logger.info("Flux density limit for dose %5.2f MGy= %5.2e " % (dose_value, photon_density_limit))
+        self.logger.info("Utilized Beam = %5.2f x %5.2f [um]" % (cond['ds_vbeam'], cond['ds_hbeam']))
+        self.logger.info("Utilized flux = %5.2e [phs/sec]" % flux)
+        best_transmission = self.estimateAttFactor(cond['exp_ds'], cond['total_osc'],
+                                                   cond['osc_width'], dist_vec_um, flux, cond['ds_vbeam'])
+        # Dose slicing is considered
+        self.logger.info("KUMA: Best attenuation factor=%10.7f" % best_transmission)
+        self.logger.info("Reduced factor for dose slicing: %8.5f" % cond['reduced_fact'])
+        self.logger.info("The number of datasets to be collected: %5d" % cond['ntimes'])
+        mod_transmission = cond['reduced_fact'] * best_transmission
+        self.logger.info("modified transmission for dose slicing %9.5f" % mod_transmission)
+
+        # Attenuator is not required
+        exp_orig = cond['exp_ds']
+        n_frames = self.getNframe(cond)
+
+        if mod_transmission >= 1.0:
+            exp_time = exp_orig * mod_transmission
+            mod_transmission = 1.0
+            print("Exposure time was replaced by %8.4f sec" % exp_time)
+            print("Measurement time will be longer than the initial condition")
+            print("Initial data collection time: %8.2f [sec]" % (exp_orig * float(n_frames)))
+            print("Current data collection time: %8.2f [sec]" % (exp_time * float(n_frames)))
+        # Attenuator is required
+        else:
+            exp_time = exp_orig
+            self.logger.info("Exposure time is input value: %8.2f [sec]" % exp_orig)
+
+        return exp_time, mod_transmission
+    # end of getBestCondsHelical
+
+    # condを引数で渡すのではなく doseごとに測定条件を返すようにした
+    # 'dose_slice'を実装するためにより汎用的な関数にする必要があると感じたので
+
+    def getBestCondsHelicalDose(self, cond, flux, dist_vec_mm):
+        self.logger.info("==================================")
+        self.logger.info("==> getBestCondsHelical starts <==")
+        self.logger.info("==================================")
+        print(f"dose_ds = {cond['dose_ds']}")
+
+        dose_value = self.checkDoseString(cond['dose_ds'], mode="helical")
+
+        photon_density_limit = self.convDoseToDensityLimit(dose_value, cond['wavelength'])
+        dist_vec_um = dist_vec_mm * 1000.0  # [um]
+        self.logger.info("Flux density limit for dose %5.2f MGy= %5.2e " % (dose_value, photon_density_limit))
         self.logger.info("Utilized Beam = %5.2f x %5.2f [um]" % (cond['ds_vbeam'], cond['ds_hbeam']))
         self.logger.info("Utilized flux = %5.2e [phs/sec]" % flux)
         best_transmission = self.estimateAttFactor(cond['exp_ds'], cond['total_osc'],
@@ -202,15 +261,19 @@ if __name__ == "__main__":
     # conds[0]['ds_vbeam'] = 20.0
     # conds[0]['total_osc'] = 360.0
 
-    # print("hbeam = ", conds[0]['ds_hbeam'])
-    # kuma.getBestCondsHelical(conds[0], flux, dist_vec)
-
+    # Dose estimation of 'helical data collection'
     flux = 5E12
     dist_vec=0.1
+    # string type of dose values
+    dose_ds = ["5.0"]
     # cond dictionaryを作成する
-    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':5.0, 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
+    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
     exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
     print(f"suitable exposure time: {exp_time:.4f} sec, modified transmission: {mod_transmission:.5f}")
+
+    # Dose estimation of 'SWSX' data collection
+    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':"0.1+1.0+1.0+1.0",'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
+    exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
 
     """
 

@@ -409,6 +409,11 @@ class UserESA():
         # pandasを利用してエクセルのタブのリストを取得して表示する
         #print(pd.ExcelFile(self.fname).sheet_names)
 
+        # エクセルファイルのカラム数を数える
+        ncols = len(pd.read_excel(self.fname, sheet_name="Sheet", header=2).columns)
+        print(f"Number of columns in the sheet: {ncols}")
+        # ncols が 18 でなければ付録のカラムがついていることになる
+
         # エクセルのタブ名が "ZOOPREP_YYMMDD_NAME_BLNAME_v2" であるタブを読み込む
         # Index(['PuckID', 'PinID', 'SampleName', 'Objective', 'Mode', 'HA',
         # 'Wavelength [Å]', 'Hor. scan length [µm]', 'Resolution limit [Å]',
@@ -424,6 +429,18 @@ class UserESA():
         # データは4行目から
         # 250121: sheet_name -> ZOO_YYMMDD_NAME_BLNAME_v2 -> Sheet
         self.df = pd.read_excel(self.fname, sheet_name="Sheet", header=2)
+
+        # 読み込んだカラム名を表示する
+        read_columns = self.df.columns.tolist()
+        # 前半のカラム名は columns にする
+        for i, col in enumerate(read_columns):
+            if i < 19:
+                continue
+            else:
+                columns.append(read_columns[i])
+
+        print(f"current columns: {columns}")
+
         # 列名を指定する
         self.df.columns = columns
         # 現時点でのデータ数をself.loggerに出力する

@@ -965,6 +965,9 @@ class ZooNavigator():
             self.collectQuick(trayid, pinid, prefix, cond, sphi)
         elif cond['mode'] == "screening":
             self.collectScreen(cond, sphi)
+        # 2025/07/03 K. Hirata coded
+        elif cond['mode'] == ['dose_slice']:
+            self.collectDoseSlice(trayid, pinid, prefix, cond, sphi)
         else:
             self.logger.error("Unknown mode: %s" % cond['mode'])
             error_code = ErrorCode.UNKNOWN_MODE
@@ -1501,8 +1504,7 @@ class ZooNavigator():
             if n_crystals > 0:
                 self.updateDBinfo(cond, "nds_helical", n_crystals)
                 # Data proc
-                sample_name = cond['sample_name']
-                root_dir = cond['root_dir']
+                sample_name = cond['sample_name'] root_dir = cond['root_dir']
                 self.data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
                 self.data_proc_file.flush()
                 # Log file for time stamp

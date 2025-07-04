@@ -623,16 +623,18 @@ class ESA:
         # experimental scheme check
         for cond in condition_list:
             ok_flag = False
+            tmp_scheme = cond[2].lower()
             for scheme in self.scheme_list:
+                print(f"scheme = {scheme} and tmp_scheme = {tmp_scheme}")
                 if scheme == cond[2].lower():
-                    # print cond[1],cond[2],cond[3],"Okay"
+                    print(f"scheme={scheme} found in {cond[2]}")
                     ok_flag = True
                     break
-                # SSROX made kiteitara error
-                if scheme == "ssrox":
-                    msg = "No such experimental scheme!! %s-%s : >> %s << Please fix it!\n" % (
-                        cond[3], cond[4], cond[2])
-                    raise MyException.MyException(msg)
+            # SSROX made kiteitara error
+            if ok_flag == False:
+                msg = "No such experimental scheme!! %s-%02d : >> %s << Please fix it!\n" % (
+                    cond[3], cond[4], cond[2])
+                raise MyException.MyException(msg)
         # Check Mode
 
         return condition_list
@@ -665,7 +667,11 @@ if __name__ == "__main__":
     ppp=esa.getDict()
     
     for p in ppp:
-        print(p['dose_ds_list'])
+        print(type(p['dose_ds_list']))
+
+    # my condition
+    prior_cond = esa.getPriorPinCond()
+    print(prior_cond)
 
     #condlist= esa.readCSV(sys.argv[2])
     #esa.updateValueAt(0, "isDone", 9999)
