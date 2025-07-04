@@ -667,11 +667,7 @@ if __name__ == "__main__":
     ppp=esa.getDict()
     
     for p in ppp:
-        print(type(p['dose_ds_list']))
-
-    # my condition
-    prior_cond = esa.getPriorPinCond()
-    print(prior_cond)
+        print(p['dose_ds_list'])
 
     #condlist= esa.readCSV(sys.argv[2])
     #esa.updateValueAt(0, "isDone", 9999)
