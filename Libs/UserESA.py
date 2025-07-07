@@ -439,8 +439,6 @@ class UserESA():
             else:
                 columns.append(read_columns[i])
 
-        print(f"current columns: {columns}")
-        self.checkDoseList()
         # 列名を指定する
         self.df.columns = columns
         # 現時点でのデータ数をself.loggerに出力する
@@ -450,9 +448,6 @@ class UserESA():
         # 現時点でのデータ数をself.loggerに出力する
         self.logger.info("Number of data after polishment: %d"%len(self.df))
         self.isPrep = True
-        # もしも 'dist_list'が存在する場合にはTrueを返す
-        if 'dist_list' in self.df.columns:
-            return True
 
     # 高分解能データ収集用に設定したものについて以下のような仕様でチェック
     # 1) column name: "dose_list": "+"で区切られた文字列
@@ -465,34 +460,41 @@ class UserESA():
     def makeValueList(self, column_value):
         # column_valueが intもしくはfloatの場合には単一のリストにして返す
         if isinstance(column_value, (int, float)):
-            return [float(column_value)]
+            # "[10.0]" というような文字列にして返す
+            #return_value = f"[{column_value}]"
+            # [columnn_value] のようなリストに変換して返す
+            return_value = [column_value]
+            return return_value
         else:
             # column_valueが文字列の場合には "+" で分割してリストに変換する
             return list(map(float, column_value.split('+')))
         
     def checkDoseList(self):
-        # そもそも dose_list, dist_list が必要かどうか
-        # self.dfにdose_listもしくはdist_listが存在しない場合には何もしない
-        # "dose_list" と "dist_list" が存在するかチェック
-        if 'dose_list' not in self.df.columns or 'dist_list' not in self.df.columns:
-            raise ValueError("dose_list or dist_list column is missing from the dataframe")
-
         # self.df の要素数ずつ
         for i, row in self.df.iterrows():
-            # もしも dose_list, dist_listが存在しない場合にはエラーで落とす
-            if pd.isna(row['dose_list']) or pd.isna(row['dist_list']):
-                raise ValueError(f"Row {i} has NaN in dose_list or dist_list. Please check 'list' columns carefully.")
-            dose_list = self.makeValueList(row['dose_list'])
-            dist_list = self.makeValueList(row['dist_list'])
+            print(f"Checking row {i}: {row}")
+            # もしも dose_list, dist_listが存在する場合は
+            if 'dose_list' in row:
+                print(f"Row {i} has 'dose_list' and 'dist_list'. Using them.")
+                dose_list = self.makeValueList(row['dose_list'])
+                dist_list = self.makeValueList(row['dist_list'])
+                print(f"dose_list= {dose_list}, dist_list={dist_list}")
+                # dose_list と dist_list の要素数をチェック
+                if not isinstance(dose_list, list) or not isinstance(dist_list, list):
+                    raise ValueError(f"Row {i} has invalid 'dose_list' or 'dist_list'. They should be lists.")
+            else:
+                print(f"Row {i} does not have 'dose_list' or 'dist_list'. Using 'dose_ds' and 'dist_ds'.")
+                dose_list = self.makeValueList(row['dose_ds'])
+                dist_list = self.makeValueList(row['dist_ds'])
+                print(f"type of dose_list: {type(dose_list)}, type of dist_list: {type(dist_list)}")
+                print(f"dose_list= {dose_list}, dist_list={dist_list}")
             
-            # dose_list と dist_list の要素数をチェック
-            if not isinstance(dose_list, list) or not isinstance(dist_list, list):
-                raise ValueError(f"Invalid type for dose_list or dist_list at index {i}: {type(dose_list)}, {type(dist_list)}")
-
             # dose_listを書き換える
             self.df.at[i, 'dose_list'] = dose_list
             # dist_listを書き換える
             self.df.at[i, 'dist_list'] = dist_list
+
+        print(self.df)
 
     def expandPinRange(self, pinstr):
         # pinid_str = "1-4" のような文字列を受け取る
@@ -622,7 +624,7 @@ class UserESA():
 
     def makeCondList(self):
         # DataFrameとしてExcelファイルを読み込む　 →　self.df
-        flag_list = self.read_new()
+        self.read_new()
         # self.dfの中にある 'puckid' の情報を展開する
         self.expandCompressedPinInfo()
         # 液体窒素ぶっ掛けの情報を管理してCSV用の情報へ変換
@@ -645,14 +647,27 @@ class UserESA():
         # 結晶サイズについてのWarning（今は multi だけ)
         self.sizeWarning()
 
-        # 仮にflag_listがTrueの場合
-        if flag_list == True:
-            # 'dose_list', 'dist_list' を文字列としてCSVファイルに書き込みたい
-            # dose_listには 数値のリストが入っている。これをJSON形式の文字列に書き換えて補間する
-            # 今、リストがあるとすると [0.1, 1.0, 1.0, 1.0] みたいな感じ
-            # これを{0.1, 1.0, 1.0, 1.0} のような文字列に変換して書き込む
-            self.df['dose_ds'] = self.df['dose_list'].apply(lambda x: '{' + ', '.join(map(str, x)) + '}')
-            self.df['dist_ds'] = self.df['dist_list'].apply(lambda x: '{' + ', '.join(map(str, x)) + '}')
+        # Doseについてリストにしてしまう
+        self.checkDoseList()
+
+        # 'dose_list', 'dist_list' を文字列としてCSVファイルに書き込みたい
+        # dose_listには 数値のリストが入っている。これをJSON形式の文字列に書き換えて補間する
+        # 今、リストがあるとすると [0.1, 1.0, 1.0, 1.0] みたいな感じ
+        # これを{0.1, 1.0, 1.0, 1.0} のような文字列に変換して書き込む
+        for i, row in self.df.iterrows():
+            # dose_list, dist_listに数値が入っていなければエラーで落とす
+            # nanやNoneが入っている場合はエラーで落とす
+            if type(row['dose_list']) is float and type(row['dist_list']) is float:
+                # dose_listがfloatの場合は文字列を作成
+                # {10.0} というような文字列
+                self.df.at[i, 'dose_ds'] = f"{{{row['dose_list']}}}"
+            if type(row['dist_list']) is float:
+                # dist_listがfloatの場合は文字列を作成
+                # {10.0} というような文字列
+                self.df.at[i, 'dist_ds'] = f"{{{row['dist_list']}}}"
+            elif type(row['dose_list']) is list and type(row['dist_list']) is list:
+                self.df['dose_ds'] = self.df['dose_list'].apply(lambda x: '{' + ', '.join(map(str, x)) + '}')
+                self.df['dist_ds'] = self.df['dist_list'].apply(lambda x: '{' + ', '.join(map(str, x)) + '}')
 
         # self.dfの内容をCSVファイルに書き出す
         # column の並び順は以下のように変更する
