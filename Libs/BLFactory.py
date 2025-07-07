@@ -4,6 +4,7 @@ import socket
 import Gonio44
 import Gonio
 import os
+import BSSconfig
 
 from configparser import ConfigParser, ExtendedInterpolation
 
@@ -21,6 +22,8 @@ class BLFactory:
         self.bss_server = self.config.get("server", "bss_server")
         # configure fileから blanc_address を取得
         self.blanc_address = self.config.get("server", "blanc_address")
+        # BSS config file
+        self.bss_config = BSSconfig.BSSconfig()
 
     def initDevice(self):
         # Message server に接続

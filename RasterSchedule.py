@@ -249,7 +249,7 @@ class RasterSchedule:
             schstr.append("Raster Scan Type: 2 # 0:vertical, 1:horizontal, 2: 2D")
 
         # Cover scan
-        if self.isCoverScan == True and beamline.upper() == "BL45XU":
+        if self.isCoverScan == True and self.beamline.upper() == "BL45XU":
             schstr.append("Raster Close Cover Flag: 1")
 
         schstr.append("Raster Vertical Points: %d" % self.v_points)
