@@ -440,7 +440,7 @@ class UserESA():
                 columns.append(read_columns[i])
 
         print(f"current columns: {columns}")
-
+        self.checkDoseList()
         # 列名を指定する
         self.df.columns = columns
         # 現時点でのデータ数をself.loggerに出力する
@@ -450,6 +450,49 @@ class UserESA():
         # 現時点でのデータ数をself.loggerに出力する
         self.logger.info("Number of data after polishment: %d"%len(self.df))
         self.isPrep = True
+        # もしも 'dist_list'が存在する場合にはTrueを返す
+        if 'dist_list' in self.df.columns:
+            return True
+
+    # 高分解能データ収集用に設定したものについて以下のような仕様でチェック
+    # 1) column name: "dose_list": "+"で区切られた文字列
+    # 例) "0.1+1.0+1.0+1.0": [0.1, 1.0, 1.0, 1.0] 
+    # というリストのこと
+    # 2) column name: "dist_list": "+"で区切られた文字列
+    # 例) "150.0+110.0+110.0+120.0": [150.0, 110.0, 110.0, 120.0] 
+    # というリストのこと
+    # この２つは必ず同じ数の要素を持つのでそうでない場合にはエラーで落ちるようにする
+    def makeValueList(self, column_value):
+        # column_valueが intもしくはfloatの場合には単一のリストにして返す
+        if isinstance(column_value, (int, float)):
+            return [float(column_value)]
+        else:
+            # column_valueが文字列の場合には "+" で分割してリストに変換する
+            return list(map(float, column_value.split('+')))
+        
+    def checkDoseList(self):
+        # そもそも dose_list, dist_list が必要かどうか
+        # self.dfにdose_listもしくはdist_listが存在しない場合には何もしない
+        # "dose_list" と "dist_list" が存在するかチェック
+        if 'dose_list' not in self.df.columns or 'dist_list' not in self.df.columns:
+            raise ValueError("dose_list or dist_list column is missing from the dataframe")
+
+        # self.df の要素数ずつ
+        for i, row in self.df.iterrows():
+            # もしも dose_list, dist_listが存在しない場合にはエラーで落とす
+            if pd.isna(row['dose_list']) or pd.isna(row['dist_list']):
+                raise ValueError(f"Row {i} has NaN in dose_list or dist_list. Please check 'list' columns carefully.")
+            dose_list = self.makeValueList(row['dose_list'])
+            dist_list = self.makeValueList(row['dist_list'])
+            
+            # dose_list と dist_list の要素数をチェック
+            if not isinstance(dose_list, list) or not isinstance(dist_list, list):
+                raise ValueError(f"Invalid type for dose_list or dist_list at index {i}: {type(dose_list)}, {type(dist_list)}")
+
+            # dose_listを書き換える
+            self.df.at[i, 'dose_list'] = dose_list
+            # dist_listを書き換える
+            self.df.at[i, 'dist_list'] = dist_list
 
     def expandPinRange(self, pinstr):
         # pinid_str = "1-4" のような文字列を受け取る
@@ -460,7 +503,7 @@ class UserESA():
         if '-' in pinstr:
             start, end = map(int, pinstr.split('-'))
             return list(range(start, end + 1))
-        elif '+' in pinstr:
+        
             return list(map(int, pinstr.split('+')))
         elif ';' in pinstr:
             return list(map(int, pinstr.split(';')))
@@ -579,7 +622,7 @@ class UserESA():
 
     def makeCondList(self):
         # DataFrameとしてExcelファイルを読み込む　 →　self.df
-        self.read_new()
+        flag_list = self.read_new()
         # self.dfの中にある 'puckid' の情報を展開する
         self.expandCompressedPinInfo()
         # 液体窒素ぶっ掛けの情報を管理してCSV用の情報へ変換
@@ -601,6 +644,15 @@ class UserESA():
         self.modifyExposureConditions()
         # 結晶サイズについてのWarning（今は multi だけ)
         self.sizeWarning()
+
+        # 仮にflag_listがTrueの場合
+        if flag_list == True:
+            # 'dose_list', 'dist_list' を文字列としてCSVファイルに書き込みたい
+            # dose_listには 数値のリストが入っている。これをJSON形式の文字列に書き換えて補間する
+            # 今、リストがあるとすると [0.1, 1.0, 1.0, 1.0] みたいな感じ
+            # これを{0.1, 1.0, 1.0, 1.0} のような文字列に変換して書き込む
+            self.df['dose_ds'] = self.df['dose_list'].apply(lambda x: '{' + ', '.join(map(str, x)) + '}')
+            self.df['dist_ds'] = self.df['dist_list'].apply(lambda x: '{' + ', '.join(map(str, x)) + '}')
 
         # self.dfの内容をCSVファイルに書き出す
         # column の並び順は以下のように変更する
@@ -635,8 +687,8 @@ class UserESA():
             'ds_vbeam': float,
             'ds_hbeam': float,
             'exp_ds': float,
-            'dist_ds': float,
-            'dose_ds': float,
+            'dist_ds': str,
+            'dose_ds': str,
             'offset_angle': float,
             'reduced_fact': float,
             'ntimes': int,
@@ -665,7 +717,12 @@ class UserESA():
 if __name__ == "__main__":
     root_dir = os.getcwd()
     u2db = UserESA(sys.argv[1], root_dir, beamline="BL32XU")
+    # logger set
+    u2db.logger = logging.getLogger("UserESA")
+    u2db.logger.setLevel(logging.INFO)
+    
     u2db.makeCondList()
+    #u2db.checkDoseList()
     #u2db.read_new()
     #newdf = u2db.expandCompressedPinInfo()
     # CSV ファイルに書き出す
