@@ -472,29 +472,28 @@ class UserESA():
     def checkDoseList(self):
         # self.df の要素数ずつ
         for i, row in self.df.iterrows():
-            print(f"Checking row {i}: {row}")
             # もしも dose_list, dist_listが存在する場合は
             if 'dose_list' in row:
-                print(f"Row {i} has 'dose_list' and 'dist_list'. Using them.")
+                # dose_list, dist_list のいずれかに値がない場合
+                if pd.isna(row['dose_list']) or pd.isna(row['dist_list']):
+                    raise ValueError(f"Row {i} has NaN in 'dose_list' or 'dist_list'. Please check the input file.")
                 dose_list = self.makeValueList(row['dose_list'])
                 dist_list = self.makeValueList(row['dist_list'])
-                print(f"dose_list= {dose_list}, dist_list={dist_list}")
+                self.logger.info(f"dose_list= {dose_list}, dist_list={dist_list}")
                 # dose_list と dist_list の要素数をチェック
                 if not isinstance(dose_list, list) or not isinstance(dist_list, list):
                     raise ValueError(f"Row {i} has invalid 'dose_list' or 'dist_list'. They should be lists.")
             else:
-                print(f"Row {i} does not have 'dose_list' or 'dist_list'. Using 'dose_ds' and 'dist_ds'.")
+                self.logger.info(f"Row {i} does not have 'dose_list' or 'dist_list'. Using 'dose_ds' and 'dist_ds'.")
                 dose_list = self.makeValueList(row['dose_ds'])
                 dist_list = self.makeValueList(row['dist_ds'])
-                print(f"type of dose_list: {type(dose_list)}, type of dist_list: {type(dist_list)}")
-                print(f"dose_list= {dose_list}, dist_list={dist_list}")
+                self.logger.info(f"type of dose_list: {type(dose_list)}, type of dist_list: {type(dist_list)}")
+                self.logger.info(f"dose_list= {dose_list}, dist_list={dist_list}")
             
             # dose_listを書き換える
             self.df.at[i, 'dose_list'] = dose_list
             # dist_listを書き換える
             self.df.at[i, 'dist_list'] = dist_list
-
-        print(self.df)
 
     def expandPinRange(self, pinstr):
         # pinid_str = "1-4" のような文字列を受け取る
@@ -648,7 +647,11 @@ class UserESA():
         self.sizeWarning()
 
         # Doseについてリストにしてしまう
-        self.checkDoseList()
+        try:
+            self.checkDoseList()
+        except ValueError as e:
+            self.logger.error(f"Error in checkDoseList: {e}")
+            raise
 
         # 'dose_list', 'dist_list' を文字列としてCSVファイルに書き込みたい
         # dose_listには 数値のリストが入っている。これをJSON形式の文字列に書き換えて補間する

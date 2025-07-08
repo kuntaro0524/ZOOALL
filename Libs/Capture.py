@@ -7,7 +7,7 @@ import datetime
 import os
 import numpy
 from socket import error as socket_error
-from Libs import MyException
+from Libs import ZooMyException
 from configparser import ConfigParser, ExtendedInterpolation
 
 class Capture:
@@ -185,7 +185,7 @@ class Capture:
         try:
             recbuf = self.communicate(com1)
         except socket.error as e:
-            raise MyException("capture failed!")
+            raise ZooMyException("capture failed!")
 
     def setShutterSpeed(self, speed):
         """ for BL32XU only

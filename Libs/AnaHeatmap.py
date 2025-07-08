@@ -1,6 +1,5 @@
 import sys, os, math, numpy, scipy
 import scipy.spatial as ss
-import MyException
 import time
 import datetime
 import DiffscanLog

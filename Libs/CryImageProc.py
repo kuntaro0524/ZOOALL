@@ -3,8 +3,8 @@ import cv2,sys
 import numpy as np
 import copy
 #from Libs import MyException
-from MyException import *
-from MyException import FatalCenteringError
+from ZooMyException import *
+from ZooMyException import FatalCenteringError
 import logging
 import logging.config
 from Libs import File

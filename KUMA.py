@@ -112,8 +112,27 @@ class KUMA:
         n_frames = int(cond['total_osc'] / cond['osc_width'])
         return n_frames
 
+    def checkDoseString(self, dose_string, mode):
+        # Multiのときは１つだけ
+        if mode=="multi":
+            # 文字列は "[10.0]" のようになっている
+            try:
+                dose_value = float(dose_string.strip("{}"))
+            except ValueError:
+                self.logger.error(f"Invalid dose string format: {dose_string}. Expected format is '[value]'.")
+                raise ValueError("Invalid dose string format.")
+            return dose_value
+        else:
+            return 100.0
+
     def getBestCondsMulti(self, cond, flux):
         n_frames = self.getNframe(cond)
+        # mode='multi' のときは通常通りdose_ds, dist_dsは一つずつのはず
+        # 文字列として "[10.0]" のようになっている(dose_ds) -> floatにして 10.0 として数値をとりたい
+        tmp_dose_ds = self.checkDoseString(cond['dose_ds'], mode="multi")
+        print(f"tmp_dose_ds={tmp_dose_ds}")
+        cond['dose_ds'] = tmp_dose_ds  # 文字列ではなくfloatにする
+        
         exptime_limit = self.convDoseToExptimeLimit(cond['dose_ds'], cond['ds_hbeam'], cond['ds_vbeam'], flux,
                                                     cond['wavelength'])
         best_transmission = exptime_limit / float(n_frames) / cond['exp_ds']
@@ -137,17 +156,6 @@ class KUMA:
             exp_time = exp_orig
             print("Exposure time is input value: %8.3f [sec]" % exp_orig)
         return exp_time, mod_transmission
-
-    # dose_stringは単体の場合には dose_ds で10.0など
-    def checkDoseString(self, dose_string, mode):
-        if mode != "dose_slice":
-            dose_value = float(dose_string[0])
-            return dose_value
-        else:
-            # "0.1+1+1+1"
-            dose_list = dose_string.split('+')
-            print(dose_list)
-            print(f"dose_string={dose_string}")
 
     def getBestCondsHelical(self, cond, flux, dist_vec_mm):
         self.logger.info("==================================")
@@ -267,6 +275,7 @@ if __name__ == "__main__":
     # string type of dose values
     dose_ds = ["5.0"]
     # cond dictionaryを作成する
+    """
     cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
     exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
     print(f"suitable exposure time: {exp_time:.4f} sec, modified transmission: {mod_transmission:.5f}")
@@ -275,6 +284,13 @@ if __name__ == "__main__":
     cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':"0.1+1.0+1.0+1.0",'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
     exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
 
+    """
+    # Dose slicing test
+    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':"{10.0}", 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
+    kuma.getBestCondsMulti(cond,flux)
+    """
+
+    """
     """
 
     print("#########################################")

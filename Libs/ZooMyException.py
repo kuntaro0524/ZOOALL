@@ -1,4 +1,4 @@
-class MyException(Exception): pass
+class ZooMyException(Exception): pass
 class MovementFailed(Exception): pass
 class NandaKandaExcept(Exception): pass
 class verticalCenteringFailed(Exception): pass
@@ -8,10 +8,10 @@ class SameVerticalCordinates(Exception): pass
 class CrystalIsTooSmall(Exception): pass
 
 # Related to 'centering' crystals.
-class RecoverableCenteringError(MyException):
+class RecoverableCenteringError(ZooMyException):
     """Exception raised when centering fails but can be recovered."""
     pass
 
-class FatalCenteringError(MyException):
+class FatalCenteringError(ZooMyException):
     """Critical error in centering : Experiment should be aborted."""
     pass

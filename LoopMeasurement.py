@@ -2,7 +2,7 @@ import sys, os, math, socket, time
 import numpy as np
 import datetime
 
-from MyException import *
+from ZooMyException import *
 import INOCC
 import RasterSchedule
 import MultiCrystal
@@ -1317,7 +1317,7 @@ if __name__ == "__main__":
     ppp = esa.getDict()
 
     root_dir = "/isilon/users/t_shimizu_4368/t_shimizu_4368/Junk/junk4/"
-    root_dir = "/isilon/users/target/target/AutoUsers/191114/kun/"
+    root_dir = os.environ("PWD")
     cxyz = [1.7601, -6.1756, 0.6280]
     phi = 0.00
     scan_id = "sample99"
@@ -1341,9 +1341,9 @@ if __name__ == "__main__":
     logfile = open("logfile.log", "w")
     #lm.genHelical(startphi, endphi, left_xyz, right_xyz, prefix, flux, ppp[0], logfile)
 
-    lm.multi_dir = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo"
+    lm.multi_dir = os.path.join(os.environ("PWD"), "multi")
     glist=[left_xyz, right_xyz]
-    cond={'total_osc':10.0,'dist_ds':130.0, 'ds_hbeam':10.0, 'ds_vbeam':10.0, 'osc_width':0.1,'dose_ds':10.0, 'wavelength':1.0,'exp_ds':0.02, 'reduced_fact':1.0, 'sample_name':"TEST",'ntimes':1}
+    cond={'total_osc':10.0,'dist_ds':130.0, 'ds_hbeam':10.0, 'ds_vbeam':10.0, 'osc_width':0.1,'dose_ds':"{10.0,1.0,5.0}",'wavelength':1.0,'exp_ds':0.02, 'reduced_fact':1.0, 'sample_name':"TEST",'ntimes':1}
     lm.genMultiSchedule(0.0, glist, cond, flux, prefix="multi")
 
     ms.close()

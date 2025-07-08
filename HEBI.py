@@ -3,7 +3,7 @@ import sys, math, numpy, os
 import datetime
 import LoopMeasurement
 import AttFactor
-from MyException import *
+from ZooMyException import *
 import StopWatch
 import AnaHeatmap
 import CrystalList
@@ -95,7 +95,7 @@ class HEBI():
             self.zoo.doRaster(schfile)
             self.zoo.waitTillReady()
         except:
-            raise MyException("HEBI.do2Dscan : Failed.")
+            raise ZooMyException("HEBI.do2Dscan : Failed.")
 
         return raspath
 
@@ -163,7 +163,7 @@ class HEBI():
 
         # There are no good crystals
         if len(sorted_crystal_list) == 0:
-            raise MyException("HEBI.ana2Dscan : no crystals are found in scan %s" % prefix)
+            raise ZooMyException("HEBI.ana2Dscan : no crystals are found in scan %s" % prefix)
 
         the_best_crystal = sorted_crystal_list[0]
         if method == "peak_xyz":
@@ -181,7 +181,7 @@ class HEBI():
 
         # There are no good crystals
         if len(sorted_crystal_list) == 0:
-            raise MyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
+            raise ZooMyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
 
         the_best_crystal = sorted_crystal_list[0]
         if method == "peak_xyz":
@@ -242,10 +242,69 @@ class HEBI():
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("HEBI.doHelical: ERRors occured in data collection loop.\n")
 
-        # When the data collection finished.
-        # self.sw.setTime("end")
-        # consumed_time=self.sw.getDsecBtw("start","end")
-        # self.logfile.write("Consuming time for this crystal %5.1f[sec]\n"%(consumed_time))
+    def getDoseDistList(self, cond):
+        # dose_ds = "{0.1, 1.0, 1.0}" 
+        # dist_ds = "{125, 100, 100}"
+        # これらをZIPで数値にして dose_ds, dist_dsを作成する
+        dose_string = cond['dose_ds']
+        dist_string = cond['dist_ds']
+        # リストにしてしまう
+        tmpstr = dose_string.replace("{", "").replace("}", "")
+        # tmpstr を "," で区切って float に変換してリストにする
+        dose_list = [float(x) for x in tmpstr.split(",")]
+        # dist_listも同様にさくせい
+        tmpstr = dist_string.replace("{", "").replace("}", "")
+        dist_list = [float(x) for x in tmpstr.split(",")]
+        # ここで、dose_list と dist_list を zip する
+        dose_dist_list = list(zip(dose_list, dist_list))
+        return dose_dist_list
+
+    # simulation
+    def doHelicalSIMU(self, left_xyz, right_xyz, cond, phi_face, prefix):
+        self.logger.info("Exposure condition will be considered from now...")
+        start_phi = phi_face - cond['total_osc'] / 2.0
+        end_phi = phi_face + cond['total_osc'] / 2.0
+        data_index=0
+        try:
+            # crystal size is smaller than horizontal beam size
+            # helical data collection is switched to 'single irradiation mode'
+            cry_y_len = numpy.fabs(left_xyz[1] - right_xyz[1]) * 1000.0 # [um]
+            self.logger.info("Crystal length for this measurement: %8.3f [um]" % cry_y_len)
+
+            #if cry_y_len <= cond['ds_hbeam']:
+            if cry_y_len <= (2.0 * cond['ds_hbeam']):
+                self.logger.info("Crystal size is smaller than the horizontal beam size (%5.2f [um])" % cond['ds_hbeam'])
+                self.logger.info("Helical data collection is swithced to the single irradiation mode")
+                # New version : 2025/07/08 
+                # dose_ds = "{0.1, 1.0, 1.0}", dist_ds = "{125, 100, 100}"
+                # のように情報が含まれてるので、ここでループを回す
+                dose_dist_list = self.getDoseDistList(cond)
+                for dose, dist in dose_dist_list:
+                    prefix = "single%02d" % data_index
+                    cond['dose_ds'] = dose
+                    cond['dist_ds'] = dist
+                    #self.doSingle(left_xyz, cond, phi_face, prefix)
+                    self.logger.info("Single irradiation has been prepared with LM.doSingle {prefix=%s}" % prefix)
+                    data_index += 1
+            else:
+                self.logger.info("Generate helical schedule file")
+                # New version : 2025/07/08 
+                # dose_ds = "{0.1, 1.0, 1.0}", dist_ds = "{125, 100, 100}"
+                # のように情報が含まれてるので、ここでループを回す
+                dose_dist_list = self.getDoseDistList(cond)
+                for dose, dist in dose_dist_list:
+                    prefix = "hel%02d" % data_index
+                    cond['dose_ds'] = dose
+                    cond['dist_ds'] = dist
+                    #helical_sch = self.lm.genHelical(start_phi, end_phi, left_xyz, right_xyz, prefix, self.phosec_meas, cond)
+                    self.logger.info("Schedule file has been prepared with LM.genHelical {prefix=%s}" % prefix)
+                    #self.zoo.doDataCollection(helical_sch)
+                    #self.zoo.waitTillReady()
+                    data_index += 1
+                    
+        except Exception as e:
+            self.logger.info("Exception: %s\n" % e)
+            self.logger.info("HEBI.doHelical: ERRors occured in data collection loop.\n")
 
     # Crystal edge: Left/Right vertical scan to define crystal position in 3D
     def edgeCentering(self, cond, phi_face, rough_xyz, LorR = "Left", cry_index=0):
@@ -288,7 +347,7 @@ class HEBI():
                 self.logger.info("HEBI.mainLoop: increment Y coordinate by %8.4f mm" % self.gaburiyoru_h_length)
                 vertical_index += 1
                 if vertical_index > self.gaburiyoru_ntimes:
-                    raise MyException("Left vertical scan finally failed.\n")
+                    raise ZooMyException("Left vertical scan finally failed.\n")
                 else:
                     continue
             if new_xyz[0] != 0.0:
@@ -421,7 +480,7 @@ class HEBI():
                 # generate helical schedule file
                 # doHelical(self,left_xyz,right_xyz,cond,phi_face,prefix,phosec_meas):
                 ds_prefix = "cry%02d" % cry_index
-                sch_file = self.doHelical(left_xyz, right_xyz, cond, phi_face, ds_prefix)
+                sch_file = self.doHelical(left_xyz, right_xyz, cond, phi_face, "hel")
 
             # Crystal index
             cry_index += 1
@@ -433,8 +492,7 @@ class HEBI():
 
 
 if __name__ == "__main__":
-    face_agnle = 60.0
-    # def __init__(self,zoo,loop_measurement,logfile):
+    face_angle = 60.0
 
     zoo = 1
     lm = 2
@@ -442,6 +500,16 @@ if __name__ == "__main__":
     stopwatch = "sw"
     # def __init__(self,zoo,loop_measurement,logfile,stopwatch):
     h2 = HEBI(zoo, lm, log, stopwatch)
+    xyz1= 0.0, 0.0, 0.0
+    xyz2 = 0.0, 0.001, 0.0
+    cond = {'total_osc':360.0,'wavelength': 1.0, 'hebi_att': 10.0, 'ds_hbeam': 10.0, 'ds_vbeam': 10.0, 'dose_ds':"{0.1, 1.0, 1.0}", 'dist_ds':"{125,100,100}"}
+
+    # logging
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    h2.doHelicalSIMU(xyz1,xyz2, cond, face_angle, "test_simu")
+
+    """_summary_
     # def getSortedCryList(self,scan_path,scan_prefix,phi_center,isWeakScan=False):
     # sc= h2.getSortedCryList("/isilon/users/target/target/nagano/190121/Auto/1575-07/scan00/2d/","2d_",260.0,isWeakScan=False)
     sc = h2.getSortedCryList("/isilon/users/target/target/AutoUsers/190122/Toma/PF0082-03/scan00/2d", "2d_", 260.0,
@@ -468,3 +536,5 @@ if __name__ == "__main__":
     # print h2.ana2Dscan("helical_test/lface-00/","lface-00",0.0,method="left_lower")
 
     # DEBUGGIN
+
+    #"""

@@ -2,7 +2,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-import Libs.MyException
+import Libs.ZooMyException
 
 # Modified 2015/07/22
 # Y translation is changed 500um -> 1000um when the loop is 

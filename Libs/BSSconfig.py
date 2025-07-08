@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from Libs import MyException
+from Libs import ZooMyException
 import sys,os
 from configparser import ConfigParser, ExtendedInterpolation
 
@@ -400,7 +400,7 @@ class BSSconfig:
 
         # check if the string was found
         if isFound == False:
-            raise MyException("config string was not found:%s"%confstr)
+            raise ZooMyException("config string was not found:%s"%confstr)
 
         # strip after "#"
         if fstr.rfind("#") != -1:
