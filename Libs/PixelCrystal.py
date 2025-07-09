@@ -1,5 +1,5 @@
 import sys,os,math,numpy
-import MyException
+import ZooMyException
 import time
 import datetime
 import DiffscanLog
@@ -378,7 +378,7 @@ class PixelCrystal:
         # Crystal grid
         if cry_length <= 5.0:
             dc_block['mode'] = "not_collect"
-            raise MyException.CrystalIsTooSmall("Crystal is too small.")
+            raise ZooMyException.CrystalIsTooSmall("Crystal is too small.")
         # 360 deg. rotation crystals
         elif osc_range == 360.0:
             if cry_length >= 40.0:
@@ -541,12 +541,12 @@ class PixelCrystal:
             # in this case: situation is not so good.
             if min_v == max_v:
                 self.logger.info("MIN_V and MAX_V is same coordinates!!")
-                raise MyException.SameVerticalCordinates()
+                raise ZooMyException.SameVerticalCordinates()
             else:
                 self.logger.info("MIN_V, MAX_V= %5d, %5d" % (min_v, max_v))
         else:
             self.logger.info("Not found : H=%5d" % htarget)
-            raise MyException.FailedToGetVcenter()
+            raise ZooMyException.FailedToGetVcenter()
 
         # Crystal coordinate calculation
         medium_v = int((float(min_v) + float(max_v))/2.0)

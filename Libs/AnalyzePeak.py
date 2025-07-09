@@ -9,7 +9,7 @@ import numpy
 #from numpy import *
 from pylab import *
 from scipy.interpolate import splrep,splev,interp1d,splprep
-import MyException
+import ZooMyException
 
 class AnalyzePeak:
     def __init__(self,datfile):
@@ -1084,14 +1084,14 @@ class AnalyzePeak:
             maxx1=self.getXinY(px,py1,maxy1)
             fwhm,center=self.newFWHM(px,py1)
             if fwhm==0:
-                raise MyException("analyzeAll failed: FWHM is none\n")
+                raise ZooMyException("analyzeAll failed: FWHM is none\n")
 
         else:
             maxy1=sy1.max()
             maxx1=self.getXinY(px,sy1,maxy1)
             fwhm,center=self.newFWHM(px,sy1)
             if fwhm==0:
-                raise MyException("analyzeAll failed: FWHM is none%s\n")
+                raise ZooMyException("analyzeAll failed: FWHM is none%s\n")
 
         # plot all data
         pylab.xlabel(xlabel)
@@ -1153,14 +1153,14 @@ class AnalyzePeak:
             maxx1=self.getXinY(px,py1,maxy1)
             fwhm,center=self.newFWHM(px,py1)
             if fwhm==0:
-                raise MyException("analyzeAll failed: FWHM is none\n")
+                raise ZooMyException("analyzeAll failed: FWHM is none\n")
 
         else:
             maxy1=sy1.max()
             maxx1=self.getXinY(px,sy1,maxy1)
             fwhm,center=self.newFWHM(px,sy1)
             if fwhm==0:
-                raise MyException("analyzeAll failed: FWHM is none%s\n")
+                raise ZooMyException("analyzeAll failed: FWHM is none%s\n")
 
         # plot all data
         pylab.xlabel(xlabel)

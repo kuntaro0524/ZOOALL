@@ -1,5 +1,5 @@
 import sys, os, math, numpy
-from MyException import *
+from ZooMyException import *
 import time
 import datetime
 import DiffscanLog

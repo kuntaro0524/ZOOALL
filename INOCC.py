@@ -5,7 +5,7 @@ import numpy as np
 import File
 import matplotlib
 import matplotlib.pyplot as plt
-from MyException import *
+from ZooMyException import *
 import CryImageProc
 import CoaxImage
 import BSSconfig
@@ -117,8 +117,8 @@ class INOCC:
         """
         try:
             os.system("\\rm -Rf %s"%self.fname)
-        except MyException,ttt:
-            raise MyException("Centering:init fails to remove the previous 'test.ppm'")
+        except ZooMyException,ttt:
+            raise ZooMyException("Centering:init fails to remove the previous 'test.ppm'")
         return
         """
         self.isInit = True
@@ -306,7 +306,7 @@ class INOCC:
 
             # Check a distance from mount position
             if self.isYamagiwaSafe(gx, newgy, gz) == False:
-                raise MyException("Movement was larger than limited value (Yamagiwa safety)")
+                raise ZooMyException("Movement was larger than limited value (Yamagiwa safety)")
             else:
                 self.gonio.moveXYZPhi(gx, newgy, gz, phi)
             return False
@@ -347,10 +347,10 @@ class INOCC:
             self.logger.error(f"FatalCenteringError during simpleCenter at phi={phi:.2f}: {e}")
             # 受け取った例外をそのまま再スローする
             raise
-        except MyException as ttt:
+        except ZooMyException as ttt:
             # messageはそのまま継承して表示する
             self.logger.info("Simple centering failed but not fatal")
-            raise MyException("Simple centering failed but not fatal")
+            raise ZooMyException("Simple centering failed but not fatal")
 
         self.logger.info("PHI: %5.2f deg Option=%s Centering: (Xtarget, Ytarget) = (%5d, %5d) HAMIDASHI = %s\n"
                          % (phi, option, xtarget, ytarget, hamidashi_flag))
@@ -426,7 +426,7 @@ class INOCC:
             area, hamidashi_flag = self.simpleCenter(phi_center, option="top")
             area_array.append((phi_center, area))
         except:
-            raise MyException("suribachiCentering failed")
+            raise ZooMyException("suribachiCentering failed")
 
         self.logfile.write("AAAAAAAAAAAREEE %s AREAERRE\n" % area_array)
         self.logfile.write("EEEEEEEEEEEEEEEEEE  SURIBACHI ENDS EEEEEEEEEEEEEEEEEE\n")
@@ -485,8 +485,8 @@ class INOCC:
                     # 受け取った例外をそのまま再スローする
                     raise
                 # Case when the loop was not found in the trial section
-                except MyException as ttt:
-                    # raise MyException("INOCC.coreCentering failed"
+                except ZooMyException as ttt:
+                    # raise ZooMyException("INOCC.coreCentering failed"
                     self.logfile.write("Go to next phi from %5.2f deg\n" % phi)
                     continue
             else:
@@ -494,7 +494,7 @@ class INOCC:
                 area, hamidashi_flag = self.simpleCenter(phi, loop_size=loop_size, option='top')
 
         if n_good == 0:
-            raise MyException("coreCentering failed")
+            raise ZooMyException("coreCentering failed")
 
         return n_good, phi_area_list
 
@@ -529,17 +529,17 @@ class INOCC:
                 self.logger.error(f"FatalCenteringError during edgeCentering: {ttt}")
                 # 受け取った例外をそのまま再スローする
                 raise
-            except MyException as tttt:
+            except ZooMyException as tttt:
                 self.logger.info("INOCC.edgeCentering moves Y 2000um")
                 gx, gy, gz, phi = self.gonio.getXYZPhi()
                 move_ymm = self.cip.calcYdistAgainstGoniometer(2.0)
                 newgy = gy + move_ymm
                 if self.isYamagiwaSafe(gx, newgy, gz) == False:
-                    raise MyException("Movement was larger than threshold (Yamagiwa safety)")
+                    raise ZooMyException("Movement was larger than threshold (Yamagiwa safety)")
                 
                 self.gonio.moveXYZPhi(gx, newgy, gz, phi)
         if n_good == 0:
-            raise MyException("edgeCentering failed")
+            raise ZooMyException("edgeCentering failed")
 
         print("################### EDGE CENTERING ENDED ######################")
         return n_good, phi_area_list
@@ -564,7 +564,7 @@ class INOCC:
                 grav_x, grav_y, xwidth, ywidth, area, xedge, yedge = \
                     self.cip.getCenterInfo(self.fname, debug=False)
                 print("PHI AREA=", phi, area)
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 # print ttt.args[1]
                 continue
             if min_area > area:
@@ -628,7 +628,7 @@ class INOCC:
                 self.logger.debug(f"FatalCenteringError during edgeCentering: {ttt}")
                 # 受け取った例外をそのまま再スローする
                 raise
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 self.logger.debug("The first edge centering failed..")
                 try:
                     self.logger.debug("The second edge centering..")
@@ -638,10 +638,10 @@ class INOCC:
                     self.logger.debug(f"FatalCenteringError during edgeCentering: {ttt}")
                     # 受け取った例外をそのまま再スローする
                     raise
-                except MyException as tttt:
+                except ZooMyException as tttt:
                     self.logger.debug("The second edge centering failed. Raise exception")
                     self.logger.debug("%s" % tttt)
-                    raise MyException("Loop cannot be found after edgeCentering x 2 times. %s " % tttt)
+                    raise ZooMyException("Loop cannot be found after edgeCentering x 2 times. %s " % tttt)
 
             try:
                 phi_face = self.fitAndFace(phi_area_list)
@@ -665,9 +665,9 @@ class INOCC:
                 self.logger.debug(f"FatalCenteringError during fitAndFace: {ttt}")
                 # 受け取った例外をそのまま再スローする
                 raise
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 self.logger.debug("fitAndFace failed")
-                raise MyException("fitAndFace failed")
+                raise ZooMyException("fitAndFace failed")
 
         # Final centering
         cx, cy, cz, phi = self.gonio.getXYZPhi()

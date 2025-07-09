@@ -7,7 +7,7 @@ import pylab
 import numpy
 # from numpy import *
 from pylab import *
-from MyException import *
+from ZooMyException import *
 
 class DiffscanLog:
     def __init__(self, path, filename="diffscan.log"):
@@ -44,7 +44,7 @@ class DiffscanLog:
     # ) A simple function to read lines
     # )
     def readfile(self):
-        print("Reading %s" % self.filename)
+        print("Reading %:s" % self.filename)
         ifile = open(self.filename, "r")
         self.lines = ifile.readlines()
         ifile.close()
@@ -219,7 +219,7 @@ class DiffscanLog:
             print("getXYZindex: frame_index=", frame_index)
 
         if frame_index > n_xyz or frame_index < 0:
-            raise MyException("getXYZindex: invalid index number")
+            raise ZooMyException("getXYZindex: invalid index number")
 
         else:
             for xyz in xyzlist:

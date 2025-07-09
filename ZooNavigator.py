@@ -23,7 +23,7 @@ from Libs import BSSconfig
 import cv2
 import time
 import math
-from MyException import *
+from ZooMyException import *
 from html_log_maker import ZooHtmlLog
 from ErrorCode import ErrorCode
 
@@ -267,7 +267,7 @@ class ZooNavigator():
         # Check if the pin is mounted or not
         try:
             self.zoo.dismountCurrentPin()
-        except MyException as tttt:
+        except ZooMyException as tttt:
             self.logger.info("dismounting sample for capturing background image failed.")
             sys.exit()
         # Background image for centering
@@ -281,8 +281,8 @@ class ZooNavigator():
                 time.sleep(0.5)
                 self.logger.debug("The 2nd image..")
                 self.dev.capture.capture(self.backimg)
-            except MyException as tttt:
-                raise MyException("Capture background file failed")
+            except ZooMyException as tttt:
+                raise ZooMyException("Capture background file failed")
                 sys.exit()
 
             timg = cv2.imread(self.backimg)
@@ -371,7 +371,7 @@ class ZooNavigator():
                 self.processLoop(cond, checkEnergyFlag=True)
                 self.logger.info("ZN: processLoop has been finished for this pin.")
 
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 # Logging a caught exception message from modules.
                 exception_message = ttt.args[0]
                 self.logger.info("+++ Caught exception in a main loop.:%s +++" % exception_message)
@@ -429,7 +429,7 @@ class ZooNavigator():
                 cond = self.esa.getPriorPinCond()
                 self.processLoop(cond, checkEnergyFlag=True)
                 self.logger.info("ZN: processLoop has been finished for this pin.")
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 # Logging a caught exception message from modules.
                 exception_message = ttt.args[0]
                 self.logger.info("+++ Caught exception in a main loop.:%s +++" % exception_message)
@@ -699,7 +699,7 @@ class ZooNavigator():
         """
         try:
             self.zoo.mountSample(trayid, pinid)
-        except MyException as ttt:
+        except ZooMyException as ttt:
             exception_message = ttt.args[0]
             self.logger.info("Failed to mount a sample pin:%s" % ttt)
             # Accident case
@@ -875,7 +875,7 @@ class ZooNavigator():
             self.updateDBinfo(cond, "scan_width", self.rwidth)
 
         # exception reason
-        except MyException as ttt:
+        except ZooMyException as ttt:
             self.logger.error("ZOO detects exception in centering")
             # reason
             exception_message = ttt.args[0]
@@ -1064,7 +1064,7 @@ class ZooNavigator():
             gfile.close()
 
         # Raster scan analysis failed.
-        except MyException as tttt:
+        except ZooMyException as tttt:
             logstring = tttt.args[0]
             self.logger.warning(f"Raster scan failed: {logstring}")
             # isDone, meas_record にエラーコードを入れる
@@ -1377,7 +1377,7 @@ class ZooNavigator():
             gfile.close()
 
         # Raster scan failed
-        except MyException as message:
+        except ZooMyException as message:
             self.logger.info("Caught error: %s " % message)
             self.logger.info("Skipping this loop: diffraction based centering loop.")
             # isDone, meas_record にエラーコードを入れる
@@ -1504,7 +1504,8 @@ class ZooNavigator():
             if n_crystals > 0:
                 self.updateDBinfo(cond, "nds_helical", n_crystals)
                 # Data proc
-                sample_name = cond['sample_name'] root_dir = cond['root_dir']
+                sample_name = cond['sample_name'] 
+                root_dir = cond['root_dir']
                 self.data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
                 self.data_proc_file.flush()
                 # Log file for time stamp
@@ -1710,7 +1711,7 @@ class ZooNavigator():
             # end_time
             #self.updateTime(cond, "meas_end", comment="Measurement normally finished")
 
-        except MyException as tttt:
+        except ZooMyException as tttt:
             self.logger.warning("Skipping this loop!!")
             # logging
             logstr = f"Raster scan failed during analysis: {tttt.args[0]}"

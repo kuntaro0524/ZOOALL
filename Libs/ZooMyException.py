@@ -1,4 +1,5 @@
 class ZooMyException(Exception): pass
+MyException = ZooMyException
 class MovementFailed(Exception): pass
 class NandaKandaExcept(Exception): pass
 class verticalCenteringFailed(Exception): pass

@@ -10,3 +10,4 @@ wget-log*
 *png
 *.log
 beamline.ini
+zoo.sh

@@ -10,7 +10,7 @@ from Motor import *
 from AxesInfo import *
 #from ConfigFile import *
 from TCS import *
-from MyException import *
+from ZooMyException import *
 
 import BSSconfig
 from configparser import ConfigParser, ExtendedInterpolation
@@ -182,7 +182,7 @@ class Mono:
             tcsh = conf.getCondition2(confchar, "tcsh")
             detune_pls = int(conf.getCondition2(confchar, "detune"))
 
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
 
@@ -219,7 +219,7 @@ class Mono:
             tcsh = conf.getCondition2(confchar, "tcsh")
             detune_pls = int(conf.getCondition2(confchar, "detune"))
 
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
 
@@ -250,11 +250,11 @@ class Mono:
         comment = AxesInfo(self.s).getLeastInfo()
         try:
             fwhm, center = ana.analyzeAll("dtheta1[pulse]", "Intensity", outfig, comment, "OBS", "PEAK")
-        except MyException as ttt:
-            raise MyException("Dtheta1 tune peak analysis failed.%s" % ttt.args[0])
+        except ZooMyException as ttt:
+            raise ZooMyException("Dtheta1 tune peak analysis failed.%s" % ttt.args[0])
 
         if fwhm == 0.0:
-            raise MyException("Bad peak shape!!")
+            raise ZooMyException("Bad peak shape!!")
 
         # back lash position
         bl_pos = counter_1_max - backlash
@@ -286,7 +286,7 @@ class Mono:
             tcsh = conf.getCondition2(confchar, "tcsh")
             detune_pls = int(conf.getCondition2(confchar, "detune"))
 
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
 
@@ -315,11 +315,11 @@ class Mono:
         comment = AxesInfo(self.s).getLeastInfo()
         try:
             fwhm, center = ana.analyzeAll("dtheta1[pulse]", "Intensity", outfig, comment, "OBS", "PEAK")
-        except MyException as ttt:
-            raise MyException("Dtheta1 tune peak analysis failed.%s" % ttt.args[0])
+        except ZooMyException as ttt:
+            raise ZooMyException("Dtheta1 tune peak analysis failed.%s" % ttt.args[0])
 
         if fwhm == 0.0:
-            raise MyException("Bad peak shape!!")
+            raise ZooMyException("Bad peak shape!!")
 
         # back lash position
         bl_pos = counter_1_max - backlash

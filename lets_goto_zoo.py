@@ -15,7 +15,7 @@ logging_conf = config.get("files", "logging_conf")
 import Zoo
 import datetime
 import ZooNavigator
-from MyException import *
+from ZooMyException import *
 import socket
 import MyDate
 import logging

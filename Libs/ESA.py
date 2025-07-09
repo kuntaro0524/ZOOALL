@@ -1,5 +1,5 @@
 import sqlite3, csv, os, sys, copy, datetime
-import MyException
+import ZooMyException
 import re
 
 import logging
@@ -153,7 +153,7 @@ class ESA:
 
         msg = "ESA.getPriorPin: Not found.\n"
         print(msg)
-        raise MyException.MyException(msg)
+        raise ZooMyException.MyException(msg)
 
     def updateValue(self, paramname, value, condition):
         con = sqlite3.connect(self.dbname)
@@ -618,7 +618,7 @@ class ESA:
                     msg = "Duplication in CSV file: %s-%s and %s-%s. Please fix it!\n" % (
                         check_puck, check_pin, tmp_puck, tmp_pin)
                     #print msg
-                    raise MyException.MyException(msg)
+                    raise ZooMyException.MyException(msg)
 
         # experimental scheme check
         for cond in condition_list:
@@ -634,7 +634,7 @@ class ESA:
             if ok_flag == False:
                 msg = "No such experimental scheme!! %s-%02d : >> %s << Please fix it!\n" % (
                     cond[3], cond[4], cond[2])
-                raise MyException.MyException(msg)
+                raise ZooMyException.MyException(msg)
         # Check Mode
 
         return condition_list

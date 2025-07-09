@@ -2,7 +2,7 @@ import os, sys, glob
 import time, datetime
 import numpy as np
 import socket
-from MyException import *
+from ZooMyException import *
 import logging
 import logging.config
 from configparser import ConfigParser, ExtendedInterpolation
@@ -48,7 +48,7 @@ class Zoo:
                 self.bssr.connect((self.bss_srv, self.bss_port))
                 self.isConnect = True
                 return True
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 print("connect: failed. %s" % ttt.args[0])
                 time.sleep(20.0)
         return False
@@ -111,10 +111,10 @@ class Zoo:
             # 210415 K.Hirata (strange answer from BSS)
             if self.wait_flag: time.sleep(0.5)
             self.waitSPACE()
-        except MyException as ttt:
+        except ZooMyException as ttt:
             self.logger.info("Received message=%s" % ttt)
             message = ttt.args[0]
-            raise MyException(ttt.args[0])
+            raise ZooMyException(ttt.args[0])
 
     def exchangeSample(self, trayID, pinID):
         # print(trayID, pinID)
@@ -122,8 +122,8 @@ class Zoo:
         recstr = self.communicate(com)
         try:
             self.waitTillReady()
-        except MyException as ttt:
-            raise MyException("exchangeSample: failed. %s" % ttt.args[0])
+        except ZooMyException as ttt:
+            raise ZooMyException("exchangeSample: failed. %s" % ttt.args[0])
 
     def isMounted(self):
         com = "get/sample/on_gonio"
@@ -158,8 +158,8 @@ class Zoo:
             if self.wait_flag: time.sleep(0.5)
             print("Entering waiting loop for SPACE...")
             self.waitSPACE()
-        except MyException as ttt:
-            raise MyException("mountSample: failed. %s" % ttt.args[0])
+        except ZooMyException as ttt:
+            raise ZooMyException("mountSample: failed. %s" % ttt.args[0])
 
     def getCurrentPin(self):
         com = "get/sample/on_gonio"
@@ -171,7 +171,7 @@ class Zoo:
             self.logger.info("Error code = %s" % error_code)
             if int(error_code) == -1005000009:
                 self.logger.error("SPACE server does not know current pin information")
-                raise MyException("SPACE server does not know the current pin information")
+                raise ZooMyException("SPACE server does not know the current pin information")
 
         puck_pin = self.getSVOC_C(recstr)
         puck_char, pin_char = puck_pin.split('_')
@@ -204,9 +204,9 @@ class Zoo:
             # 210415 K.Hirata (strange answer from BSS)
             if self.wait_flag: time.sleep(0.5)
             self.waitSPACE()
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print("TTT=", ttt)
-            raise MyException("cleaning: failed. %s" % ttt.args[0])
+            raise ZooMyException("cleaning: failed. %s" % ttt.args[0])
 
     def capture(self, filename):
         command = "put/video/capture_%s" % filename
@@ -240,7 +240,7 @@ class Zoo:
             if svoc_c.rfind("ready") != -1:
                 return False
             elif svoc_c.rfind("fail") != -1:
-                raise MyException("Something failed.")
+                raise ZooMyException("Something failed.")
             else:
                 return True
 
@@ -258,8 +258,8 @@ class Zoo:
                     time.sleep(2.0)
                 else:
                     break
-            except MyException as ttt:
-                raise MyException("waitTillReady: Some error occurred : %s" % ttt.args[0])
+            except ZooMyException as ttt:
+                raise ZooMyException("waitTillReady: Some error occurred : %s" % ttt.args[0])
 
     def isBusy(self):
         if self.isConnect == False:
@@ -274,7 +274,7 @@ class Zoo:
                 print("isBusy:RECBUF=", recstr)
                 return False
             elif svoc_c.rfind("fail") != -1:
-                raise MyException("Something failed.")
+                raise ZooMyException("Something failed.")
             else:
                 return True
 
@@ -330,7 +330,7 @@ class Zoo:
                 else:
                     message = "unknown error code. (code = %s)" % error_code
                 self.logger.error(message)
-                raise MyException(message)
+                raise ZooMyException(message)
             else:
                 print("waiting...")
                 time.sleep(5.0)
@@ -343,8 +343,8 @@ class Zoo:
                     time.sleep(2.0)
                 else:
                     break
-            except MyException as ttt:
-                raise MyException("Some error occurred : %s" % ttt.args[0])
+            except ZooMyException as ttt:
+                raise ZooMyException("Some error occurred : %s" % ttt.args[0])
 
     def doDataCollection(self, jobfile):
         # JOB FILE NAME MUST NOT INCLUDE "_"
@@ -383,7 +383,7 @@ class Zoo:
                 # print "waitTillFinish:RECBUF=",recstr
                 break
             elif svoc_c.rfind("fail") != -1:
-                raise MyException("Something failed.")
+                raise ZooMyException("Something failed.")
             else:
                 time.sleep(2.0)
                 continue
@@ -411,7 +411,7 @@ class Zoo:
                 self.logger.info("Go to the next loop...")
 
                 continue
-        raise MyException("getBeamsize: failed. Check beamsize.config")
+        raise ZooMyException("getBeamsize: failed. Check beamsize.config")
 
     def getWavelength(self):
         self.logger.info("getting wavelength from BSS.")
@@ -443,7 +443,7 @@ class Zoo:
                 self.logger.info("Go to the next loop...")
                 time.sleep(2.0)
                 continue
-        raise MyException("getWavelength: failed. Check beamsize.config")
+        raise ZooMyException("getWavelength: failed. Check beamsize.config")
 
     def setWavelength(self, wavelength):
         com = "put/beamline/wavelength_%7.5fA" % wavelength
@@ -453,7 +453,7 @@ class Zoo:
             recstr = self.communicate(com)
             self.waitTillFinish(query_command)
         except:
-            raise MyException("getWavelength: failed. Check beamsize.config")
+            raise ZooMyException("getWavelength: failed. Check beamsize.config")
 
     def onlyQuery(self):
         com = "get/beamline/query"

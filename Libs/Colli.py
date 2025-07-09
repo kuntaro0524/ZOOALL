@@ -11,7 +11,7 @@ import os
 from Received import *
 from Motor import *
 import BSSconfig
-from MyException import *
+from ZooMyException import *
 from configparser import ConfigParser, ExtendedInterpolation
 import BaseAxis
 import WebSocketBSS 
@@ -195,12 +195,12 @@ class Colli(BaseAxis.BaseAxis):
             fwhm, center = ana.analyzeAll("colliZ[pulse]", "Intensity", outfig, strtime, "OBS", "JJJJ")
             print(fwhm, center)
             fwhm_z = fwhm / 2.0  # [um]
-        except MyException as ttt:
+        except ZooMyException as ttt:
             self.colz.move(0)
             err_log01 = "%s\n" % ttt.args[0]
             err_log02 = "Collimetor Z scan failed\n"
             err_all = err_log01 + err_log02
-            raise MyException(err_all)
+            raise ZooMyException(err_all)
 
         print("setting collimeter Z")
         self.colz.move(center)
@@ -241,12 +241,12 @@ class Colli(BaseAxis.BaseAxis):
         try:
             fwhm, center = ana.analyzeAll("colliY[pulse]", "Intensity", outfig, strtime, "OBS", "JJJJ")
             fwhm_y = fwhm * 2.0  # [um]
-        except MyException as ttt:
+        except ZooMyException as ttt:
             self.coly.move(0)
             err_log01 = "%s\n" % ttt.args[0]
             err_log02 = "Collimetor Y scan failed\n"
             err_all = err_log01 + err_log02
-            raise MyException(err_all)
+            raise ZooMyException(err_all)
 
         self.coly.move(center)
         self.coly.preset(0)
@@ -403,7 +403,7 @@ class Colli(BaseAxis.BaseAxis):
         try:
             fwhm, center = ana.analyzeAll("colliZ[pulse]", "Intensity", outfig, strtime, "OBS", "JJJJ")
             fwhm_z = fwhm / 2.0  # [um]
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print("Collimeter scan failed")
             print(ttt.args[0])
             return 0, 0, 30, 30
@@ -449,7 +449,7 @@ class Colli(BaseAxis.BaseAxis):
         try:
             fwhm, center = ana.analyzeAll("colliY[pulse]", "Intensity", outfig, strtime, "OBS", "JJJJ")
             fwhm_y = fwhm * 2.0  # [um]
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print("Collimeter scan failed")
             print(ttt.args[0])
             return 0, 0, 30, 30

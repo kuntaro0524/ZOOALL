@@ -28,7 +28,7 @@ import Flux
 import PreColli
 from configparser import ConfigParser, ExtendedInterpolation
 import WebSocketBSS
-import MyException
+import ZooMyException
 
 class Device(Singleton.Singleton):
     def __init__(self, ms_port):
@@ -71,7 +71,7 @@ class Device(Singleton.Singleton):
             self.total_num=conf.getCondition2("FIXED_POINT","total_num")
             self.count_time=conf.getCondition2("FIXED_POINT","time")
 
-        except MyException.MyException as ttt:
+        except ZooMyException.MyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
             sys.exit(1)
