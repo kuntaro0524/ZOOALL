@@ -50,7 +50,8 @@ class KUMA:
 
     def getDose1sec(self, beam_h, beam_v, flux, energy):
         # density_limit は tableにある数値 → 10 MGy に到達するまでの photon density
-        dose_per_photon, density_limit = self.getDoseLimitParams(energy=energy)
+        aimed_dose = 10.0 # MGy
+        dose_per_photon, density_limit = self.getDoseLimitParams(aimed_dose, energy=energy)
         # このビームの flux density を計算する
         flux_density = flux / (beam_h * beam_v)
         # このビームの 1 sec あたりの dose を計算する
