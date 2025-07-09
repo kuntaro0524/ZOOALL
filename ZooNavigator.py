@@ -1494,8 +1494,12 @@ class ZooNavigator():
         # HEBI instance
         hebi = HEBI.HEBI(self.zoo, self.lm, self.stopwatch, flux)
 
-        # Log for dose
-        self.logger.info("Dose limit  = %3.1f[MGy]" % cond['dose_ds'])
+        # Log for dose list
+        # 250709 dose_ds contains '{1.0, 10.0, 10.0}' as a string
+        dose_list = cond['dose_ds'].strip("{}").split(",")
+        for dose in dose_list:
+            self.logger.info(f"dose for helical data collection: {dose.strip()}")
+
         n_crystals = 0
         try:
             self.updateTime(cond, "ds_start", comment="Data collection started")

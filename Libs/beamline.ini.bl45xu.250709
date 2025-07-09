@@ -85,7 +85,8 @@ att_raster = 20
 hebi_att = 20
 cover_flag = 1
 exp_ds=0.02
-max_hori_scan_speed = 1000.0 # [um/s]
+# unit [um/sec]
+max_hori_scan_speed = 1000.0 
 
 # Raster ROIにするかどうか
 raster_roi = 1
@@ -98,7 +99,7 @@ resol_raster=4.0
 # "" are not required to define 'character variable'
 gonio_direction =FROM_LEFT
 # pin channel
-pin_channel = 3
+pin_channel = 1
 # pulse for non-attenuated beam
 pulse_for_noatt = 3500
 
@@ -162,3 +163,10 @@ det_cover = cover_1_z
 beammonitor_y = st2_monitor_1_y
 beammonitor_x = st2_monitor_1_x
 beammonitor_z = st2_monitor_1_z
+# Monochromator axes
+mono_dtheta1_axis=bl_45in_tc1_mono_1_dtheta
+mono_dtheta1_unit=pulse
+mono_energy_axis=bl_45in_tc1_mono_1
+mono_energy_unit=kev
+mono_theta_axis=bl_45in_tc1_mono_1_theta
+mono_theta_unit=deg
