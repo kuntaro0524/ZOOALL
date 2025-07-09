@@ -87,7 +87,6 @@ cover_flag = 1
 exp_ds=0.02
 # unit [um/sec]
 max_hori_scan_speed = 1000.0 
-
 # Raster ROIにするかどうか
 raster_roi = 1
 # raster_roi=1の場合には
@@ -100,8 +99,15 @@ resol_raster=4.0
 gonio_direction =FROM_LEFT
 # pin channel
 pin_channel = 1
+# pin_uA convetion factor
+# BL45XU : value / 10.0 * 2.0　という謎の計算式
+pin_uA_conv = 0.2
+# BL32XU : value / 100.0 でOK
+# pin_uA_conv = 0.01
 # pulse for non-attenuated beam
 pulse_for_noatt = 3500
+# wait time in changing energy @BL45XU [min]
+wait_time_change_energy = 1
 
 [detector]
 # カメラ長最短 [mm]
