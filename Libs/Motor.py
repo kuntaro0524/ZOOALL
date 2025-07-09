@@ -255,6 +255,7 @@ class Motor(ScanAxis.ScanAxis):
 
         rrrr = Received.Received(recbuf)
         position = rrrr.readQuery()
+        print(f"position={position}")
 
         if position.find("kev") != -1:
             value = float(position.replace("kev", ""))

@@ -621,6 +621,29 @@ class UserESA():
         self.logger.info(f"dist_raster: {dist_raster}")
         self.df['dist_raster'] = dist_raster
 
+    def checkScanSpeed(self):
+        # exp_raster　の数値について確認をする→水平方向のスキャン速度の上限に依存する
+        # self.df に含まれる exp_rasterの数値を確認する
+        # raster_hbeam [um] / exp_raster [s] = scan speed[um/s]
+        # max_scan_speed = self.config.getfloat("experiment", "max_scan_speed") を超える場合は
+        # exp_rasterの数値を変更する
+        # exp_raster = raster_hbeam / max_scan_speed
+        for i, row in self.df.iterrows():
+            # raster_hbeam の数値を取得する
+            raster_hbeam = row['raster_hbeam']
+            # exp_raster の数値を取得する
+            exp_raster = row['exp_raster']
+            # max_scan_speed の数値を取得する
+            max_scan_speed = self.config.getfloat("experiment", "max_hori_scan_speed")
+            # scan speed を計算する
+            scan_speed = raster_hbeam / exp_raster
+            
+            # scan speed が max_scan_speed を超える場合は exp_raster を変更する
+            if scan_speed > max_scan_speed:
+                new_exp_raster = raster_hbeam / max_scan_speed
+                self.df.at[i, 'exp_raster'] = new_exp_raster
+                self.logger.warning(f"Scan speed {scan_speed:.2f} um/s exceeds the maximum limit {max_scan_speed:.2f} um/s. Adjusting exp_raster to {new_exp_raster:.2f} s.")
+
     def makeCondList(self):
         # DataFrameとしてExcelファイルを読み込む　 →　self.df
         self.read_new()
@@ -639,6 +662,8 @@ class UserESA():
         self.fillFlux()
         # default parameterをDataFrameに入れていく（beamline.iniからほとんど読み込んでいる）
         self.setDefaults()
+        # Checking scan speed for the horizontal direction
+        self.checkScanSpeed()
         # raster scanの露光条件の決定
         self.defineScanCondition()
         # 露光条件について検討。transmission > 100% のときに露光時間とtransmissionを編集する
