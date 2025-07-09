@@ -352,7 +352,7 @@ class AnaHeatmap:
             cycle_list = []
             while (1):
                 cycle_list = self.process_cycle(check_map, kdtree_map, kdtree, good_list)
-                print("The next good_list=", cycle_list)
+                self.logger.info(f"Cycle list={cycle_list}")
                 if len(cycle_list) != 0:
                     cry_indices += cycle_list
                     good_list = cycle_list
@@ -360,7 +360,7 @@ class AnaHeatmap:
                     break
             crystal_list.append(cry_indices)
 
-        print("Number of found crystal=", len(crystal_list))
+        self.logger.info("Number of found crystal=", len(crystal_list))
 
         # Logging
         if self.debug == True:

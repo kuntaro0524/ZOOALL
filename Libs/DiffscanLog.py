@@ -44,7 +44,7 @@ class DiffscanLog:
     # ) A simple function to read lines
     # )
     def readfile(self):
-        print("Reading %:s" % self.filename)
+        print("Reading %s" % self.filename)
         ifile = open(self.filename, "r")
         self.lines = ifile.readlines()
         ifile.close()

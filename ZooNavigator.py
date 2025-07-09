@@ -600,7 +600,8 @@ class ZooNavigator():
                     self.logger.info("Wavelength will be changed.")
                     self.zoo.setWavelength(cond['wavelength'])
                     self.logger.info("Wavelength has been changed. You should wait for 15 minutes")
-                    time.sleep(15 * 60)
+                    sleep_time_mins = float(self.config.get("experiment", "wait_time_change_energy"))
+                    time.sleep(sleep_time_mins * 60)
                     self.logger.info("Tuning is required.")
                     # 2020/04/06 Dtheta1 tune will be conducted
                     self.logger.info("BOSS command : BLdtheta_tune will be run.")

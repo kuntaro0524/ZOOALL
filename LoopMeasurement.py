@@ -160,10 +160,10 @@ class LoopMeasurement:
             self.rwidth = rwidth
 
             return rwidth, rheight
-        except MyException as e:
+        except ZooMyException as e:
             self.logger.warning("Exception detected.{0}".format(e))
             self.logger.warning("Exception detected.")
-            raise MyException("Centering failed.")
+            raise ZooMyException("Centering failed.")
 
     # 2016/10/08 height_add was added. unit [um]
     def roughCentering(self, backimg, loop_size=600, offset_angle=0.0, height_add=0.0, largest_movement=5.0):
@@ -461,7 +461,7 @@ class LoopMeasurement:
                 self.raster_n_height = int(vscan_um / vstep_um)
             self.raster_n_width = 1
         else:
-            raise MyException("rasterMaster: scan setting failed")
+            raise ZooMyException("rasterMaster: scan setting failed")
 
         # Raster schedule file path
         raster_path = "%s/%s/" % (self.raster_dir, scan_id)
@@ -601,8 +601,8 @@ class LoopMeasurement:
         sshika.waitingForSummary()
         try:
             glist = sshika.readSummary()
-        except MyException as tttt:
-            raise MyException("SHIKA could not get any good crystasl")
+        except ZooMyException as tttt:
+            raise ZooMyException("SHIKA could not get any good crystasl")
 
         left_xyz = [99.999, 99.999, 99.999]
         right_xyz = [99.999, 99.999, 99.999]
@@ -632,10 +632,10 @@ class LoopMeasurement:
 
         if xmin == 99.9999 or ymin == 99.9999 or zmin == 99.9999:
             print("shikaEdges:XMIN")
-            raise MyException("Left edge of the crystal: Wrong")
+            raise ZooMyException("Left edge of the crystal: Wrong")
         elif xmax == 99.9999 or ymax == 99.9999 or zmax == 99.9999:
             print("shikaEdges:XMAX")
-            raise MyException("Right edge of the crystal: Wrong")
+            raise ZooMyException("Right edge of the crystal: Wrong")
         else:
             left_code = xmin, ymin, zmin
             right_code = xmax, ymax, zmax
@@ -663,8 +663,8 @@ class LoopMeasurement:
             ashika.readSummary(prefix, ngrids, comp_thresh=comp_thresh, timeout=600)
             print("LoopMeasurement.readSummaryDat succeeded.")
 
-        except MyException as tttt:
-            raise MyException("shikaSumSkipStrong failed to wait summary.dat")
+        except ZooMyException as tttt:
+            raise ZooMyException("shikaSumSkipStrong failed to wait summary.dat")
 
         return ashika
 
@@ -1167,6 +1167,9 @@ class LoopMeasurement:
         return multi_sch
 
     # 2019/05/22 Largely modified to use KUMA
+    # 2025/07/09 dose_listに対応はしているが、この関数の呼び出し以降は
+    # dose_listを使わず、cond['dose_ds']に数値が単体で入っている
+    # (HEBI.pyの中で展開してからこちらの呼び出しをしている)
     def genHelical(self, startphi, endphi, left_xyz, right_xyz, prefix, flux, cond):
         schbss = ScheduleBSS.ScheduleBSS()
         gv = GonioVec.GonioVec()
@@ -1183,7 +1186,7 @@ class LoopMeasurement:
         dist_vec = np.fabs(scanvec[1])
 
         if dist_vec < 0.005:
-            raise MyException("crystal size is too small for helical data collection")
+            raise ZooMyException("crystal size is too small for helical data collection")
 
         nframes_per_point = 1
         while (1):
@@ -1211,7 +1214,7 @@ class LoopMeasurement:
         cond['total_osc'] = total_osc
 
         exp_time, best_transmission = kuma.getBestCondsHelical(cond, flux, dist_vec)
-        self.logger.info("Best transmission = %8.2f" % best_transmission)
+        self.logger.info("Best transmission = %8.6f" % best_transmission)
         self.logger.info("Estimate best ends....")
         ntimes = cond['ntimes']
 

@@ -5,17 +5,16 @@ import socket
 import time
 import datetime
 
-sys.path.append("/isilon/BL45XU/BLsoft/PPPP/Libs/")
 
-import Device
-host = '172.24.242.59'
-port = 10101
+# BLFactory
+import BLFactory
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((host, port))
+blf = BLFactory.BLFactory()
+blf.initDevice()
 
-dev = Device.Device(s,bl="bl45xu")
-dev.init()
+# prep measureFlux
+blf.device.prepScan()
+flux = blf.device.measureFlux()
+blf.device.finishScan()
 
-phosec = dev.measureFlux()
-print phosec *2.0
+print(f"Flux: {flux} phs/sec")

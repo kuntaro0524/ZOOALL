@@ -489,6 +489,12 @@ class Zoo:
         recstr = self.communicate(com)
         return recstr
 
+    # Run a local script
+    def runScriptOnBSS(self, script_name):
+        com = "put/run_script/%s" % script_name
+        recstr = self.communicate(com)
+        return recstr
+
 if __name__ == "__main__":
     # Logging setting
     # open configure file
@@ -505,7 +511,8 @@ if __name__ == "__main__":
     zoo = Zoo()
     zoo.connect()
     #zoo.exposeLN2(15)
-    zoo.stop()
+    #zoo.stop()
+    zoo.setWavelength(1.0)
     # zoo.setBeamsize(0)
     #print("BBBBBBBBBBBBBBBB")
     #print(zoo.getBeamsize())

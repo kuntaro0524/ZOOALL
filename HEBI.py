@@ -10,8 +10,6 @@ import CrystalList
 import logging
 import logging.config
 
-beamline = "BL32XU"
-
 # version 2.0.0 2019/07/04
 
 class HEBI():
@@ -215,7 +213,7 @@ class HEBI():
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("HEBI.doSingle: ERRors occured in data collection loop.\n")
 
-    def doHelical(self, left_xyz, right_xyz, cond, phi_face, prefix):
+    def doHelical_Obsoleted(self, left_xyz, right_xyz, cond, phi_face, prefix):
         self.logger.info("Exposure condition will be considered from now...")
 
         start_phi = phi_face - cond['total_osc'] / 2.0
@@ -260,7 +258,7 @@ class HEBI():
         return dose_dist_list
 
     # simulation
-    def doHelicalSIMU(self, left_xyz, right_xyz, cond, phi_face, prefix):
+    def doHelical(self, left_xyz, right_xyz, cond, phi_face, prefix):
         self.logger.info("Exposure condition will be considered from now...")
         start_phi = phi_face - cond['total_osc'] / 2.0
         end_phi = phi_face + cond['total_osc'] / 2.0
@@ -283,7 +281,7 @@ class HEBI():
                     prefix = "single%02d" % data_index
                     cond['dose_ds'] = dose
                     cond['dist_ds'] = dist
-                    #self.doSingle(left_xyz, cond, phi_face, prefix)
+                    self.doSingle(left_xyz, cond, phi_face, prefix)
                     self.logger.info("Single irradiation has been prepared with LM.doSingle {prefix=%s}" % prefix)
                     data_index += 1
             else:
@@ -296,10 +294,10 @@ class HEBI():
                     prefix = "hel%02d" % data_index
                     cond['dose_ds'] = dose
                     cond['dist_ds'] = dist
-                    #helical_sch = self.lm.genHelical(start_phi, end_phi, left_xyz, right_xyz, prefix, self.phosec_meas, cond)
+                    helical_sch = self.lm.genHelical(start_phi, end_phi, left_xyz, right_xyz, prefix, self.phosec_meas, cond)
                     self.logger.info("Schedule file has been prepared with LM.genHelical {prefix=%s}" % prefix)
-                    #self.zoo.doDataCollection(helical_sch)
-                    #self.zoo.waitTillReady()
+                    self.zoo.doDataCollection(helical_sch)
+                    self.zoo.waitTillReady()
                     data_index += 1
                     
         except Exception as e:

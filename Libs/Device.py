@@ -123,11 +123,11 @@ class Device(Singleton.Singleton):
         en=self.mono.getE()
         # Prep scan
         self.prepScan()
+        # convertion 
+        conv_factor = self.config.getfloat("experiment","pin_uA_conv")
         # Measurement
         ipin,iic=self.countPin(pin_ch=self.pin_channel)
-        print(ipin,iic)
-        pin_uA=ipin/100.0
-        iic_nA=iic/100.0
+        pin_uA=ipin * conv_factor
         # Photon flux estimation
         ff=Flux.Flux(en)
         phosec=ff.calcFluxFromPIN(pin_uA)

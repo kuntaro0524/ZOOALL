@@ -200,10 +200,10 @@ class ScheduleBSS:
         schstr.append("Oscillation delay: 100.000000  # [msec]\n")
         schstr.append("Anomalous Nuclei: Mn  # Mn-K\n")
         schstr.append("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
-        if self.beamline.upper() == "BL45XU":
-            schstr.append("Attenuator: %5d\n" % self.att_index)
-        elif self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU":
+        if self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU" or self.beamline.upper() == "BL45XU":
             schstr.append("Attenuator transmission: %9.6f\n" % self.transmission)
+        else:
+            schstr.append("Attenuator: %5d\n" % self.att_index)
         schstr.append("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]\n")
         schstr.append("XAFS Count time: 1.000000  # [sec]\n")
         schstr.append("XAFS Wait time: 30  # [msec]\n")
@@ -284,10 +284,10 @@ class ScheduleBSS:
         ofile.write("Anomalous Nuclei: Mn  # Mn-K\n")
         ofile.write("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
 
-        if self.beamline.upper() == "BL45XU":
-            ofile.write("Attenuator: %5d\n" % self.att_index)
-        elif self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU":
+        if self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU" or self.beamline.upper() == "BL45XU":
             ofile.write("Attenuator transmission: %9.6f\n" % self.transmission)
+        else:
+            ofile.write("Attenuator: %5d\n" % self.att_index)
 
         ofile.write("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]\n")
         ofile.write("XAFS Count time: 1.000000  # [sec]\n")

@@ -122,8 +122,10 @@ class KUMA:
                 self.logger.error(f"Invalid dose string format: {dose_string}. Expected format is '[value]'.")
                 raise ValueError("Invalid dose string format.")
             return dose_value
-        else:
-            return 100.0
+        elif mode=="helical":
+            # Helicalのときは"{10.0, 20.0, 30.0}" のようになっている
+            dose_list = dose_string.strip("{}").split(',')
+            return dose_list
 
     def getBestCondsMulti(self, cond, flux):
         n_frames = self.getNframe(cond)
@@ -157,61 +159,17 @@ class KUMA:
             print("Exposure time is input value: %8.3f [sec]" % exp_orig)
         return exp_time, mod_transmission
 
+    # 2025/07/09 dose_listに対応はしているが、この関数の呼び出し以降は
+    # dose_listを使わず、cond['dose_ds']に数値が単体で入っている
+    # (HEBI.pyの中で展開してからこちらの呼び出しをしている)
     def getBestCondsHelical(self, cond, flux, dist_vec_mm):
         self.logger.info("==================================")
         self.logger.info("==> getBestCondsHelical starts <==")
         self.logger.info("==================================")
-        print(f"dose_ds = {cond['dose_ds']}")
 
-        dose_value = self.checkDoseString(cond['dose_ds'], mode="helical")
-
-        photon_density_limit = self.convDoseToDensityLimit(dose_value, cond['wavelength'])
+        photon_density_limit = self.convDoseToDensityLimit(cond['dose_ds'], cond['wavelength'])
         dist_vec_um = dist_vec_mm * 1000.0  # [um]
-        self.logger.info("Flux density limit for dose %5.2f MGy= %5.2e " % (dose_value, photon_density_limit))
-        self.logger.info("Utilized Beam = %5.2f x %5.2f [um]" % (cond['ds_vbeam'], cond['ds_hbeam']))
-        self.logger.info("Utilized flux = %5.2e [phs/sec]" % flux)
-        best_transmission = self.estimateAttFactor(cond['exp_ds'], cond['total_osc'],
-                                                   cond['osc_width'], dist_vec_um, flux, cond['ds_vbeam'])
-        # Dose slicing is considered
-        self.logger.info("KUMA: Best attenuation factor=%10.7f" % best_transmission)
-        self.logger.info("Reduced factor for dose slicing: %8.5f" % cond['reduced_fact'])
-        self.logger.info("The number of datasets to be collected: %5d" % cond['ntimes'])
-        mod_transmission = cond['reduced_fact'] * best_transmission
-        self.logger.info("modified transmission for dose slicing %9.5f" % mod_transmission)
-
-        # Attenuator is not required
-        exp_orig = cond['exp_ds']
-        n_frames = self.getNframe(cond)
-
-        if mod_transmission >= 1.0:
-            exp_time = exp_orig * mod_transmission
-            mod_transmission = 1.0
-            print("Exposure time was replaced by %8.4f sec" % exp_time)
-            print("Measurement time will be longer than the initial condition")
-            print("Initial data collection time: %8.2f [sec]" % (exp_orig * float(n_frames)))
-            print("Current data collection time: %8.2f [sec]" % (exp_time * float(n_frames)))
-        # Attenuator is required
-        else:
-            exp_time = exp_orig
-            self.logger.info("Exposure time is input value: %8.2f [sec]" % exp_orig)
-
-        return exp_time, mod_transmission
-    # end of getBestCondsHelical
-
-    # condを引数で渡すのではなく doseごとに測定条件を返すようにした
-    # 'dose_slice'を実装するためにより汎用的な関数にする必要があると感じたので
-
-    def getBestCondsHelicalDose(self, cond, flux, dist_vec_mm):
-        self.logger.info("==================================")
-        self.logger.info("==> getBestCondsHelical starts <==")
-        self.logger.info("==================================")
-        print(f"dose_ds = {cond['dose_ds']}")
-
-        dose_value = self.checkDoseString(cond['dose_ds'], mode="helical")
-
-        photon_density_limit = self.convDoseToDensityLimit(dose_value, cond['wavelength'])
-        dist_vec_um = dist_vec_mm * 1000.0  # [um]
-        self.logger.info("Flux density limit for dose %5.2f MGy= %5.2e " % (dose_value, photon_density_limit))
+        self.logger.info("Flux density limit for dose %8.5f MGy= %5.2e " % (cond['dose_ds'], photon_density_limit))
         self.logger.info("Utilized Beam = %5.2f x %5.2f [um]" % (cond['ds_vbeam'], cond['ds_hbeam']))
         self.logger.info("Utilized flux = %5.2e [phs/sec]" % flux)
         best_transmission = self.estimateAttFactor(cond['exp_ds'], cond['total_osc'],
