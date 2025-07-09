@@ -283,7 +283,8 @@ class AnaHeatmap:
             # append Crystal class to the crystal_list
             crystal_array.append(crystal)
 
-        self.logger.info(f"Number of found crystals={len(crystal_array)}")
+        n_found_cry = len(crystal_array)
+        self.logger.info(f"Number of found crystals={n_found_cry}")
         self.logger.info(f"Checked grids={checked_grids}")
 
         for crystal in crystal_array:
