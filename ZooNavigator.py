@@ -276,11 +276,13 @@ class ZooNavigator():
         while (True):
             try:
                 self.dev.prepCentering(zoom_out=True)
+                # Wait time for 5 secs
+                time.sleep(5.0)
                 self.logger.debug("Dummy capture for the first image")
-                self.dev.capture.capture(self.backimg)
+                self.dev.capture.capture(self.backimg, wait_time=1.0)
                 time.sleep(0.5)
                 self.logger.debug("The 2nd image..")
-                self.dev.capture.capture(self.backimg)
+                self.dev.capture.capture(self.backimg, wait_time=1.0)
             except MyException as tttt:
                 raise MyException("Capture background file failed")
                 sys.exit()

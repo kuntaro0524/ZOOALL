@@ -170,7 +170,7 @@ class Capture:
     # Quick capture : 190419
     # def capture(self, filename, speed=150, cross=False):
     # speed is not required except for BL32XU, probablly. K. Hirata 190419
-    def capture(self, filename, speed=150, cross=False):
+    def capture(self, filename, speed=150, cross=False, wait_time=0.0):
         if self.isPrep == False:
             print("Preparation is called from capture function")
             self.prep()
@@ -182,6 +182,10 @@ class Capture:
             self.setCross()
         com1 = "get/video_grab/%s" % filename
         print(com1)
+        # wait if wait is not 0.0
+        if wait_time > 0.0:
+            print("Waiting for %f seconds before capture" % wait_time)
+            time.sleep(wait_time)
         try:
             recbuf = self.communicate(com1)
         except socket.error as e:
