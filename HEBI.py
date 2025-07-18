@@ -203,42 +203,13 @@ class HEBI():
         try:
             gonio_list = []
             gonio_list.append(center_xyz)
-            prefix = "single_from_helical"
-            multi_sch = self.lm.genMultiSchedule(phi_face, gonio_list, cond, self.phosec_meas, prefix=prefix)
-            self.logger.info("MultiSchedule class was used to generate the schedule file.\n")
-            self.logger.info("Data collection will be started by using %s.\n" % multi_sch)
-            self.zoo.doDataCollection(multi_sch)
+            single_sch = self.lm.genSingleSchedule(start_phi, end_phi, center_xyz, cond, self.phosec_meas, prefix, same_point=True)
+            self.logger.info("Data collection will be started by using %s.\n" % single_sch)
+            self.zoo.doDataCollection(single_sch)
             self.zoo.waitTillReady()
         except Exception as e:
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("HEBI.doSingle: ERRors occured in data collection loop.\n")
-
-    def doHelical_Obsoleted(self, left_xyz, right_xyz, cond, phi_face, prefix):
-        self.logger.info("Exposure condition will be considered from now...")
-
-        start_phi = phi_face - cond['total_osc'] / 2.0
-        end_phi = phi_face + cond['total_osc'] / 2.0
-        try:
-            # crystal size is smaller than horizontal beam size
-            # helical data collection is switched to 'single irradiation mode'
-            cry_y_len = numpy.fabs(left_xyz[1] - right_xyz[1]) * 1000.0 # [um]
-            self.logger.info("Crystal length for this measurement: %8.3f [um]" % cry_y_len)
-
-            #if cry_y_len <= cond['ds_hbeam']:
-            if cry_y_len <= (2.0 * cond['ds_hbeam']):
-                self.logger.info("Crystal size is smaller than the horizontal beam size (%5.2f [um])" % cond['ds_hbeam'])
-                self.logger.info("Helical data collection is swithced to the single irradiation mode")
-                self.doSingle(left_xyz, cond, phi_face, prefix)
-            else:
-                self.logger.info("Generate helical schedule file")
-                helical_sch = self.lm.genHelical(start_phi, end_phi, left_xyz, right_xyz, prefix, self.phosec_meas, cond)
-
-                self.logger.info("Schedule file has been prepared with LM.genHelical")
-                self.zoo.doDataCollection(helical_sch)
-                self.zoo.waitTillReady()
-        except Exception as e:
-            self.logger.info("Exception: %s\n" % e)
-            self.logger.info("HEBI.doHelical: ERRors occured in data collection loop.\n")
 
     def getDoseDistList(self, cond):
         # dose_ds = "{0.1, 1.0, 1.0}" 

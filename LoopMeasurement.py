@@ -810,7 +810,7 @@ class LoopMeasurement:
 
     # 2020/07/09 K.Hirata coded.
     # multi_sch = self.lm.genMultiSchedule(phi_start, phi_end, center_xyz, cond, self.phosec_meas, prefix=prefix)
-    def genSingleSchedule(self, phi_start, phi_end, cenxyz, cond, flux, prefix="multi", same_point=True):
+    def genSingleSchedule(self, phi_start, phi_end, cenxyz, cond, flux, prefix="single", same_point=True):
         mc = MultiCrystal.MultiCrystal()
         single_sch = "%s/single.sch" % self.multi_dir
         # glist for generating the schedule file
@@ -828,7 +828,7 @@ class LoopMeasurement:
         # This line is very important for HITO
         cond['total_osc'] = total_osc
         kuma = KUMA.KUMA()
-        exp_time, best_transmission = kuma.getBestCondsMulti(cond, flux)
+        exp_time, best_transmission = kuma.getBestCondsSingle(cond, flux)
 
         if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline == "BL45XU":
             # Check transmission with 'thinnest attenuator'

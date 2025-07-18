@@ -117,6 +117,7 @@ class KUMA:
         if mode=="multi":
             # 文字列は "[10.0]" のようになっている
             try:
+                self.logger.info(f"Current dose string: {dose_string}")
                 dose_value = float(dose_string.strip("{}"))
             except ValueError:
                 self.logger.error(f"Invalid dose string format: {dose_string}. Expected format is '[value]'.")
@@ -126,6 +127,35 @@ class KUMA:
             # Helicalのときは"{10.0, 20.0, 30.0}" のようになっている
             dose_list = dose_string.strip("{}").split(',')
             return dose_list
+
+    # やむをえず作成 2025/07/18
+    # HEBIの中でsingleに切り替わったときには dose_ds には単一の数値が入っている
+    # 昔はgetBestCondsMultiを呼んでいたのだがそれではまずいことが判明した
+    def getBestCondsSingle(self, cond, flux):
+        n_frames = self.getNframe(cond)
+        exptime_limit = self.convDoseToExptimeLimit(cond['dose_ds'], cond['ds_hbeam'], cond['ds_vbeam'], flux,
+                                                    cond['wavelength'])
+        best_transmission = exptime_limit / float(n_frames) / cond['exp_ds']
+
+        mod_transmission = cond['reduced_fact'] * best_transmission
+        self.logger.info("Exptime limit = {exptime_limit:.4f} sec.")
+        self.logger.info("Multi: Exposure time limit for dose %5.2f MGy = %10.5f " % (cond['dose_ds'], exptime_limit))
+        self.logger.info("Multi: Utilized flux = %5.2e " % flux)
+
+        # Attenuator is not required
+        exp_orig = cond['exp_ds']
+        if mod_transmission >= 1.0:
+            exp_time = exptime_limit / float(n_frames)
+            mod_transmission = 1.0
+            self.logger.info("Exposure time was replaced by %8.3f sec" % exp_time)
+            self.logger.info("Measurement time will be longer than the initial condition")
+            self.logger.info("Initial data collection time: %8.2f [sec]" % (exp_orig * float(n_frames)))
+            self.logger.info("Current data collection time: %8.2f [sec]" % (exp_time * float(n_frames)))
+        # Attenuator is required
+        else:
+            exp_time = exp_orig
+            print("Exposure time is input value: %8.3f [sec]" % exp_orig)
+        return exp_time, mod_transmission
 
     def getBestCondsMulti(self, cond, flux):
         n_frames = self.getNframe(cond)
