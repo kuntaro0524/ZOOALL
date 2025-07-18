@@ -599,8 +599,8 @@ class ZooNavigator():
                 if self.beamline.upper() == "BL45XU":
                     self.logger.info("Wavelength will be changed.")
                     self.zoo.setWavelength(cond['wavelength'])
-                    self.logger.info("Wavelength has been changed. You should wait for 15 minutes")
                     sleep_time_mins = float(self.config.get("experiment", "wait_time_change_energy"))
+                    self.logger.info("Wavelength has been changed. Waiting time is {sleep_time_mins} minutes.")
                     time.sleep(sleep_time_mins * 60)
                     self.logger.info("Tuning is required.")
                     # 2020/04/06 Dtheta1 tune will be conducted
