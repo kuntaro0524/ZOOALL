@@ -610,6 +610,9 @@ class ZooNavigator():
                     self.logger.info("BOSS command : BLTune will be run.")
                     self.zoo.runScriptOnBSS("BLTune")
                     self.dev.zoom.zoomOut()
+                else:
+                    self.logger.info("X-ray energy was changed. Waiting for 15 mins")
+                    time.sleep(15 * 60)
             else:
                 self.logger.info("Wavelength is not changed in this condition. Tuning is not required")
 

@@ -21,4 +21,5 @@ if __name__=="__main__":
     dev.init()
     gonio = blf.getGoniometer()
     x,y,z = gonio.getXYZmm()
-    print(("current_xyz=",x,y,z))
+    phi = gonio.getPhi()
+    print(("current_xyz=",x,y,z,phi))
