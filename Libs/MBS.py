@@ -1,4 +1,5 @@
 #!/bin/env python 
+import os
 import sys
 import socket
 import time
@@ -8,12 +9,23 @@ from Received import *
 from Motor import *
 
 import BaseAxis
+from configparser import ConfigParser, ExtendedInterpolation
+
 
 class MBS(BaseAxis.BaseAxis):
     def __init__(self, server):
+        self.s = server
         # axis name for MBS
-        axis_config = "mbs"
-        super().__init__(server, axis_config, axis_type="plc")
+        # read beamline.ini
+        self.config= ConfigParser(interpolation=ExtendedInterpolation())
+        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+        self.config.read(config_path)
+        bl_object = self.config.get("beamline", "bl_object")
+        mbs_str = self.config.get("axes", "mbs")
+        # axis name
+        self.axis_name = f"bl_{bl_object}_{mbs_str}"
+        #super().__init__(server, axis_config, axis_type="plc")
+        self.full_axis_name = f"bl_{bl_object}_{mbs_str}"
 
     def anaRes(self, recbuf):
         #	bl_32in_plc_mbs/get/1128_blrs_root_blanc4deb/open/0
@@ -38,7 +50,8 @@ class MBS(BaseAxis.BaseAxis):
         return repr(recstr)
 
     def getStatus(self):
-        com = "get/{self.full_axis_name}/status"
+        com = f"get/{self.full_axis_name}/status"
+        print("Result: MBS getStatus: %s" % com)
         # counter clear
         recbuf = self.communicate(com)
         status = self.anaRes(recbuf)
@@ -47,7 +60,6 @@ class MBS(BaseAxis.BaseAxis):
 
     def open(self):
         com = "put/{self.full_axis_name}/open"
-        # counter clear
         recbuf = self.communicate(com)
         # 30 sec trials
         for i in range(0, 10):
@@ -61,8 +73,7 @@ class MBS(BaseAxis.BaseAxis):
     def close(self):
         com = "put/{self.full_axis_name}/close"
         # counter clear
-        self.s.sendall(com)
-        recbuf = self.s.recv(8000)
+        recbuf = self.communicate(com)
 
         # 30 sec trials
         for i in range(0, 10):
@@ -103,7 +114,7 @@ if __name__ == "__main__":
     print(mbs.isLocked())
     # mbs.openTillOpen(wait_interval=10,ntrial=30)
     # time.sleep(10)
-    # print mbs.close()
+    mbs.close()
     # time.sleep(15)
     # mbs.getStatus()
     # mbs.open()

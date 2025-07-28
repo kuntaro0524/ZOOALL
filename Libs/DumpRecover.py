@@ -69,4 +69,4 @@ if __name__=="__main__":
     dr=DumpRecover(dev)
     if dr.isDump()==True:
         print("OKAY")
-        dr.recover(1.0)
+        #dr.recover(1.0)
