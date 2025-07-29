@@ -21,8 +21,8 @@ import Colli
 import Cover
 import CCDlen
 import CoaxPint
-#import MBS
-#import DSS
+import MBS
+import DSS
 import BeamsizeConfig
 import Flux
 import PreColli
@@ -90,9 +90,9 @@ class Device(Singleton.Singleton):
         self.clen=CCDlen.CCDlen(self.s)
         self.covz=Cover.Cover(self.s)
         # Optics
-        #self.mbs=MBS.MBS(self.s)
-        #self.dss=DSS.DSS(self.s)
-        # BL32XU specific
+        # Test for BL32XU 
+        self.mbs=MBS.MBS(self.s)
+        self.dss=DSS.DSS(self.s)
         # BL44XU specific
         if self.beamline.lower() == "bl44xu":
             self.precolli = PreColli.PreColli(self.s)

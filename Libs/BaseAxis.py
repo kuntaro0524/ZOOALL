@@ -12,11 +12,11 @@ class BaseAxis:
         
         # BSSconfig の設定読み込み
         self.bssconf = BSSconfig.BSSconfig()
-        self.bl_object = self.bssconf.getBLobject()
 
         # beamline.ini を読み込む
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         self.config.read(f"{os.environ['ZOOCONFIGPATH']}/beamline.ini")
+        self.bl_object = self.config.get("beamline", "bl_object")
 
         try:
             if axis_type.lower() == "pulse":
@@ -62,3 +62,10 @@ class BaseAxis:
         except Exception as e:
             print(f"[ERROR] {e}")
             raise
+
+    def communicate(self, comstr):
+        sending_command = comstr.encode()
+        print(type(sending_command))
+        self.s.sendall(sending_command)
+        recstr = self.s.recv(8000)
+        return repr(recstr)

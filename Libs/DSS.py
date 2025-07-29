@@ -1,5 +1,5 @@
 #!/bin/env python 
-import sys
+import sys,os
 import socket
 import time
 
@@ -7,15 +7,27 @@ import time
 from Received import *
 from Motor import *
 import BaseAxis
+from configparser import ConfigParser, ExtendedInterpolation
 
 class DSS(BaseAxis.BaseAxis):
     def __init__(self, server):
+        self.s = server
         # axis name for DSS
         axis_config = "dss"
-        BaseAxis.__init__(self, server, axis_config, axis_type="plc")
+        #BaseAxis.__init__(self, server, axis_config, axis_type="plc")
+        # New code
+        self.config= ConfigParser(interpolation=ExtendedInterpolation())
+        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+        self.config.read(config_path)
+        bl_object = self.config.get("beamline", "bl_object")
+        dss_str = self.config.get("axes", "dss")
+        #super().__init__(server, axis_config, axis_type="plc")
+        self.full_axis_name = f"bl_{bl_object}_{dss_str}"
+        print(f"[INFO] DSS initialized with axis name: {self.full_axis_name}")
 
     def anaRes(self, recbuf):
         cols = recbuf.split("/")
+        print(f"[DEBUG] Received buffer: {recbuf}")
         ncol = len(cols)
         status = cols[ncol - 2]
         return status
@@ -27,19 +39,11 @@ class DSS(BaseAxis.BaseAxis):
         else:
             return False
 
-    # String to bytes
-    def communicate(self, comstr):
-        sending_command = comstr.encode()
-        print(type(sending_command))
-        self.s.sendall(sending_command)
-        recstr = self.s.recv(8000)
-        return repr(recstr)
-
     def getStatus(self):
-        com = "get/{self.full_axis_name}/status"
+        com = f"get/{self.full_axis_name}/status"
         # counter clear
         recbuf = self.communicate(com)
-        # print recbuf
+        print(f"Result: DSS getStatus: {com}")
         status = self.anaRes(recbuf)
         # return value: lock/moving/open/close
         return status
@@ -98,9 +102,9 @@ if __name__ == "__main__":
     s.connect((host, port))
 
     dss = DSS(s)
-    # print dss.getStatus()
-    # dss.isLocked()
-    dss.openTillOpen(wait_interval=5, ntrial=10)
+    print(dss.getStatus())
+    print(dss.isLocked())
+    #dss.openTillOpen(wait_interval=5, ntrial=10)
     # time.sleep(10)
     # print dss.close()
     # time.sleep(15)

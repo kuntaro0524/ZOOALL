@@ -11,7 +11,6 @@ from Motor import *
 import BaseAxis
 from configparser import ConfigParser, ExtendedInterpolation
 
-
 class MBS(BaseAxis.BaseAxis):
     def __init__(self, server):
         self.s = server
@@ -41,13 +40,13 @@ class MBS(BaseAxis.BaseAxis):
         else:
             return False
 
-    # String to bytes
-    def communicate(self, comstr):
-        sending_command = comstr.encode()
-        print(type(sending_command))
-        self.s.sendall(sending_command)
-        recstr = self.s.recv(8000)
-        return repr(recstr)
+    # # String to bytes
+    # def communicate(self, comstr):
+    #     sending_command = comstr.encode()
+    #     print(type(sending_command))
+    #     self.s.sendall(sending_command)
+    #     recstr = self.s.recv(8000)
+    #     return repr(recstr)
 
     def getStatus(self):
         com = f"get/{self.full_axis_name}/status"
@@ -114,7 +113,7 @@ if __name__ == "__main__":
     print(mbs.isLocked())
     # mbs.openTillOpen(wait_interval=10,ntrial=30)
     # time.sleep(10)
-    mbs.close()
+    #mbs.close()
     # time.sleep(15)
     # mbs.getStatus()
     # mbs.open()
