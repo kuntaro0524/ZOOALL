@@ -28,6 +28,9 @@ class Zoo:
         # Wait option
         self.wait_flag = True
 
+        # debug flag
+        self.isDebug = False
+
     # String to bytes
     def communicate(self, comstr):
         sending_command = comstr.encode()
@@ -254,7 +257,7 @@ class Zoo:
         while (1):
             try:
                 if self.isBusy():
-                    print("Now busy...")
+                    self.logger.info("Now busy...")
                     time.sleep(2.0)
                 else:
                     break
@@ -269,7 +272,9 @@ class Zoo:
             command = "get/measurement/query"
             recstr = self.communicate(command)
             svoc_c = self.getSVOC_C(recstr)
-            print(f"{svoc_c} is detected.")
+            if self.isDebug:
+                self.logger.debug(f"Received buffer in isBusy: {recstr}")
+                self.logger.debug(f"SVOC_C in isBusy: {svoc_c}")
             if svoc_c.rfind("ready") != -1:
                 print("isBusy:RECBUF=", recstr)
                 return False
@@ -339,7 +344,7 @@ class Zoo:
         while (1):
             try:
                 if self.isBusy():
-                    print("Now busy...")
+                    self.logger.info("Now busy...")
                     time.sleep(2.0)
                 else:
                     break
@@ -349,9 +354,8 @@ class Zoo:
     def doDataCollection(self, jobfile):
         # JOB FILE NAME MUST NOT INCLUDE "_"
         com = "put/measurement/start_1_3_1_schedule_%s" % jobfile
-        print("Submitting command: %s" % com)
+        self.logger.info("Submitting command: %s" % com)
         recstr = self.communicate(com)
-        print(recstr)
 
     def stop(self):
         # JOB FILE NAME MUST NOT INCLUDE "_"

@@ -66,5 +66,5 @@ if __name__=="__main__":
     #print(gonio.getXYZmm())
     #import time
     #blf.gonio.rotatePhi(225.0)
-    gonio.moveXYZmm(1.25525, 3.2166, -1.00825)
+    #gonio.moveXYZmm(1.25525, 3.2166, -1.00825)
 
