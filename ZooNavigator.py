@@ -574,9 +574,9 @@ class ZooNavigator():
             return
 
         # Write log string
-        self.logger.info(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        self.logger.info(f"ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ Wellcome to our ZOO ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
         self.logger.info(f">>>>>>>>>>>>>>>> Processing {cond['puckid']}-{cond['pinid']:02d} <<<<<<<<<<<<<<<<<")
-        self.logger.info(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        self.logger.info(f"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 
         # Making root directory
         if os.path.exists(root_dir):
