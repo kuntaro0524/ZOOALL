@@ -1405,7 +1405,7 @@ class ZooNavigator():
         # Data collection
         # Why is this wait required?
         time.sleep(0.1)
-        data_prefix = "%s-%02d-single" % (trayid, pinid)
+        data_prefix = "single"
 
         # Dose to limit exposure time
         self.logger.info("KUMA will be called from now!!")
@@ -1442,7 +1442,6 @@ class ZooNavigator():
         self.logger.info("Now ZOO finishes single data collection.")
         # Data proc
         sample_name = cond['sample_name']
-        prefix = "%s-%02d" % (trayid, pinid)
         root_dir = cond['root_dir']
         self.data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
         self.data_proc_file.flush()
