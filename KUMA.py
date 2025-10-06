@@ -13,7 +13,7 @@ class KUMA:
         self.limit_dens = 0.00  # phs/um^2 this is for 1A wavelength
         # Kuntaro Log file
         self.logger = logging.getLogger('ZOO').getChild("KUMA")
-        self.debug = False
+        self.debug = True
 
         # Dose limit file
         # en_dose_lys.csv, en_dose_oxi.csv
@@ -39,6 +39,8 @@ class KUMA:
         dose_per_photon = en_dose_function(energy).flatten()[0]
         # density_limit: CSV 3rd column (10MGyに到達するまでの photon density)
         density_limit = interpolate.interp1d(df['energy'], df['density_limit_for10MGy'], kind='cubic')(energy).flatten()[0]
+        if self.debug:
+            self.logger.info(f"aimed_dose={type(aimed_dose)} {aimed_dose:.3f} MGy, energy={energy:.3f} keV")
         # aimed_dose_per_photon
         aimed_dose_per_photon = aimed_dose / 10.0 * dose_per_photon
         # aimed_density_limit
@@ -197,6 +199,10 @@ class KUMA:
         self.logger.info("==> getBestCondsHelical starts <==")
         self.logger.info("==================================")
 
+        print(f"type of dose_ds={type(cond['dose_ds'])}, value={cond['dose_ds']}")
+        print(f"type of dist_ds={type(cond['dist_ds'])}, value={cond['dist_ds']}")
+        if isinstance(cond['dose_ds'], str):
+            cond['dose_ds'] = float(cond['dose_ds'])
         photon_density_limit = self.convDoseToDensityLimit(cond['dose_ds'], cond['wavelength'])
         dist_vec_um = dist_vec_mm * 1000.0  # [um]
         self.logger.info("Flux density limit for dose %8.5f MGy= %5.2e " % (cond['dose_ds'], photon_density_limit))
@@ -261,24 +267,22 @@ if __name__ == "__main__":
     flux = 5E12
     dist_vec=0.1
     # string type of dose values
-    dose_ds = ["5.0"]
+    dose_ds = 5.0
     # cond dictionaryを作成する
-    """
     cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
     exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
     print(f"suitable exposure time: {exp_time:.4f} sec, modified transmission: {mod_transmission:.5f}")
 
+    """
     # Dose estimation of 'SWSX' data collection
     cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':"0.1+1.0+1.0+1.0",'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
     exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
 
-    """
     # Dose slicing test
     cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':"{10.0}", 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
     kuma.getBestCondsMulti(cond,flux)
     """
 
-    """
     """
 
     print("#########################################")

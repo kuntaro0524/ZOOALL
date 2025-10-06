@@ -665,6 +665,8 @@ if __name__ == "__main__":
     esa = ESA("zoo.db")
     esa.makeTable(sys.argv[1],force_to_make=True)
     ppp=esa.getDict()
+
+    print(ppp)
     
     for p in ppp:
         print(p['dose_ds_list'])

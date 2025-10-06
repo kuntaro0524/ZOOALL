@@ -179,7 +179,7 @@ class AnaHeatmap:
         # Preparation of self.heatmap
         if self.isPrep == False:
             self.prep(prefix)
-            self.logger.info("Heatmap shape=", self.heatmap.shape)
+            self.logger.info(f"Heatmap shape={self.heatmap.shape}")
 
         # A new map array is prepared here based on self.heatmap
         check_map_array = []
@@ -347,7 +347,7 @@ class AnaHeatmap:
             if len(good_list) != 0:
                 cry_indices += good_list
             else:
-                print("Process finished")
+                self.logger.info("Process finished")
                 break
             self.logger.info(f"First good_list={good_list}")
             cycle_list = []
@@ -361,7 +361,7 @@ class AnaHeatmap:
                     break
             crystal_list.append(cry_indices)
 
-        self.logger.info("Number of found crystal=", len(crystal_list))
+        self.logger.info(f"number of found crystals={len(crystal_list)}")
 
         # Logging
         if self.debug == True:

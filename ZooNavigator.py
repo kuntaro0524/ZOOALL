@@ -574,7 +574,9 @@ class ZooNavigator():
             return
 
         # Write log string
+        self.logger.info(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         self.logger.info(f">>>>>>>>>>>>>>>> Processing {cond['puckid']}-{cond['pinid']:02d} <<<<<<<<<<<<<<<<<")
+        self.logger.info(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
         # Making root directory
         if os.path.exists(root_dir):
@@ -1102,7 +1104,8 @@ class ZooNavigator():
 
         # Data collection
         time.sleep(0.1)
-        data_prefix = "%s-%02d-multi" % (trayid, pinid)
+        #data_prefix = "%s-%02d-multi" % (trayid, pinid)
+        data_prefix = "multi"
 
         # Photon flux is extracted from beamsize.config
         if self.phosec_meas == 0.0:

@@ -212,12 +212,40 @@ class HEBI():
             self.logger.info("HEBI.doSingle: ERRors occured in data collection loop.\n")
 
     def getDoseDistList(self, cond):
+        # Dose slicing
         # dose_ds = "{0.1, 1.0, 1.0}" 
         # dist_ds = "{125, 100, 100}"
+        # >>> Normal setting
+        # dose_ds = 1.0
+        # dist_dis = 100.0
         # これらをZIPで数値にして dose_ds, dist_dsを作成する
+        dose=0.0
+        dist=0.0
         dose_string = cond['dose_ds']
         dist_string = cond['dist_ds']
-        # リストにしてしまう
+        self.logger.info("Uppdate check 01")
+        self.logger.info(f"dose_string={dose_string}, dist_string={dist_string}")
+        print(f"type of dose_string={type(dose_string)}, type of dist_string={type(dist_string)}")
+        # まず　"," で区切られたリストかどうかを確認する
+        # 仮に "{}" が含まれていなかったらそれぞれは単体の float として扱う
+        # もしも dose_string、dist_stringがすでにfloatであったら
+        if isinstance(dose_string, float):
+            dose= dose_string
+        elif isinstance(dose_string, str):
+            print(f"strings")
+            if "{" not in dose_string:
+                dose= float(dose_string)
+        if isinstance(dist_string, float):
+            dist = dist_string
+        elif isinstance(dist_string, str):
+            if "{" not in dist_string:
+                dist= float(dist_string)
+        if dose != 0.0 and dist != 0.0:
+            self.logger.info("Single float values were detected.")
+            self.logger.info(f"dose={dose:.3f}, dist={dist:.1f}")
+            return [(dose, dist)]
+        self.logger.info("TOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+        # 含まれていたら リストにしてしまう
         tmpstr = dose_string.replace("{", "").replace("}", "")
         # tmpstr を "," で区切って float に変換してリストにする
         dose_list = [float(x) for x in tmpstr.split(",")]
@@ -226,7 +254,36 @@ class HEBI():
         dist_list = [float(x) for x in tmpstr.split(",")]
         # ここで、dose_list と dist_list を zip する
         dose_dist_list = list(zip(dose_list, dist_list))
+        self.logger.info(f"Dose slicing values were detected.")
+        self.logger.info(f"dose_dist_list={dose_dist_list}")
         return dose_dist_list
+
+    def loopSIMU(self, dose_dist_list, small=True):
+        data_index=0
+        if small:
+            self.logger.info("Crystal size is smaller than the horizontal beam size (%5.2f [um])" % cond['ds_hbeam'])
+            self.logger.info("Helical data collection is swithced to the single irradiation mode")
+            # New version : 2025/07/08 
+            # dose_ds = "{0.1, 1.0, 1.0}", dist_ds = "{125, 100, 100}"
+            # のように情報が含まれてるので、ここでループを回す
+            dose_dist_list = self.getDoseDistList(cond)
+            for dose, dist in dose_dist_list:
+                prefix = "single%02d" % data_index
+                cond['dose_ds'] = dose
+                cond['dist_ds'] = dist
+                data_index += 1
+        else:
+            self.logger.info("Generate helical schedule file")
+            # New version : 2025/07/08 
+            # dose_ds = "{0.1, 1.0, 1.0}", dist_ds = "{125, 100, 100}"
+            # のように情報が含まれてるので、ここでループを回す
+            dose_dist_list = self.getDoseDistList(cond)
+            for dose, dist in dose_dist_list:
+                prefix = "hel%02d" % data_index
+                cond['dose_ds'] = dose
+                cond['dist_ds'] = dist
+                self.logger.info("Schedule file has been prepared with LM.genHelical {prefix=%s}" % prefix)
+                data_index += 1
 
     # simulation
     def doHelical(self, left_xyz, right_xyz, cond, phi_face, prefix):
@@ -256,11 +313,12 @@ class HEBI():
                     self.logger.info("Single irradiation has been prepared with LM.doSingle {prefix=%s}" % prefix)
                     data_index += 1
             else:
-                self.logger.info("Generate helical schedule file")
+                self.logger.info("Now generating helical schedule file....")
                 # New version : 2025/07/08 
                 # dose_ds = "{0.1, 1.0, 1.0}", dist_ds = "{125, 100, 100}"
                 # のように情報が含まれてるので、ここでループを回す
                 dose_dist_list = self.getDoseDistList(cond)
+                self.logger.info(f"dose_dist_list={dose_dist_list}")
                 for dose, dist in dose_dist_list:
                     prefix = "hel%02d" % data_index
                     cond['dose_ds'] = dose
@@ -472,11 +530,14 @@ if __name__ == "__main__":
     xyz1= 0.0, 0.0, 0.0
     xyz2 = 0.0, 0.001, 0.0
     cond = {'total_osc':360.0,'wavelength': 1.0, 'hebi_att': 10.0, 'ds_hbeam': 10.0, 'ds_vbeam': 10.0, 'dose_ds':"{0.1, 1.0, 1.0}", 'dist_ds':"{125,100,100}"}
+    cond = {'total_osc':360.0,'wavelength': 1.0, 'hebi_att': 10.0, 'ds_hbeam': 10.0, 'ds_vbeam': 10.0, 'dose_ds':"1.0", 'dist_ds':"125"}
 
     # logging
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-    h2.doHelicalSIMU(xyz1,xyz2, cond, face_angle, "test_simu")
+    h2.loopSIMU(cond, small=True)
+
+    #h2.doHelicalSIMU(xyz1,xyz2, cond, face_angle, "test_simu")
 
     """_summary_
     # def getSortedCryList(self,scan_path,scan_prefix,phi_center,isWeakScan=False):
