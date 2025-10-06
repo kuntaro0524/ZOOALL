@@ -18,12 +18,12 @@ class Capture:
         self.isPrep = False
         self.user = os.environ["USER"]
         self.isDark = False
+        self.isDebug= False
 
         # Read configure file
         # Get information from beamline.ini file.
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         config_path="%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        print(config_path)
         self.config.read(config_path)
 
         self.contrast_default=self.config.getint("capture", "contrast_default")
@@ -56,7 +56,8 @@ class Capture:
     # String to bytes
     def communicate(self, comstr):
         sending_command = comstr.encode()
-        print(sending_command)
+        if self.isDebug:
+            print(sending_command)
         self.s.sendall(sending_command)
         recstr = self.s.recv(8000)
         return repr(recstr)
@@ -76,7 +77,6 @@ class Capture:
 
     def prep(self):
         if self.open_sig == True:
-            print("SDFDSFSDFSDFSDFSDFSDFSDFSDFDSFSDFSDFSDFSDFSDFSDF")
             self.isPrep = True
             # Set brightness 190418
             self.setBright(self.bright_default)
@@ -144,7 +144,7 @@ class Capture:
         # set brightness
         com_bright = "put/video_brightness/%d" % bright
         recbuf = self.communicate(com_bright)
-        print("setBright:", recbuf)
+        if self.isDebug: print("setBright:", recbuf)
 
     def setCross(self):
         com1 = "put/video_cross/on"
@@ -153,19 +153,19 @@ class Capture:
     def unsetCross(self):
         com1 = "put/video_cross/off"
         recbuf = self.communicate(com1)
-        print(recbuf)
+        if self.isDebug: print(recbuf)
 
     def setContrast(self, contrast):
         if self.isPrep == False: self.prep()
         com1 = "put/video_contrast/%d" % contrast
         recbuf = self.communicate(com1)
-        print("setContrast:", recbuf)
+        if self.isDebug: print("setContrast:", recbuf)
 
     def setGain(self, gain):
         if self.isPrep == False: self.prep()
         com1 = "put/video_color/%d" % gain
         recbuf = self.communicate(com1)
-        print("setGain:", recbuf)
+        if self.isDebug: print("setGain:", recbuf)
 
     # Quick capture : 190419
     # def capture(self, filename, speed=150, cross=False):
@@ -181,7 +181,7 @@ class Capture:
         else:
             self.setCross()
         com1 = "get/video_grab/%s" % filename
-        print(com1)
+        #if self.isDebug: print(com1)
         # wait if wait is not 0.0
         if wait_time > 0.0:
             print("Waiting for %f seconds before capture" % wait_time)

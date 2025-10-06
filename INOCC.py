@@ -73,7 +73,7 @@ class INOCC:
 
         # Making today's directory
         if os.path.exists(self.todaydir):
-            print("%s already exists" % self.todaydir)
+            self.logger.info(f"Already exists: {self.todaydir}")
         else:
             os.makedirs(self.todaydir)
             os.system("chmod a+rw %s" % self.todaydir)
@@ -83,17 +83,17 @@ class INOCC:
         # Get the newest number in 4 digits: like "0001","0099"
         num_prefix = dp.getRoundHeadPrefix(ndigit=4)
         self.loop_dir = "%s/%s_%s" % (self.todaydir, num_prefix, self.sample_name)
-        print("SELF=", self.loop_dir)
+        self.logger.info(f"Loop directory: {self.loop_dir}")
 
         # Making today's directory
         if os.path.exists(self.loop_dir):
-            print("%s already exists" % self.loop_dir)
+            self.logger.info("%s already exists" % self.loop_dir)
         else:
             os.makedirs(self.loop_dir)
             os.system("chmod a+rw %s" % self.loop_dir)
 
         # self.raster_picpath = self.todaydir
-        print("Coax camera information will be acquired!")
+        self.logger.info("Coax camera information will be acquired!")
 
         self.cip = CryImageProc.CryImageProc()
 
@@ -328,8 +328,8 @@ class INOCC:
     def simpleCenter(self, phi, loop_size=600.0, option='top'):
         new_idx = self.ff.getNewIdx3()
         self.fname = "%s/%03d_center.ppm" % (self.loop_dir, new_idx)
-        self.logger.info("##################### TOP CENTERING %5.2f deg.\n" % phi)
-        self.logger.info("INOCC.coreCentering captures %s\n" % self.fname)
+        self.logger.info("##################### Tip centering process %5.2f deg." % phi)
+        self.logger.info("INOCC.coreCentering captures %s" % self.fname)
         self.gonio.rotatePhi(phi)
         cx, cy, cz, phi = self.gonio.getXYZPhi()
         self.coi.get_coax_image(self.fname)
@@ -352,7 +352,7 @@ class INOCC:
             self.logger.info("Simple centering failed but not fatal")
             raise ZooMyException("Simple centering failed but not fatal")
 
-        self.logger.info("PHI: %5.2f deg Option=%s Centering: (Xtarget, Ytarget) = (%5d, %5d) HAMIDASHI = %s\n"
+        self.logger.info("PHI: %5.2f deg Option=%s Centering: (Xtarget, Ytarget) = (%5d, %5d) HAMIDASHI = %s"
                          % (phi, option, xtarget, ytarget, hamidashi_flag))
         x, y, z = self.coi.calc_gxyz_of_pix_at(xtarget, ytarget, cx, cy, cz, phi)
 
@@ -362,7 +362,7 @@ class INOCC:
         return area, hamidashi_flag
 
     def suribachiCentering(self, phi_center, loop_size=600.0):
-        self.logger.info("OOOOOOOOOOOOOOOOOO  SURIBACHI STARTS center: %5.2f OOOOOOOOOOOOOO\n" % phi_center)
+        self.logger.info("OOOOOOOOOOOOOOOOOO  SURIBACHI STARTS center: %5.2f OOOOOOOOOOOOOO" % phi_center)
         phi_range = 90.0
         phi_step = 10.0
         phi_min = phi_center - phi_range / 2.0
@@ -375,7 +375,7 @@ class INOCC:
             # At around phi_min
             if ok_min == False:
                 for phi in np.arange(phi_min, phi_center, phi_step):
-                    self.logger.info("Around minimum angle\n")
+                    self.logger.info("Around minimum angle")
                     try:
                         self.logger.info("move to simpleCenter function.")
                         area, hamidashi_flag = self.simpleCenter(phi, option="top")
@@ -513,7 +513,9 @@ class INOCC:
     def edgeCentering(self, phi_list, ntimes, challenge=False, loop_size=600.0):
         if self.isInit == False:
             self.init()
+        self.logger.info("##########################################################")
         self.logger.info("################### EDGE CENTERING ######################")
+        self.logger.info("##########################################################")
         n_good = 0
         for i in range(0, ntimes):
             try:
@@ -541,7 +543,9 @@ class INOCC:
         if n_good == 0:
             raise ZooMyException("edgeCentering failed")
 
-        print("################### EDGE CENTERING ENDED ######################")
+        self.logger.info("##########################################################")
+        self.logger.info("########## Edge centering finished successfully ##########")
+        self.logger.info("##########################################################")
         return n_good, phi_area_list
 
     def facing(self, phi_list):
@@ -577,7 +581,7 @@ class INOCC:
     # Largely modified on 190514 by K.Hirata
     # loop_size should have unit of "um"
     def cap4width(self, loop_size=600.0):
-        self.logger.info("++++++++++++++          cap4width starts")
+        self.logger.info("=======================          cap4width starts")
         if self.isInit == False:
             self.init()
 
@@ -591,10 +595,9 @@ class INOCC:
         # For small loop
         roi_cont = cip.getROIcontour(loop_size)
         # raster_pic = "%s/raster.png" % (self.loop_dir)
-        print("cap4width captures", self.raster_picpath)
+        self.logger.info(f"Processing {self.fname} for cap4width")
         roi_xmin, roi_xmax, roi_ymin, roi_ymax, roi_cenx, roi_ceny = cip.getRasterArea(roi_cont, self.raster_picpath)
         log_pic = "%s/raster.png" % (self.loop_dir)
-        print(log_pic)
         roi_xmin, roi_xmax, roi_ymin, roi_ymax, roi_cenx, roi_ceny = cip.getRasterArea(roi_cont, log_pic)
 
         # Raster width
@@ -648,13 +651,17 @@ class INOCC:
                 self.logger.info(f"face_angle = {phi_face}deg")
 
                 # adds offset angles for plate-like crystals
-                self.logger.info(">>>> offset angle setting <<<<<")
+                self.logger.info(f"offset angle = {offset_angle}deg")
                 phi_face = phi_face + offset_angle
                 phi_small = phi_face + 90.0
-                self.logger.info(f">>>> Simple centering at {phi_small} <<<<<")
+                self.logger.info("##################################################")
+                self.logger.info(f"####  Simple centering at {phi_small:.2f}  ######")
+                self.logger.info(f"#### where 90deg apart from face angle <<<<<")
+                self.logger.info("##################################################")
                 self.simpleCenter(phi_small, loop_size, option="gravity")
-                print("#################<FACE>ANGLE ####################3")
-                print("phi_face=", phi_face)  
+                self.logger.info("##################################################")
+                self.logger.info("###### Again simple centering at face angle ######")
+                self.logger.info("##################################################")
                 area, hamidashi_flag = self.simpleCenter(phi_face, loop_size, option="gravity")
                 self.logger.info("Hamidashi_flag = %s" % hamidashi_flag)
                 # Re-centering if hamidashi_flag = True
@@ -672,21 +679,19 @@ class INOCC:
         # Final centering
         cx, cy, cz, phi = self.gonio.getXYZPhi()
         # Raster area definition
-        print(f"########III phi = {phi} IIIIIIII########3")
+        self.logger.info(f"$$$$$$$$$ Raster area definition at {phi_face:.2f} deg $$$$$$$$$$$")
         xwidth, ywidth, r_cenx, r_ceny = self.cap4width(loop_size)
-        print("########IIIIIIIIIIIIIIIIIIIIIIII########3")
+        self.logger.info(f"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
         gonio_info = cx, cy, cz, phi
         pix_size_um = self.coi.get_pixel_size()
         raster_width = pix_size_um * float(xwidth)
         raster_height = pix_size_um * float(ywidth)
 
-        print("Width  = %8.1f[um]" % raster_width)
-        print("Height = %8.1f[um]" % raster_height)
-        print("Centering.doAll finished.")
+        self.logger.info(f"(width, height) = ({raster_width:8.1f}, {raster_height:8.1f}) [um]")
+        self.logger.info("Centering.doAll finished.")
 
         phi = self.gonio.getPhi()
-        print(phi)
 
         return raster_width, raster_height, phi_face, gonio_info
 

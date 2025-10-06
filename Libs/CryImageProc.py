@@ -133,7 +133,8 @@ class CryImageProc():
         self.back_file = back_file
         self.timg = cv2.imread(target_file)
         self.bimg = cv2.imread(back_file)
-        self.logger.info("CIP.setImages: T: %s, B: %s"% (target_file, back_file))
+        if self.debug:
+            self.logger.info("CIP.setImages: T: %s, B: %s"% (target_file, back_file))
         self.tgrey = cv2.cvtColor(self.timg, cv2.COLOR_BGR2GRAY)
         self.bgrey = cv2.cvtColor(self.bimg, cv2.COLOR_BGR2GRAY)
         self.tgrey = self.trimEdges(self.tgrey, ntrim=7)

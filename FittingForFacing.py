@@ -1,6 +1,7 @@
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
+import logging
 
 import Libs.ZooMyException
 
@@ -14,6 +15,9 @@ class FittingForFacing:
         self.areas=areas
         self.isDone=False
         self.logpath = logpath
+
+        # logging
+        self.logger = logging.getLogger('ZOO').getChild('FittingForFacing')
 
     def prep(self):
         self.phi_list=np.array(self.phis)
@@ -35,9 +39,9 @@ class FittingForFacing:
 
         param_opt, covariance = scipy.optimize.curve_fit(self.func, self.phi_list, self.area_list, p0=parameter_initial)
 
-        print("phi_list = ", self.phi_list)
-        print("area_list = ", self.area_list)
-        print("parameter =", param_opt)
+        self.logger.info(f"phi_list = {self.phi_list}")
+        self.logger.info(f"area_list = {self.area_list}")
+        self.logger.info(f"Fitted parameters: a={param_opt[0]:.2f}, b={param_opt[1]:.2f}, c={param_opt[2]:.2f}")
 
         # DEBUGGING PLOT
         plt.cla()
@@ -55,7 +59,10 @@ class FittingForFacing:
         return a*np.cos(np.pi/90.0*(phi+b))+c
 
     def findFaceAngle(self):
-        print("findFaceAngle")
+        self.logger.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        self.logger.info("@@@@@@@@@@@@@@ Searching for the face angle @@@@@@@@@@@@@@")
+        self.logger.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        self.logger.info(f"FittingForFacing.findFaceAngle started with {len(self.phis)} points.")
         if self.isDone==False:
             param_opt=self.prep()
 
@@ -68,14 +75,18 @@ class FittingForFacing:
                 min_value=value
                 phi_min=phi
 
-        print("PHI  Fitted = %10.2f Obs = %10.2f"%(phi_min, self.phi_min_obs))
-        print("Area Fitted = %10.2f Obs = %10.2f"%(min_value, self.area_min_obs))
+        self.logger.info(f"Fitted minimum at phi = {phi_min:.2f} deg, Area = {min_value:.2f}")
+        self.logger.info(f"Area at observed minimum = {self.area_min_obs:.2f} at phi = {self.phi_min_obs:.2f} deg")
 
         if min_value > self.area_min_obs:
             phi_min = self.phi_min_obs
 
         face_angle=phi_min+90.0
-        print("findFaceAngle=%5.1f deg."%face_angle)
+        self.logger.info("Detected face angle=%5.1f deg."%face_angle)
+
+        self.logger.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        self.logger.info("@@@@@@@@@ End of Searching for the face angle @@@@@@@@@@@@")
+        self.logger.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
         return face_angle
 

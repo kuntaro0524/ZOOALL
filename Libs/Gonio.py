@@ -47,7 +47,7 @@ class Gonio:
         self.isPrep = False
 
         # BL32XU specific sense parameter for a rotation axis: mysterious setting
-        if self.beamline == "BL32XU":
+        if self.beamline == "BL32XU" or "BL45XU":
             self.sense_phi_special = -1.0
         elif self.beamline == "BL41XU":
             self.sense_phi_special = 1.0
