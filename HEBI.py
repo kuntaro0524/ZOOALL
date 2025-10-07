@@ -221,45 +221,38 @@ class HEBI():
     # ChatGPTに仕様を伝えて書いてもらいました。 K. Hirata
     def getDoseDistList(self, cond):
         """
-        cond から dose_ds と dist_ds を取得し、
-        (dose, dist) のペアリストを返す。
-        
+        cond から dose_ds / dist_ds を取得し、(dose, dist) のペアを返す。
         仕様:
-          - cond は CSV 由来の辞書
-          - 'dose_ds', 'dist_ds' の値は "{1.0, 5.0, 10.0}" のような文字列でもよい
-          - どちらか一方が1要素しかない場合、もう一方の長さに合わせて複製する
-          - 両方空の場合は ValueError
+          - 入力は "5.0" / "{1,2,10}" / "[...]" / "(...)" などを許容（fields側で処理）
+          - 長さ不一致時:
+              * dose の方を短く → dose の「最大値」を繰り返して長い方に合わせる
+              * dist の方を短く → dist の「最小値」を繰り返して長い方に合わせる
+          - 両方空はエラー
+          - どちらか空は 0.0 を繰り返して補完（従来互換）
         """
-        # --- 1. dose, dist の取得 ---
         dose_list = get_dose_ds(cond) or []
         dist_list = get_dist_ds(cond) or []
-    
-        # --- 2. どちらも空ならエラー ---
+
         if not dose_list and not dist_list:
             raise ValueError("Both dose_ds and dist_ds are empty.")
     
-        # --- 3. 片方が空ならもう片方の長さに合わせる ---
         if not dose_list:
             dose_list = [0.0] * len(dist_list)
-        elif not dist_list:
+        if not dist_list:
             dist_list = [0.0] * len(dose_list)
     
-        # --- 4. 長さ調整（短い方を繰り返して合わせる） ---
-        len_dose = len(dose_list)
-        len_dist = len(dist_list)
-        if len_dose != len_dist:
-            if len_dose < len_dist:
-                repeats = (len_dist + len_dose - 1) // len_dose
-                dose_list = (dose_list * repeats)[:len_dist]
+        ld, lt = len(dose_list), len(dist_list)
+        if ld != lt:
+            if ld < lt:
+                # dose を拡張：dose の最大値を繰り返す
+                pad = max(dose_list) if dose_list else 0.0
+                dose_list = dose_list + [pad] * (lt - ld)
             else:
-                repeats = (len_dose + len_dist - 1) // len_dist
-                dist_list = (dist_list * repeats)[:len_dose]
-            print(f"[INFO] dose_ds と dist_ds の長さが異なったため、短い方を繰り返して長さを合わせました。")
+                # dist を拡張：dist の最小値を繰り返す
+                pad = min(dist_list) if dist_list else 0.0
+                dist_list = dist_list + [pad] * (ld - lt)
     
-        # --- 5. ペアにまとめて返す ---
-        dose_dist_pairs = list(zip(dose_list, dist_list))
-
-        return dose_dist_pairs
+        return list(zip(dose_list, dist_list))
 
     def loopSIMU(self, dose_dist_list, small=True):
         data_index=0

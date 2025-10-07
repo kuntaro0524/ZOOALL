@@ -4,7 +4,7 @@ import pandas as pd
 from scipy import interpolate
 import numpy as np
 from configparser import ConfigParser, ExtendedInterpolation
-from Libs.dose.fields import get_dose_ds, get_dist_ds
+from dose.fields import get_dose_ds, get_dist_ds
 
 # Version 2.0.0 2019/07/04 K.Hirata
 class KUMA:
@@ -13,7 +13,7 @@ class KUMA:
         self.limit_dens = 0.00  # phs/um^2 this is for 1A wavelength
         # Kuntaro Log file
         self.logger = logging.getLogger('ZOO').getChild("KUMA")
-        self.debug = True
+        self.debug = False
 
         # Dose limit file
         # en_dose_lys.csv, en_dose_oxi.csv
@@ -39,6 +39,7 @@ class KUMA:
         dose_per_photon = en_dose_function(energy).flatten()[0]
         # density_limit: CSV 3rd column (10MGyに到達するまでの photon density)
         density_limit = interpolate.interp1d(df['energy'], df['density_limit_for10MGy'], kind='cubic')(energy).flatten()[0]
+        #print(f"aimed_dose={aimed_dose} MGy, energy={energy} keV, dose_per_photon={dose_per_photon} MGy/photon, density_limit={density_limit} phs/um^2 for 10 MGy")
         if self.debug:
             self.logger.info(f"aimed_dose={type(aimed_dose)} {aimed_dose:.3f} MGy, energy={energy:.3f} keV")
         # aimed_dose_per_photon
@@ -51,14 +52,18 @@ class KUMA:
         return aimed_dose_per_photon, aimed_density_limit
 
     def getDose1sec(self, beam_h, beam_v, flux, energy):
-        # density_limit は tableにある数値 → 10 MGy に到達するまでの photon density
-        aimed_dose = 10.0 # MGy
-        dose_per_photon, density_limit = self.getDoseLimitParams(aimed_dose, energy=energy)
-        # このビームの flux density を計算する
-        flux_density = flux / (beam_h * beam_v)
-        # このビームの 1 sec あたりの dose を計算する
-        # density_limit: は　10MGy あたりの photon density なので
-        dose_per_sec = flux_density * 10.0 / density_limit
+        """
+        Calculate dose rate [MGy/s] from beam geometry, flux, and photon energy.
+        The '10 MGy' reference in CSV is used internally; no explicit constant here.
+        """
+        # use the CSV-based dose_per_photon directly
+        dose_per_photon, _ = self.getDoseLimitParams(aimed_dose=1.0, energy=energy)
+        # getDoseLimitParams scales linearly with aimed_dose,
+        # so aimed_dose=1.0 simply returns 1 MGy-equivalent dose_per_photon value.
+    
+        flux_density = flux / (beam_h * beam_v)       # photons/(s·µm²)
+        dose_per_sec = flux_density * dose_per_photon # MGy/s
+
         return dose_per_sec
 
     def getDose(self, beam_h, beam_v, flux, energy, exp_time):
@@ -133,108 +138,182 @@ class KUMA:
     # やむをえず作成 2025/07/18
     # HEBIの中でsingleに切り替わったときには dose_ds には単一の数値が入っている
     # 昔はgetBestCondsMultiを呼んでいたのだがそれではまずいことが判明した
+    # 2025/10/07 ChatGPTの提案を受け入れて改修
     def getBestCondsSingle(self, cond, flux):
+        from Libs.dose.fields import get_dose_ds, get_dist_ds
+
+        mode = cond.get("mode", "single")
+        if mode != "single":
+            raise ValueError(f"getBestCondsSingle() called with mode='{mode}'. Expected 'single'.")
+    
+        dose_list = get_dose_ds(cond) or []
+        dist_list = get_dist_ds(cond) or []
+        if not dose_list and not dist_list:
+            raise ValueError("Both dose_ds and dist_ds are empty.")
+    
+        # どちらか空は 0.0 で補完（従来互換）
+        if not dose_list:
+            dose_list = [0.0] * (len(dist_list) if dist_list else 1)
+        if not dist_list:
+            dist_list = [0.0] * (len(dose_list) if dose_list else 1)
+    
+        ld, lt = len(dose_list), len(dist_list)
+        if ld != lt:
+            if ld < lt:
+                # dose を拡張：dose の最大値を繰り返す
+                pad = max(dose_list) if dose_list else 0.0
+                dose_list = dose_list + [pad] * (lt - ld)
+                self.logger.info(f"[INFO] dose_ds was shorter; padded with max(dose)={pad} to length {len(dose_list)}")
+            else:
+                # dist を拡張：dist の最小値を繰り返す
+                pad = min(dist_list) if dist_list else 0.0
+                dist_list = dist_list + [pad] * (ld - lt)
+                self.logger.info(f"[INFO] dist_ds was shorter; padded with min(dist)={pad} to length {len(dist_list)}")
+    
         n_frames = self.getNframe(cond)
-        exptime_limit = self.convDoseToExptimeLimit(cond['dose_ds'], cond['ds_hbeam'], cond['ds_vbeam'], flux,
-                                                    cond['wavelength'])
-        best_transmission = exptime_limit / float(n_frames) / cond['exp_ds']
-
-        mod_transmission = cond['reduced_fact'] * best_transmission
-        self.logger.info("Exptime limit = {exptime_limit:.4f} sec.")
-        self.logger.info("Multi: Exposure time limit for dose %5.2f MGy = %10.5f " % (cond['dose_ds'], exptime_limit))
-        self.logger.info("Multi: Utilized flux = %5.2e " % flux)
-
-        # Attenuator is not required
-        exp_orig = cond['exp_ds']
-        if mod_transmission >= 1.0:
-            exp_time = exptime_limit / float(n_frames)
-            mod_transmission = 1.0
-            self.logger.info("Exposure time was replaced by %8.3f sec" % exp_time)
-            self.logger.info("Measurement time will be longer than the initial condition")
-            self.logger.info("Initial data collection time: %8.2f [sec]" % (exp_orig * float(n_frames)))
-            self.logger.info("Current data collection time: %8.2f [sec]" % (exp_time * float(n_frames)))
-        # Attenuator is required
-        else:
-            exp_time = exp_orig
-            print("Exposure time is input value: %8.3f [sec]" % exp_orig)
-        return exp_time, mod_transmission
+        results = []
+        for dose_val, dist_val in zip(dose_list, dist_list):
+            exptime_limit = self.convDoseToExptimeLimit(
+                dose_val, cond['ds_hbeam'], cond['ds_vbeam'], flux, cond['wavelength']
+            )
+            best_transmission = exptime_limit / float(n_frames) / cond['exp_ds']
+            mod_transmission = cond['reduced_fact'] * best_transmission
+    
+            exp_orig = cond['exp_ds']
+            if mod_transmission >= 1.0:
+                exp_time = exptime_limit / float(n_frames)
+                mod_transmission = 1.0
+                self.logger.info(f"[single dose={dose_val}, dist={dist_val}] exp -> {exp_time:.3f}s (limit reached)")
+            else:
+                exp_time = exp_orig
+                self.logger.info(f"[single dose={dose_val}, dist={dist_val}] exp uses input {exp_time:.3f}s")
+    
+            results.append({
+                "dose": dose_val,
+                "dist": dist_val,
+                "exp_time": exp_time,
+                "mod_transmission": mod_transmission
+            })
+    
+        return results
 
     def getBestCondsMulti(self, cond, flux):
+        from Libs.dose.fields import get_dose_ds, get_dist_ds
+        # --- 基本設定 ---
         n_frames = self.getNframe(cond)
-        # mode='multi' のときは通常通りdose_ds, dist_dsは一つずつのはず
-        # 文字列として "[10.0]" のようになっている(dose_ds) -> floatにして 10.0 として数値をとりたい
-        tmp_dose_ds = self.checkDoseString(cond['dose_ds'], mode="multi")
-        print(f"tmp_dose_ds={tmp_dose_ds}")
-        cond['dose_ds'] = tmp_dose_ds  # 文字列ではなくfloatにする
-        
-        exptime_limit = self.convDoseToExptimeLimit(cond['dose_ds'], cond['ds_hbeam'], cond['ds_vbeam'], flux,
-                                                    cond['wavelength'])
+
+        # --- dose_ds の取得と検証 ---
+        dose_list = get_dose_ds(cond)
+        if not dose_list:
+            raise ValueError("dose_ds is empty or invalid.")
+
+        # Multiモードでは単一値のみ許可
+        if len(dose_list) > 1:
+            raise ValueError(
+                f"Multiple dose_ds values detected ({dose_list}) "
+                f"but mode='{cond.get('mode')}'. Only one value allowed in 'multi' mode."
+            )
+
+        # dist_ds がある場合も同様に確認（将来の拡張用）
+        dist_list = get_dist_ds(cond)
+        if len(dist_list) > 1:
+            raise ValueError(
+                f"Multiple dist_ds values detected ({dist_list}) "
+                f"but mode='{cond.get('mode')}'. Only one value allowed in 'multi' mode."
+            )
+
+        cond['dose_ds'] = float(dose_list[0])
+
+        # --- 計算部分 ---
+        exptime_limit = self.convDoseToExptimeLimit(
+            cond['dose_ds'],
+            cond['ds_hbeam'],
+            cond['ds_vbeam'],
+            flux,
+            cond['wavelength']
+        )
+
         best_transmission = exptime_limit / float(n_frames) / cond['exp_ds']
-
         mod_transmission = cond['reduced_fact'] * best_transmission
-        print("Exptime limit = ", exptime_limit)
-        self.logger.info("Multi: Exposure time limit for dose %5.2f MGy = %10.5f " % (cond['dose_ds'], exptime_limit))
-        self.logger.info("Multi: Utilized flux = %5.2e " % flux)
 
-        # Attenuator is not required
+        self.logger.info(f"Multi: Exposure time limit for dose {cond['dose_ds']:.2f} MGy = {exptime_limit:.5f}")
+        self.logger.info(f"Multi: Utilized flux = {flux:.2e}")
+
+        # --- Attenuator 判定 ---
         exp_orig = cond['exp_ds']
         if mod_transmission >= 1.0:
             exp_time = exptime_limit / float(n_frames)
             mod_transmission = 1.0
-            self.logger.info("Exposure time was replaced by %8.3f sec" % exp_time)
-            self.logger.info("Measurement time will be longer than the initial condition")
-            self.logger.info("Initial data collection time: %8.2f [sec]" % (exp_orig * float(n_frames)))
-            self.logger.info("Current data collection time: %8.2f [sec]" % (exp_time * float(n_frames)))
-        # Attenuator is required
+            self.logger.info(f"Exposure time was replaced by {exp_time:.3f} sec")
+            self.logger.info(f"Initial data collection time: {exp_orig * n_frames:.2f} [sec]")
+            self.logger.info(f"Current data collection time: {exp_time * n_frames:.2f} [sec]")
         else:
             exp_time = exp_orig
-            print("Exposure time is input value: %8.3f [sec]" % exp_orig)
+            self.logger.info(f"Exposure time is input value: {exp_orig:.3f} [sec]")
+
         return exp_time, mod_transmission
 
     # 2025/07/09 dose_listに対応はしているが、この関数の呼び出し以降は
     # dose_listを使わず、cond['dose_ds']に数値が単体で入っている
     # (HEBI.pyの中で展開してからこちらの呼び出しをしている)
+    # 2025/10/07 ChatGPTの提案を受け入れて改修
     def getBestCondsHelical(self, cond, flux, dist_vec_mm):
-        self.logger.info("==================================")
-        self.logger.info("==> getBestCondsHelical starts <==")
-        self.logger.info("==================================")
-
-        print(f"type of dose_ds={type(cond['dose_ds'])}, value={cond['dose_ds']}")
-        print(f"type of dist_ds={type(cond['dist_ds'])}, value={cond['dist_ds']}")
-        if isinstance(cond['dose_ds'], str):
-            cond['dose_ds'] = float(cond['dose_ds'])
-        photon_density_limit = self.convDoseToDensityLimit(cond['dose_ds'], cond['wavelength'])
-        dist_vec_um = dist_vec_mm * 1000.0  # [um]
-        self.logger.info("Flux density limit for dose %8.5f MGy= %5.2e " % (cond['dose_ds'], photon_density_limit))
-        self.logger.info("Utilized Beam = %5.2f x %5.2f [um]" % (cond['ds_vbeam'], cond['ds_hbeam']))
-        self.logger.info("Utilized flux = %5.2e [phs/sec]" % flux)
-        best_transmission = self.estimateAttFactor(cond['exp_ds'], cond['total_osc'],
-                                                   cond['osc_width'], dist_vec_um, flux, cond['ds_vbeam'])
-        # Dose slicing is considered
-        self.logger.info("KUMA: Best attenuation factor=%10.7f" % best_transmission)
-        self.logger.info("Reduced factor for dose slicing: %8.5f" % cond['reduced_fact'])
-        self.logger.info("The number of datasets to be collected: %5d" % cond['ntimes'])
+        """
+        単一 (dose_ds, dist_ds) ペアを入力として、
+        ヘリカル測定条件に基づく露光時間と透過率を計算する。
+    
+        仕様:
+          - HEBI 側で展開済みの単一ペアを受け取る想定。
+          - 複数値 (list) が渡された場合はエラー。
+        """
+        mode = cond.get("mode", "helical")
+        if mode != "helical":
+            raise ValueError(f"getBestCondsHelical() called with mode='{mode}'. Expected 'helical'.")
+    
+        dose_val = cond.get("dose_ds")
+        dist_val = cond.get("dist_ds")
+    
+        # --- 型チェック ---
+        if isinstance(dose_val, (list, tuple)):
+            raise ValueError(f"getBestCondsHelical(): dose_ds should be scalar, got list {dose_val}")
+        if isinstance(dist_val, (list, tuple)):
+            raise ValueError(f"getBestCondsHelical(): dist_ds should be scalar, got list {dist_val}")
+    
+        dose_val = float(dose_val)
+        dist_val = float(dist_val)
+    
+        photon_density_limit = self.convDoseToDensityLimit(dose_val, cond['wavelength'])
+        dist_vec_um = dist_vec_mm * 1000.0  # mm → μm
+    
+        self.logger.info(f"Flux density limit for dose {dose_val:.5f} MGy = {photon_density_limit:.2e}")
+        self.logger.info(f"Utilized Beam = {cond['ds_vbeam']:.2f} x {cond['ds_hbeam']:.2f} [μm]")
+        self.logger.info(f"Utilized flux = {flux:.2e} [phs/sec]")
+    
+        best_transmission = self.estimateAttFactor(
+            cond['exp_ds'], cond['total_osc'], cond['osc_width'],
+            dist_vec_um, flux, cond['ds_vbeam']
+        )
+    
+        self.logger.info(f"KUMA: Best attenuation factor = {best_transmission:.7f}")
+        self.logger.info(f"Reduced factor for dose slicing = {cond['reduced_fact']:.5f}")
+        self.logger.info(f"Number of datasets = {cond['ntimes']:d}")
+    
         mod_transmission = cond['reduced_fact'] * best_transmission
-        self.logger.info("modified transmission for dose slicing %9.5f" % mod_transmission)
-
-        # Attenuator is not required
+        self.logger.info(f"Modified transmission = {mod_transmission:.5f}")
+    
         exp_orig = cond['exp_ds']
         n_frames = self.getNframe(cond)
-
+    
         if mod_transmission >= 1.0:
             exp_time = exp_orig * mod_transmission
             mod_transmission = 1.0
-            print("Exposure time was replaced by %8.4f sec" % exp_time)
-            print("Measurement time will be longer than the initial condition")
-            print("Initial data collection time: %8.2f [sec]" % (exp_orig * float(n_frames)))
-            print("Current data collection time: %8.2f [sec]" % (exp_time * float(n_frames)))
-        # Attenuator is required
+            self.logger.info(f"[dose={dose_val}, dist={dist_val}] Exposure time adjusted: {exp_time:.4f}s")
         else:
             exp_time = exp_orig
-            self.logger.info("Exposure time is input value: %8.2f [sec]" % exp_orig)
-
+            self.logger.info(f"[dose={dose_val}, dist={dist_val}] Using original exposure {exp_time:.3f}s")
+    
+        # 常にタプルで返す（HEBI 側の期待仕様）
         return exp_time, mod_transmission
-    # end of getBestCondsHelical
 
 if __name__ == "__main__":
     #import ESA
@@ -268,10 +347,22 @@ if __name__ == "__main__":
     dist_vec=0.1
     # string type of dose values
     dose_ds = 5.0
+    #dose_ds = "{1.0,5.0,10.0}"
+    dist_ds = 110.0
+    # Test for helical
     # cond dictionaryを作成する
-    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
+    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'dist_ds':dist_ds,'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
     exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
     print(f"suitable exposure time: {exp_time:.4f} sec, modified transmission: {mod_transmission:.5f}")
+    """
+
+    # Test for multi
+    dose_ds = "{1.0,5.0,10.0}"
+    dist_ds = "{110.0,120.0}"
+    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'dist_ds':dist_ds,'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
+    exp_time, mod_transmission=kuma.getBestCondsMulti(cond, flux)
+    print(f"suitable exposure time: {exp_time:.4f} sec, modified transmission: {mod_transmission:.5f}")
+    """
 
     """
     # Dose estimation of 'SWSX' data collection
