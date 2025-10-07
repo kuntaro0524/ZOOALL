@@ -9,6 +9,7 @@ import AnaHeatmap
 import CrystalList
 import logging
 import logging.config
+from dose.fields import get_dose_ds, get_dist_ds
 
 # version 2.0.0 2019/07/04
 
@@ -211,52 +212,54 @@ class HEBI():
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("HEBI.doSingle: ERRors occured in data collection loop.\n")
 
+    def plan_something(self, cond):
+        dose_list = get_dose_ds(cond)
+        dist_list = get_dist_ds(cond)
+
+        print(dose_list, dist_list)
+
+    # ChatGPTに仕様を伝えて書いてもらいました。 K. Hirata
     def getDoseDistList(self, cond):
-        # Dose slicing
-        # dose_ds = "{0.1, 1.0, 1.0}" 
-        # dist_ds = "{125, 100, 100}"
-        # >>> Normal setting
-        # dose_ds = 1.0
-        # dist_dis = 100.0
-        # これらをZIPで数値にして dose_ds, dist_dsを作成する
-        dose=0.0
-        dist=0.0
-        dose_string = cond['dose_ds']
-        dist_string = cond['dist_ds']
-        self.logger.info("Uppdate check 01")
-        self.logger.info(f"dose_string={dose_string}, dist_string={dist_string}")
-        print(f"type of dose_string={type(dose_string)}, type of dist_string={type(dist_string)}")
-        # まず　"," で区切られたリストかどうかを確認する
-        # 仮に "{}" が含まれていなかったらそれぞれは単体の float として扱う
-        # もしも dose_string、dist_stringがすでにfloatであったら
-        if isinstance(dose_string, float):
-            dose= dose_string
-        elif isinstance(dose_string, str):
-            print(f"strings")
-            if "{" not in dose_string:
-                dose= float(dose_string)
-        if isinstance(dist_string, float):
-            dist = dist_string
-        elif isinstance(dist_string, str):
-            if "{" not in dist_string:
-                dist= float(dist_string)
-        if dose != 0.0 and dist != 0.0:
-            self.logger.info("Single float values were detected.")
-            self.logger.info(f"dose={dose:.3f}, dist={dist:.1f}")
-            return [(dose, dist)]
-        self.logger.info("TOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-        # 含まれていたら リストにしてしまう
-        tmpstr = dose_string.replace("{", "").replace("}", "")
-        # tmpstr を "," で区切って float に変換してリストにする
-        dose_list = [float(x) for x in tmpstr.split(",")]
-        # dist_listも同様にさくせい
-        tmpstr = dist_string.replace("{", "").replace("}", "")
-        dist_list = [float(x) for x in tmpstr.split(",")]
-        # ここで、dose_list と dist_list を zip する
-        dose_dist_list = list(zip(dose_list, dist_list))
-        self.logger.info(f"Dose slicing values were detected.")
-        self.logger.info(f"dose_dist_list={dose_dist_list}")
-        return dose_dist_list
+        """
+        cond から dose_ds と dist_ds を取得し、
+        (dose, dist) のペアリストを返す。
+        
+        仕様:
+          - cond は CSV 由来の辞書
+          - 'dose_ds', 'dist_ds' の値は "{1.0, 5.0, 10.0}" のような文字列でもよい
+          - どちらか一方が1要素しかない場合、もう一方の長さに合わせて複製する
+          - 両方空の場合は ValueError
+        """
+        # --- 1. dose, dist の取得 ---
+        dose_list = get_dose_ds(cond) or []
+        dist_list = get_dist_ds(cond) or []
+    
+        # --- 2. どちらも空ならエラー ---
+        if not dose_list and not dist_list:
+            raise ValueError("Both dose_ds and dist_ds are empty.")
+    
+        # --- 3. 片方が空ならもう片方の長さに合わせる ---
+        if not dose_list:
+            dose_list = [0.0] * len(dist_list)
+        elif not dist_list:
+            dist_list = [0.0] * len(dose_list)
+    
+        # --- 4. 長さ調整（短い方を繰り返して合わせる） ---
+        len_dose = len(dose_list)
+        len_dist = len(dist_list)
+        if len_dose != len_dist:
+            if len_dose < len_dist:
+                repeats = (len_dist + len_dose - 1) // len_dose
+                dose_list = (dose_list * repeats)[:len_dist]
+            else:
+                repeats = (len_dose + len_dist - 1) // len_dist
+                dist_list = (dist_list * repeats)[:len_dose]
+            print(f"[INFO] dose_ds と dist_ds の長さが異なったため、短い方を繰り返して長さを合わせました。")
+    
+        # --- 5. ペアにまとめて返す ---
+        dose_dist_pairs = list(zip(dose_list, dist_list))
+
+        return dose_dist_pairs
 
     def loopSIMU(self, dose_dist_list, small=True):
         data_index=0
@@ -535,7 +538,13 @@ if __name__ == "__main__":
     # logging
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+    #h2.plan_something(cond)
+    values = h2.getDoseDistList(cond)
+    print(values)
+
+    """
     h2.loopSIMU(cond, small=True)
+    """
 
     #h2.doHelicalSIMU(xyz1,xyz2, cond, face_angle, "test_simu")
 

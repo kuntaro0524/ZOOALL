@@ -4,7 +4,7 @@ import pandas as pd
 from scipy import interpolate
 import numpy as np
 from configparser import ConfigParser, ExtendedInterpolation
-
+from Libs.dose.fields import get_dose_ds, get_dist_ds
 
 # Version 2.0.0 2019/07/04 K.Hirata
 class KUMA:
