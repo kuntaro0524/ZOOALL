@@ -253,10 +253,10 @@ class Zoo:
         recstr = self.communicate(com)
         self.logger.debug("a received message: %s" % recstr)
 
-    def waitTillReady(self):
+    def waitTillReady(self,isPE=False):
         while (1):
             try:
-                if self.isBusy():
+                if self.isBusy(isPE):
                     self.logger.info("Now busy...")
                     time.sleep(2.0)
                 else:
@@ -264,12 +264,14 @@ class Zoo:
             except ZooMyException as ttt:
                 raise ZooMyException("waitTillReady: Some error occurred : %s" % ttt.args[0])
 
-    def isBusy(self):
-        if self.isConnect == False:
-            print("Connection first!")
-            return False
+    def isBusy(self, isPE=False):
+        if isPE:
+            command = "get/puck/query"
         else:
             command = "get/measurement/query"
+        if self.isConnect == False:
+            return False
+        else:
             recstr = self.communicate(command)
             svoc_c = self.getSVOC_C(recstr)
             if self.isDebug:
@@ -498,6 +500,14 @@ class Zoo:
         com = "put/run_script/%s" % script_name
         recstr = self.communicate(com)
         return recstr
+
+    def pe_mount_puck(self, target_puck):
+        com = "put/puck/mount_%s" % (target_puck)
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except ZooMyException as ttt:
+            raise ZooMyException("pe_mount_puck: failed. %s" % ttt.args[0])
 
 if __name__ == "__main__":
     # Logging setting
