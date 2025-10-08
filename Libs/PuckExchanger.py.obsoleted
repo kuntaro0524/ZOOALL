@@ -23,11 +23,6 @@ class PuckExchanger():
         self.puck_df = pd.read_csv(csvfile)
         # self.logger(self.puck_df)
         self.schedule_pucks = self.puck_df['puckid']
-        # self.schedule_pucks -> 重複をなくす
-        self.schedule_pucks = list(dict.fromkeys(self.schedule_pucks))
-        self.schedule_pucks = [str(puck) for puck in self.schedule_pucks if
-                                str(puck) != "nan" and str(puck) != ""]
-
         self.logger.info("Scheduling pucks %s" % self.schedule_pucks)
 
         return self.schedule_pucks
@@ -47,15 +42,15 @@ class PuckExchanger():
 
         # Check if scheduled pucks are in SPACE dewar now.
         for scheduled_puck in scheduled_pucks:
-            self.logger.info(f"Scheduled puck={scheduled_puck}")
+            print("SCHE=",scheduled_puck)
             non_touch_flag=False
             for puck_in_space in pucks_in_space:
-                self.logger.info(f"PINSA={puck_in_space}")
+                print("PINSPA=",puck_in_space)
                 if puck_in_space.rfind("Not-Mount")!=-1:
-                    self.logger.info(f"{puck_in_space}: skipping")
+                    self.logger.info("%s is not mounted" % puck_in_space)
                     continue
                 elif puck_in_space==scheduled_puck:
-                    self.logger.info(f"{scheduled_puck} is already in SPACE dewar. It will be a 'non-touch' puck.")
+                    self.logger.info("%s is already in SPACE dewar." % puck_in_space)
                     non_touch_pucks.append(puck_in_space)
                     non_touch_flag=True
                     break
@@ -188,5 +183,5 @@ if __name__ == "__main__":
 
     pe=PuckExchanger(zoo)
     mount_list, unmount_list=pe.checkCurrentPucks(sys.argv[1])
-    logger.info(f"mountlist={mount_list}")
-    logger.info(f"unmountlist={unmount_list}")
+    print("  mountlist=", mount_list)
+    print("unmountlist=", unmount_list)
