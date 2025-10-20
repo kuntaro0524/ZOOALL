@@ -9,6 +9,7 @@ import AnaHeatmap
 import CrystalList
 import logging
 import logging.config
+from dose.fields import get_dose_ds, get_dist_ds
 
 # version 2.0.0 2019/07/04
 
@@ -211,52 +212,47 @@ class HEBI():
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("HEBI.doSingle: ERRors occured in data collection loop.\n")
 
+    def plan_something(self, cond):
+        dose_list = get_dose_ds(cond)
+        dist_list = get_dist_ds(cond)
+
+        print(dose_list, dist_list)
+
+    # ChatGPTに仕様を伝えて書いてもらいました。 K. Hirata
     def getDoseDistList(self, cond):
-        # Dose slicing
-        # dose_ds = "{0.1, 1.0, 1.0}" 
-        # dist_ds = "{125, 100, 100}"
-        # >>> Normal setting
-        # dose_ds = 1.0
-        # dist_dis = 100.0
-        # これらをZIPで数値にして dose_ds, dist_dsを作成する
-        dose=0.0
-        dist=0.0
-        dose_string = cond['dose_ds']
-        dist_string = cond['dist_ds']
-        self.logger.info("Uppdate check 01")
-        self.logger.info(f"dose_string={dose_string}, dist_string={dist_string}")
-        print(f"type of dose_string={type(dose_string)}, type of dist_string={type(dist_string)}")
-        # まず　"," で区切られたリストかどうかを確認する
-        # 仮に "{}" が含まれていなかったらそれぞれは単体の float として扱う
-        # もしも dose_string、dist_stringがすでにfloatであったら
-        if isinstance(dose_string, float):
-            dose= dose_string
-        elif isinstance(dose_string, str):
-            print(f"strings")
-            if "{" not in dose_string:
-                dose= float(dose_string)
-        if isinstance(dist_string, float):
-            dist = dist_string
-        elif isinstance(dist_string, str):
-            if "{" not in dist_string:
-                dist= float(dist_string)
-        if dose != 0.0 and dist != 0.0:
-            self.logger.info("Single float values were detected.")
-            self.logger.info(f"dose={dose:.3f}, dist={dist:.1f}")
-            return [(dose, dist)]
-        self.logger.info("TOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-        # 含まれていたら リストにしてしまう
-        tmpstr = dose_string.replace("{", "").replace("}", "")
-        # tmpstr を "," で区切って float に変換してリストにする
-        dose_list = [float(x) for x in tmpstr.split(",")]
-        # dist_listも同様にさくせい
-        tmpstr = dist_string.replace("{", "").replace("}", "")
-        dist_list = [float(x) for x in tmpstr.split(",")]
-        # ここで、dose_list と dist_list を zip する
-        dose_dist_list = list(zip(dose_list, dist_list))
-        self.logger.info(f"Dose slicing values were detected.")
-        self.logger.info(f"dose_dist_list={dose_dist_list}")
-        return dose_dist_list
+        """
+        cond から dose_ds / dist_ds を取得し、(dose, dist) のペアを返す。
+        仕様:
+          - 入力は "5.0" / "{1,2,10}" / "[...]" / "(...)" などを許容（fields側で処理）
+          - 長さ不一致時:
+              * dose の方を短く → dose の「最大値」を繰り返して長い方に合わせる
+              * dist の方を短く → dist の「最小値」を繰り返して長い方に合わせる
+          - 両方空はエラー
+          - どちらか空は 0.0 を繰り返して補完（従来互換）
+        """
+        dose_list = get_dose_ds(cond) or []
+        dist_list = get_dist_ds(cond) or []
+
+        if not dose_list and not dist_list:
+            raise ValueError("Both dose_ds and dist_ds are empty.")
+    
+        if not dose_list:
+            dose_list = [0.0] * len(dist_list)
+        if not dist_list:
+            dist_list = [0.0] * len(dose_list)
+    
+        ld, lt = len(dose_list), len(dist_list)
+        if ld != lt:
+            if ld < lt:
+                # dose を拡張：dose の最大値を繰り返す
+                pad = max(dose_list) if dose_list else 0.0
+                dose_list = dose_list + [pad] * (lt - ld)
+            else:
+                # dist を拡張：dist の最小値を繰り返す
+                pad = min(dist_list) if dist_list else 0.0
+                dist_list = dist_list + [pad] * (ld - lt)
+    
+        return list(zip(dose_list, dist_list))
 
     def loopSIMU(self, dose_dist_list, small=True):
         data_index=0
@@ -535,7 +531,13 @@ if __name__ == "__main__":
     # logging
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+    #h2.plan_something(cond)
+    values = h2.getDoseDistList(cond)
+    print(values)
+
+    """
     h2.loopSIMU(cond, small=True)
+    """
 
     #h2.doHelicalSIMU(xyz1,xyz2, cond, face_angle, "test_simu")
 

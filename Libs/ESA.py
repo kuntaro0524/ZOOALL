@@ -99,12 +99,6 @@ class ESA:
         results = []
         for row in cur.fetchall():
             x = dict(list(zip([d[0] for d in cur.description], row)))
-            # dose_dsの補足処理
-            if 'dose_ds' in x and isinstance(x['dose_ds'], str):
-                try:
-                    x['dose_ds_list']=[float(v) for v in x['dose_ds'].split("+")]
-                except Exception:
-                    x['dose_ds_list'] = []
             results.append(x)
         return results
 

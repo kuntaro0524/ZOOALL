@@ -6,7 +6,7 @@ ESA -> the main function : the class to read & write zoo database file
 This code is originally written by K.Hirata and modified by N.Mizuno.
 NM added function to read xlsx file directly and output zoo.db by using ESA class.
 
-Vice-author: Nobuhiro Mizuno
+The second author: Nobuhiro Mizuno
 """
 import sys, os, math, numpy, csv, re, datetime, xlrd, codecs
 import configparser
@@ -16,6 +16,7 @@ import KUMA
 # logger の設定
 import logging
 from configparser import ConfigParser, ExtendedInterpolation
+from dose.fields import get_dose_ds, get_dist_ds
 
 class UserESA():
     def __init__(self, fname=None, root_dir=".", beamline=None):
@@ -30,6 +31,8 @@ class UserESA():
         self.isGot  = None
         self.zoocsv = None
         self.contents = []
+
+        self.debug=True
 
         # configure file から情報を読む: beamlineの名前
         self.beamline = self.config.get("beamline", "beamline")
@@ -61,6 +64,27 @@ class UserESA():
         self.logger.addHandler(self.logger_ch)
 
         self.root_dir = root_dir
+
+    # ChatGPT 2024-10-07 
+    # dose_ds, dist_ds は mode = 'multi', 'mixed' は複数不可
+    def validateDoseDist(self, cond):
+        """mode に応じて dose/dist の形式をチェック"""
+        mode = cond.get("mode", "").lower()
+        dose_list = get_dose_ds(cond)
+        dist_list = get_dist_ds(cond)
+    
+        if mode in ("multi", "mixed"):
+            if len(dose_list) > 1 or len(dist_list) > 1:
+                raise ValueError(
+                    f"[UserESA] mode='{mode}' does not allow multiple dose/dist values. "
+                    f"dose_ds={dose_list}, dist_ds={dist_list}"
+                )
+        elif mode in ("single", "helical"):
+            # OK: 複数対応は HEBI 側で展開可能
+            pass
+        else:
+            # 念のため未知モードも弾く
+            raise ValueError(f"[UserESA] Unknown mode='{mode}' in condition.") 
 
     def setDefaults(self):
         # self.df に以下のカラムを追加する
@@ -278,6 +302,7 @@ class UserESA():
         # 1 frameあたりのdoseを計算する
         # kuma.getDose()の引数は hbeam, vbeam, flux, energy, exp_raster
         # dose_per_frame = kuma.getDose(hbeam, vbeam, flux, energy, exp_raster) * self.df['att_raster'] / 100.0
+        print(self.df)
         self.df.loc[mask1, 'dose_per_frame'] = kuma.getDose(self.df['ds_hbeam'], self.df['ds_vbeam'], self.df['flux'], self.df['energy'], self.df['exp_raster']) * self.df['att_raster'] / 100.0
 
         # mask2 
@@ -470,30 +495,88 @@ class UserESA():
             return list(map(float, column_value.split('+')))
         
     def checkDoseList(self):
-        # self.df の要素数ずつ
-        for i, row in self.df.iterrows():
-            # もしも dose_list, dist_listが存在する場合は
-            if 'dose_list' in row:
-                # dose_list, dist_list のいずれかに値がない場合
-                if pd.isna(row['dose_list']) or pd.isna(row['dist_list']):
-                    raise ValueError(f"Row {i} has NaN in 'dose_list' or 'dist_list'. Please check the input file.")
-                dose_list = self.makeValueList(row['dose_list'])
-                dist_list = self.makeValueList(row['dist_list'])
-                self.logger.info(f"dose_list= {dose_list}, dist_list={dist_list}")
-                # dose_list と dist_list の要素数をチェック
-                if not isinstance(dose_list, list) or not isinstance(dist_list, list):
-                    raise ValueError(f"Row {i} has invalid 'dose_list' or 'dist_list'. They should be lists.")
+        # 例: df は Excel から読み込んだ DataFrame
+        # 必要に応じて列が無い場合は作っておく（空列）
+        self.logger.info(f"columns={self.df.columns.tolist()}")
+        for col in ("dose_list", "dist_list"):
+            if col not in self.df.columns:
+                self.df[col] = ""
+
+        # 各行処理
+        normalized_rows = []
+        for _, row in self.df.iterrows():
+            mode = str(row.get("mode", "")).strip().lower()
+
+            # debug
+            if self.debug:
+                # dose_list, dist_listの表示
+                self.logger.debug(f"Raw input - dose_list: {row.get('dose_list', '')}, dist_list: {row.get('dist_list', '')}")
+
+            # ユーザ入力の有無（両方揃っていなければ無視）
+            raw_dose = row.get("dose_list", "")
+            raw_dist = row.get("dist_list", "")
+
+            has_dose = str(raw_dose).strip() != ""
+            has_dist = str(raw_dist).strip() != ""
+
+            if has_dose != has_dist:
+                # 片方だけ → 読まない（既存ロジック：希望分解能などで dist を算出）
+                dose_vals = None
+                dist_vals = None
+                prefer_brace_single = False
             else:
-                self.logger.info(f"Row {i} does not have 'dose_list' or 'dist_list'. Using 'dose_ds' and 'dist_ds'.")
-                dose_list = self.makeValueList(row['dose_ds'])
-                dist_list = self.makeValueList(row['dist_ds'])
-                self.logger.info(f"type of dose_list: {type(dose_list)}, type of dist_list: {type(dist_list)}")
-                self.logger.info(f"dose_list= {dose_list}, dist_list={dist_list}")
-            
-            # dose_listを書き換える
-            self.df.at[i, 'dose_list'] = dose_list
-            # dist_listを書き換える
-            self.df.at[i, 'dist_list'] = dist_list
+                # 両方ある → パース
+                dose_vals = self._parse_series_like(raw_dose) if has_dose else None
+                dist_vals = self._parse_series_like(raw_dist) if has_dist else None
+                # 単一値を {} で書いていたかを検出しておく（書き戻し時に反映したい場合）
+                prefer_brace_single = (
+                    isinstance(raw_dose, str) and raw_dose.strip().startswith(("{", "［", "（", "[", "("))
+                )
+
+                # モードと値数チェック
+                # モードと値数チェック（multi/mixed は多値禁止）
+                multi_dose = dose_vals is not None and len(dose_vals) > 1
+                multi_dist = dist_vals is not None and len(dist_vals) > 1
+                if mode in ("multi", "mixed") and (multi_dose or multi_dist):
+                    n_dose = len(dose_vals) if dose_vals is not None else 0
+                    n_dist = len(dist_vals) if dist_vals is not None else 0
+                    if n_dose > 1 or n_dist > 1:
+                        raise ValueError(
+                            f"[UserESA] mode='{mode}' prohibits multiple values: "
+                            f"dose_list={dose_vals}, dist_list={dist_vals}"
+                        )
+
+                # 長さ不一致の補間（dose→max, dist→min）
+                if dose_vals is not None and dist_vals is not None:
+                    # 長さ一致パディング (dose->max, dist->min)
+                    dose_vals, dist_vals = self._pad_lists_by_policy(dose_vals, dist_vals)
+                    # --- modeによる多値禁止を厳密にチェック ---
+                    m = (mode or "").strip().lower()
+                    if m in ("multi", "mixed"):
+                        if len(dose_vals) > 1 or len(dist_vals) > 1:
+                            raise ValueError(
+                                f"[UserESA] mode='{m}' prohibits multiple values: "
+                                f"dose_list={dose_vals}, dist_list={dist_vals}"
+                            )
+
+            # ---- ここで CSV に書き出す値を決める ----
+            # 1) dose_list / dist_list は、そのまま（ただし補間後）書き出す
+            out_dose_list = self._serialize_list_for_csv(dose_vals) if dose_vals is not None else ""
+            out_dist_list = self._serialize_list_for_csv(dist_vals) if dist_vals is not None else ""
+
+            self.logger.info(f"dose_list= {out_dose_list}, dist_list={out_dist_list}")
+
+            # 2) 互換のため dose_ds / dist_ds にも同じ内容をミラー
+            row_out = row.copy()
+            row_out["dose_list"] = out_dose_list
+            row_out["dist_list"] = out_dist_list
+            row_out["dose_ds"]   = out_dose_list
+            row_out["dist_ds"]   = out_dist_list
+
+            normalized_rows.append(row_out)
+
+        # 正規化後 DF
+        self.df = pd.DataFrame(normalized_rows)
 
     def expandPinRange(self, pinstr):
         # pinid_str = "1-4" のような文字列を受け取る
@@ -673,6 +756,7 @@ class UserESA():
 
         # Doseについてリストにしてしまう
         try:
+            self.logger.info(f"Checking dose_list and dist_list")
             self.checkDoseList()
         except ValueError as e:
             self.logger.error(f"Error in checkDoseList: {e}")
@@ -704,10 +788,14 @@ class UserESA():
         # exp_ds,dist_ds,dose_ds,offset_angle,reduced_fact,ntimes,meas_name,cry_min_size_um,cry_max_size_um,
         # hel_full_osc,hel_part_osc, raster_roi, ln2_flag, cover_scan_flag, zoomcap_flag, warm_time 
         # その他の値は self.df から読み込む
+        read_columns = self.df.columns.tolist()
+
         self.columns = ['root_dir', 'p_index', 'mode', 'puckid', 'pinid', 'sample_name', 'wavelength', 'raster_vbeam', 'raster_hbeam', 'att_raster', \
                         'hebi_att', 'exp_raster', 'dist_raster', 'loopsize', 'score_min', 'score_max', 'maxhits', 'total_osc', 'osc_width', 'ds_vbeam', 'ds_hbeam', \
                         'exp_ds', 'dist_ds', 'dose_ds', 'offset_angle', 'reduced_fact', 'ntimes', 'meas_name', 'cry_min_size_um', 'cry_max_size_um', \
                         'hel_full_osc', 'hel_part_osc', 'raster_roi', 'ln2_flag', 'cover_scan_flag', 'zoomcap_flag', 'warm_time']       
+
+
 
         # ここで変数の型を明示的に指定する
         # float を想定しているもののみ
@@ -757,11 +845,84 @@ class UserESA():
         # 全パラメータの型を出力
         self.logger.info(f"Data types of all parameters in the DataFrame: {self.df.dtypes}")
 
+    # ChatGPT section
+    # ==========================================================
+    #  dose_list / dist_list パース＆正規化ユーティリティ群
+    # ==========================================================
+    def _parse_series_like(self, text):
+        """
+        '{1, 2, 5}', '[1,2]', '(1)', '1', '1.0' などを [float, ...] にする。
+        空(None/NaN/空文字)なら None を返す。
+        全角カッコ/カンマにも対応。
+        """
+        import re
+        import pandas as pd
+
+        if text is None or (isinstance(text, float) and pd.isna(text)):
+            return None
+        s = str(text).strip()
+        if not s:
+            return None
+
+        # 全角→半角
+        trans = str.maketrans({'（':'(', '）':')', '［':'[', '］':']', '｛':'{', '｝':'}', '，':','})
+        s = s.translate(trans).strip()
+
+        # 外側の1組の括弧を剥がす
+        if (s.startswith('{') and s.endswith('}')) or \
+           (s.startswith('[') and s.endswith(']')) or \
+           (s.startswith('(') and s.endswith(')')):
+            inner = s[1:-1].strip()
+            if not inner:
+                return []
+            s = inner
+
+        parts = [p.strip() for p in s.split(',') if p.strip()]
+        if not parts:
+            return []
+        vals = []
+        for p in parts:
+            if not re.fullmatch(r'[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?', p):
+                raise ValueError(f"Bad numeric token: {p!r}")
+            vals.append(float(p))
+        return vals
+
+    def _pad_lists_by_policy(self, dose_vals, dist_vals):
+        """
+        長さが違う場合の埋め方:
+          - dose_list が短い → dose の最大値で埋める
+          - dist_list が短い → dist の最小値で埋める
+        """
+        if dose_vals is None: dose_vals=[]
+        if dist_vals is None: dist_vals=[]
+        if not dose_vals and not dist_vals:
+            return [], []
+        if not dose_vals:
+            return [0.0]*len(dist_vals), dist_vals
+        if not dist_vals:
+            return dose_vals, [0.0]*len(dose_vals)
+
+        ld, lt = len(dose_vals), len(dist_vals)
+        if ld == lt:
+            return dose_vals, dist_vals
+        if ld < lt:
+            return dose_vals + [max(dose_vals)]*(lt-ld), dist_vals
+        else:
+            return dose_vals, dist_vals + [min(dist_vals)]*(ld-lt)
+
+    def _serialize_list_for_csv(self, vals):
+        """リストを CSV に書き戻す文字列へ。"""
+        if vals is None or len(vals)==0:
+            return ""
+        if len(vals)==1:
+            return f"{vals[0]:g}"   # 単一値は数値形式で出力
+        return "{" + ", ".join(f"{v:g}" for v in vals) + "}"
+
 if __name__ == "__main__":
     root_dir = os.getcwd()
     u2db = UserESA(sys.argv[1], root_dir, beamline="BL32XU")
     # logger set
-    u2db.logger = logging.getLogger("UserESA")
+    u2db.logger = logging.getLogger("ZOO")
     u2db.logger.setLevel(logging.INFO)
     
     u2db.makeCondList()
