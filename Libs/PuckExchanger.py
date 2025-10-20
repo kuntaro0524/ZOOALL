@@ -244,25 +244,28 @@ class PuckExchanger():
             self.logger.info(f"mount {p}")
             self.zoo.pe_mount_puck(p)    # 既存のマウント呼び出しに合わせる
 
-    def run_exchange_for_single_csv(self, csv_path, capacity=8):
-        import pandas as pd
-        df = pd.read_csv(csv_path)
-        if 'puckid' not in df.columns:
-            raise RuntimeError(f"{csv_path}: 'puckid' 列がありません。")
-        planned = _unique_keep_order(df['puckid'].dropna().astype(str).tolist())
+    def run_exchange_for_single_csv(self, csv_path:str):
+        planned = self._get_planned_from_csv(csv_path)
+        pe_pucks = self.getAllPuckInfoPE()
+        self._validate_planned_exist_in_pe(planned)
 
-        space_pucks = get_space_pucks(self)
-        pe_pucks    = get_pe_pucks(self)
+        cur = self.zoo.getSampleInformation()
+        space_pucks = [p for p in cur if ("Not-Mount" not in p) and ("Not-Mounted" not in p)]
 
-        # 1) 仕様④：最初にPE在庫チェック（無ければ停止）
-        validate_planned_exist_in_pe(self, planned, pe_pucks)
+        keep = [p for p in space_pucks if p in planned]
+        to_unmount = [p for p in space_pucks if p not in planned]
+        to_mount = [p for p in planned if p not in keep]
 
-        # 2) 計画
-        to_mount, to_unmount, keep = plan_exchange(self, planned, space_pucks, capacity)
-        self.logger.info(f"[{csv_path}] keep={keep}, unmount={to_unmount}, mount={to_mount}")
-
-        # 3) 実行
-        execute_exchange(self, to_unmount, to_mount)
+        final_keep = [p for p in space_pucks if p not in to_unmount]
+        free_slots = 8 - len(final_keep)
+        if len(to_mount) > free_slots:
+            raise RuntimeError("Not enough space to mount all scheduled pucks after unmounting. Please check the CSV file and current SPACE status.")
+        
+        for p in to_unmount:
+            self.logger.info(f"unmount {p}")
+            self.zoo.pe_unmount_puck(p)
+        for p in to_mount:
+            self.zoo.pe_mount_puck(p)
 
 if __name__ == "__main__":
     import Zoo
