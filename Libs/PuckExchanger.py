@@ -19,7 +19,7 @@ class PuckExchanger():
         # logger
         self.logger = logging.getLogger('ZOO').getChild('PuckExchanger')
 
-    def read(self, csvfile):
+    def readPuckInfoFromCSV(self, csvfile):
         self.puck_df = pd.read_csv(csvfile)
         # self.logger(self.puck_df)
         self.schedule_pucks = self.puck_df['puckid']
@@ -160,7 +160,7 @@ class PuckExchanger():
         self.puck_in_PE = []
         for index in range(1, self.nmax_pucks+1):
             puck=self.zoo.pe_get_puck(index)
-            if (*Not-Mount" not in puck) and ("Not-Mounted" not in puck):
+            if ("Not-Mount" not in puck) and ("Not-Mounted" not in puck):
                 self.puck_in_PE.append(puck)
                 self.n_stored+=1
 
@@ -210,6 +210,18 @@ class PuckExchanger():
         if missing:
             # shows error message in English
             raise RuntimeError(f"The following planned pucks are not found in PE inventory: {missing}. Please check the CSV file and PE status.")
+
+    def _get_planned_from_csv(self, csv_path: str):
+        puck_list = self.readPuckInfoFromCSV(csv_path)
+
+        seen = set()
+        planned = []
+        for puck in puck_list:
+            if puck and puck not in seen:
+                seen.add(puck)
+                planned.append(puck)
+
+        return planned
 
     def plan_exchange(self, planned, space_pucks, capacity=8):
         # すでにSPACEに入っていて必要なものは残す（keep）
