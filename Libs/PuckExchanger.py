@@ -50,7 +50,7 @@ class PuckExchanger():
             self.logger.info(f"Scheduled puck={scheduled_puck}")
             non_touch_flag=False
             for puck_in_space in pucks_in_space:
-                self.logger.info(f"PINSA={puck_in_space}")
+                self.logger.info(f"puck in space dewar={puck_in_space}")
                 if puck_in_space.rfind("Not-Mount")!=-1:
                     self.logger.info(f"{puck_in_space}: skipping")
                     continue
@@ -67,9 +67,10 @@ class PuckExchanger():
         # To be unmounted
         to_be_unmounted=[]
         if len(to_be_mounted) != 0:
-            for puck_in_space in pucks_in_space:
+            #for puck_in_space in pucks_in_space:
+            for puck_index, puck_in_space in enumerate(pucks_in_space):
                 if puck_in_space.rfind("Not-Mount")!=-1:
-                    self.logger.info("%s: skipping" % puck_in_space)
+                    self.logger.info(f"ID={puck_index+1} is skipping -> empty slot")
                     continue
                 # Non touch pucks
                 for non_touch_puck in non_touch_pucks:
