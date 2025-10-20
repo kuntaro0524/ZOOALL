@@ -501,13 +501,68 @@ class Zoo:
         recstr = self.communicate(com)
         return recstr
 
+    # Puck exchanger related functions are here
+    def pe_exchange_pucks(self, space_puck, target_puck):
+        com = "put/puck/exchange_%s_%s" % (space_puck, target_puck)
+        self.bssr.sendall(com)
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
     def pe_mount_puck(self, target_puck):
         com = "put/puck/mount_%s" % (target_puck)
         recstr = self.communicate(com)
         try:
             self.waitTillReady(isPE=True)
-        except ZooMyException as ttt:
-            raise ZooMyException("pe_mount_puck: failed. %s" % ttt.args[0])
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_unmount_puck(self, space_puck):
+        com = "put/puck/unmount_%s" % (space_puck)
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_clean_both(self):
+        com = "put/puck/cleaningall" % (space_puck)
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_clean_stock(self):
+        com = "put/puck/cleaningstock"
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_clean_robot(self):
+        com = "put/puck/cleaningrobo"
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_get_puck(self, puckid):
+        com = "get/puck/puckid_%s" % puckid
+        recstr = self.communicate(com)
+        puckid=(recstr.split('/'))[3]
+
+        return puckid
+        #RETURN?: puck/get/(BSS pid)_pxbl_server/bbb
+
+    def pe_query(self):
+        com = "put/puck/query"
+        # RETURN(?): puck/get/(BSS pid)_pxbl_server/ret_val/errcode
+        recstr = self.communicate(com)
 
 if __name__ == "__main__":
     # Logging setting
@@ -525,8 +580,9 @@ if __name__ == "__main__":
     zoo = Zoo()
     zoo.connect()
     #zoo.exposeLN2(15)
+    zoo.pe_mount_puck(sys.argv[1])
     #zoo.stop()
-    zoo.setWavelength(1.0)
+    #zoo.setWavelength(1.0)
     # zoo.setBeamsize(0)
     #print("BBBBBBBBBBBBBBBB")
     #print(zoo.getBeamsize())

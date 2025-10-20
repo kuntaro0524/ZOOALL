@@ -21,7 +21,10 @@ class PuckExchanger():
 
     def readPuckInfoFromCSV(self, csvfile):
         self.puck_df = pd.read_csv(csvfile)
-        # self.logger(self.puck_df)
+        # header check
+        if 'puckid' not in self.puck_df.columns:
+            raise RuntimeError("CSV file must contain 'puckid' column.")
+
         self.schedule_pucks = self.puck_df['puckid']
         # self.schedule_pucks -> 重複をなくす
         self.schedule_pucks = list(dict.fromkeys(self.schedule_pucks))
@@ -31,99 +34,6 @@ class PuckExchanger():
         self.logger.info("Scheduling pucks %s" % self.schedule_pucks)
 
         return self.schedule_pucks
-
-    def checkCurrentPucks(self, csvfile):
-        # Read puck IDs in the dewar.
-        pucks_in_space=self.zoo.getSampleInformation()
-        scheduled_pucks=self.readPuckInfoFromCSV(csvfile)
-
-        self.logger.info(f"Pucks in SPACE dewar={pucks_in_space}")
-        self.logger.info(f"Scheduled pucks  ={scheduled_pucks}")
-
-        # Non-touch pucks
-        non_touch_pucks=[]
-        # residual pucks
-        to_be_mounted = []
-
-        # Check if scheduled pucks are in SPACE dewar now.
-        for scheduled_puck in scheduled_pucks:
-            self.logger.info(f"Scheduled puck={scheduled_puck}")
-            non_touch_flag=False
-            for puck_in_space in pucks_in_space:
-                self.logger.info(f"puck in space dewar={puck_in_space}")
-                if puck_in_space.rfind("Not-Mount")!=-1:
-                    self.logger.info(f"{puck_in_space}: skipping")
-                    continue
-                elif puck_in_space==scheduled_puck:
-                    self.logger.info(f"{scheduled_puck} is already in SPACE dewar. It will be a 'non-touch' puck.")
-                    non_touch_pucks.append(puck_in_space)
-                    non_touch_flag=True
-                    break
-
-            if non_touch_flag==False:
-                self.logger.info("%s is added to the mounting puck list." % scheduled_puck)
-                to_be_mounted.append(scheduled_puck)
-
-        # To be unmounted
-        to_be_unmounted=[]
-        if len(to_be_mounted) != 0:
-            #for puck_in_space in pucks_in_space:
-            for puck_index, puck_in_space in enumerate(pucks_in_space):
-                if puck_in_space.rfind("Not-Mount")!=-1:
-                    self.logger.info(f"ID={puck_index+1} is skipping -> empty slot")
-                    continue
-                # Non touch pucks
-                for non_touch_puck in non_touch_pucks:
-                    if puck_in_space==non_touch_puck:
-                        self.logger.info("This puck is 'non-touch' pucks.")
-                        continue
-                for puck_to_be_mounted in to_be_mounted:
-                    if puck_to_be_mounted == puck_in_space:
-                        # self.logger.info("This puck will come from PE from now: %s" % puck_to_be_mounted)
-                        continue
-                self.logger.info("%s should be removed from SPACE dewar" % puck_in_space)
-                to_be_unmounted.append(puck_in_space)
-
-        # Check the number of pucks to be mounted from now.
-        n_pucks_to_be_mount=len(to_be_mounted)
-        n_pucks_to_be_unmounted=len(to_be_unmounted)
-        n_non_touch_pucks=len(non_touch_pucks)
-
-        self.logger.info("%5d pucks will be   mounted from now" % n_pucks_to_be_mount)
-        self.logger.info("%5d pucks will be unmounted from now" % n_pucks_to_be_unmounted)
-        self.logger.info("%5d pucks will be left as they are" % n_non_touch_pucks)
-
-        return to_be_mounted, to_be_unmounted
-
-    def checkCurrentPucksAndMount(self, csvfile):
-        pucks_to_be_mounted, pucks_to_be_unmounted = self.checkCurrentPucks(csvfile)
-
-        # Unmounting pucks
-        if len(pucks_to_be_unmounted) == 0:
-            self.logger.info("Unmounting is not required now!")
-        else:
-            self.logger.info("Unmounting will be applied...")
-            for unmounting_puck in pucks_to_be_unmounted:
-                self.logger.info("unmounting %s" % unmounting_puck)
-                self.zoo.pe_unmount_puck(unmounting_puck)
-
-        space_pucks = self._get_space_pucks()
-        keep = [p for p in space_pucks if p in self.schedule_pucks]
-        free_slots = 8 - len(keep)
-        if len(pucks_to_be_mounted) > free_slots:
-            raise RuntimeError("Not enough space to mount all scheduled pucks after unmounting. Please check the CSV file and current SPACE status.")
-
-        # Mounting pucks
-        if len(pucks_to_be_mounted) <= 8 and len(pucks_to_be_mounted) > 0:
-            for puckid in pucks_to_be_mounted:
-                self.zoo.pe_mount_puck(puckid)
-        elif len(pucks_to_be_mounted) > 8:
-            self.logger.info("The number of pucks exceeds 8! Error")
-            return False
-        else:
-            self.logger.info("Pucks on the CSV are already mounted.")
-            self.logger.info("or CSV file is empty.")
-            return False
 
     def mountAllonCSV(self, csvfile):
         # First unount all pucks in SPACE
@@ -256,7 +166,7 @@ class PuckExchanger():
             self.logger.info(f"mount {p}")
             self.zoo.pe_mount_puck(p)    # 既存のマウント呼び出しに合わせる
 
-    def run_exchange_for_single_csv(self, csv_path:str):
+    def checkCurrentPucksAndMount(self, csv_path:str, dry_run:bool=False):
         planned = self._get_planned_from_csv(csv_path)
         pe_pucks = self.getAllPuckInfoPE()
         self._validate_planned_exist_in_pe(planned)
@@ -267,6 +177,13 @@ class PuckExchanger():
         keep = [p for p in space_pucks if p in planned]
         to_unmount = [p for p in space_pucks if p not in planned]
         to_mount = [p for p in planned if p not in keep]
+
+        # plan
+        plan = {"keep": keep, "to_unmount": to_unmount, "to_mount": to_mount}
+
+        # return dry run info
+        if dry_run:
+            return plan
 
         final_keep = [p for p in space_pucks if p not in to_unmount]
         free_slots = 8 - len(final_keep)
@@ -296,6 +213,6 @@ if __name__ == "__main__":
     logger.addHandler(fh)   
 
     pe=PuckExchanger(zoo)
-    mount_list, unmount_list=pe.checkCurrentPucks(sys.argv[1])
-    logger.info(f"mountlist={mount_list}")
-    logger.info(f"unmountlist={unmount_list}")
+    # dry run
+    plan = pe.checkCurrentPucksAndMount(sys.argv[1], dry_run=True)
+    logger.info(f"Dry run plan: {plan}")
