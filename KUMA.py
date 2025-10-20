@@ -146,56 +146,24 @@ class KUMA:
         if mode != "single":
             raise ValueError(f"getBestCondsSingle() called with mode='{mode}'. Expected 'single'.")
     
-        dose_list = get_dose_ds(cond) or []
-        dist_list = get_dist_ds(cond) or []
-        if not dose_list and not dist_list:
-            raise ValueError("Both dose_ds and dist_ds are empty.")
-    
-        # どちらか空は 0.0 で補完（従来互換）
-        if not dose_list:
-            dose_list = [0.0] * (len(dist_list) if dist_list else 1)
-        if not dist_list:
-            dist_list = [0.0] * (len(dose_list) if dose_list else 1)
-    
-        ld, lt = len(dose_list), len(dist_list)
-        if ld != lt:
-            if ld < lt:
-                # dose を拡張：dose の最大値を繰り返す
-                pad = max(dose_list) if dose_list else 0.0
-                dose_list = dose_list + [pad] * (lt - ld)
-                self.logger.info(f"[INFO] dose_ds was shorter; padded with max(dose)={pad} to length {len(dose_list)}")
-            else:
-                # dist を拡張：dist の最小値を繰り返す
-                pad = min(dist_list) if dist_list else 0.0
-                dist_list = dist_list + [pad] * (ld - lt)
-                self.logger.info(f"[INFO] dist_ds was shorter; padded with min(dist)={pad} to length {len(dist_list)}")
-    
         n_frames = self.getNframe(cond)
         results = []
-        for dose_val, dist_val in zip(dose_list, dist_list):
-            exptime_limit = self.convDoseToExptimeLimit(
-                dose_val, cond['ds_hbeam'], cond['ds_vbeam'], flux, cond['wavelength']
-            )
-            best_transmission = exptime_limit / float(n_frames) / cond['exp_ds']
-            mod_transmission = cond['reduced_fact'] * best_transmission
+        exptime_limit = self.convDoseToExptimeLimit(
+            cond['dose_ds'], cond['ds_hbeam'], cond['ds_vbeam'], flux, cond['wavelength']
+        )
+        best_transmission = exptime_limit / float(n_frames) / cond['exp_ds']
+        mod_transmission = cond['reduced_fact'] * best_transmission
+
+        exp_orig = cond['exp_ds']
+        if mod_transmission >= 1.0:
+            exp_time = exptime_limit / float(n_frames)
+            mod_transmission = 1.0
+            self.logger.info(f"[single dose={cond['dose_ds']} exp -> {exp_time:.3f}s (limit reached)")
+        else:
+            exp_time = exp_orig
+            self.logger.info(f"[single dose={cond['dose_ds']}, exp uses input {exp_time:.3f}s")
     
-            exp_orig = cond['exp_ds']
-            if mod_transmission >= 1.0:
-                exp_time = exptime_limit / float(n_frames)
-                mod_transmission = 1.0
-                self.logger.info(f"[single dose={dose_val}, dist={dist_val}] exp -> {exp_time:.3f}s (limit reached)")
-            else:
-                exp_time = exp_orig
-                self.logger.info(f"[single dose={dose_val}, dist={dist_val}] exp uses input {exp_time:.3f}s")
-    
-            results.append({
-                "dose": dose_val,
-                "dist": dist_val,
-                "exp_time": exp_time,
-                "mod_transmission": mod_transmission
-            })
-    
-        return results
+        return exp_time, mod_transmission
 
     def getBestCondsMulti(self, cond, flux):
         from Libs.dose.fields import get_dose_ds, get_dist_ds

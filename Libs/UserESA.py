@@ -494,32 +494,6 @@ class UserESA():
             # column_valueが文字列の場合には "+" で分割してリストに変換する
             return list(map(float, column_value.split('+')))
         
-    def checkDoseList_obsoleted(self):
-        # self.df の要素数ずつ
-        for i, row in self.df.iterrows():
-            # もしも dose_list, dist_listが存在する場合は
-            if 'dose_list' in row:
-                # dose_list, dist_list のいずれかに値がない場合
-                if pd.isna(row['dose_list']) or pd.isna(row['dist_list']):
-                    raise ValueError(f"Row {i} has NaN in 'dose_list' or 'dist_list'. Please check the input file.")
-                dose_list = self.makeValueList(row['dose_list'])
-                dist_list = self.makeValueList(row['dist_list'])
-                self.logger.info(f"dose_list= {dose_list}, dist_list={dist_list}")
-                # dose_list と dist_list の要素数をチェック
-                if not isinstance(dose_list, list) or not isinstance(dist_list, list):
-                    raise ValueError(f"Row {i} has invalid 'dose_list' or 'dist_list'. They should be lists.")
-            else:
-                self.logger.info(f"Row {i} does not have 'dose_list' or 'dist_list'. Using 'dose_ds' and 'dist_ds'.")
-                dose_list = self.makeValueList(row['dose_ds'])
-                dist_list = self.makeValueList(row['dist_ds'])
-                self.logger.info(f"type of dose_list: {type(dose_list)}, type of dist_list: {type(dist_list)}")
-                self.logger.info(f"dose_list= {dose_list}, dist_list={dist_list}")
-            
-            # dose_listを書き換える
-            self.df.at[i, 'dose_list'] = dose_list
-            # dist_listを書き換える
-            self.df.at[i, 'dist_list'] = dist_list
-
     def checkDoseList(self):
         # 例: df は Excel から読み込んだ DataFrame
         # 必要に応じて列が無い場合は作っておく（空列）
@@ -559,17 +533,31 @@ class UserESA():
                     isinstance(raw_dose, str) and raw_dose.strip().startswith(("{", "［", "（", "[", "("))
                 )
 
-                # 長さ不一致の補間（dose→max, dist→min）
-                if dose_vals is not None and dist_vals is not None:
-                    dose_vals, dist_vals = self._pad_lists_by_policy(dose_vals, dist_vals)
-
-                # mode による多値禁止
-                if mode in ("multi", "mixed"):
-                    if (dose_vals and len(dose_vals) > 1) or (dist_vals and len(dist_vals) > 1):
+                # モードと値数チェック
+                # モードと値数チェック（multi/mixed は多値禁止）
+                multi_dose = dose_vals is not None and len(dose_vals) > 1
+                multi_dist = dist_vals is not None and len(dist_vals) > 1
+                if mode in ("multi", "mixed") and (multi_dose or multi_dist):
+                    n_dose = len(dose_vals) if dose_vals is not None else 0
+                    n_dist = len(dist_vals) if dist_vals is not None else 0
+                    if n_dose > 1 or n_dist > 1:
                         raise ValueError(
                             f"[UserESA] mode='{mode}' prohibits multiple values: "
                             f"dose_list={dose_vals}, dist_list={dist_vals}"
                         )
+
+                # 長さ不一致の補間（dose→max, dist→min）
+                if dose_vals is not None and dist_vals is not None:
+                    # 長さ一致パディング (dose->max, dist->min)
+                    dose_vals, dist_vals = self._pad_lists_by_policy(dose_vals, dist_vals)
+                    # --- modeによる多値禁止を厳密にチェック ---
+                    m = (mode or "").strip().lower()
+                    if m in ("multi", "mixed"):
+                        if len(dose_vals) > 1 or len(dist_vals) > 1:
+                            raise ValueError(
+                                f"[UserESA] mode='{m}' prohibits multiple values: "
+                                f"dose_list={dose_vals}, dist_list={dist_vals}"
+                            )
 
             # ---- ここで CSV に書き出す値を決める ----
             # 1) dose_list / dist_list は、そのまま（ただし補間後）書き出す
