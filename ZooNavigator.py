@@ -676,7 +676,6 @@ class ZooNavigator():
         # d_index was defined as 'the newest directory number' of scan??/data??.
         d_index = self.lm.prepDataCollection()
         self.logger.info("Directory preparation finished.")
-        # n_mount is not useful then 'directory index' is stored to 'n_mount'
 
         # ラップタイムを記録
         self.updateTime(cond, "meas_start", comment="Measurement start")
@@ -802,6 +801,9 @@ class ZooNavigator():
         # isMount = d_index + 1
         isMount = d_index + 1
         self.updateDBinfo(cond, "isMount", isMount)
+        self.updateDBinfo(cond, "n_mount", isMount)
+        # 251029 K.Hirata added
+        self.updateDBinfo(cond, "data_index", d_index)
         self.updateTime(cond, "mount_end", comment="Sample mounting finished")
 
         # Time for waiting for the elongation

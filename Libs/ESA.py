@@ -226,7 +226,8 @@ class ESA:
         cur.execute(command)
         tmp_cond = cur.fetchone()
         previous_str = tmp_cond['t_meas_start']
-        d_index = tmp_cond['n_mount']
+        #d_index = tmp_cond['n_mount']
+        d_index = tmp_cond['data_index']
         event_tag = "%s_%02d" % (seq_name, d_index)
         timestr = self.makeEventTime(event_tag)
         self.logger.debug("previous_str = %s" % previous_str)
