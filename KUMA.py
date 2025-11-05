@@ -234,8 +234,8 @@ class KUMA:
           - HEBI 側で展開済みの単一ペアを受け取る想定。
           - 複数値 (list) が渡された場合はエラー。
         """
-        mode = cond.get("mode", "helical")
-        if mode != "helical":
+        mode = cond['mode']
+        if mode != "helical" and mode != "mixed":
             raise ValueError(f"getBestCondsHelical() called with mode='{mode}'. Expected 'helical'.")
     
         dose_val = cond.get("dose_ds")
@@ -319,7 +319,7 @@ if __name__ == "__main__":
     dist_ds = 110.0
     # Test for helical
     # cond dictionaryを作成する
-    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'dist_ds':dist_ds,'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
+    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'dist_ds':dist_ds,'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5,'mode':"helical"}
     exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
     print(f"suitable exposure time: {exp_time:.4f} sec, modified transmission: {mod_transmission:.5f}")
     """

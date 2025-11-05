@@ -435,7 +435,7 @@ class NOU():
             if cry_y_len <= (2.0 * cond['ds_hbeam']):
                 self.logger.info("Crystal size is smaller than the horizontal beam size (%5.2f [um])" % cond['ds_hbeam'])
                 self.logger.info("Helical data collection is swithced to the single irradiation mode")
-                self.doSingle(left_xyz, cond, phi_face, prefix)
+                self.doSingle(left_xyz, cond, osc_start, osc_end, prefix)
             else:
                 self.logger.info("Generate helical schedule file")
                 helical_sch = self.lm.genHelical(osc_start, osc_end, left_xyz, right_xyz, prefix, self.phosec_meas, cond)

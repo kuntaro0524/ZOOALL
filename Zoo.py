@@ -232,21 +232,6 @@ class Zoo:
         recstr = self.communicate(com)
         print(recstr)
 
-    def isBusy(self):
-        if self.isConnect == False:
-            print("Connection first!")
-            return False
-        else:
-            command = "get/measurement/query"
-            recstr = self.communicate(command)
-            svoc_c = self.getSVOC_C(recstr)
-            if svoc_c.rfind("ready") != -1:
-                return False
-            elif svoc_c.rfind("fail") != -1:
-                raise ZooMyException("Something failed.")
-            else:
-                return True
-
     def doRaster(self, jobfile):
         # JOB FILE NAME MUST NOT INCLUDE "_"
         com = "put/measurement/start_1_3_1_schedule_%s" % jobfile
@@ -524,7 +509,8 @@ class Zoo:
         recstr = self.communicate(com)
         try:
             self.waitTillReady(isPE=True)
-        except:
+        except ZooMyException as ttt:
+            # error handling with ZooMyException
             raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
 
     def pe_clean_both(self):
@@ -580,7 +566,7 @@ if __name__ == "__main__":
     zoo = Zoo()
     zoo.connect()
     #zoo.exposeLN2(15)
-    zoo.pe_mount_puck(sys.argv[1])
+    #zoo.pe_mount_puck(sys.argv[1])
     #zoo.stop()
     #zoo.setWavelength(1.0)
     # zoo.setBeamsize(0)
@@ -652,5 +638,6 @@ if __name__ == "__main__":
     # zoo.doDataCollection("/isilon/users/target/target/Staff/kuntaro/160715/Auto/KUN10-CPS1013-07/data/cry01.sch")
     # zoo.doDataCollection(schfile)
     # zoo.doDataCollection("/isilon/users/target/target/AutoUsers/kuntaro/161218/RR-test//mbeam09-CPS1716-02/data//multi.sch")
-    zoo.waitTillReady()
+    #zoo.waitTillReady()
+    zoo.waitTillReady(isPE=True)
     zoo.disconnect()

@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "load-dials-env",
+      "type": "shell",
+      "command": "source /opt/dials/dials-v3-23-0/dials_env.sh"
+    }
+  ]
+}
+

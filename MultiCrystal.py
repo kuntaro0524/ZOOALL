@@ -39,6 +39,7 @@ class MultiCrystal:
         self.z1 = 1.0
         self.x2 = 1.0
         self.y2 = 1.0
+        self.trans = None
         self.z2 = 1.0
         self.isSlow = False
         self.isReadBeamSize = False
@@ -49,10 +50,8 @@ class MultiCrystal:
         config.read(config_path)
         self.beamline = config.get("beamline", "beamline")
 
-        if self.beamline == "BL32XU" or "BL41XU" or "BL44XU":
-            self.data_suffix = "h5"
-        if self.beamline == "BL45XU":
-            self.data_suffix = "cbf"
+        # data suffix from a configure file
+        self.data_suffix = config.get("files", "data_suffix")
 
         # Is this valid only for BL32XU? K.Hirata 190412
         self.oscillation_delay = 100 #msec

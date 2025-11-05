@@ -525,8 +525,8 @@ if __name__ == "__main__":
     h2 = HEBI(zoo, lm, log, stopwatch)
     xyz1= 0.0, 0.0, 0.0
     xyz2 = 0.0, 0.001, 0.0
-    cond = {'total_osc':360.0,'wavelength': 1.0, 'hebi_att': 10.0, 'ds_hbeam': 10.0, 'ds_vbeam': 10.0, 'dose_ds':"{0.1, 1.0, 1.0}", 'dist_ds':"{125,100,100}"}
     cond = {'total_osc':360.0,'wavelength': 1.0, 'hebi_att': 10.0, 'ds_hbeam': 10.0, 'ds_vbeam': 10.0, 'dose_ds':"1.0", 'dist_ds':"125"}
+    cond = {'total_osc':360.0,'wavelength': 1.0, 'hebi_att': 10.0, 'ds_hbeam': 10.0, 'ds_vbeam': 10.0, 'dose_ds':"{0.1, 1.0, 1.0}", 'dist_ds':"{125,100,100}"}
 
     # logging
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
