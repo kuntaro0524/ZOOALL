@@ -24,6 +24,7 @@ class Mono:
         # beamlineの名前はconfigから読む
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+        print(f"config_path={config_path}")
         self.config.read(config_path)
 
         # dtheta1 axis

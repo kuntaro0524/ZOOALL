@@ -258,14 +258,15 @@ class Zoo:
             return False
         else:
             recstr = self.communicate(command)
-            svoc_c = self.getSVOC_C(recstr)
+            svoc_c = self.getSVOC_C(recstr).lower()
             if self.isDebug:
                 self.logger.debug(f"Received buffer in isBusy: {recstr}")
                 self.logger.debug(f"SVOC_C in isBusy: {svoc_c}")
             if svoc_c.rfind("ready") != -1:
-                print("isBusy:RECBUF=", recstr)
+                self.logger.info(f"{command}: Ready was detected= {recstr}")
                 return False
-            elif svoc_c.rfind("fail") != -1:
+            # svoc lower case
+            elif svoc_c.rfind("fail") != -1 or svoc_c.rfind("error") != -1:
                 raise ZooMyException("Something failed.")
             else:
                 return True
