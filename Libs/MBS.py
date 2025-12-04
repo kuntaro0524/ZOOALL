@@ -38,15 +38,16 @@ class MBS(BaseAxis.BaseAxis):
         return repr(recstr)
 
     def getStatus(self):
-        com = "get/{self.full_axis_name}/status"
+        com = f"get/{self.full_axis_name}/status"
         # counter clear
         recbuf = self.communicate(com)
+        print(recbuf)
         status = self.anaRes(recbuf)
         # return value: lock/moving/open/close
         return status
 
     def open(self):
-        com = "put/{self.full_axis_name}/open"
+        com = f"put/{self.full_axis_name}/open"
         # counter clear
         recbuf = self.communicate(com)
         # 30 sec trials
@@ -59,7 +60,7 @@ class MBS(BaseAxis.BaseAxis):
         return False
 
     def close(self):
-        com = "put/{self.full_axis_name}/close"
+        com = f"put/{self.full_axis_name}/close"
         # counter clear
         self.s.sendall(com)
         recbuf = self.s.recv(8000)

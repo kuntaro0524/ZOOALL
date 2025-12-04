@@ -21,8 +21,8 @@ import Colli
 import Cover
 import CCDlen
 import CoaxPint
-#import MBS
-#import DSS
+import MBS
+import DSS
 import BeamsizeConfig
 import Flux
 import PreColli
@@ -90,8 +90,8 @@ class Device(Singleton.Singleton):
         self.clen=CCDlen.CCDlen(self.s)
         self.covz=Cover.Cover(self.s)
         # Optics
-        #self.mbs=MBS.MBS(self.s)
-        #self.dss=DSS.DSS(self.s)
+        self.mbs=MBS.MBS(self.s)
+        self.dss=DSS.DSS(self.s)
         # BL32XU specific
         # BL44XU specific
         if self.beamline.lower() == "bl44xu":
@@ -348,7 +348,9 @@ if __name__=="__main__":
     dev.init()
 
     import time
-    dev.prepCentering()
+    #dev.prepCentering()
+    pwd = os.getcwd()
+    dev.tuneDt1(logpath=pwd+"/")
     #dev.prepScan()
     #dev.gonio.rotatePhi(225.0)
     #dev.measureFlux()
