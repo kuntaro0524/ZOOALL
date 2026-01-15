@@ -102,7 +102,7 @@ class Device(Singleton.Singleton):
         print("Device. initialization finished")
         self.isInit=True
 
-    def tuneDt1(self,logpath):
+    def tuneDt1_obsoleted(self,logpath):
         if os.path.exists(logpath)==False:
             os.makedirs(logpath)
         self.f=File.File(logpath)

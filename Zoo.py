@@ -584,7 +584,7 @@ if __name__ == "__main__":
     # zoo.setBeamsize(1)
 
     # while(1):
-    # zoo.skipSample()
+    zoo.skipSample()
     # zoo.dismountCurrPin()
     # zoo.sampleQuery()
     #zoo.stop()

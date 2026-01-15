@@ -109,6 +109,16 @@ class WebSocketBSS:
         response = requests.post(self.api_url, headers=self.headers, json=command)
         return response.json()
 
+    def tuneDt1(self):
+        command = {
+            "command":"bss_function",
+            "function":"stvme_monochro_dtheta1_tune",
+            "param":"0"
+        }
+        print(command)
+        response = requests.post(self.api_url, headers=self.headers, json=command)
+        return response.json()
+
     def shutter(self, switch):
         if switch == "open":
             command = {
@@ -127,7 +137,7 @@ class WebSocketBSS:
 
 if __name__ == "__main__":
     ws = WebSocketBSS()
-    print(ws.beamstopper("on"))
+    #print(ws.beamstopper("on"))
     #print(ws.collimator("on"))
     #print(ws.intensityMonitor("on"))
     #print(ws.light("on"))
@@ -135,3 +145,4 @@ if __name__ == "__main__":
     #print(ws.beamstopper("off"))
     #print(ws.collimator("off"))
     #print(ws.intensityMonitor("off"))
+    ws.tuneDt1()
