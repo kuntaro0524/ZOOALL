@@ -2265,3 +2265,209 @@ Response: {'id': 207, 'exid': 'ECHA_API_TEST_003', 'o_index': 0, 'p_index': 0, '
 getCondDataFrame starts
 Response: {'id': 210, 'exid': 'ECHA_API_TEST_003', 'o_index': 3, 'p_index': 3, 'isSkip': 0, 'isDone': 0, 'created_at': '2025-02-13T11:28:25.058666+09:00', 'updated_at': '2025-02-13T16:24:24.012251+09:00', 'zoo_id': 13}
 Response: {'id': 210, 'exid': 'ECHA_API_TEST_003', 'o_index': 3, 'p_index': 3, 'isSkip': 0, 'isDone': 0, 'created_at': '2025-02-13T11:28:25.058666+09:00', 'updated_at': '2025-02-13T16:31:55.610329+09:00', 'zoo_id': 13}
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+[ESAloaderAPI] failed to resolve zoo_id from exid=ZOO_target_BL32XU_202601151050: HTTPSConnectionPool(host='dcha-spx.spring8.or.jp', port=443): Max retries exceeded with url: /api1.0.2/dj-rest-auth/login/ (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x1744b2b50>: Failed to establish a new connection: [Errno 61] Connection refused'))
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+[ESAloaderAPI] failed to resolve zoo_id from exid=ZOO_target_BL32XU_202601151050: HTTPSConnectionPool(host='dcha-spx.spring8.or.jp', port=443): Max retries exceeded with url: /api1.0.2/dj-rest-auth/login/ (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x10e7cebd0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+[ESAloaderAPI] failed to resolve zoo_id from exid=ZOO_target_BL32XU_202601151050: HTTPSConnectionPool(host='dcha-spx.spring8.or.jp', port=443): Max retries exceeded with url: /api1.0.2/dj-rest-auth/login/ (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x10dfc8390>: Failed to establish a new connection: [Errno 61] Connection refused'))
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+setDone response status code: 403
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
+setDone response status code: 403
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:       id                             exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0      1                ECHA_API_TEST_004        0      187       0       0  2024-10-07T18:59:16.438564+09:00  2025-02-12T15:57:58.307610+09:00       6
+1      2                ECHA_API_TEST_004        1      188       0       0  2024-10-07T18:59:16.496837+09:00  2025-02-12T15:57:58.405207+09:00       6
+2      3                ECHA_API_TEST_004        2      189       0       0  2024-10-07T18:59:16.554237+09:00  2025-02-12T15:57:58.494649+09:00       6
+3      4                ECHA_API_TEST_004        3      190       0       0  2024-10-07T18:59:16.611656+09:00  2025-02-12T15:57:58.587241+09:00       6
+4      5                ECHA_API_TEST_004        4      191       0       0  2024-10-07T18:59:16.670114+09:00  2025-02-12T15:57:58.686085+09:00       6
+..   ...                              ...      ...      ...     ...     ...                               ...                               ...     ...
+289  290  ZOO_rikenbl_BL26B1_202512251026        1        1       0       0  2026-01-06T17:49:08.058494+09:00  2026-01-06T17:49:08.058505+09:00      21
+290  291  ZOO_rikenbl_BL26B1_202512251026        2        2       0       0  2026-01-06T17:49:08.082837+09:00  2026-01-06T17:49:08.082846+09:00      21
+291  292   ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-15T10:49:57.370600+09:00      22
+292  293   ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-15T10:49:57.395354+09:00      22
+293  294   ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-15T10:49:57.419455+09:00      22
+
+[294 rows x 9 columns]
