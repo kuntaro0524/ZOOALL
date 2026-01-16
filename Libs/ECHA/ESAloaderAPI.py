@@ -182,15 +182,6 @@ class ESAloaderAPI:
         response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id": zoo_samplepin_id})
         return response.json()
 
-    def getCondsEXID(self, exid: str):
-        # access token
-        auth_headers = self.make_authenticated_request()
-        # get zoo_samplepin information from DB
-        target_url = f"{self.api_url}zoo_samplepin/"
-        response = requests.get(target_url, headers=auth_headers, params={"exid": exid})
-        df = pd.DataFrame(response.json())
-        self.logger.info("Dataframe: %s" % df)
-        return df
 
     def getSamplePin(self):
         self.require_zoo_id()
@@ -226,12 +217,26 @@ class ESAloaderAPI:
         self.logger.info("putCond response status code: %s" % response.status_code)
         return response
 
-    def setDone(self, zoo_samplepin_id):
+    def setDone(self, p_index, zoo_samplepin_id, isDone):
         auth_headers = self.make_authenticated_request()
-        target_url = f"{self.api_url}zoo_samplepin/{zoo_samplepin_id}/"
-        response = requests.patch(target_url, headers=auth_headers, data={"isDone": 1})
-        self.logger.info("setDone response status code: %s" % response.status_code)
-        return response
+        target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
+        print(f"target_url: {target_url}")
+        params= {
+            "isDone": isDone,
+            "p_index": p_index
+        }   
+            
+        # params は data で渡す必要がある（三田さん情報）
+        response = requests.put(target_url, headers=auth_headers, data=params)
+        print(f"Raw response={response}") 
+            
+        try:
+            json_data = response.json()
+            self.logger.info(f"Response: {json_data}")
+            return True
+        except requests.exceptions.JSONDecodeError:
+            self.logger.info(f"Failed to setDone: {response.status_code}")
+            return False
 
     def setSkip(self, zoo_samplepin_id):
         auth_headers = self.make_authenticated_request()
