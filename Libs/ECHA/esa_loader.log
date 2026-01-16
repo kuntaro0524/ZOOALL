@@ -2798,3 +2798,311 @@ Dataframe:     id                            exid  o_index  p_index  isSkip  isD
 zoo sample pin id: 292
 zoo sample pin id: 293
 zoo sample pin id: 294
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=.%2FESAloaderAPI.py. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+setDone OK: status=200
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       1  2026-01-15T10:49:57.370588+09:00  2026-01-16T11:20:28.182687+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       1  2026-01-15T10:49:57.395344+09:00  2026-01-16T11:20:32.855371+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       1  2026-01-15T10:49:57.419446+09:00  2026-01-16T11:20:36.435329+09:00      22
+setDone OK: status=200
+setDone OK: status=200
+setDone OK: status=200
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-16T16:30:06.934422+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-16T16:30:06.950177+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-16T16:30:06.965437+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-16T16:30:06.934422+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-16T16:30:06.950177+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-16T16:30:06.965437+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-16T16:30:06.934422+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-16T16:30:06.950177+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-16T16:30:06.965437+09:00      22
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-16T16:30:06.934422+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-16T16:30:06.950177+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-16T16:30:06.965437+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+Login URL=https://dcha-spx.spring8.or.jp/api1.0.2/dj-rest-auth/login/
+Login successful
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+getCondDataFrame starts
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Initial request without auth failed: 401 Client Error: Unauthorized for url: https://dcha-spx.spring8.or.jp/api1.0.2/zoo/?exid=ZOO_target_BL32XU_202601151050. Retrying with auth headers.
+[ESAloaderAPI] resolved zoo_id=22 from exid=ZOO_target_BL32XU_202601151050
+Dataframe:     id                            exid  o_index  p_index  isSkip  isDone                        created_at                        updated_at  zoo_id
+0  292  ZOO_target_BL32XU_202601151050        0        0       0       0  2026-01-15T10:49:57.370588+09:00  2026-01-16T16:30:06.934422+09:00      22
+1  293  ZOO_target_BL32XU_202601151050        1        1       0       0  2026-01-15T10:49:57.395344+09:00  2026-01-16T16:30:06.950177+09:00      22
+2  294  ZOO_target_BL32XU_202601151050        2        2       0       0  2026-01-15T10:49:57.419446+09:00  2026-01-16T16:30:06.965437+09:00      22
+zoo sample pin id: 292
+zoo sample pin id: 293
+zoo sample pin id: 294

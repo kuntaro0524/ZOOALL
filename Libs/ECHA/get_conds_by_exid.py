@@ -10,21 +10,21 @@ print("ESAloaderAPI class init signature:", inspect.signature(ESAloaderAPI.ESAlo
 
 if __name__ == '__main__':
     zoo_exid = sys.argv[1]
-    esa = ESAloaderAPI.ESAloaderAPI(exid=zoo_exid, auto_resolve=False)
+    esa = ESAloaderAPI.ESAloaderAPI(exid=zoo_exid)
 
     esa.require_zoo_id()
     conds = esa.getCondDataFrame()
 
-    print("########################33")
+    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     print(conds)
-    print("########################33")
+    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
     """
     dict_next = esa.getNextPin()
     print(dict_next)
     p_index = dict_next['p_index']
     pin_id = dict_next['zoo_samplepin_id']
-    isDone = True
+    esDone = True
     cond = esa.getCond(pin_id)
     print(cond)
     isDone = 1

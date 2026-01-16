@@ -9,11 +9,18 @@ import logging
 
 class ESAloaderAPI:
     """
-    既存仕様（zoo_id をキーに条件・結果を取得/更新）を維持しつつ、
-    新しい入口として exid を受け取り、起動時に WebDB から zoo_id を解決できるようにする。
+    入口は exid のみとし、必要に応じて WebDB から zoo_id を解決して内部利用する。
+
+    <zoo_samplepin>
+    zoo_samplepin info は実験条件のヘッダのようなもの
+    id: zoo_samplepin_id
+    p_index: ピン番号
+    isDone: 測定完了フラグ
+    isSkip: スキップフラグ
+    zoo_id: EXIDに対応するZOOのID
     """
 
-    def __init__(self, zoo_id=None, exid: Optional[str] = None, *, auto_resolve: bool = True):
+    def __init__(self, exid: str):
         # 既存の api_url 末尾 "/" を維持（原型互換）
         self.api_url = "https://dcha-spx.spring8.or.jp/api1.0.2/"
         self.login_url = "%sdj-rest-auth/login/" % self.api_url
@@ -33,9 +40,6 @@ class ESAloaderAPI:
 
         # ★追加：exid を保持（入口）
         self.exid = exid
-
-        # 既存：zoo_id が内部キー（正）
-        self.zoo_id = zoo_id
 
         # Flag in steps
         self.isLogin = False
@@ -58,17 +62,6 @@ class ESAloaderAPI:
             file_handler = logging.FileHandler(log_file)
             file_handler.setLevel(logging.DEBUG)
             self.logger.addHandler(file_handler)
-
-        # ★追加：起動時に exid が与えられ、zoo_id が無いなら解決
-        if auto_resolve and (self.zoo_id is None) and (self.exid is not None):
-            try:
-                self.make_authenticated_request()
-                self.zoo_id = self.resolve_zoo_id_from_exid(self.exid)
-                self.logger.info(f"[ESAloaderAPI] resolved zoo_id={self.zoo_id} from exid={self.exid}")
-            except Exception as e:
-                # 起動直後に落としたくない場合もあるので、明示的ログ＋例外再送出
-                self.logger.error(f"[ESAloaderAPI] failed to resolve zoo_id from exid={self.exid}: {e}")
-                raise
 
     # -------------------------
     # Auth
@@ -107,18 +100,27 @@ class ESAloaderAPI:
     # -------------------------
     # ★追加：EXID -> zoo_id 解決
     # -------------------------
-    def resolve_zoo_id_from_exid(self, exid: str) -> int:
+    def resolve_zoo_id_from_exid(self) -> int:
         """
         GET api1.0.2/zoo/?exid=XXXX を叩いて zoo_id を得る。
         返り値形式が dict / list のどちらでも壊れにくいように処理する。
         """
-        auth_headers = self.make_authenticated_request()
-
-        # 原型は api_url が末尾 "/" なので、そのまま連結しても "//" になりにくい形
-        target_url = f"{self.api_url}zoo/"
-        response = requests.get(target_url, headers=auth_headers, params={"exid": exid})
-        response.raise_for_status()
-        data = response.json()
+        if not self.exid:
+            raise ValueError("exid is required to resolve zoo_id")
+        # まずheadersなしで GETしてみてだめならば headers付きで再試行
+        try:
+            # 原型は api_url が末尾 "/" なので、そのまま連結しても "//" になりにくい形
+            target_url = f"{self.api_url}zoo/"
+            response = requests.get(target_url, params={"exid": self.exid})
+            response.raise_for_status()
+            data = response.json()
+        except requests.exceptions.RequestException as e:
+            self.logger.warning(f"Initial request without auth failed: {e}. Retrying with auth headers.")
+            auth_headers = self.make_authenticated_request()
+            target_url = f"{self.api_url}zoo/"
+            response = requests.get(target_url, headers=auth_headers, params={"exid": self.exid})
+            response.raise_for_status()
+            data = response.json()
 
         zoo_id = None
         if isinstance(data, dict):
@@ -131,48 +133,27 @@ class ESAloaderAPI:
                 zoo_id = data[0].get("zoo_id") or data[0].get("id")
 
         if zoo_id is None:
-            raise LookupError(f"zoo_id not found for exid={exid}")
+            raise LookupError(f"zoo_id not found for exid={self.exid}")
 
         return int(zoo_id)
 
     def require_zoo_id(self):
-        """
-        zoo_id が必要な操作の前に呼ぶ。
-        zoo_id が無く exid があるなら解決する。
-        """
-        if self.zoo_id is not None:
-            return
-
         if self.exid is None:
             raise ValueError("zoo_id is required (or provide exid to resolve zoo_id)")
 
-        self.make_authenticated_request()
-        self.zoo_id = self.resolve_zoo_id_from_exid(self.exid)
+        self.zoo_id = self.resolve_zoo_id_from_exid()
         self.logger.info(f"[ESAloaderAPI] resolved zoo_id={self.zoo_id} from exid={self.exid}")
 
     # -------------------------
     # Existing methods (keep)
     # -------------------------
     def isSkipped(self, zoo_samplepin_id):
-        self.require_zoo_id()
-        # start time
-        start_time = datetime.now()
-        # access token
         auth_headers = self.make_authenticated_request()
-        # get zoo_samplepin information from DB
-        target_url = f"{self.api_url}zoo_samplepin/"
-        response = requests.get(target_url, headers=auth_headers, params={"zoo_id": self.zoo_id})
-        json_data = response.json()
-        for data in json_data:
-            if data["id"] == zoo_samplepin_id:
-                # return boolean
-                consumed_time = datetime.now() - start_time
-                self.logger.info("Consumed Time: %s" % consumed_time)
-                if data["isSkip"] == 1:
-                    return True
-                else:
-                    return False
-        return False
+        url = f"{self.api_url}zoo_samplepin/{zoo_samplepin_id}/"
+        r = requests.get(url, headers=auth_headers, timeout=10)
+        r.raise_for_status()
+        data = r.json()
+        return data.get("isSkip") == 1
 
     def getCond(self, zoo_samplepin_id):
         # access token
@@ -182,8 +163,7 @@ class ESAloaderAPI:
         response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id": zoo_samplepin_id})
         return response.json()
 
-
-    def getSamplePin(self):
+    def getSamplePinInfo(self):
         self.require_zoo_id()
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}zoo_samplepin/"
@@ -198,7 +178,7 @@ class ESAloaderAPI:
 
         auth_headers = self.make_authenticated_request()
         # get sample pin list
-        df = self.getSamplePin()
+        df = self.getSamplePinInfo()
         data_list = []
         for i in range(len(df)):
             zoo_samplepin_id = df.iloc[i]["id"]
@@ -219,23 +199,19 @@ class ESAloaderAPI:
 
     def setDone(self, p_index, zoo_samplepin_id, isDone):
         auth_headers = self.make_authenticated_request()
-        target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
-        print(f"target_url: {target_url}")
+        target_url = f"{self.api_url}zoo_samplepin/{zoo_samplepin_id}/"
         params= {
             "isDone": isDone,
             "p_index": p_index
         }   
             
-        # params は data で渡す必要がある（三田さん情報）
         response = requests.put(target_url, headers=auth_headers, data=params)
-        print(f"Raw response={response}") 
-            
-        try:
-            json_data = response.json()
-            self.logger.info(f"Response: {json_data}")
+
+        if 200 <= response.status_code < 300:
+            self.logger.info(f"setDone OK: status={response.status_code}")
             return True
-        except requests.exceptions.JSONDecodeError:
-            self.logger.info(f"Failed to setDone: {response.status_code}")
+        else:
+            self.logger.warning(f"setDone NG: status={response.status_code} body={response.text[:200]}")
             return False
 
     def setSkip(self, zoo_samplepin_id):
@@ -243,6 +219,13 @@ class ESAloaderAPI:
         target_url = f"{self.api_url}zoo_samplepin/{zoo_samplepin_id}/"
         response = requests.patch(target_url, headers=auth_headers, data={"isSkip": 1})
         self.logger.info("setSkip response status code: %s" % response.status_code)
+        return response
+
+    def unsetSkip(self, zoo_samplepin_id):
+        auth_headers = self.make_authenticated_request()
+        target_url = f"{self.api_url}zoo_samplepin/{zoo_samplepin_id}/"
+        response = requests.patch(target_url, headers=auth_headers, data={"isSkip": 0})
+        self.logger.info("unsetSkip response status code: %s" % response.status_code)
         return response
 
     def postResult(self, dict_result):

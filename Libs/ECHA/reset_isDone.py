@@ -1,23 +1,20 @@
 import ECHA.ESAloaderAPI as ESAloaderAPI
-
+import sys
 
 if __name__ == '__main__':
-    zoo_id = 12
-    esa = ESAloaderAPI.ESAloaderAPI(zoo_id)
-    #conds_df = esa.getCondDataFrame()
-    #print(conds_df)
+    exid = sys.argv[1]
+    esa = ESAloaderAPI.ESAloaderAPI(exid)
 
-    """
-    for i in range(len(conds_df)):
-        # zoo_samplepin_id 
-        zoo_samplepin_id = conds_df.iloc[i]['zoo_samplepin_id']
-        p_index = conds_df.iloc[i]['p_index']
-        print("####################3")
-        print(f"p_index={p_index} zoo_samplepin_id={zoo_samplepin_id}")
-        print("####################3")
-        # isDone をすべて０にする
-        esa.setDone(p_index, zoo_samplepin_id, 0)
-        # isSkip をすべて０にする
-        esa.setSkip(p_index, zoo_samplepin_id, 0)
-    """
-    esa.setDone(3, 210, 0)
+    # EXIDのzoo_samplepinの情報を取得
+    conds_df = esa.getSamplePinInfo()
+    print(conds_df.columns)
+    # conds_df['p_index'] で 全p_indexのisSkipをリセットする
+    for p_index in conds_df['p_index'].unique():
+        pin_info = conds_df[conds_df['p_index'] == p_index].iloc[0]
+        pin_id = pin_info['id']
+        print(pin_info['isSkip'], pin_info['isDone'])
+        p_index = pin_info['p_index']
+        if pin_info['isSkip'] == 1:
+            print(f"Unsetting isSkip for pin_id={pin_id}")
+        if pin_info['isDone'] == 1:
+            esa.setDone(p_index, zoo_samplepin_id=pin_id, isDone=0)
