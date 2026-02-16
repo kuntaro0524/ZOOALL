@@ -12,7 +12,7 @@ if __name__ == '__main__':
     zoo_exid = sys.argv[1]
     esa = ESAloaderAPI.ESAloaderAPI(exid=zoo_exid)
 
-    esa.require_zoo_id()
+    #esa.require_zoo_id()
     conds = esa.getCondDataFrame()
 
     print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

@@ -138,9 +138,11 @@ class ESAloaderAPI:
         return int(zoo_id)
 
     def require_zoo_id(self):
-        if self.exid is None:
-            raise ValueError("zoo_id is required (or provide exid to resolve zoo_id)")
-
+        if getattr(self, "zoo_id", None) is not None:
+            return
+        if not self.exid:
+            raise ValueError("exid is required to resolve zoo_id")
+    
         self.zoo_id = self.resolve_zoo_id_from_exid()
         self.logger.info(f"[ESAloaderAPI] resolved zoo_id={self.zoo_id} from exid={self.exid}")
 
