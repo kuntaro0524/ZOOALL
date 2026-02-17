@@ -279,8 +279,9 @@ class Zoo:
         while (1):
             query_command = "get/measurement/query"
             recstr = self.communicate(query_command)
-            self.logger.debug("Sent command= %s" % query_command)
-            self.logger.debug("Received buffer = %s" % recstr)
+            if self.isDebug:
+                self.logger.debug("Sent command= %s" % query_command)
+                self.logger.debug("Received buffer = %s" % recstr)
             # print "Received buffer in isBusy: %s"%recstr
             svoc_c = self.getSVOC_C(recstr)
             if svoc_c.rfind("ready") != -1:

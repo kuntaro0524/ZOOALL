@@ -15,6 +15,9 @@ if __name__ == '__main__':
     #esa.require_zoo_id()
     conds = esa.getCondDataFrame()
 
+    user_info = esa.get_user_info()
+    print(user_info)
+
     print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     print(conds)
     print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

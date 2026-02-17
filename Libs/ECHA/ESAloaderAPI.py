@@ -137,6 +137,17 @@ class ESAloaderAPI:
 
         return int(zoo_id)
 
+    # acquire user information
+    def get_user_info(self):
+        auth_headers = self.make_authenticated_request()
+        url = f"{self.api_url}zoo/"
+        response = requests.get(url, headers=auth_headers, params={"exid": self.exid})
+        if response.status_code == 200:
+            return response.json()
+        else:
+            self.logger.error("Failed to get user info. status_code=%s" % response.status_code)
+            raise Exception("Failed to get user info")
+
     def require_zoo_id(self):
         if getattr(self, "zoo_id", None) is not None:
             return

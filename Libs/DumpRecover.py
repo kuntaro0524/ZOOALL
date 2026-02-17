@@ -66,7 +66,10 @@ if __name__=="__main__":
     dev=Device.Device(s)
     dev.init()
 
+    energy = 20.0
+    wl = 12.3984 / energy
+
     dr=DumpRecover(dev)
     if dr.isDump()==True:
-        print("OKAY")
-        dr.recover(1.0)
+        print("Now Beam aborted. Recovering...")
+        dr.recover(wl)

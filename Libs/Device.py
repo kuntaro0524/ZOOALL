@@ -318,18 +318,19 @@ class Device(Singleton.Singleton):
         return x,y
     
     def checkRingCurrent(self,current_threshold=50.0):
-        self.get_current_str="get/bl_dbci_ringcurrent/present"
+        self.get_current_str="get/bl_dbci_ringcurrent/present".encode()
         self.s.sendall(self.get_current_str)
         recbuf = self.s.recv(8000)
-        strs=recbuf.split("/")
+        return_str=repr(recbuf)
+        strs=return_str.split("/")
         ring_current=float(strs[len(strs)-2].replace("mA",""))
     
         if ring_current > current_threshold:
-            print("Ring current %5.1f"%ring_current)
+            print("Ring current %8.3f"%ring_current)
             return True
         else:
             print("Ring aborted.")
-            print("Ring current %5.1f"%ring_current)
+            print("Ring current %8.3f"%ring_current)
             return False
 
 if __name__=="__main__":
@@ -349,8 +350,8 @@ if __name__=="__main__":
 
     import time
     #dev.prepCentering()
-    pwd = os.getcwd()
-    dev.tuneDt1(logpath=pwd+"/")
+    #pwd = os.getcwd()
+    #dev.tuneDt1(logpath=pwd+"/")
     #dev.prepScan()
     #dev.gonio.rotatePhi(225.0)
     #dev.measureFlux()
@@ -359,3 +360,6 @@ if __name__=="__main__":
     #dev.prepScan()
     #dev.prepCentering()
     #dev.finishCentering()
+
+    # Check ring current
+    dev.checkRingCurrent(current_threshold=50.0)
