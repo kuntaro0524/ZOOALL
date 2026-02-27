@@ -1,6 +1,8 @@
 import sys, os
 from configparser import ConfigParser, ExtendedInterpolation
 
+import ECHA.ZooContext as ZooContext
+
 # This was coded for PILATUS 3 6M at BL45XU
 # modified for versatile code
 # Version 2.0.0 coded on 2019/07/04 K.Hirata
@@ -14,6 +16,9 @@ class RasterSchedule:
         print(config_path)
         self.config.read(config_path)
         self.beamline = self.config.get("beamline", "beamline")
+
+        # is ECHA database is used? True or False
+        self.isECHA = self.config.get("ECHA", "isECHA")
 
         print("Raster schedule class is called")
         self.beamsizeIndex = 0
@@ -261,6 +266,13 @@ class RasterSchedule:
         # Zig-zag raster scan is now default 2019/04/12 K.Hirata
         schstr.append("Raster Zig-Zag Flag: 1 # 0: off, 1:on")
         schstr.append("Comment:  ")
+        # is ECHA database is used
+        if self.isECHA == "True":
+            zoo_context = ZooContext.ZooContext()
+            username = zoo_context.get_username()
+            zoo_exid = zoo_context.get_zoo_exid()
+            schstr.append("User Name: %s" % username)
+            schstr.append("Zoo Number: %s" % zoo_exid)
         return schstr
 
 if __name__ == "__main__":
@@ -280,6 +292,9 @@ if __name__ == "__main__":
     rs.setExpTime(0.1)
     rs.makeSchedule(sc_name)
     """
+    zoo_context = ZooContext.ZooContext()
+    zoo_context.set_username("test_user")
+    zoo_context.set_zoo_exid("ZOO12345")
     # Conditions for Shutterless vertical scan
     sc_name = "./raster-test.sch"
     rs.setPrefix("test01")
@@ -291,4 +306,5 @@ if __name__ == "__main__":
     rs.setVpoints(10)
     rs.setHpoints(10)
     rs.setExpTime(0.02)
+    rs.setTrans(100)
     rs.makeSchedule(sc_name)

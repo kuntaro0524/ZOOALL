@@ -725,7 +725,7 @@ if __name__ == "__main__":
     # back image path read from 'beamline.ini'
     #backimg = config.get('files', 'backimg')
     #backimg = "/user/admin45/JunkZOO/BackImages/back-2510021439.ppm"
-    backimg = "/user/target/JunkZoo/BackImages/back-2512032015.ppm"
+    backimg = "/user/admin45/JunkZOO/BackImages/back-2602251555.ppm"
 
     inocc.setBack(backimg)
     # inocc.setBack("/staff/bl41xu/BLsoft/ZOOALL/BackImages/back-2406271411.ppm")
