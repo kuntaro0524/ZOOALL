@@ -16,7 +16,7 @@ import KUMA
 # logger の設定
 import logging
 from configparser import ConfigParser, ExtendedInterpolation
-from dose.fields import get_dose_ds, get_dist_ds
+#from dose.fields import get_dose_ds, get_dist_ds
 
 
 class DoseDistanceHandler:
@@ -128,7 +128,14 @@ class DoseDistanceHandler:
         if not s:
             return None
 
-        trans = str.maketrans({'（':'(', '）':')', '［':'[', '］':']', '｛':'{', '｝':'}', '，':','})
+        trans = str.maketrans({
+            '（':'(', '）':')',
+            '［':'[', '］':']',
+            '｛':'{', '｝':'}',
+            '，':',',
+            '＋':'+',
+            '；':';'
+        })
         s = s.translate(trans).strip()
 
         if (s.startswith('{') and s.endswith('}')) or \
@@ -139,7 +146,8 @@ class DoseDistanceHandler:
                 return []
             s = inner
 
-        parts = [p.strip() for p in s.split(',') if p.strip()]
+        parts = [p.strip() for p in re.split(r'[,;+]', s) if p.strip()]
+
         if not parts:
             return []
 
@@ -637,8 +645,9 @@ class UserESA():
             return_value = [column_value]
             return return_value
         else:
-            # column_valueが文字列の場合には "+" で分割してリストに変換する
-            return list(map(float, column_value.split('+')))
+            # column_valueが文字列の場合には "+", ",", ";" の区切りを許容してリストに変換する
+            tokens = [x.strip() for x in re.split(r'[,;+]', str(column_value)) if x.strip()]
+            return list(map(float, tokens))
         
     def checkDoseList(self):
         self.df = self.dose_distance_handler.check_dose_list(self.df)
@@ -652,7 +661,7 @@ class UserESA():
         if '-' in pinstr:
             start, end = map(int, pinstr.split('-'))
             return list(range(start, end + 1))
-        
+        elif '+' in pinstr:
             return list(map(int, pinstr.split('+')))
         elif ';' in pinstr:
             return list(map(int, pinstr.split(';')))
