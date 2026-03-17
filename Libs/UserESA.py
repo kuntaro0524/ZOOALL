@@ -566,12 +566,10 @@ class UserESA():
 
             self.logger.info(f"dose_list= {out_dose_list}, dist_list={out_dist_list}")
 
-            # 2) 互換のため dose_ds / dist_ds にも同じ内容をミラー
+            # 2) dose_list / dist_listだけを更新する
             row_out = row.copy()
             row_out["dose_list"] = out_dose_list
             row_out["dist_list"] = out_dist_list
-            row_out["dose_ds"]   = out_dose_list
-            row_out["dist_ds"]   = out_dist_list
 
             normalized_rows.append(row_out)
 
@@ -762,25 +760,6 @@ class UserESA():
             self.logger.error(f"Error in checkDoseList: {e}")
             raise
 
-        # 'dose_list', 'dist_list' を文字列としてCSVファイルに書き込みたい
-        # dose_listには 数値のリストが入っている。これをJSON形式の文字列に書き換えて補間する
-        # 今、リストがあるとすると [0.1, 1.0, 1.0, 1.0] みたいな感じ
-        # これを{0.1, 1.0, 1.0, 1.0} のような文字列に変換して書き込む
-        for i, row in self.df.iterrows():
-            # dose_list, dist_listに数値が入っていなければエラーで落とす
-            # nanやNoneが入っている場合はエラーで落とす
-            if type(row['dose_list']) is float and type(row['dist_list']) is float:
-                # dose_listがfloatの場合は文字列を作成
-                # {10.0} というような文字列
-                self.df.at[i, 'dose_ds'] = f"{{{row['dose_list']}}}"
-            if type(row['dist_list']) is float:
-                # dist_listがfloatの場合は文字列を作成
-                # {10.0} というような文字列
-                self.df.at[i, 'dist_ds'] = f"{{{row['dist_list']}}}"
-            elif type(row['dose_list']) is list and type(row['dist_list']) is list:
-                self.df['dose_ds'] = self.df['dose_list'].apply(lambda x: '{' + ', '.join(map(str, x)) + '}')
-                self.df['dist_ds'] = self.df['dist_list'].apply(lambda x: '{' + ', '.join(map(str, x)) + '}')
-
         # self.dfの内容をCSVファイルに書き出す
         # column の並び順は以下のように変更する
         # root_dir,p_index,mode,puckid,pinid,sample_name,wavelength,raster_vbeam,raster_hbeam,att_raster,
@@ -912,11 +891,11 @@ class UserESA():
 
     def _serialize_list_for_csv(self, vals):
         """リストを CSV に書き戻す文字列へ。"""
-        if vals is None or len(vals)==0:
+        if vals is None or len(vals) == 0:
             return ""
-        if len(vals)==1:
+        if len(vals) == 1:
             return f"{vals[0]:g}"   # 単一値は数値形式で出力
-        return "{" + ", ".join(f"{v:g}" for v in vals) + "}"
+        return "[" + ", ".join(f"{v:g}" for v in vals) + "]"
 
 if __name__ == "__main__":
     root_dir = os.getcwd()
