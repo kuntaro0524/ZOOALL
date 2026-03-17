@@ -520,10 +520,10 @@ class UserESA():
             has_dist = str(raw_dist).strip() != ""
 
             if has_dose != has_dist:
-                # 片方だけ → 読まない（既存ロジック：希望分解能などで dist を算出）
-                dose_vals = None
-                dist_vals = None
-                prefer_brace_single = False
+                raise ValueError(
+                    "[UserESA] dose_list and dist_list must be specified together. "
+                    f"dose_list={raw_dose!r}, dist_list={raw_dist!r}"
+                )
             else:
                 # 両方ある → パース
                 dose_vals = self._parse_series_like(raw_dose) if has_dose else None
@@ -922,10 +922,25 @@ if __name__ == "__main__":
     root_dir = os.getcwd()
     u2db = UserESA(sys.argv[1], root_dir, beamline="BL32XU")
     # logger set
-    u2db.logger = logging.getLogger("ZOO")
-    u2db.logger.setLevel(logging.INFO)
-    
-    u2db.makeCondList()
+    # u2db.logger = logging.getLogger("ZOO")
+    # u2db.logger.setLevel(logging.INFO)
+
+    u = UserESA(fname="dummy.xlsx", root_dir=".")
+    u.df = pd.DataFrame([
+        {
+            "mode": "single",
+            "dose_list": "[1,2]",
+            "dist_list": "",
+        }
+    ])
+
+    try:
+        u.checkDoseList()
+        print("NG: ValueError が出るべき")
+    except ValueError as e:
+        print("OK:", e)
+        
+    #u2db.makeCondList()
     #u2db.checkDoseList()
     #u2db.read_new()
     #newdf = u2db.expandCompressedPinInfo()

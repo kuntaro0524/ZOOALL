@@ -219,19 +219,18 @@ class ESAloaderAPI:
     # パラメータのリストは以下のURL先にある
     # https://docs.google.com/spreadsheets/d/1FOFIqBsO4myY7BVIsj6hlMz3fsNlrLBrxmJaJw7bSkQ/edit?gid=2077362619#gid=2077362619
     def postResult(self, sample_pin_id, param_json):
-        # target url 
         target_url = f"{self.api_url}zoo_result_samplepin/create_multiple_data/"
         print(f"target_url: {target_url}")
-
-        payload={
+    
+        payload = {
             "zoo_samplepin_id": sample_pin_id,
-            "data": json.dumps(param_json['data'])
+            "data": json.dumps(param_json["data"])
         }
         print(payload)
-
-        # put
+    
         auth_headers = self.make_authenticated_request()
         response = requests.post(target_url, headers=auth_headers, json=payload)
+    
         print("status:", response.status_code)
         print("headers:", response.headers)
         print("text:", response.text[:2000])
@@ -239,14 +238,13 @@ class ESAloaderAPI:
             print("json:", response.json())
         except Exception:
             pass
-
-        # 失敗したら例外を発生させる
+    
         print(f"response: {response}")
-        if response.status_code != 200 and response.status_code != 201:
+        if response.status_code not in (200, 201):
             raise Exception(f"Failed to post result: {response.status_code}")
+    
         print(response.json())
         print("posted!!")
-
         return True
 
     def getResult(self, sample_pin_id):
