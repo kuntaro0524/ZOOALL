@@ -12,16 +12,16 @@ isECHA=True
 isWebSocket = False
 
 [dirs]
-zooroot = /user/admin45/JunkZOO/
+zooroot = /Users/kuntaro/kundev/zooall_echa/
 logdir = ${dirs:zooroot}/Logs/
 zoologdir= ${dirs:zooroot}/ZooLogs/
-bssconfig_dir=/staff/config/bl45xu/
+bssconfig_dir=/Users/kuntaro/Dropbox/Projects/ECHA/260316-CSVconvetTest/config/
 backimage_dir = ${dirs:zooroot}/BackImages/
 
 [files]
-bssconfig_file=${dirs:bssconfig_dir}/bss/bss.config
+bssconfig_file=${dirs:bssconfig_dir}/bss.config
 camera_inf=${dirs:bssconfig_dir}/video/camera.inf
-beamsize_conf_file=${dirs:bssconfig_dir}/bss/beamsize.config
+beamsize_conf_file=${dirs:bssconfig_dir}/beamsize.config
 inocc_image=/staff/config/bl45xu/bss/test.ppm
 logging_conf=${dirs:zooroot}/Libs/logging.conf
 dose_csv=${dirs:zooroot}/Libs/en_dose_lys.csv

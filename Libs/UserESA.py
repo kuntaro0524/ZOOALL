@@ -18,7 +18,6 @@ import logging
 from configparser import ConfigParser, ExtendedInterpolation
 #from dose.fields import get_dose_ds, get_dist_ds
 
-
 class DoseDistanceHandler:
     def __init__(self, logger, debug=False):
         self.logger = logger
@@ -226,8 +225,9 @@ class UserESA():
         self.logger_fh.setFormatter(self.logger_formatter)
         self.logger_ch.setFormatter(self.logger_formatter)
         # add the handlers to logger
-        self.logger.addHandler(self.logger_fh)
-        self.logger.addHandler(self.logger_ch)
+        if not self.logger.handlers:
+            self.logger.addHandler(self.logger_fh)
+            self.logger.addHandler(self.logger_ch)
 
         self.root_dir = root_dir
         self.dose_distance_handler = DoseDistanceHandler(self.logger, debug=self.debug)
@@ -254,7 +254,13 @@ class UserESA():
         # "cover_flag"
         # "exp_ds"
         self.df["score_min"] = self.config.getfloat("experiment", "score_min")
-        self.df["score_max"] = self.config.getfloat("experiment", "score_max")
+
+        if "score_max" not in self.df.columns:
+            self.df["score_max"] = self.config.getfloat("experiment", "score_max")
+        else:
+            self.df["score_max"] = self.df["score_max"].fillna(
+                self.config.getfloat("experiment", "score_max")
+            )
         self.df["raster_dose"] = self.config.getfloat("experiment", "raster_dose")
         self.df["dose_ds"] = self.config.getfloat("experiment", "dose_ds")
         self.df["raster_roi"] = self.config.getfloat("experiment", "raster_roi")
@@ -289,13 +295,18 @@ class UserESA():
         # score_min, score_max ともに 9999 とする
         # raster_dose: 0.3, dose_ds: 0.0, cover_flag: 0
         self.df.loc[self.df['desired_exp'] == "scan_only", 'score_min'] = 9999
+        self.df.loc[self.df['desired_exp'] == "scan_only", 'score_max'] = 9999
         self.df.loc[self.df['desired_exp'] == "scan_only", 'raster_dose'] = 0.3
-        self.df.loc[self.df['desired_exp'] == "scan_only", 'dose_ds'] = 0.0
+        self.df.loc[self.df['desired_exp'] == "scan_only", 'dose_ds'] = 1.0 # 0は気持ち悪いから入れとく
         self.df.loc[self.df['desired_exp'] == "scan_only", 'cover_scan_flag'] = 0
 
         # 2) desired_exp が "normal" のとき
-        # mode が "helical" の場合には、score_max を 9999 とする
-        self.df.loc[self.df['desired_exp'] == "normal", 'score_max'] = 9999
+        # mode が "helical" または "mixed" の場合には、score_max を 9999 とする
+        self.df.loc[
+            (self.df['desired_exp'] == "normal") &
+            (self.df['mode'].astype(str).str.strip().str.lower().isin(["helical", "mixed"])),
+            'score_max'
+        ] = 9999
 
         # 3) desired_exp が "ultra_high_dose_scan" のとき
         # dose_ds = 9.0 とする
@@ -307,7 +318,11 @@ class UserESA():
     # ビームライン、実験モードと結晶のタイプから実験パラメータを取得する
     # 2023/05/09 type_crystal は使わない
     def getParams(self, desired_exp_string, mode):
-        desired_exp_string = desired_exp_string.lower()
+        desired_exp_string = str(desired_exp_string).strip().lower()
+        mode = str(mode).strip().lower()
+
+        if mode not in ("single", "multi", "helical", "mixed", "ssrox"):
+            raise ValueError(f"[UserESA] Unknown mode: {mode}")
 
         # DEFAULT PARAMETER
         # beamline.ini から読む
@@ -404,14 +419,11 @@ class UserESA():
         # self.df['warm_time']の初期値を30.0とする
         self.df['warm_time'] = 30.0
         # self.df にはすでに"pin_flag"があるので、それを利用する
-        # self.df['pin_flag']の文字列を小文字に変換した文字列が "spine"　であれば self.df['warm_time'] = 10.0
-        self.df.loc[self.df['pin_flag'].str.lower() == 'spine', 'warm_time'] = 10.0
-        # self.df['pin_flag']の文字列を小文字に変換した文字列が "als + ssrl"　であれば self.df['warm_time'] = 20.0
-        self.df.loc[self.df['pin_flag'].str.lower() == 'als + ssrl', 'warm_time'] = 20.0
-        # self.df['pin_flag']の文字列を小文字に変換した文字列が "copper"　であれば self.df['warm_time'] = 60.0
-        self.df.loc[self.df['pin_flag'].str.lower() == 'copper', 'warm_time'] = 60.0
-        # self.df['pin_flag']の文字列を小文字に変換した文字列が "no-wait"　であれば self.df['warm_time'] = 0.0
-        self.df.loc[self.df['pin_flag'].str.lower() == 'no-wait', 'warm_time'] = 0.0
+        pin_flag_norm = self.df['pin_flag'].astype(str).str.strip().str.lower()
+        self.df.loc[pin_flag_norm == 'spine', 'warm_time'] = 10.0
+        self.df.loc[pin_flag_norm == 'als + ssrl', 'warm_time'] = 20.0
+        self.df.loc[pin_flag_norm == 'copper', 'warm_time'] = 60.0
+        self.df.loc[pin_flag_norm == 'no-wait', 'warm_time'] = 0.0
 
     def fillFlux(self):
         # self.df['flux']の数値を読み込む
@@ -530,7 +542,7 @@ class UserESA():
         # self.df['hbeam']と self.df['vbeam']を比較して大きい方を tmp_beamsize とする
         # self.df['max_crystal_size']が tmp_beamsize の2倍よりも大きい場合には警告を出す
         # "Warning: max_crystal_size is larger than 2 times of beam_size. Please check the exposure condition."
-        mask = (self.df['mode'] == 'multi')
+        mask = (self.df['mode'].astype(str).str.strip().str.lower() == 'multi')
         if mask.any():
             for i in range(len(self.df)):
                 if mask[i]:
@@ -909,22 +921,7 @@ if __name__ == "__main__":
     # u2db.logger = logging.getLogger("ZOO")
     # u2db.logger.setLevel(logging.INFO)
 
-    u = UserESA(fname="dummy.xlsx", root_dir=".")
-    u.df = pd.DataFrame([
-        {
-            "mode": "single",
-            "dose_list": "[1,2]",
-            "dist_list": "",
-        }
-    ])
-
-    try:
-        u.checkDoseList()
-        print("NG: ValueError が出るべき")
-    except ValueError as e:
-        print("OK:", e)
-        
-    #u2db.makeCondList()
+    u2db.makeCondList()
     #u2db.checkDoseList()
     #u2db.read_new()
     #newdf = u2db.expandCompressedPinInfo()
