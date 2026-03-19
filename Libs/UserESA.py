@@ -198,6 +198,7 @@ class UserESA():
         self.contents = []
 
         self.debug=True
+        self.isDoseError = False
 
         # configure file から情報を読む: beamlineの名前
         self.beamline = self.config.get("beamline", "beamline")
@@ -297,7 +298,7 @@ class UserESA():
         self.df.loc[self.df['desired_exp'] == "scan_only", 'score_min'] = 9999
         self.df.loc[self.df['desired_exp'] == "scan_only", 'score_max'] = 9999
         self.df.loc[self.df['desired_exp'] == "scan_only", 'raster_dose'] = 0.3
-        self.df.loc[self.df['desired_exp'] == "scan_only", 'dose_ds'] = 1.0 # 0は気持ち悪いから入れとく
+        self.df.loc[self.df['desired_exp'] == "scan_only", 'dose_ds'] = 0.0
         self.df.loc[self.df['desired_exp'] == "scan_only", 'cover_scan_flag'] = 0
 
         # 2) desired_exp が "normal" のとき
@@ -321,7 +322,7 @@ class UserESA():
         desired_exp_string = str(desired_exp_string).strip().lower()
         mode = str(mode).strip().lower()
 
-        if mode not in ("single", "multi", "helical", "mixed", "ssrox"):
+        if mode not in ("single", "multi", "helical", "mixed"):
             raise ValueError(f"[UserESA] Unknown mode: {mode}")
 
         # DEFAULT PARAMETER
@@ -459,6 +460,9 @@ class UserESA():
         photons_per_image = 4E10
         # 1 secあたりの最大フォトン数を計算する
         photons_per_exptime = self.df['flux'] * self.df['exp_raster']
+
+        # 1 secあたりの最大フォトン数を計算する
+        photons_per_exptime = self.df['flux'] * self.df['exp_raster']
         # 1 frameあたりに必要なフォトン数を入れるためのatt_factorを計算する
         self.df.loc[mask1, 'att_raster'] = photons_per_image / photons_per_exptime * 100.0
         # 1 frameあたりに必要なフォトン数を入れるためのhebi_att_factorを計算する
@@ -471,31 +475,69 @@ class UserESA():
         print(self.df)
         self.df.loc[mask1, 'dose_per_frame'] = kuma.getDose(self.df['ds_hbeam'], self.df['ds_vbeam'], self.df['flux'], self.df['energy'], self.df['exp_raster']) * self.df['att_raster'] / 100.0
 
-        # mask2 
-        mask2 = (self.df['desired_exp'] == 'high_dose_scan')
-        dose_for_raster = 0.30 # MGy
-        # 1 frameあたりのdoseを計算する
-        self.df.loc[mask2, 'dose_per_frame'] = kuma.getDose(self.df['ds_hbeam'], self.df['ds_vbeam'], self.df['flux'], self.df['energy'], self.df['exp_raster'])
-        # transmissionは dose_for_raster / dose_per_frame * 100.0 で計算する
-        self.df.loc[mask2, 'att_raster'] = dose_for_raster / self.df['dose_per_frame'] * 100.0
-        self.df.loc[mask2, 'hebi_att'] = dose_for_raster / self.df['dose_per_frame'] * 100.0
-        # 'ppf' = photons per frame
-        self.df.loc[mask2, 'ppf_raster'] = self.df['flux'] * self.df['exp_raster'] * self.df['att_raster'] / 100.0
-        # dose_per_frame = kuma.getDose(hbeam, vbeam, flux, energy, exp_raster) * self.df['att_raster'] / 100.0
-        self.df.loc[mask2, 'dose_per_frame'] = kuma.getDose(self.df['ds_hbeam'], self.df['ds_vbeam'], self.df['flux'], self.df['energy'], self.df['exp_raster']) * self.df['att_raster'] / 100.0
+        # normal の 4E10 photons/frame 条件で得られる dose_per_frame を基準にする
+        normal_dose_per_frame = kuma.getDose(
+            self.df['ds_hbeam'],
+            self.df['ds_vbeam'],
+            self.df['flux'],
+            self.df['energy'],
+            self.df['exp_raster']
+        ) * (photons_per_image / (self.df['flux'] * self.df['exp_raster']))
 
-        # masks
+        # mask2
+        mask2 = (self.df['desired_exp'] == 'high_dose_scan')
+        if mask2.any():
+            dose_for_raster = normal_dose_per_frame * 1.5
+            self.df.loc[mask2, 'att_raster'] = dose_for_raster[mask2] / kuma.getDose(
+                self.df.loc[mask2, 'ds_hbeam'],
+                self.df.loc[mask2, 'ds_vbeam'],
+                self.df.loc[mask2, 'flux'],
+                self.df.loc[mask2, 'energy'],
+                self.df.loc[mask2, 'exp_raster']
+            ) * 100.0
+            self.df.loc[mask2, 'hebi_att'] = self.df.loc[mask2, 'att_raster']
+            self.df.loc[mask2, 'ppf_raster'] = self.df.loc[mask2, 'flux'] * self.df.loc[mask2, 'exp_raster'] * self.df.loc[mask2, 'att_raster'] / 100.0
+            self.df.loc[mask2, 'dose_per_frame'] = kuma.getDose(
+                self.df.loc[mask2, 'ds_hbeam'],
+                self.df.loc[mask2, 'ds_vbeam'],
+                self.df.loc[mask2, 'flux'],
+                self.df.loc[mask2, 'energy'],
+                self.df.loc[mask2, 'exp_raster']
+            ) * self.df.loc[mask2, 'att_raster'] / 100.0
+
+        # mask3
         mask3 = (self.df['desired_exp'] == 'ultra_high_dose_scan')
-        dose_for_raster = 1.0 # MGy
-        # 1 frame あたりのdoseを計算する
-        self.df.loc[mask3, 'dose_per_frame'] = kuma.getDose(self.df['ds_hbeam'], self.df['ds_vbeam'], self.df['flux'], self.df['energy'], self.df['exp_raster'])
-        # transmissionは dose_for_raster / dose_per_frame * 100.0 で計算する
-        self.df.loc[mask3, 'att_raster'] = dose_for_raster / self.df['dose_per_frame'] * 100.0
-        self.df.loc[mask3, 'hebi_att'] = dose_for_raster / self.df['dose_per_frame'] * 100.0
-        # 'ppf' = photons per frame
-        self.df.loc[mask3, 'ppf_raster'] = self.df['flux'] * self.df['exp_raster'] * self.df['att_raster'] / 100.0
-        # dose_per_frame = kuma.getDose(hbeam, vbeam, flux, energy, exp_raster) * self.df['att_raster'] / 100.0
-        self.df.loc[mask3, 'dose_per_frame'] = kuma.getDose(self.df['ds_hbeam'], self.df['ds_vbeam'], self.df['flux'], self.df['energy'], self.df['exp_raster']) * self.df['att_raster'] / 100.0
+        if mask3.any():
+            dose_for_raster = normal_dose_per_frame * 3.0
+            self.df.loc[mask3, 'att_raster'] = dose_for_raster[mask3] / kuma.getDose(
+                self.df.loc[mask3, 'ds_hbeam'],
+                self.df.loc[mask3, 'ds_vbeam'],
+                self.df.loc[mask3, 'flux'],
+                self.df.loc[mask3, 'energy'],
+                self.df.loc[mask3, 'exp_raster']
+            ) * 100.0
+            self.df.loc[mask3, 'hebi_att'] = self.df.loc[mask3, 'att_raster']
+            self.df.loc[mask3, 'ppf_raster'] = self.df.loc[mask3, 'flux'] * self.df.loc[mask3, 'exp_raster'] * self.df.loc[mask3, 'att_raster'] / 100.0
+            self.df.loc[mask3, 'dose_per_frame'] = kuma.getDose(
+                self.df.loc[mask3, 'ds_hbeam'],
+                self.df.loc[mask3, 'ds_vbeam'],
+                self.df.loc[mask3, 'flux'],
+                self.df.loc[mask3, 'energy'],
+                self.df.loc[mask3, 'exp_raster']
+            ) * self.df.loc[mask3, 'att_raster'] / 100.0
+
+        total_dose = 10.0
+        dose_control_mask = mask1 | mask2 | mask3
+        self.df.loc[dose_control_mask, 'dose_ds'] = total_dose - self.df.loc[dose_control_mask, 'dose_per_frame']
+
+        neg_mask = self.df['dose_ds'] < 0
+        if neg_mask.any():
+            self.logger.error("dose_ds < 0 detected. total dose budget exceeded.")
+            self.logger.error(self.df.loc[neg_mask, ['puckid', 'pinid', 'desired_exp', 'dose_per_frame', 'dose_ds']])
+            self.df.loc[neg_mask, 'dose_ds'] = 0.0
+            self.isDoseError = True
+        else:
+            self.isDoseError = False
 
         # self.logger.info -> 'dose_per_frame' をリスト表示
         # puckid, pinid, dose_per_frame のリストを表示する
@@ -905,8 +947,12 @@ class UserESA():
         # 型を指定する
         self.df = self.df.astype(set_types)
 
+        if self.isDoseError:
+            raise RuntimeError("dose_ds < 0 detected. CSV will not be generated.")
+
         # floatのフォーマットを指定
         float_format = '%.5f'
+
         # to_csv()メソッドでファイルに書き出す際にfloatのフォーマットを指定して書き出す
         zoo_csv_name = f"{self.csv_prefix}.csv"
         self.df.to_csv(zoo_csv_name, columns=self.columns, index=False, float_format=float_format)
