@@ -32,9 +32,13 @@ class DoseDistanceHandler:
         has_dose = (not pd.isna(raw_dose)) and str(raw_dose).strip() != ""
         has_dist = (not pd.isna(raw_dist)) and str(raw_dist).strip() != ""
 
-        if has_dose != has_dist:
+        # spec:
+        # dose_list がある場合に複数条件指定が成立
+        # dist_list は省略可
+        # dist_list 単独は不正
+        if (not has_dose) and has_dist:
             raise ValueError(
-                "[UserESA] dose_list and dist_list must be specified together. "
+                "[UserESA] dist_list cannot be specified without dose_list. "
                 f"dose_list={raw_dose!r}, dist_list={raw_dist!r}"
             )
 
@@ -66,30 +70,36 @@ class DoseDistanceHandler:
         for _, row in work_df.iterrows():
             mode = str(row.get("mode", "")).strip().lower()
 
-            if self.debug:
-                self.logger.debug(
-                    f"Raw input - dose_list: {row.get('dose_list', '')}, dist_list: {row.get('dist_list', '')}"
-                )
-
             raw_dose = row.get("dose_list", "")
             raw_dist = row.get("dist_list", "")
 
             has_dose = (not pd.isna(raw_dose)) and str(raw_dose).strip() != ""
             has_dist = (not pd.isna(raw_dist)) and str(raw_dist).strip() != ""
 
-            if has_dose != has_dist:
+            if self.debug:
+                self.logger.debug(
+                    f"Raw input - dose_list: {raw_dose}, dist_list: {raw_dist}"
+                )
+
+            # spec:
+            # dose_list あり -> 有効
+            # dist_list は省略可
+            # dist_list 単独 -> エラー
+            if (not has_dose) and has_dist:
                 raise ValueError(
-                    "[UserESA] dose_list and dist_list must be specified together. "
+                    "[UserESA] dist_list cannot be specified without dose_list. "
                     f"dose_list={raw_dose!r}, dist_list={raw_dist!r}"
                 )
 
             dose_vals = self._parse_series_like(raw_dose) if has_dose else None
             dist_vals = self._parse_series_like(raw_dist) if has_dist else None
 
-            multi_dose = dose_vals is not None and len(dose_vals) > 1
-            multi_dist = dist_vals is not None and len(dist_vals) > 1
+            # 両方あるときだけ長さ補正
+            if dose_vals is not None and dist_vals is not None:
+                dose_vals, dist_vals = self._pad_lists_by_policy(dose_vals, dist_vals)
 
-            if mode in ("multi", "mixed") and (multi_dose or multi_dist):
+            # mode 制約
+            if mode in ("multi", "mixed"):
                 n_dose = len(dose_vals) if dose_vals is not None else 0
                 n_dist = len(dist_vals) if dist_vals is not None else 0
                 if n_dose > 1 or n_dist > 1:
@@ -98,20 +108,10 @@ class DoseDistanceHandler:
                         f"dose_list={dose_vals}, dist_list={dist_vals}"
                     )
 
-            if dose_vals is not None and dist_vals is not None:
-                dose_vals, dist_vals = self._pad_lists_by_policy(dose_vals, dist_vals)
-                m = (mode or "").strip().lower()
-                if m in ("multi", "mixed"):
-                    if len(dose_vals) > 1 or len(dist_vals) > 1:
-                        raise ValueError(
-                            f"[UserESA] mode='{m}' prohibits multiple values: "
-                            f"dose_list={dose_vals}, dist_list={dist_vals}"
-                        )
-
             out_dose_list = self._serialize_list_for_csv(dose_vals) if dose_vals is not None else ""
             out_dist_list = self._serialize_list_for_csv(dist_vals) if dist_vals is not None else ""
 
-            self.logger.info(f"dose_list= {out_dose_list}, dist_list={out_dist_list}")
+            self.logger.info(f"dose_list={out_dose_list}, dist_list={out_dist_list}")
 
             row_out = row.copy()
             row_out["dose_list"] = out_dose_list
@@ -158,23 +158,20 @@ class DoseDistanceHandler:
         return vals
 
     def _pad_lists_by_policy(self, dose_vals, dist_vals):
-        if dose_vals is None:
-            dose_vals = []
-        if dist_vals is None:
-            dist_vals = []
-
-        if not dose_vals and not dist_vals:
-            return [], []
-        if not dose_vals:
-            return [0.0] * len(dist_vals), dist_vals
-        if not dist_vals:
-            return dose_vals, [0.0] * len(dose_vals)
+        # spec:
+        # 両方存在する場合のみ長さ補正を行う
+        # dist_list 未入力時は補正しない
+        if dose_vals is None or dist_vals is None:
+            return dose_vals, dist_vals
 
         ld, lt = len(dose_vals), len(dist_vals)
+
         if ld == lt:
             return dose_vals, dist_vals
+
         if ld < lt:
             return dose_vals + [max(dose_vals)] * (lt - ld), dist_vals
+
         return dose_vals, dist_vals + [min(dist_vals)] * (ld - lt)
 
     def _serialize_list_for_csv(self, vals):
@@ -444,38 +441,42 @@ class UserESA():
     # Raster scanの露光条件を定義する
     # Pandas dataframeに対して一気に処理を行う
     def defineScanCondition(self):
-        # Dose estimation will be conducted by KUMA
         kuma = KUMA.KUMA()
-    
-        # self.df['wavelgnth']からself.df['energy']を計算する
+
         self.df['energy'] = 12.3984 / self.df['wavelength']
 
-        # self.df['desired_exp']の文字列を小文字に変換した文字列が "normal", "scan_only", "phasing", "rapid"の場合は以下の処理を行う
-        # photons_per_image は 4E10 で固定する
-        # photons_per_exptime は flux * exp_raster で計算する
-        # df['att_raster'] = photons_per_image / photons_per_exptime * 100.0 とする
-        # df['hebi_att'] = photons_per_image / photons_per_exptime * 100.0 とする
-        # maskを利用して条件ごとに処理をしていく
-        mask1 = (self.df['desired_exp'] == 'normal') | (self.df['desired_exp'] == 'scan_only') | (self.df['desired_exp'] == 'phasing') | (self.df['desired_exp'] == 'rapid')
+        def _has_value(v):
+            return (not pd.isna(v)) and str(v).strip() != ""
+
+        if "dose_list" not in self.df.columns:
+            self.df["dose_list"] = ""
+        if "dist_list" not in self.df.columns:
+            self.df["dist_list"] = ""
+
+        extended_mask = self.df["dose_list"].apply(_has_value)
+
         photons_per_image = 4E10
-        # 1 secあたりの最大フォトン数を計算する
         photons_per_exptime = self.df['flux'] * self.df['exp_raster']
 
-        # 1 secあたりの最大フォトン数を計算する
-        photons_per_exptime = self.df['flux'] * self.df['exp_raster']
-        # 1 frameあたりに必要なフォトン数を入れるためのatt_factorを計算する
-        self.df.loc[mask1, 'att_raster'] = photons_per_image / photons_per_exptime * 100.0
-        # 1 frameあたりに必要なフォトン数を入れるためのhebi_att_factorを計算する
-        self.df.loc[mask1, 'hebi_att'] = photons_per_image / photons_per_exptime * 100.0
-        # 1 frameあたりのphotonsを計算する
+        base_mask1 = (
+            (self.df['desired_exp'] == 'normal') |
+            (self.df['desired_exp'] == 'scan_only') |
+            (self.df['desired_exp'] == 'phasing') |
+            (self.df['desired_exp'] == 'rapid')
+        )
+        mask1 = base_mask1 & (~extended_mask)
+
+        self.df.loc[mask1, 'att_raster'] = photons_per_image / photons_per_exptime[mask1] * 100.0
+        self.df.loc[mask1, 'hebi_att'] = self.df.loc[mask1, 'att_raster']
         self.df.loc[mask1, 'ppf_raster'] = photons_per_image
-        # 1 frameあたりのdoseを計算する
-        # kuma.getDose()の引数は hbeam, vbeam, flux, energy, exp_raster
-        # dose_per_frame = kuma.getDose(hbeam, vbeam, flux, energy, exp_raster) * self.df['att_raster'] / 100.0
-        print(self.df)
-        self.df.loc[mask1, 'dose_per_frame'] = kuma.getDose(self.df['ds_hbeam'], self.df['ds_vbeam'], self.df['flux'], self.df['energy'], self.df['exp_raster']) * self.df['att_raster'] / 100.0
+        self.df.loc[mask1, 'dose_per_frame'] = kuma.getDose(
+            self.df.loc[mask1, 'ds_hbeam'],
+            self.df.loc[mask1, 'ds_vbeam'],
+            self.df.loc[mask1, 'flux'],
+            self.df.loc[mask1, 'energy'],
+            self.df.loc[mask1, 'exp_raster']
+        ) * self.df.loc[mask1, 'att_raster'] / 100.0
 
-        # normal の 4E10 photons/frame 条件で得られる dose_per_frame を基準にする
         normal_dose_per_frame = kuma.getDose(
             self.df['ds_hbeam'],
             self.df['ds_vbeam'],
@@ -484,8 +485,7 @@ class UserESA():
             self.df['exp_raster']
         ) * (photons_per_image / (self.df['flux'] * self.df['exp_raster']))
 
-        # mask2
-        mask2 = (self.df['desired_exp'] == 'high_dose_scan')
+        mask2 = (self.df['desired_exp'] == 'high_dose_scan') & (~extended_mask)
         if mask2.any():
             dose_for_raster = normal_dose_per_frame * 1.5
             self.df.loc[mask2, 'att_raster'] = dose_for_raster[mask2] / kuma.getDose(
@@ -496,7 +496,11 @@ class UserESA():
                 self.df.loc[mask2, 'exp_raster']
             ) * 100.0
             self.df.loc[mask2, 'hebi_att'] = self.df.loc[mask2, 'att_raster']
-            self.df.loc[mask2, 'ppf_raster'] = self.df.loc[mask2, 'flux'] * self.df.loc[mask2, 'exp_raster'] * self.df.loc[mask2, 'att_raster'] / 100.0
+            self.df.loc[mask2, 'ppf_raster'] = (
+                self.df.loc[mask2, 'flux'] *
+                self.df.loc[mask2, 'exp_raster'] *
+                self.df.loc[mask2, 'att_raster'] / 100.0
+            )
             self.df.loc[mask2, 'dose_per_frame'] = kuma.getDose(
                 self.df.loc[mask2, 'ds_hbeam'],
                 self.df.loc[mask2, 'ds_vbeam'],
@@ -505,8 +509,7 @@ class UserESA():
                 self.df.loc[mask2, 'exp_raster']
             ) * self.df.loc[mask2, 'att_raster'] / 100.0
 
-        # mask3
-        mask3 = (self.df['desired_exp'] == 'ultra_high_dose_scan')
+        mask3 = (self.df['desired_exp'] == 'ultra_high_dose_scan') & (~extended_mask)
         if mask3.any():
             dose_for_raster = normal_dose_per_frame * 3.0
             self.df.loc[mask3, 'att_raster'] = dose_for_raster[mask3] / kuma.getDose(
@@ -517,7 +520,11 @@ class UserESA():
                 self.df.loc[mask3, 'exp_raster']
             ) * 100.0
             self.df.loc[mask3, 'hebi_att'] = self.df.loc[mask3, 'att_raster']
-            self.df.loc[mask3, 'ppf_raster'] = self.df.loc[mask3, 'flux'] * self.df.loc[mask3, 'exp_raster'] * self.df.loc[mask3, 'att_raster'] / 100.0
+            self.df.loc[mask3, 'ppf_raster'] = (
+                self.df.loc[mask3, 'flux'] *
+                self.df.loc[mask3, 'exp_raster'] *
+                self.df.loc[mask3, 'att_raster'] / 100.0
+            )
             self.df.loc[mask3, 'dose_per_frame'] = kuma.getDose(
                 self.df.loc[mask3, 'ds_hbeam'],
                 self.df.loc[mask3, 'ds_vbeam'],
@@ -526,11 +533,30 @@ class UserESA():
                 self.df.loc[mask3, 'exp_raster']
             ) * self.df.loc[mask3, 'att_raster'] / 100.0
 
+        # dose_list 有効時: scan dose を 1 kGy/frame に固定
+        if extended_mask.any():
+            target_scan_dose = 0.001  # MGy/frame
+            base_dose = kuma.getDose(
+                self.df.loc[extended_mask, 'ds_hbeam'],
+                self.df.loc[extended_mask, 'ds_vbeam'],
+                self.df.loc[extended_mask, 'flux'],
+                self.df.loc[extended_mask, 'energy'],
+                self.df.loc[extended_mask, 'exp_raster']
+            )
+            self.df.loc[extended_mask, 'att_raster'] = target_scan_dose / base_dose * 100.0
+            self.df.loc[extended_mask, 'hebi_att'] = self.df.loc[extended_mask, 'att_raster']
+            self.df.loc[extended_mask, 'ppf_raster'] = (
+                self.df.loc[extended_mask, 'flux'] *
+                self.df.loc[extended_mask, 'exp_raster'] *
+                self.df.loc[extended_mask, 'att_raster'] / 100.0
+            )
+            self.df.loc[extended_mask, 'dose_per_frame'] = target_scan_dose
+
         total_dose = 10.0
         dose_control_mask = mask1 | mask2 | mask3
         self.df.loc[dose_control_mask, 'dose_ds'] = total_dose - self.df.loc[dose_control_mask, 'dose_per_frame']
 
-        neg_mask = self.df['dose_ds'] < 0
+        neg_mask = (self.df['dose_ds'] < 0) & (~extended_mask)
         if neg_mask.any():
             self.logger.error("dose_ds < 0 detected. total dose budget exceeded.")
             self.logger.error(self.df.loc[neg_mask, ['puckid', 'pinid', 'desired_exp', 'dose_per_frame', 'dose_ds']])
@@ -539,18 +565,12 @@ class UserESA():
         else:
             self.isDoseError = False
 
-        # self.logger.info -> 'dose_per_frame' をリスト表示
-        # puckid, pinid, dose_per_frame のリストを表示する
-        # format f"PuckID: {puckid} PinID: {pinid} dose_per_frame: {dose_per_frame}"
-        # 'pinid' については文字列の場合があるのでそのまま表示する
         self.logger.info("Scan conditions estimated results")
         for i in range(len(self.df)):
-            self.logger.info(f"PuckID: {self.df['puckid'][i]} PinID: {self.df['pinid'][i]} dose_per_frame: {self.df['dose_per_frame'][i]:.3f}")
-            #self.logger.info(f"Puck-Pin ID: {self.df['puckid'][i]}-{self.df['pinid'][i]:2d} : dose/frame: {self.df['dose_per_frame'][i]:.3f} MGy")
-
-        #print(self.df)
-
-
+            self.logger.info(
+                f"PuckID: {self.df['puckid'][i]} PinID: {self.df['pinid'][i]} "
+                f"dose_per_frame: {self.df['dose_per_frame'][i]:.3f}"
+            )
     # end of defineScanCondition()
 
     def makeExpWarning(self): 
@@ -856,61 +876,68 @@ class UserESA():
                 self.logger.warning(f"Scan speed {scan_speed:.2f} um/s exceeds the maximum limit {max_scan_speed:.2f} um/s. Adjusting exp_raster to {new_exp_raster:.2f} s.")
 
     def makeCondList(self):
-        # DataFrameとしてExcelファイルを読み込む　 →　self.df
+        # DataFrameとしてExcelファイルを読み込む → self.df
         self.read_new()
+
         # self.dfの中にある 'puckid' の情報を展開する
         self.expandCompressedPinInfo()
+
         # 液体窒素ぶっ掛けの情報を管理してCSV用の情報へ変換
         self.checkLN2flag()
+
         # カメラのZoomに関する情報を管理してCSV用の情報へ変換
         self.checkZoomFlag()
-        # カメラ長に関する情報をCSV用の情報へ変換
-        self.addDistance()
+
         # ピンの温めに関する情報を管理してCSV用の情報へ変換
         self.checkPinFlag()
+
+        # beam size 文字列を展開
         self.splitBeamsizeInfo()
+
         # beam sizeから beamsize.config → Fluxを読み込んでDataFrameに入れる
         self.fillFlux()
+
         # default parameterをDataFrameに入れていく（beamline.iniからほとんど読み込んでいる）
+        # spec: dose_ds の初期値は setDefaults() で与える
         self.setDefaults()
+
+        # カメラ長に関する情報をCSV用の情報へ変換
+        # spec: dist_ds の初期値は addDistance() で与える
+        self.addDistance()
+
         # Checking scan speed for the horizontal direction
         self.checkScanSpeed()
+
         # raster scanの露光条件の決定
         self.defineScanCondition()
+
         # 露光条件について検討。transmission > 100% のときに露光時間とtransmissionを編集する
         self.modifyExposureConditions()
+
         # 結晶サイズについてのWarning（今は multi だけ)
         self.sizeWarning()
 
         # Doseについてリストにしてしまう
         try:
-            self.logger.info(f"Checking dose_list and dist_list")
+            self.logger.info("Checking dose_list and dist_list")
             self.checkDoseList()
         except ValueError as e:
             self.logger.error(f"Error in checkDoseList: {e}")
             raise
 
         # self.dfの内容をCSVファイルに書き出す
-        # column の並び順は以下のように変更する
-        # root_dir,p_index,mode,puckid,pinid,sample_name,wavelength,raster_vbeam,raster_hbeam,att_raster,
-        # hebi_att,exp_raster,dist_raster,loopsize,score_min,score_max,maxhits,total_osc,osc_width,ds_vbeam,ds_hbeam,
-        # exp_ds,dist_ds,dose_ds,offset_angle,reduced_fact,ntimes,meas_name,cry_min_size_um,cry_max_size_um,
-        # hel_full_osc,hel_part_osc, raster_roi, ln2_flag, cover_scan_flag, zoomcap_flag, warm_time 
-        # その他の値は self.df から読み込む
         read_columns = self.df.columns.tolist()
 
-        self.columns = ['root_dir', 'p_index', 'mode', 'puckid', 'pinid', 'sample_name', \
-                        'wavelength', 'raster_vbeam', 'raster_hbeam', 'att_raster', 'hebi_att', \
-                        'exp_raster', 'dist_raster', 'loopsize', 'score_min', 'score_max', 'maxhits', \
-                        'total_osc', 'osc_width', 'ds_vbeam', 'ds_hbeam', 'exp_ds', 'dist_ds', 'dose_ds', \
-                        'dist_list', 'dose_list', 'offset_angle', 'reduced_fact', 'ntimes', 'meas_name', \
-                        'cry_min_size_um', 'cry_max_size_um', 'hel_full_osc', 'hel_part_osc', 'raster_roi', \
-                        'ln2_flag', 'cover_scan_flag', 'zoomcap_flag', 'warm_time']
+        self.columns = [
+            'root_dir', 'p_index', 'mode', 'puckid', 'pinid', 'sample_name',
+            'wavelength', 'raster_vbeam', 'raster_hbeam', 'att_raster', 'hebi_att',
+            'exp_raster', 'dist_raster', 'loopsize', 'score_min', 'score_max', 'maxhits',
+            'total_osc', 'osc_width', 'ds_vbeam', 'ds_hbeam', 'exp_ds', 'dist_ds', 'dose_ds',
+            'dist_list', 'dose_list', 'offset_angle', 'reduced_fact', 'ntimes', 'meas_name',
+            'cry_min_size_um', 'cry_max_size_um', 'hel_full_osc', 'hel_part_osc', 'raster_roi',
+            'ln2_flag', 'cover_scan_flag', 'zoomcap_flag', 'warm_time'
+        ]
 
-        # ここで変数の型を明示的に指定する
-        # float を想定しているもののみ
-        # wavelength, resolution_limit, max_crystal_size, total_osc, osc_width
-        # については float として読み込む
         set_types = {
             'wavelength': float,
             'raster_vbeam': float,
@@ -944,20 +971,16 @@ class UserESA():
             'max_crystal_size': float,
             'osc_width': float,
         }
-        # 型を指定する
+
         self.df = self.df.astype(set_types)
 
         if self.isDoseError:
             raise RuntimeError("dose_ds < 0 detected. CSV will not be generated.")
 
-        # floatのフォーマットを指定
         float_format = '%.5f'
-
-        # to_csv()メソッドでファイルに書き出す際にfloatのフォーマットを指定して書き出す
         zoo_csv_name = f"{self.csv_prefix}.csv"
         self.df.to_csv(zoo_csv_name, columns=self.columns, index=False, float_format=float_format)
 
-        # 全パラメータの型を出力
         self.logger.info(f"Data types of all parameters in the DataFrame: {self.df.dtypes}")
 
 if __name__ == "__main__":
