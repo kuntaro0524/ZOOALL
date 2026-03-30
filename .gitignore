@@ -11,3 +11,4 @@ wget-log*
 *.log
 beamline.ini
 zoo.sh
+.DS_Store
