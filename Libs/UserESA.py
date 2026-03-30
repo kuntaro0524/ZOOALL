@@ -466,24 +466,28 @@ class UserESA():
         )
         mask1 = base_mask1 & (~extended_mask)
 
-        self.df.loc[mask1, 'att_raster'] = photons_per_image / photons_per_exptime[mask1] * 100.0
-        self.df.loc[mask1, 'hebi_att'] = self.df.loc[mask1, 'att_raster']
-        self.df.loc[mask1, 'ppf_raster'] = photons_per_image
-        self.df.loc[mask1, 'dose_per_frame'] = kuma.getDose(
-            self.df.loc[mask1, 'ds_hbeam'],
-            self.df.loc[mask1, 'ds_vbeam'],
-            self.df.loc[mask1, 'flux'],
-            self.df.loc[mask1, 'energy'],
-            self.df.loc[mask1, 'exp_raster']
-        ) * self.df.loc[mask1, 'att_raster'] / 100.0
+        if mask1.any():
+            self.df.loc[mask1, 'att_raster'] = photons_per_image / photons_per_exptime[mask1] * 100.0
+            self.df.loc[mask1, 'hebi_att'] = self.df.loc[mask1, 'att_raster']
+            self.df.loc[mask1, 'ppf_raster'] = photons_per_image
+            self.df.loc[mask1, 'dose_per_frame'] = kuma.getDose(
+                self.df.loc[mask1, 'ds_hbeam'],
+                self.df.loc[mask1, 'ds_vbeam'],
+                self.df.loc[mask1, 'flux'],
+                self.df.loc[mask1, 'energy'],
+                self.df.loc[mask1, 'exp_raster']
+            ) * self.df.loc[mask1, 'att_raster'] / 100.0        
 
-        normal_dose_per_frame = kuma.getDose(
-            self.df['ds_hbeam'],
-            self.df['ds_vbeam'],
-            self.df['flux'],
-            self.df['energy'],
-            self.df['exp_raster']
-        ) * (photons_per_image / (self.df['flux'] * self.df['exp_raster']))
+        if len(self.df) > 0:
+            normal_dose_per_frame = kuma.getDose(
+                self.df['ds_hbeam'],
+                self.df['ds_vbeam'],
+                self.df['flux'],
+                self.df['energy'],
+                self.df['exp_raster']
+            ) * (photons_per_image / (self.df['flux'] * self.df['exp_raster']))
+        else:
+            normal_dose_per_frame = pd.Series(dtype=float)
 
         mask2 = (self.df['desired_exp'] == 'high_dose_scan') & (~extended_mask)
         if mask2.any():
@@ -552,9 +556,14 @@ class UserESA():
             )
             self.df.loc[extended_mask, 'dose_per_frame'] = target_scan_dose
 
-        total_dose = 10.0
         dose_control_mask = mask1 | mask2 | mask3
-        self.df.loc[dose_control_mask, 'dose_ds'] = total_dose - self.df.loc[dose_control_mask, 'dose_per_frame']
+
+        total_dose_series = pd.Series(10.0, index=self.df.index)
+        total_dose_series.loc[self.df['desired_exp'] == 'phasing'] = 5.0
+        
+        self.df.loc[dose_control_mask, 'dose_ds'] = (
+            total_dose_series.loc[dose_control_mask] - self.df.loc[dose_control_mask, 'dose_per_frame']
+        )
 
         neg_mask = (self.df['dose_ds'] < 0) & (~extended_mask)
         if neg_mask.any():
@@ -657,49 +666,144 @@ class UserESA():
         return
 
     def read_new(self):
-        # pandasを利用して.xlsxファイルを読み込む
-        # tabの名前を指定して読む "ZOOPREP_YYMMDD_NAME_BLNAME_v2"
-        # pandasを利用してエクセルのタブのリストを取得して表示する
-        #print(pd.ExcelFile(self.fname).sheet_names)
-
-        # エクセルファイルのカラム数を数える
-        ncols = len(pd.read_excel(self.fname, sheet_name="Sheet", header=2).columns)
-        print(f"Number of columns in the sheet: {ncols}")
-        # ncols が 18 でなければ付録のカラムがついていることになる
-
-        # エクセルのタブ名が "ZOOPREP_YYMMDD_NAME_BLNAME_v2" であるタブを読み込む
-        # Index(['PuckID', 'PinID', 'SampleName', 'Objective', 'Mode', 'HA',
-        # 'Wavelength [Å]', 'Hor. scan length [µm]', 'Resolution limit [Å]',
-        # 'Beam size [um]\n(H x V)', 'Crystal size [µm]',
-        # '# of crystals\n / Loop', 'Total osc \n/ Crystal', 'Osc. Width',
-        # 'LN2\nSplash', 'PIN Type', 'Zoom\nCapture', 'Unnamed: 17',
-        # 'Confirmation required'],
-        # column名を指定する
-        columns = ['puckid', 'pinid', 'sample_name', 'desired_exp', 'mode', 'anomalous_flag', \
-            'wavelength', 'loopsize', 'resolution_limit', 'beamsize', 'max_crystal_size', 'maxhits', 'total_osc', 'osc_width', \
-                'ln2_flag', 'pin_flag', 'zoomcap_flag', 'what', 'confirmation_require']
-
-        # データは4行目から
-        # 250121: sheet_name -> ZOO_YYMMDD_NAME_BLNAME_v2 -> Sheet
+        # Excel 読み込み
         self.df = pd.read_excel(self.fname, sheet_name="Sheet", header=2)
 
-        # 読み込んだカラム名を表示する
-        read_columns = self.df.columns.tolist()
-        # 前半のカラム名は columns にする
-        for i, col in enumerate(read_columns):
-            if i < 19:
-                continue
-            else:
-                columns.append(read_columns[i])
+        # 元の列名をログ
+        raw_columns = self.df.columns.tolist()
+        self.logger.info(f"Raw columns from Excel: {raw_columns}")
 
-        # 列名を指定する
-        self.df.columns = columns
-        # 現時点でのデータ数をself.loggerに出力する
-        self.logger.info("Number of data: %d"%len(self.df))
-        # 'puckid' がないデータを削除する
-        self.df = self.df.dropna(subset=['puckid'])
-        # 現時点でのデータ数をself.loggerに出力する
-        self.logger.info("Number of data after polishment: %d"%len(self.df))
+        # 列名正規化関数
+        def _norm_col(c):
+            if pd.isna(c):
+                return ""
+            s = str(c).strip().lower()
+            s = s.replace("\n", " ")
+            s = re.sub(r"\s+", " ", s)
+
+            # よくある表記ゆれを吸収
+            rename_map = {
+                "puckid": "puckid",
+                "puck id": "puckid",
+
+                "pinid": "pinid",
+                "pin id": "pinid",
+
+                "samplename": "sample_name",
+                "sample name": "sample_name",
+
+                "objective": "desired_exp",
+                "desired_exp": "desired_exp",
+                "desired exp": "desired_exp",
+
+                "mode": "mode",
+
+                "ha": "anomalous_flag",
+                "anomalous_flag": "anomalous_flag",
+
+                "wavelength [å]": "wavelength",
+                "wavelength": "wavelength",
+
+                "hor. scan length [µm]": "loopsize",
+                "hor. scan length [um]": "loopsize",
+                "loopsize": "loopsize",
+
+                "resolution limit [å]": "resolution_limit",
+                "resolution_limit": "resolution_limit",
+                "resolution limit": "resolution_limit",
+
+                "beam size [um] (h x v)": "beamsize",
+                "beam size [um](h x v)": "beamsize",
+                "beam size": "beamsize",
+                "beamsize": "beamsize",
+
+                "crystal size [µm]": "max_crystal_size",
+                "crystal size [um]": "max_crystal_size",
+                "max_crystal_size": "max_crystal_size",
+                "crystal size": "max_crystal_size",
+
+                "# of crystals / loop": "maxhits",
+                "# of crystals /loop": "maxhits",
+                "maxhits": "maxhits",
+
+                "total osc / crystal": "total_osc",
+                "total osc /crystal": "total_osc",
+                "total_osc": "total_osc",
+
+                "osc. width": "osc_width",
+                "osc_width": "osc_width",
+
+                "ln2 splash": "ln2_flag",
+                "ln2_flag": "ln2_flag",
+
+                "pin type": "pin_flag",
+                "pin_flag": "pin_flag",
+
+                "zoom capture": "zoomcap_flag",
+                "zoomcap_flag": "zoomcap_flag",
+
+                "confirmation required": "confirmation_require",
+                "confirmation_require": "confirmation_require",
+
+                "dose_list": "dose_list",
+                "dose list": "dose_list",
+
+                "dist_list": "dist_list",
+                "dist list": "dist_list",
+            }
+            return rename_map.get(s, s.replace(" ", "_"))
+
+        # 正規化した列名に変換
+        normalized_columns = [_norm_col(c) for c in self.df.columns]
+        self.df.columns = normalized_columns
+
+        self.logger.info(f"Normalized columns: {self.df.columns.tolist()}")
+
+        # 必須列チェック
+        required_columns = [
+            "puckid",
+            "pinid",
+            "sample_name",
+            "desired_exp",
+            "mode",
+            "wavelength",
+            "loopsize",
+            "resolution_limit",
+            "beamsize",
+            "max_crystal_size",
+            "maxhits",
+            "total_osc",
+            "osc_width",
+            "ln2_flag",
+            "pin_flag",
+            "zoomcap_flag",
+            "confirmation_require",
+        ]
+
+        missing = [c for c in required_columns if c not in self.df.columns]
+        if missing:
+            raise ValueError(
+                "[UserESA] Missing required columns in Excel: "
+                + ", ".join(missing)
+            )
+
+        # 任意列はなければ追加
+        for optional_col in ["dose_list", "dist_list"]:
+            if optional_col not in self.df.columns:
+                self.df[optional_col] = ""
+
+        # データ数ログ
+        self.logger.info("Number of data: %d" % len(self.df))
+
+        # puckid がない行を削除
+        self.df = self.df.dropna(subset=["puckid"])
+
+        self.logger.info("Number of data after polishment: %d" % len(self.df))
+
+        # dose_list / dist_list の冒頭確認
+        self.logger.info(f"dose_list preview: {self.df['dose_list'].head().tolist()}")
+        self.logger.info(f"dist_list preview: {self.df['dist_list'].head().tolist()}")
+
         self.isPrep = True
 
     # 高分解能データ収集用に設定したものについて以下のような仕様でチェック
