@@ -1616,11 +1616,10 @@ class ZooNavigator():
         hebi = HEBI.HEBI(self.zoo, self.lm, self.stopwatch, flux)
 
         # Log for dose list
-        # 250709 dose_ds contains '{1.0, 10.0, 10.0}' as a string
-        dose_list = cond['dose_ds'].strip("{}").split(",")
-        for dose in dose_list:
-            self.logger.info(f"dose for helical data collection: {dose.strip()}")
-
+        dose_dist_list = hebi.getDoseDistList(cond)
+        for dose, dist in dose_dist_list:
+            self.logger.info(f"dose/dist for helical data collection: dose={dose}, dist={dist}")
+        
         n_crystals = 0
         try:
             self.updateTime(cond, "ds_start")
@@ -1659,7 +1658,7 @@ class ZooNavigator():
             # end_time
             self.updateTime(cond, "ds_end")
             # meas_end
-            #self.updateTime(cond, "meas_end", comment="Helical data collection failed in unknown reasons.")
+            self.updateTime(cond, "meas_end")
 
         self.lm.closeCapture()
         self.logger.info("Return to the main loop of 'process'")
@@ -1756,7 +1755,7 @@ class ZooNavigator():
         self.updateDBinfo(cond, "isDS", 1)
         self.updateDBinfo(cond, "isDone", 1)
         # meas_end
-        #self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+        self.updateTime(cond, "meas_end")
         self.logger.info("Disconnecting capture")
         self.lm.closeCapture()
 
