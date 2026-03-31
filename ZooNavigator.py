@@ -990,9 +990,6 @@ class ZooNavigator():
             self.collectQuick(trayid, pinid, prefix, cond, sphi)
         elif cond['mode'] == "screening":
             self.collectScreen(cond, sphi)
-        # 2025/07/03 K. Hirata coded
-        elif cond['mode'] == ['dose_slice']:
-            self.collectDoseSlice(trayid, pinid, prefix, cond, sphi)
         else:
             self.logger.error("Unknown mode: %s" % cond['mode'])
             error_code = ErrorCode.UNKNOWN_MODE
@@ -1009,6 +1006,75 @@ class ZooNavigator():
     def finishZoo(self):
         open(os.path.join(os.environ["HOME"], ".zoo_current"), "w").write("%s %s finished\n" \
                                                                           % (self.name, self.root_dir))
+
+    def _parse_series_like_text(self, value):
+        """
+        UserESA が出力する dose_list / dist_list を list[float] に変換する。
+        許容例:
+          ""            -> []
+          "5"           -> [5.0]
+          "[5, 10, 20]" -> [5.0, 10.0, 20.0]
+        """
+        if value is None:
+            return []
+    
+        s = str(value).strip()
+        if s == "" or s.lower() == "nan":
+            return []
+    
+        # 角括弧を除去
+        if s.startswith("[") and s.endswith("]"):
+            s = s[1:-1].strip()
+    
+        if s == "":
+            return []
+    
+        return [float(x.strip()) for x in s.split(",") if x.strip() != ""]    
+
+    def _build_dc_condition_list(self, cond):
+        """
+        data collection 用の条件リストを返す。
+        返り値: list[dict]  各dictは {"dose": ..., "dist": ...}
+        """
+        dose_list = self._parse_series_like_text(cond.get("dose_list", ""))
+        dist_list = self._parse_series_like_text(cond.get("dist_list", ""))
+    
+        # dist_list only は不正
+        if len(dose_list) == 0 and len(dist_list) > 0:
+            raise ZooMyException("dist_list only is invalid. dose_list is required.")
+    
+        # 通常運用
+        if len(dose_list) == 0:
+            return [{
+                "dose": float(cond["dose_ds"]),
+                "dist": float(cond["dist_ds"]),
+            }]
+    
+        # mode 制約
+        if cond["mode"] in ("multi", "mixed"):
+            if len(dose_list) > 1 or len(dist_list) > 1:
+                raise ZooMyException(
+                    f"mode={cond['mode']} does not allow multiple dose_list/dist_list values."
+                )
+    
+        # dose_list only
+        if len(dist_list) == 0:
+            return [
+                {"dose": dose, "dist": float(cond["dist_ds"])}
+                for dose in dose_list
+            ]
+    
+        # dose_list + dist_list
+        if len(dose_list) != len(dist_list):
+            raise ZooMyException(
+                f"dose_list and dist_list length mismatch in ZooNavigator: "
+                f"{len(dose_list)} vs {len(dist_list)}"
+            )
+    
+        return [
+            {"dose": dose, "dist": dist}
+            for dose, dist in zip(dose_list, dist_list)
+        ]
 
     def collectMulti(self, trayid, pinid, prefix, cond, sphi):
         o_index = cond['o_index']
@@ -1233,6 +1299,39 @@ class ZooNavigator():
         self.logger.info("Disconnecting capture")
         self.lm.closeCapture()
 
+    def _run_single_dc_loop(self, cond, sphi, glist, flux, data_prefix="single"):
+        """
+        single mode の data collection 実行部。
+        dose_list / dist_list が有効な場合は、その条件数ぶんループする。
+        通常運用では 1 回だけ実行する。
+        """
+        dc_list = self._build_dc_condition_list(cond)
+    
+        self.logger.info(
+            f"[single-dc-loop] number of data collections = {len(dc_list)}"
+        )
+    
+        for i_dc, dc in enumerate(dc_list, start=1):
+            cond_local = cond.copy()
+            cond_local["dose_ds"] = dc["dose"]
+            cond_local["dist_ds"] = dc["dist"]
+    
+            self.logger.info(
+                f"[single-dc-loop] #{i_dc}: dose_ds={cond_local['dose_ds']} "
+                f"dist_ds={cond_local['dist_ds']}"
+            )
+    
+            multi_sch = self.lm.genMultiSchedule(
+                sphi,
+                glist,
+                cond_local,
+                flux,
+                prefix=data_prefix,
+            )
+    
+            self.zoo.doDataCollection(multi_sch)
+            self.zoo.waitTillReady()
+
     # Collect single
     def collectSingle(self, trayid, pinid, prefix, cond, sphi):
         o_index = cond['o_index']
@@ -1440,25 +1539,20 @@ class ZooNavigator():
             self.logger.info(
                 "Single: Beam size = %5.2f %5.2f um Measured flux : %5.2e" % (cond['ds_hbeam'], cond['ds_vbeam'], flux))
 
-        # Generate Schedule file
-        self.logger.info("Preparing the schedule file for a single data collection.")
-        multi_sch = self.lm.genMultiSchedule(sphi, glist, cond, flux, prefix=data_prefix)
-
-        # Why is this wait required?
-        # For waiting the schedule file???
+        # data collection loop (single / multiple conditions)
         time.sleep(0.1)
-
-        # ds_start
-        self.updateTime(cond, "ds_start", comment="Data collection started")
-        self.logger.info("Now ZOO starts single data collection.")
-        self.zoo.doDataCollection(multi_sch)
-        self.zoo.waitTillReady()
-        # ds_end
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
+        
+        self.updateTime(cond, "ds_start")
+        self.logger.info("Now ZOO starts single data collection loop.")
+        
+        self._run_single_dc_loop(cond, sphi, glist, flux, data_prefix=data_prefix)
+        
+        self.updateTime(cond, "ds_end")
         self.updateDBinfo(cond, "isDS", 1)
         self.updateDBinfo(cond, "isDone", 1)
-        self.updateDBinfo(cond, "meas_end", "Measurement normally finished")
-        self.logger.info("Now ZOO finishes single data collection.")
+        self.updateTime(cond, "meas_end")
+        self.logger.info("Now ZOO finishes single data collection loop.")
+
         # Data proc
         sample_name = cond['sample_name']
         root_dir = cond['root_dir']
