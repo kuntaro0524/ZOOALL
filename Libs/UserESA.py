@@ -387,6 +387,9 @@ class UserESA():
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('Yes', 1)
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('yes', 1)
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('YES', 1)
+        self.df['ln2_flag'] = self.df['ln2_flag'].replace('NO', 0)
+        self.df['ln2_flag'] = self.df['ln2_flag'].replace('No', 0)
+        self.df['ln2_flag'] = self.df['ln2_flag'].replace('no', 0)
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('Unavailable', 0)
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('-', 0)
 

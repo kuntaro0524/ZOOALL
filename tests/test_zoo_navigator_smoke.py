@@ -506,3 +506,47 @@ def test_processLoop_smoke_single_echa_path(patch_common):
 
     # 完了更新
     assert records["done"][-1] == (0, 310, 1)
+
+def test_helical_failure_sets_error(patch_common, monkeypatch):
+    records = {
+        "dc": [],
+        "raster": [],
+        "wait": [],
+        "mount": [],
+        "sample_info": 0,
+        "wavelength": [],
+        "beamsize": [],
+        "dismount": [],
+        "skip": [],
+        "cleaning": [],
+        "space": [],
+        "ln2": [],
+        "bss_script": [],
+        "post": [],
+        "done": [],
+    }
+
+    # helical の途中で失敗させる
+    monkeypatch.setattr(
+        hebi_module.HEBI,
+        "mainLoop",
+        lambda self, raspath, scan_id, sphi, cond, precise_face_scan=False:
+            (_ for _ in ()).throw(Exception("helical failed"))
+    )
+
+    z = _make_znav(records)
+    cond = _base_cond(mode="helical")
+
+    z.collectHelical("CPS4474", 7, "CPS4474-07", cond, sphi=0.0)
+
+    # collectHelical except 節で error 登録されるはず
+    assert records["done"][-1] == (0, 310, 3003)
+
+    posted_keys = []
+    for _, payload in records["post"]:
+        for row in payload.get("data", []):
+            posted_keys.extend(row.keys())
+
+    assert "meas_record" in posted_keys
+    assert "t_ds_end" in posted_keys
+    assert "t_meas_end" in posted_keys
