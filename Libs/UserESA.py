@@ -261,7 +261,7 @@ class UserESA():
             )
         self.df["raster_dose"] = self.config.getfloat("experiment", "raster_dose")
         self.df["dose_ds"] = self.config.getfloat("experiment", "dose_ds")
-        self.df["raster_roi"] = self.config.getfloat("experiment", "raster_roi")
+        self.df["raster_roi"] = self.config.getint("experiment", "raster_roi")
         self.df["exp_ds"] = self.config.getfloat("experiment", "exp_ds")
         self.df["exp_raster"] = self.config.getfloat("experiment", "exp_raster")
         # att_raster の数値を取得して小数点以下第一位までに丸める
@@ -329,7 +329,7 @@ class UserESA():
         score_max   = self.config.getfloat("experiment", "score_max")
         raster_dose = self.config.getfloat("experiment", "raster_dose")
         dose_ds     = self.config.getfloat("experiment", "dose_ds")
-        raster_roi  = self.config.getfloat("experiment", "raster_roi")
+        raster_roi  = self.config.getint("experiment", "raster_roi")
         exp_raster = self.config.getfloat("experiment", "exp_raster")
         att_raster  = self.config.getfloat("experiment", "att_raster")
         hebi_att    = self.config.getfloat("experiment", "hebi_att")
