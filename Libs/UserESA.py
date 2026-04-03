@@ -158,21 +158,32 @@ class DoseDistanceHandler:
         return vals
 
     def _pad_lists_by_policy(self, dose_vals, dist_vals):
-        # spec:
-        # 両方存在する場合のみ長さ補正を行う
-        # dist_list 未入力時は補正しない
+        """
+        spec 5.1.6:
+        - 主系列は dose_list
+        - dose_list は補間しない
+        - dist_list が長い場合は dose_list 長で打ち切る
+        - dist_list が短い場合はエラー
+        """
         if dose_vals is None or dist_vals is None:
             return dose_vals, dist_vals
-
+    
         ld, lt = len(dose_vals), len(dist_vals)
-
+    
         if ld == lt:
             return dose_vals, dist_vals
-
+    
         if ld < lt:
-            return dose_vals + [max(dose_vals)] * (lt - ld), dist_vals
-
-        return dose_vals, dist_vals + [min(dist_vals)] * (ld - lt)
+            self.logger.info(
+                f"[UserESA] dist_list is longer than dose_list. "
+                f"dist_list will be truncated: {lt} -> {ld}"
+            )
+            return dose_vals, dist_vals[:ld]
+    
+        raise ValueError(
+            "[UserESA] dist_list is shorter than dose_list. "
+            f"dose_list={dose_vals}, dist_list={dist_vals}"
+        )
 
     def _serialize_list_for_csv(self, vals):
         if vals is None or len(vals) == 0:

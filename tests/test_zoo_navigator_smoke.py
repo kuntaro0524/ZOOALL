@@ -1,6 +1,8 @@
 import sys
 import types
 import pytest
+from UserESA import DoseDistanceHandler
+import logging
 
 
 def _install_stub_modules():
@@ -550,3 +552,40 @@ def test_helical_failure_sets_error(patch_common, monkeypatch):
     assert "meas_record" in posted_keys
     assert "t_ds_end" in posted_keys
     assert "t_meas_end" in posted_keys
+
+def test_pad_lists_by_policy_truncate_dist_list():
+    h = DoseDistanceHandler(logger=logging.getLogger("test"))
+    dose, dist = h._pad_lists_by_policy([0.1, 1.0], [300.0, 200.0, 150.0])
+    assert dose == [0.1, 1.0]
+    assert dist == [300.0, 200.0]
+
+def test_pad_lists_by_policy_short_dist_list_raises():
+    h = DoseDistanceHandler(logger=logging.getLogger("test"))
+    with pytest.raises(ValueError):
+        h._pad_lists_by_policy([0.1, 1.0, 1.0], [300.0, 200.0])
+
+def test_kuma_helical_consistency(kuma_env):
+    kuma = kuma_env
+
+    cond = {
+        "dose_ds": 10.0,
+        "ds_hbeam": 10.0,
+        "ds_vbeam": 10.0,
+        "wavelength": 1.0,
+        "total_osc": 360.0,
+    }
+
+    flux = 1e12
+    dist_vec = 0.1  # mm
+
+    exp_time, trans = kuma.getBestCondsHelical(cond, flux, dist_vec)
+
+    dose = kuma.getDose(
+        cond["ds_hbeam"],
+        cond["ds_vbeam"],
+        flux * trans,
+        12.0,
+        exp_time
+    )
+
+    assert dose > 0
