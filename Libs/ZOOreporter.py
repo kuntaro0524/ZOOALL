@@ -32,6 +32,15 @@ class ZOOreporter:
             """
 
         return footer_note
+    
+    def getProcLinks(self):
+        kamo_results = ['_kamoproc'] # for now
+        proc_links = """<h4>KamoProc</h4>"""
+        for kamos in kamo_results:
+            proc_links += """\n<a href=%s/correct.html> Click here </a>"""%kamos
+
+        return proc_links;
+
 
     def makeHTML(self, html_prefix):
         if self.isPrep == False:
@@ -48,6 +57,9 @@ class ZOOreporter:
 
         footer_note = self.getFooter()
         ofile.write(footer_note)
+
+        proc_links = self.getProcLinks()
+        ofile.write(proc_links)
         
         # Abs path
         abs_path = os.path.abspath(html_filename)
