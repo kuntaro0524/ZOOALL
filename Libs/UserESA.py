@@ -79,7 +79,7 @@ class UserESA():
         self.df["score_max"] = self.config.getfloat("experiment", "score_max")
         self.df["raster_dose"] = self.config.getfloat("experiment", "raster_dose")
         self.df["dose_ds"] = self.config.getfloat("experiment", "dose_ds")
-        self.df["raster_roi"] = self.config.getfloat("experiment", "raster_roi")
+        self.df["raster_roi"] = self.config.getint("experiment", "raster_roi")
         self.df["exp_ds"] = self.config.getfloat("experiment", "exp_ds")
         self.df["exp_raster"] = self.config.getfloat("experiment", "exp_raster")
         # att_raster の数値を取得して小数点以下第一位までに丸める
@@ -138,7 +138,7 @@ class UserESA():
         score_max   = self.config.getfloat("experiment", "score_max")
         raster_dose = self.config.getfloat("experiment", "raster_dose")
         dose_ds     = self.config.getfloat("experiment", "dose_ds")
-        raster_roi  = self.config.getfloat("experiment", "raster_roi")
+        raster_roi  = self.config.getint("experiment", "raster_roi")
         exp_raster = self.config.getfloat("experiment", "exp_raster")
         att_raster  = self.config.getfloat("experiment", "att_raster")
         hebi_att    = self.config.getfloat("experiment", "hebi_att")
@@ -196,6 +196,9 @@ class UserESA():
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('Yes', 1)
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('yes', 1)
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('YES', 1)
+        self.df['ln2_flag'] = self.df['ln2_flag'].replace('No', 0)
+        self.df['ln2_flag'] = self.df['ln2_flag'].replace('no', 0)
+        self.df['ln2_flag'] = self.df['ln2_flag'].replace('NO', 0)
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('Unavailable', 0)
         self.df['ln2_flag'] = self.df['ln2_flag'].replace('-', 0)
 
@@ -544,18 +547,15 @@ class UserESA():
         self.df['dist_ds'] = self.df.apply(lambda x: self.calcDist(x['wavelength'], x['resolution_limit']), axis=1)
         # resolution limit は beamline.iniから読み込む
         # self.config : section=experiment, option=resol_raster
-        roi_value = self.config.getint("experiment", "raster_roi")
-        if self.beamline.lower() == "bl32xu":
-            # roi flag
-            # roi_value =1 -> roi_flag=True
-            # roi_value =0 -> roi_flag=False
-            if roi_value == 1:
-                self.logger.info(f"BL32XU: EIGER X 9M ROI")
-                dist_raster = self.calcDist(roi_value, self.config.getfloat("experiment", "resol_raster"), True)
-            else:
-                dist_raster = self.calcDist(roi_value, self.config.getfloat("experiment", "resol_raster"), False)
+        roi_value = self.config.getint("experiment", "raster_roi", fallback=0)
+        # roi flag
+        # roi_value =1 -> roi_flag=True
+        # roi_value =0 -> roi_flag=False
+        if roi_value == 1:
+            #self.logger.info(f"BL32XU: EIGER X 9M ROI")
+            dist_raster = self.calcDist(self.df['wavelength'], self.config.getfloat("experiment", "resol_raster"), True)
         else:
-            dist_raster = self.calcDist(roi_value, self.config.getfloat("experiment", "resol_raster"), False)
+            dist_raster = self.calcDist(self.df['wavelength'], self.config.getfloat("experiment", "resol_raster"), False)
 
         self.logger.info(f"dist_raster: {dist_raster}")
         self.df['dist_raster'] = dist_raster
