@@ -24,7 +24,7 @@ camera_inf=${dirs:bssconfig_dir}/video/camera.inf
 beamsize_conf_file=${dirs:bssconfig_dir}/beamsize.config
 inocc_image=/staff/config/bl45xu/bss/test.ppm
 logging_conf=${dirs:zooroot}/Libs/logging.conf
-dose_csv=${dirs:zooroot}/Libs/en_dose_lys.csv
+dose_csv=${dirs:zooroot}/Libs/en_dose.csv
 # Just a default background image file.
 backimg = ${dirs:zooroot}/BackImages/back.ppm
 data_suffix=h5

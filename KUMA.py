@@ -29,47 +29,65 @@ class KUMA:
     # 2023/05/10 coded by K.Hirata
     # aimed_dose: float (aimed dose in MGy)
     def getDoseLimitParams(self, aimed_dose, energy=12.3984):
-        # CSVファイルを読んでdataframeにする
-        df = pd.read_csv(self.dose_limit_file)
-        # energy .vs. dose_mgy_per_photonのグラフについてスプライン補完を行い
-        # エネルギーが与えられたら、線量を返す関数を作成する
-        # 戻り値はfloatとする
-        en_dose_function = interpolate.interp1d(df['energy'], df['dose_mgy_per_photon'], kind='cubic')
-        # dose_per_photon: CSV 2nd column
-        dose_per_photon = en_dose_function(energy).flatten()[0]
-        # density_limit: CSV 3rd column (10MGyに到達するまでの photon density)
-        density_limit = interpolate.interp1d(df['energy'], df['density_limit_for10MGy'], kind='cubic')(energy).flatten()[0]
-        #print(f"aimed_dose={aimed_dose} MGy, energy={energy} keV, dose_per_photon={dose_per_photon} MGy/photon, density_limit={density_limit} phs/um^2 for 10 MGy")
+        """
+        Return:
+            dose_coeff [MGy / (photons/um^2)]
+            density_limit [photons/um^2]
+        """
+        dose_coeff = self.getDoseCoeffPerPhoton(energy)
+
         if self.debug:
-            self.logger.info(f"aimed_dose={type(aimed_dose)} {aimed_dose:.3f} MGy, energy={energy:.3f} keV")
-        # aimed_dose_per_photon
-        aimed_dose_per_photon = aimed_dose / 10.0 * dose_per_photon
-        # aimed_density_limit
-        aimed_density_limit = aimed_dose / 10.0 * density_limit
-        # set self.limit_dens
-        self.limit_dens = aimed_density_limit
+            self.logger.info(
+                f"aimed_dose={type(aimed_dose)} {aimed_dose:.3f} MGy, energy={energy:.3f} keV"
+            )
 
-        return aimed_dose_per_photon, aimed_density_limit
+        density_limit = aimed_dose / dose_coeff
+        self.limit_dens = density_limit
 
-    def getDose1sec(self, beam_h, beam_v, flux, energy):
+        return dose_coeff, density_limit
+
+    def getDoseCoeffPerPhoton(self, energy):
         """
-        Calculate dose rate [MGy/s] from beam geometry, flux, and photon energy.
-        The '10 MGy' reference in CSV is used internally; no explicit constant here.
+        Return dose coefficient from CSV.
+        dose_mgy_per_photon_density [MGy/(photon/um^2)] 
+        -> absorbed dose [MGy] per photon density [photons/um^2]
         """
-        # use the CSV-based dose_per_photon directly
-        dose_per_photon, _ = self.getDoseLimitParams(aimed_dose=1.0, energy=energy)
-        # getDoseLimitParams scales linearly with aimed_dose,
-        # so aimed_dose=1.0 simply returns 1 MGy-equivalent dose_per_photon value.
-    
-        flux_density = flux / (beam_h * beam_v)       # photons/(s·µm²)
-        dose_per_sec = flux_density * dose_per_photon # MGy/s
+        df = pd.read_csv(self.dose_limit_file)
 
+        if "dose_mgy_per_photon_density" not in df.columns:
+            raise KeyError(
+                f"dose_mgy_per_photon_density not found in CSV. columns={list(df.columns)}"
+            )
+
+        f = interpolate.interp1d(
+            df["energy"],
+            df["dose_mgy_per_photon_density"],
+            kind="cubic"
+        )
+        return float(f(energy))
+
+    def getDose1sec(self, beam_h, beam_v, flux, wavelength):
+        """
+        dose rate [MGy/s]
+        """
+        energy = 12.3984 / wavelength
+        flux_density = flux / (beam_h * beam_v)  # photons / um^2 / s
+        dose_coeff = self.getDoseCoeffPerPhoton(energy)
+        dose_per_sec = flux_density * dose_coeff
         return dose_per_sec
 
-    def getDose(self, beam_h, beam_v, flux, energy, exp_time):
-        dose_per_sec = self.getDose1sec(beam_h, beam_v, flux, energy)
-        dose = dose_per_sec * exp_time
-        return dose
+    def getDose(self, beam_h, beam_v, flux, wavelength, exp_time):
+        # sanity check
+        if beam_h <= 0 or beam_v <= 0:
+            raise ValueError("beam size must be positive")
+        if flux <= 0:
+            raise ValueError("flux must be positive")
+        if wavelength <= 0:
+            raise ValueError("wavelength must be positive")
+        if exp_time <= 0:
+            raise ValueError("exp_time must be positive")
+    
+        return self.getDose1sec(beam_h, beam_v, flux, wavelength) * exp_time
 
     def setPhotonDensityLimit(self, value):
         self.limit_dens = value
@@ -140,8 +158,6 @@ class KUMA:
     # 昔はgetBestCondsMultiを呼んでいたのだがそれではまずいことが判明した
     # 2025/10/07 ChatGPTの提案を受け入れて改修
     def getBestCondsSingle(self, cond, flux):
-        from Libs.dose.fields import get_dose_ds, get_dist_ds
-
         mode = cond.get("mode", "single")
         if mode != "single":
             raise ValueError(f"getBestCondsSingle() called with mode='{mode}'. Expected 'single'.")
@@ -166,7 +182,6 @@ class KUMA:
         return exp_time, mod_transmission
 
     def getBestCondsMulti(self, cond, flux):
-        from Libs.dose.fields import get_dose_ds, get_dist_ds
         # --- 基本設定 ---
         n_frames = self.getNframe(cond)
 
@@ -370,3 +385,4 @@ if __name__ == "__main__":
         limit_time = kuma.convDoseToExptimeLimit(dose,10,15,phosec_meas,wl)
         print(f"Wavelength:{wl:.3f} LIMIT_TIME={limit_time:.4f}")
     """
+
