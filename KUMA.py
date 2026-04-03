@@ -163,7 +163,6 @@ class KUMA:
             raise ValueError(f"getBestCondsSingle() called with mode='{mode}'. Expected 'single'.")
     
         n_frames = self.getNframe(cond)
-        results = []
         exptime_limit = self.convDoseToExptimeLimit(
             cond['dose_ds'], cond['ds_hbeam'], cond['ds_vbeam'], flux, cond['wavelength']
         )
@@ -297,92 +296,3 @@ class KUMA:
     
         # 常にタプルで返す（HEBI 側の期待仕様）
         return exp_time, mod_transmission
-
-if __name__ == "__main__":
-    #import ESA
-
-    kuma = KUMA()
-
-    # logger setting
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s %(levelname)s: %(message)s')
-    #kuma.logger.setLevel(logging.DEBUG)
-    kuma.logger.setLevel(logging.INFO)
-    kuma.debug = True
-    
-    #exptime_limit=kuma.convDoseToExptimeLimit(10.0,10,15,9.4E12,1.0000)
-    #print(kuma.estimateAttFactor(0.02,360,0.1,100,9E12,15.0))
-
-    # 10 x 18 um beam 12.3984 keV 
-    # Photon flux = 1.2E13 phs/s
-    # exptime=1/30.0
-    ##att=kuma.estimateAttFactor(exptime,1.0,1.0,100,1.2E13,18.0)
-    # exptime_limit=kuma.convDoseToDensityLimit(10.0,1.0000)
-    # print "%e"%exptime_limit
-
-    # flux = 1E13
-    # dist_vec = 100.0 /1000.0
-    # conds[0]['ds_hbeam'] = 20
-    # conds[0]['ds_vbeam'] = 20.0
-    # conds[0]['total_osc'] = 360.0
-
-    # Dose estimation of 'helical data collection'
-    flux = 5E12
-    dist_vec=0.1
-    # string type of dose values
-    dose_ds = 5.0
-    #dose_ds = "{1.0,5.0,10.0}"
-    dist_ds = 110.0
-    # Test for helical
-    # cond dictionaryを作成する
-    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'dist_ds':dist_ds,'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5,'mode':"helical"}
-    exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
-    print(f"suitable exposure time: {exp_time:.4f} sec, modified transmission: {mod_transmission:.5f}")
-    """
-
-    # Test for multi
-    dose_ds = "{1.0,5.0,10.0}"
-    dist_ds = "{110.0,120.0}"
-    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':dose_ds, 'dist_ds':dist_ds,'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
-    exp_time, mod_transmission=kuma.getBestCondsMulti(cond, flux)
-    print(f"suitable exposure time: {exp_time:.4f} sec, modified transmission: {mod_transmission:.5f}")
-    """
-
-    """
-    # Dose estimation of 'SWSX' data collection
-    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':"0.1+1.0+1.0+1.0",'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
-    exp_time, mod_transmission=kuma.getBestCondsHelical(cond, flux, dist_vec)
-
-    # Dose slicing test
-    cond = {'ds_hbeam':10.0,'ds_vbeam':15.0,'dose_ds':"{10.0}", 'wavelength':1.0, 'exp_ds':0.02, 'total_osc':360.0, 'osc_width': 0.1, 'reduced_fact':0.2, 'ntimes':5}
-    kuma.getBestCondsMulti(cond,flux)
-    """
-
-    """
-
-    print("#########################################")
-    exptime = 0.02
-    total_osc = 360.0
-    stepphi = 0.1
-    dist_vec = 200.0
-    phosec_meas = 9.9E12
-    beam_vert = 15.0
-    dose = 10.0
-    wl_list = np.arange(0.5, 1.5, 0.1)
-
-    # getDose の挙動テスト
-    dose_tmp = kuma.getDose(1,1,2E10,12.3984,1.0)
-    print(f"getDose: {dose_tmp:.3f}")
-
-    dose_1sec = kuma.getDose1sec(10, 15, 9.9E12, 12.3984)
-    dose_per_exptime = 0.01*dose_1sec
-    print("##################################")
-    print(f'dose_1sec={dose_1sec:.3f}, dose_per_exptime={dose_per_exptime:.3f}')
-    print("##################################")
-
-    for wl in wl_list:
-        photon_density_limit=kuma.convDoseToDensityLimit(10.0, wl)
-        print(f"density limit={photon_density_limit:8.3e}")
-        limit_time = kuma.convDoseToExptimeLimit(dose,10,15,phosec_meas,wl)
-        print(f"Wavelength:{wl:.3f} LIMIT_TIME={limit_time:.4f}")
-    """
-
