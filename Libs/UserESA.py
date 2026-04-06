@@ -1017,15 +1017,16 @@ class UserESA():
         # resolution limit は beamline.iniから読み込む
         # self.config : section=experiment, option=resol_raster
         roi_value = self.config.getint("experiment", "raster_roi", fallback=0)
-        # roi flag
-        if roi_value == 1:
-            self.logger.info(f"BL32XU: EIGER X 9M ROI")
-            dist_raster = self.calcDist(self.df['wavelength'], self.config.getfloat("experiment", "resol_raster"), True)
+        resol_raster = self.config.getfloat("experiment", "resol_raster")
+        is_roi = (roi_value == 1)
+        if is_roi:
+            self.logger.info(f"Using ROI for distance calculation with resol_raster: {resol_raster} Å")
         else:
-            dist_raster = self.calcDist(self.df['wavelength'], self.config.getfloat("experiment", "resol_raster"), False)
+            self.logger.info(f"Not using ROI for distance calculation, using resolution_limit from Excel")
 
-        self.logger.info(f"dist_raster: {dist_raster}")
-        self.df['dist_raster'] = dist_raster
+        self.df['dist_raster'] = self.df.apply(lambda x: self.calcDist(x['wavelength'], resol_raster, is_roi), axis=1)
+
+        self.logger.info(f"dist_raster: {self.df['dist_raster'].tolist()}")
 
     def checkScanSpeed(self):
         # exp_raster　の数値について確認をする→水平方向のスキャン速度の上限に依存する
