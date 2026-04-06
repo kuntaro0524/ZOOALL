@@ -88,7 +88,7 @@ hebi_att = 20
 cover_flag = 1
 exp_ds=0.02
 # unit [um/sec]
-max_hori_scan_speed = 500.0 
+max_hori_scan_speed = 1000.0 
 # Raster ROIにするかどうか (integer 0/1)
 raster_roi = 1
 # raster_roi=1の場合には

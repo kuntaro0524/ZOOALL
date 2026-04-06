@@ -457,8 +457,6 @@ class UserESA():
     def defineScanCondition(self):
         kuma = KUMA.KUMA()
 
-        self.df['energy'] = 12.3984 / self.df['wavelength']
-
         def _has_value(v):
             return (not pd.isna(v)) and str(v).strip() != ""
 
@@ -484,85 +482,111 @@ class UserESA():
             self.df.loc[mask1, 'att_raster'] = photons_per_image / photons_per_exptime[mask1] * 100.0
             self.df.loc[mask1, 'hebi_att'] = self.df.loc[mask1, 'att_raster']
             self.df.loc[mask1, 'ppf_raster'] = photons_per_image
-            self.df.loc[mask1, 'dose_per_frame'] = kuma.getDose(
-                self.df.loc[mask1, 'ds_hbeam'],
-                self.df.loc[mask1, 'ds_vbeam'],
-                self.df.loc[mask1, 'flux'],
-                self.df.loc[mask1, 'energy'],
-                self.df.loc[mask1, 'exp_raster']
-            ) * self.df.loc[mask1, 'att_raster'] / 100.0        
+        
+            base_dose_mask1 = self.df.loc[mask1].apply(
+                lambda row: kuma.getDose(
+                    row['ds_hbeam'],
+                    row['ds_vbeam'],
+                    row['flux'],
+                    row['wavelength'],
+                    row['exp_raster']
+                ),
+                axis=1
+            )
+        
+            self.df.loc[mask1, 'dose_per_frame'] = (
+                base_dose_mask1 * self.df.loc[mask1, 'att_raster'] / 100.0
+            )
 
         if len(self.df) > 0:
-            normal_dose_per_frame = kuma.getDose(
-                self.df['ds_hbeam'],
-                self.df['ds_vbeam'],
-                self.df['flux'],
-                self.df['energy'],
-                self.df['exp_raster']
-            ) * (photons_per_image / (self.df['flux'] * self.df['exp_raster']))
+            base_normal_dose = self.df.apply(
+                lambda row: kuma.getDose(
+                    row['ds_hbeam'],
+                    row['ds_vbeam'],
+                    row['flux'],
+                    row['wavelength'],
+                    row['exp_raster']
+                ),
+                axis=1
+            )
+        
+            normal_dose_per_frame = (
+                base_normal_dose * (photons_per_image / (self.df['flux'] * self.df['exp_raster']))
+            )
         else:
             normal_dose_per_frame = pd.Series(dtype=float)
-
+        
         mask2 = (self.df['desired_exp'] == 'high_dose_scan') & (~extended_mask)
         if mask2.any():
             dose_for_raster = normal_dose_per_frame * 1.5
-            self.df.loc[mask2, 'att_raster'] = dose_for_raster[mask2] / kuma.getDose(
-                self.df.loc[mask2, 'ds_hbeam'],
-                self.df.loc[mask2, 'ds_vbeam'],
-                self.df.loc[mask2, 'flux'],
-                self.df.loc[mask2, 'energy'],
-                self.df.loc[mask2, 'exp_raster']
-            ) * 100.0
+        
+            base_dose_mask2 = self.df.loc[mask2].apply(
+                lambda row: kuma.getDose(
+                    row['ds_hbeam'],
+                    row['ds_vbeam'],
+                    row['flux'],
+                    row['wavelength'],
+                    row['exp_raster']
+                ),
+                axis=1
+            )
+        
+            self.df.loc[mask2, 'att_raster'] = dose_for_raster[mask2] / base_dose_mask2 * 100.0
             self.df.loc[mask2, 'hebi_att'] = self.df.loc[mask2, 'att_raster']
             self.df.loc[mask2, 'ppf_raster'] = (
                 self.df.loc[mask2, 'flux'] *
                 self.df.loc[mask2, 'exp_raster'] *
                 self.df.loc[mask2, 'att_raster'] / 100.0
             )
-            self.df.loc[mask2, 'dose_per_frame'] = kuma.getDose(
-                self.df.loc[mask2, 'ds_hbeam'],
-                self.df.loc[mask2, 'ds_vbeam'],
-                self.df.loc[mask2, 'flux'],
-                self.df.loc[mask2, 'energy'],
-                self.df.loc[mask2, 'exp_raster']
-            ) * self.df.loc[mask2, 'att_raster'] / 100.0
+            self.df.loc[mask2, 'dose_per_frame'] = (
+                base_dose_mask2 * self.df.loc[mask2, 'att_raster'] / 100.0
+            )
 
+        # ultra_high_dose_scan: normal の dose_per_frame の 3 倍になるよう attenuation を決める
         mask3 = (self.df['desired_exp'] == 'ultra_high_dose_scan') & (~extended_mask)
+
         if mask3.any():
-            dose_for_raster = normal_dose_per_frame * 3.0
-            self.df.loc[mask3, 'att_raster'] = dose_for_raster[mask3] / kuma.getDose(
-                self.df.loc[mask3, 'ds_hbeam'],
-                self.df.loc[mask3, 'ds_vbeam'],
-                self.df.loc[mask3, 'flux'],
-                self.df.loc[mask3, 'energy'],
-                self.df.loc[mask3, 'exp_raster']
-            ) * 100.0
+            dose_for_raster = normal_dose_per_frame * 0.5
+        
+            base_dose_mask3 = self.df.loc[mask3].apply(
+                lambda row: kuma.getDose(
+                    row['ds_hbeam'],
+                    row['ds_vbeam'],
+                    row['flux'],
+                    row['wavelength'],
+                    row['exp_raster']
+                ),
+                axis=1
+            )
+        
+            self.df.loc[mask3, 'att_raster'] = dose_for_raster[mask3] / base_dose_mask3 * 100.0
             self.df.loc[mask3, 'hebi_att'] = self.df.loc[mask3, 'att_raster']
             self.df.loc[mask3, 'ppf_raster'] = (
                 self.df.loc[mask3, 'flux'] *
                 self.df.loc[mask3, 'exp_raster'] *
                 self.df.loc[mask3, 'att_raster'] / 100.0
             )
-            self.df.loc[mask3, 'dose_per_frame'] = kuma.getDose(
-                self.df.loc[mask3, 'ds_hbeam'],
-                self.df.loc[mask3, 'ds_vbeam'],
-                self.df.loc[mask3, 'flux'],
-                self.df.loc[mask3, 'energy'],
-                self.df.loc[mask3, 'exp_raster']
-            ) * self.df.loc[mask3, 'att_raster'] / 100.0
-
-        # dose_list 有効時: scan dose を 1 kGy/frame に固定
-        if extended_mask.any():
-            target_scan_dose = 0.001  # MGy/frame
-            base_dose = kuma.getDose(
-                self.df.loc[extended_mask, 'ds_hbeam'],
-                self.df.loc[extended_mask, 'ds_vbeam'],
-                self.df.loc[extended_mask, 'flux'],
-                self.df.loc[extended_mask, 'energy'],
-                self.df.loc[extended_mask, 'exp_raster']
+            self.df.loc[mask3, 'dose_per_frame'] = (
+                base_dose_mask3 * self.df.loc[mask3, 'att_raster'] / 100.0
             )
-            self.df.loc[extended_mask, 'att_raster'] = target_scan_dose / base_dose * 100.0
+
+        extended_mask = self.df['dose_list'].notna() & (self.df['dose_list'] != "")
+        if extended_mask.any():
+            target_scan_dose = 0.001 # MGy/frame
+            base_dose_ext = self.df.loc[extended_mask].apply(
+                lambda row: kuma.getDose(
+                    row['ds_hbeam'],
+                    row['ds_vbeam'],
+                    row['flux'],
+                    row['wavelength'],
+                    row['exp_raster']
+                ),
+                axis=1
+            )
+        
+            self.df.loc[extended_mask, 'att_raster'] = target_scan_dose / base_dose_ext * 100.0
             self.df.loc[extended_mask, 'hebi_att'] = self.df.loc[extended_mask, 'att_raster']
+
             self.df.loc[extended_mask, 'ppf_raster'] = (
                 self.df.loc[extended_mask, 'flux'] *
                 self.df.loc[extended_mask, 'exp_raster'] *
@@ -594,6 +618,44 @@ class UserESA():
                 f"PuckID: {self.df['puckid'][i]} PinID: {self.df['pinid'][i]} "
                 f"dose_per_frame: {self.df['dose_per_frame'][i]:.3f}"
             )
+
+        # --- debug logging for scan dose ---
+        if hasattr(self, "logger") and self.logger is not None:
+            try:
+                for i, row in self.df.iterrows():
+                    dose_pf = row.get("dose_per_frame", None)
+                    if dose_pf is None:
+                        continue
+        
+                    self.logger.info(
+                        "[ScanDose] idx=%d puck=%s pin=%s mode=%s exp=%.4f att=%.2f beam=%sx%s flux=%.3e dose=%.6f MGy",
+                        i,
+                        row.get("puckid", ""),
+                        row.get("pinid", ""),
+                        row.get("mode", ""),
+                        row.get("exp_raster", 0.0),
+                        row.get("att_raster", 0.0),
+                        row.get("ds_hbeam", 0.0),
+                        row.get("ds_vbeam", 0.0),
+                        row.get("flux", 0.0),
+                        dose_pf
+                    )
+            except Exception as e:
+                self.logger.warning(f"[ScanDose] logging failed: {e}")
+
+        mask = self.df["dose_list"].apply(
+            lambda v: (not pd.isna(v)) and str(v).strip() != ""
+        )
+        
+        for i, row in self.df[mask].iterrows():
+            self.logger.info(
+                "[ScanDose-EXT] idx=%d exp=%.4f att=%.2f dose=%.6f MGy (should be 0.001)",
+                i,
+                row["exp_raster"],
+                row["att_raster"],
+                row["dose_per_frame"]
+            )
+
     # end of defineScanCondition()
 
     def makeExpWarning(self): 
@@ -993,6 +1055,12 @@ class UserESA():
                 self.df.at[i, 'exp_raster'] = new_exp_raster
                 self.logger.warning(f"Scan speed {scan_speed:.2f} um/s exceeds the maximum limit {max_scan_speed:.2f} um/s. Adjusting exp_raster to {new_exp_raster:.2f} s.")
 
+            self.logger.info(
+                f"[ScanSpeed] idx={i} raster_hbeam={raster_hbeam} "
+                f"exp_raster(before)={exp_raster} max_scan_speed={max_scan_speed} "
+                f"scan_speed={scan_speed}"
+            )
+
     def makeCondList(self):
         # DataFrameとしてExcelファイルを読み込む → self.df
         self.read_new()
@@ -1042,9 +1110,6 @@ class UserESA():
         except ValueError as e:
             self.logger.error(f"Error in checkDoseList: {e}")
             raise
-
-        # self.dfの内容をCSVファイルに書き出す
-        read_columns = self.df.columns.tolist()
 
         self.columns = [
             'root_dir', 'p_index', 'mode', 'puckid', 'pinid', 'sample_name',
