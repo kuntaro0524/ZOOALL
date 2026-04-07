@@ -19,7 +19,7 @@ from configparser import ConfigParser, ExtendedInterpolation
 #from dose.fields import get_dose_ds, get_dist_ds
 
 class DoseDistanceHandler:
-    def __init__(self, logger, debug=False):
+    def __init__(self, logger, debug: bool = False):
         self.logger = logger
         self.debug = debug
 
@@ -32,10 +32,7 @@ class DoseDistanceHandler:
         has_dose = (not pd.isna(raw_dose)) and str(raw_dose).strip() != ""
         has_dist = (not pd.isna(raw_dist)) and str(raw_dist).strip() != ""
 
-        # spec:
-        # dose_list がある場合に複数条件指定が成立
-        # dist_list は省略可
-        # dist_list 単独は不正
+        # dist_list 単独は禁止
         if (not has_dose) and has_dist:
             raise ValueError(
                 "[UserESA] dist_list cannot be specified without dose_list. "
@@ -45,7 +42,16 @@ class DoseDistanceHandler:
         dose_vals = self._parse_series_like(raw_dose) if has_dose else None
         dist_vals = self._parse_series_like(raw_dist) if has_dist else None
 
-        if mode in ("multi", "mixed"):
+        # 両方あるなら長さ一致必須
+        if dose_vals is not None and dist_vals is not None:
+            if len(dose_vals) != len(dist_vals):
+                raise ValueError(
+                    "[UserESA] dose_list and dist_list must have the same length. "
+                    f"dose_list={dose_vals}, dist_list={dist_vals}"
+                )
+
+        # mode 制約
+        if mode in ("multi", "mixed", "ssrox"):
             n_dose = len(dose_vals) if dose_vals is not None else 0
             n_dist = len(dist_vals) if dist_vals is not None else 0
             if n_dose > 1 or n_dist > 1:
@@ -53,7 +59,7 @@ class DoseDistanceHandler:
                     f"[UserESA] mode='{mode}' does not allow multiple values. "
                     f"dose_list={dose_vals}, dist_list={dist_vals}"
                 )
-        elif mode in ("single", "helical"):
+        elif mode in ("single", "helical", "quick", "screening"):
             pass
         else:
             raise ValueError(f"[UserESA] Unknown mode='{mode}' in condition.")
@@ -68,7 +74,8 @@ class DoseDistanceHandler:
 
         normalized_rows = []
         for _, row in work_df.iterrows():
-            mode = str(row.get("mode", "")).strip().lower()
+            # 先に1行単位の検証
+            self.validate_dose_dist(row)
 
             raw_dose = row.get("dose_list", "")
             raw_dist = row.get("dist_list", "")
@@ -76,42 +83,11 @@ class DoseDistanceHandler:
             has_dose = (not pd.isna(raw_dose)) and str(raw_dose).strip() != ""
             has_dist = (not pd.isna(raw_dist)) and str(raw_dist).strip() != ""
 
-            if self.debug:
-                self.logger.debug(
-                    f"Raw input - dose_list: {raw_dose}, dist_list: {raw_dist}"
-                )
-
-            # spec:
-            # dose_list あり -> 有効
-            # dist_list は省略可
-            # dist_list 単独 -> エラー
-            if (not has_dose) and has_dist:
-                raise ValueError(
-                    "[UserESA] dist_list cannot be specified without dose_list. "
-                    f"dose_list={raw_dose!r}, dist_list={raw_dist!r}"
-                )
-
             dose_vals = self._parse_series_like(raw_dose) if has_dose else None
             dist_vals = self._parse_series_like(raw_dist) if has_dist else None
 
-            # 両方あるときだけ長さ補正
-            if dose_vals is not None and dist_vals is not None:
-                dose_vals, dist_vals = self._pad_lists_by_policy(dose_vals, dist_vals)
-
-            # mode 制約
-            if mode in ("multi", "mixed"):
-                n_dose = len(dose_vals) if dose_vals is not None else 0
-                n_dist = len(dist_vals) if dist_vals is not None else 0
-                if n_dose > 1 or n_dist > 1:
-                    raise ValueError(
-                        f"[UserESA] mode='{mode}' prohibits multiple values: "
-                        f"dose_list={dose_vals}, dist_list={dist_vals}"
-                    )
-
             out_dose_list = self._serialize_list_for_csv(dose_vals) if dose_vals is not None else ""
             out_dist_list = self._serialize_list_for_csv(dist_vals) if dist_vals is not None else ""
-
-            self.logger.info(f"dose_list={out_dose_list}, dist_list={out_dist_list}")
 
             row_out = row.copy()
             row_out["dose_list"] = out_dose_list
@@ -123,67 +99,36 @@ class DoseDistanceHandler:
     def _parse_series_like(self, text):
         if text is None or (isinstance(text, float) and pd.isna(text)):
             return None
+
         s = str(text).strip()
         if not s:
             return None
 
         trans = str.maketrans({
-            '（':'(', '）':')',
-            '［':'[', '］':']',
-            '｛':'{', '｝':'}',
-            '，':',',
-            '＋':'+',
-            '；':';'
+            '（': '(', '）': ')',
+            '［': '[', '］': ']',
+            '｛': '{', '｝': '}',
+            '，': ',',
+            '＋': '+',
+            '；': ';'
         })
         s = s.translate(trans).strip()
 
         if (s.startswith('{') and s.endswith('}')) or \
            (s.startswith('[') and s.endswith(']')) or \
            (s.startswith('(') and s.endswith(')')):
-            inner = s[1:-1].strip()
-            if not inner:
-                return []
-            s = inner
+            s = s[1:-1].strip()
 
-        parts = [p.strip() for p in re.split(r'[,;+]', s) if p.strip()]
-
-        if not parts:
+        if s == "":
             return []
 
+        parts = [p.strip() for p in re.split(r'[,;+]', s) if p.strip()]
         vals = []
         for p in parts:
             if not re.fullmatch(r'[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?', p):
-                raise ValueError(f"Bad numeric token: {p!r}")
+                raise ValueError(f"[UserESA] Bad numeric token in dose/dist list: {p!r}")
             vals.append(float(p))
         return vals
-
-    def _pad_lists_by_policy(self, dose_vals, dist_vals):
-        """
-        spec 5.1.6:
-        - 主系列は dose_list
-        - dose_list は補間しない
-        - dist_list が長い場合は dose_list 長で打ち切る
-        - dist_list が短い場合はエラー
-        """
-        if dose_vals is None or dist_vals is None:
-            return dose_vals, dist_vals
-    
-        ld, lt = len(dose_vals), len(dist_vals)
-    
-        if ld == lt:
-            return dose_vals, dist_vals
-    
-        if ld < lt:
-            self.logger.info(
-                f"[UserESA] dist_list is longer than dose_list. "
-                f"dist_list will be truncated: {lt} -> {ld}"
-            )
-            return dose_vals, dist_vals[:ld]
-    
-        raise ValueError(
-            "[UserESA] dist_list is shorter than dose_list. "
-            f"dose_list={dose_vals}, dist_list={dist_vals}"
-        )
 
     def _serialize_list_for_csv(self, vals):
         if vals is None or len(vals) == 0:
@@ -330,7 +275,7 @@ class UserESA():
         desired_exp_string = str(desired_exp_string).strip().lower()
         mode = str(mode).strip().lower()
 
-        if mode not in ("single", "multi", "helical", "mixed"):
+        if mode not in ("single", "multi", "helical", "mixed", "ssrox", "quick", "screening"):
             raise ValueError(f"[UserESA] Unknown mode: {mode}")
 
         # DEFAULT PARAMETER
@@ -1058,48 +1003,33 @@ class UserESA():
             )
 
     def makeCondList(self):
-        # DataFrameとしてExcelファイルを読み込む → self.df
         self.read_new()
-
-        # self.dfの中にある 'puckid' の情報を展開する
         self.expandCompressedPinInfo()
 
-        # 液体窒素ぶっ掛けの情報を管理してCSV用の情報へ変換
         self.checkLN2flag()
-
-        # カメラのZoomに関する情報を管理してCSV用の情報へ変換
         self.checkZoomFlag()
-
-        # ピンの温めに関する情報を管理してCSV用の情報へ変換
         self.checkPinFlag()
 
-        # beam size 文字列を展開
+        self.setDefaults()
+        self.addDistance()
         self.splitBeamsizeInfo()
-
-        # beam sizeから beamsize.config → Fluxを読み込んでDataFrameに入れる
         self.fillFlux()
 
-        # default parameterをDataFrameに入れていく（beamline.iniからほとんど読み込んでいる）
-        # spec: dose_ds の初期値は setDefaults() で与える
-        self.setDefaults()
-
-        # カメラ長に関する情報をCSV用の情報へ変換
-        # spec: dist_ds の初期値は addDistance() で与える
-        self.addDistance()
-
-        # Checking scan speed for the horizontal direction
         self.checkScanSpeed()
-
-        # raster scanの露光条件の決定
         self.defineScanCondition()
-
-        # 露光条件について検討。transmission > 100% のときに露光時間とtransmissionを編集する
         self.modifyExposureConditions()
-
-        # 結晶サイズについてのWarning（今は multi だけ)
         self.sizeWarning()
 
-        # Doseについてリストにしてしまう
+        # 1行ずつ明示的に検証
+        try:
+            self.logger.info("Validating dose_list and dist_list")
+            for _, row in self.df.iterrows():
+                self.validateDoseDist(row)
+        except ValueError as e:
+            self.logger.error(f"Error in validateDoseDist: {e}")
+            raise
+
+        # 正規化
         try:
             self.logger.info("Checking dose_list and dist_list")
             self.checkDoseList()
@@ -1148,7 +1078,6 @@ class UserESA():
             'warm_time': float,
             'resolution_limit': float,
             'max_crystal_size': float,
-            'osc_width': float,
         }
 
         self.df = self.df.astype(set_types)
@@ -1156,10 +1085,8 @@ class UserESA():
         if self.isDoseError:
             raise RuntimeError("dose_ds < 0 detected. CSV will not be generated.")
 
-        float_format = '%.5f'
         zoo_csv_name = f"{self.csv_prefix}.csv"
-        self.df.to_csv(zoo_csv_name, columns=self.columns, index=False, float_format=float_format)
-
+        self.df.to_csv(zoo_csv_name, columns=self.columns, index=False, float_format='%.5f')
         self.logger.info(f"Data types of all parameters in the DataFrame: {self.df.dtypes}")
 
 if __name__ == "__main__":
