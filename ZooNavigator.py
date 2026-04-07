@@ -1315,29 +1315,31 @@ class ZooNavigator():
         通常運用では 1 回だけ実行する。
         """
         dc_list = self._build_dc_condition_list(cond)
-    
+
         self.logger.info(
             f"[single-dc-loop] number of data collections = {len(dc_list)}"
         )
-    
-        for i_dc, dc in enumerate(dc_list, start=1):
+
+        for i_dc, dc in enumerate(dc_list):
             cond_local = cond.copy()
             cond_local["dose_ds"] = dc["dose"]
             cond_local["dist_ds"] = dc["dist"]
-    
+
+            prefix_local = f"{data_prefix}_{i_dc:02d}"
+
             self.logger.info(
-                f"[single-dc-loop] #{i_dc}: dose_ds={cond_local['dose_ds']} "
-                f"dist_ds={cond_local['dist_ds']}"
+                f"[single-dc-loop] #{i_dc+1}: prefix={prefix_local} "
+                f"dose_ds={cond_local['dose_ds']} dist_ds={cond_local['dist_ds']}"
             )
-    
+
             multi_sch = self.lm.genMultiSchedule(
                 sphi,
                 glist,
                 cond_local,
                 flux,
-                prefix=data_prefix,
+                prefix=prefix_local,
             )
-    
+
             self.zoo.doDataCollection(multi_sch)
             self.zoo.waitTillReady()
 

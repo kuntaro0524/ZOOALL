@@ -332,7 +332,8 @@ def test_zn_run_single_dc_loop_applies_each_condition():
     doses = [c["cond"]["dose_ds"] for c in zn.lm.multi_calls]
     dists = [c["cond"]["dist_ds"] for c in zn.lm.multi_calls]
 
-    assert prefixes == ["single", "single"]
+    #assert prefixes == ["single", "single"]
+    assert prefixes == ["single_00", "single_01"]
     assert doses == [1.0, 2.0]
     assert dists == [100.0, 110.0]
 
