@@ -975,6 +975,15 @@ class ZooNavigator():
         if self.beamline.upper() == "BL44XU":
             self.zoo.setBeamsize(self.beamsize_index)
 
+        dose_list_raw = str(cond.get("dose_list", "")).strip()
+        dist_list_raw = str(cond.get("dist_list", "")).strip()
+        
+        if cond["mode"] in ("quick", "screening"):
+            if dose_list_raw != "" or dist_list_raw != "":
+                raise ZooMyException(
+                    f"mode={cond['mode']} does not support dose_list/dist_list."
+                )
+
         self.logger.info("ZooNavigator starts MODE=%s" % (cond['mode']))
         if cond['mode'] == "multi":
             self.collectMulti(trayid, pinid, prefix, cond, sphi)
@@ -1051,7 +1060,7 @@ class ZooNavigator():
             }]
     
         # mode 制約
-        if cond["mode"] in ("multi", "mixed"):
+        if cond["mode"] in ("multi", "mixed", "ssrox"):
             if len(dose_list) > 1 or len(dist_list) > 1:
                 raise ZooMyException(
                     f"mode={cond['mode']} does not allow multiple dose_list/dist_list values."

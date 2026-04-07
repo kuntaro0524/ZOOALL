@@ -1,206 +1,257 @@
+
+import logging
 import sys
 import types
 import pytest
 
+# --- Stub external modules that HEBI imports but this test does not use ---
+for name in ["LoopMeasurement", "AttFactor", "StopWatch", "AnaHeatmap", "CrystalList"]:
+    if name not in sys.modules:
+        sys.modules[name] = types.ModuleType(name)
 
-def _install_stub_modules():
-    stub_names = [
-        "LoopMeasurement",
-        "AttFactor",
-        "StopWatch",
-        "AnaHeatmap",
-        "CrystalList",
-    ]
-    for name in stub_names:
-        if name not in sys.modules:
-            sys.modules[name] = types.ModuleType(name)
+if "ZooMyException" not in sys.modules:
+    zm = types.ModuleType("ZooMyException")
+    class ZooMyException(Exception):
+        pass
+    zm.ZooMyException = ZooMyException
+    sys.modules["ZooMyException"] = zm
 
-    if "ZooMyException" not in sys.modules:
-        exc_mod = types.ModuleType("ZooMyException")
-
-        class ZooMyException(Exception):
-            pass
-
-        exc_mod.ZooMyException = ZooMyException
-        sys.modules["ZooMyException"] = exc_mod
-
-
-_install_stub_modules()
-
-from HEBI import HEBI
 from ZooMyException import ZooMyException
+from HEBI import HEBI
 
 
-class DummyHEBI(HEBI):
+class DummyZoo:
     def __init__(self):
-        self.logger = types.SimpleNamespace(
-            info=lambda *a, **k: None,
-            debug=lambda *a, **k: None,
-            warning=lambda *a, **k: None,
-            error=lambda *a, **k: None,
-        )
-        self.zoo = types.SimpleNamespace(
-            doDataCollection=lambda *a, **k: None,
-            waitTillReady=lambda *a, **k: None,
-        )
-        self.lm = types.SimpleNamespace(
-            genSingleSchedule=lambda *a, **k: {
-                "dose_ds": a[3]["dose_ds"],
-                "dist_ds": a[3]["dist_ds"],
-                "prefix": a[5],
-            },
-            genHelical=lambda *a, **k: {
-                "dose_ds": a[6]["dose_ds"],
-                "dist_ds": a[6]["dist_ds"],
-                "prefix": a[4],
-            },
-        )
-        self.phosec_meas = 1.0e12
+        self.calls = []
+
+    def doDataCollection(self, schedule):
+        self.calls.append(("doDataCollection", schedule))
+
+    def waitTillReady(self):
+        self.calls.append(("waitTillReady", None))
+
+    def doRaster(self, schedule):
+        self.calls.append(("doRaster", schedule))
 
 
-@pytest.fixture
-def hebi():
-    return DummyHEBI()
+class DummyLM:
+    def __init__(self):
+        self.single_calls = []
+        self.helical_calls = []
+
+    def genSingleSchedule(self, start_phi, end_phi, center_xyz, cond, phosec, prefix, same_point=True):
+        call = {
+            "start_phi": start_phi,
+            "end_phi": end_phi,
+            "center_xyz": center_xyz,
+            "cond": cond.copy(),
+            "phosec": phosec,
+            "prefix": prefix,
+            "same_point": same_point,
+        }
+        self.single_calls.append(call)
+        return {"kind": "single", "prefix": prefix, "cond": cond.copy()}
+
+    def genHelical(self, start_phi, end_phi, left_xyz, right_xyz, prefix, phosec, cond):
+        call = {
+            "start_phi": start_phi,
+            "end_phi": end_phi,
+            "left_xyz": left_xyz,
+            "right_xyz": right_xyz,
+            "cond": cond.copy(),
+            "phosec": phosec,
+            "prefix": prefix,
+        }
+        self.helical_calls.append(call)
+        return {"kind": "helical", "prefix": prefix, "cond": cond.copy()}
 
 
-def make_cond(
-    dose_ds=10.0,
-    dist_ds=120.0,
-    dose_list="",
-    dist_list="",
-):
-    return {
-        "dose_ds": dose_ds,
-        "dist_ds": dist_ds,
-        "dose_list": dose_list,
-        "dist_list": dist_list,
-        "total_osc": 10.0,
-        "ds_hbeam": 10.0,
-        "ds_vbeam": 10.0,
+class DummyStopWatch:
+    pass
+
+
+def make_hebi():
+    logger = logging.getLogger("ZOO.HEBI")
+    logger.handlers.clear()
+    logger.addHandler(logging.NullHandler())
+    logger.setLevel(logging.DEBUG)
+
+    zoo = DummyZoo()
+    lm = DummyLM()
+    sw = DummyStopWatch()
+    hebi = HEBI(zoo, lm, sw, phosec=1.23e12)
+    return hebi, zoo, lm
+
+
+def test_parse_series_empty():
+    hebi, _, _ = make_hebi()
+    assert hebi._parse_series_like_text("") == []
+    assert hebi._parse_series_like_text(None) == []
+    assert hebi._parse_series_like_text("nan") == []
+
+
+def test_parse_series_single():
+    hebi, _, _ = make_hebi()
+    assert hebi._parse_series_like_text("5") == [5.0]
+
+
+def test_parse_series_bracketed():
+    hebi, _, _ = make_hebi()
+    assert hebi._parse_series_like_text("[5, 10, 20]") == [5.0, 10.0, 20.0]
+
+
+def test_getDoseDistList_normal_case():
+    hebi, _, _ = make_hebi()
+    cond = {"dose_ds": "10", "dist_ds": "125", "dose_list": "", "dist_list": ""}
+    assert hebi.getDoseDistList(cond) == [(10.0, 125.0)]
+
+
+def test_getDoseDistList_dose_only():
+    hebi, _, _ = make_hebi()
+    cond = {"dose_ds": "10", "dist_ds": "125", "dose_list": "[1, 2]", "dist_list": ""}
+    assert hebi.getDoseDistList(cond) == [(1.0, 125.0), (2.0, 125.0)]
+
+
+def test_getDoseDistList_dose_and_dist():
+    hebi, _, _ = make_hebi()
+    cond = {"dose_ds": "10", "dist_ds": "125", "dose_list": "[1, 2]", "dist_list": "[100, 110]"}
+    assert hebi.getDoseDistList(cond) == [(1.0, 100.0), (2.0, 110.0)]
+
+
+def test_getDoseDistList_rejects_dist_only():
+    hebi, _, _ = make_hebi()
+    cond = {"dose_ds": "10", "dist_ds": "125", "dose_list": "", "dist_list": "[100, 110]"}
+    with pytest.raises(ZooMyException, match="dist_list only"):
+        hebi.getDoseDistList(cond)
+
+
+def test_getDoseDistList_rejects_length_mismatch():
+    hebi, _, _ = make_hebi()
+    cond = {"dose_ds": "10", "dist_ds": "125", "dose_list": "[1, 2]", "dist_list": "[100]"}
+    with pytest.raises(ZooMyException, match="length mismatch"):
+        hebi.getDoseDistList(cond)
+
+
+def test_doSingle_generates_unique_prefixes_and_updates_cond():
+    hebi, zoo, lm = make_hebi()
+    cond = {
+        "total_osc": 20.0,
+        "dose_ds": 10.0,
+        "dist_ds": 125.0,
+        "dose_list": "[1, 2]",
+        "dist_list": "[100, 110]",
     }
 
+    hebi.doSingle((0.0, 0.0, 0.0), cond, phi_face=30.0, prefix="cry00_single")
 
-# -------------------------
-# getDoseDistList
-# -------------------------
-
-def test_getDoseDistList_normal_operation(hebi):
-    cond = make_cond(dose_ds=7.5, dist_ds=130.0)
-    assert hebi.getDoseDistList(cond) == [(7.5, 130.0)]
-
-
-def test_getDoseDistList_dose_list_only(hebi):
-    cond = make_cond(
-        dose_ds=999.0,
-        dist_ds=140.0,
-        dose_list="[1, 5, 10]",
-        dist_list="",
-    )
-    assert hebi.getDoseDistList(cond) == [
-        (1.0, 140.0),
-        (5.0, 140.0),
-        (10.0, 140.0),
-    ]
+    assert [c["prefix"] for c in lm.single_calls] == ["cry00_single_00", "cry00_single_01"]
+    assert lm.single_calls[0]["cond"]["dose_ds"] == 1.0
+    assert lm.single_calls[0]["cond"]["dist_ds"] == 100.0
+    assert lm.single_calls[1]["cond"]["dose_ds"] == 2.0
+    assert lm.single_calls[1]["cond"]["dist_ds"] == 110.0
+    assert len([c for c in zoo.calls if c[0] == "doDataCollection"]) == 2
 
 
-def test_getDoseDistList_dose_and_dist_list(hebi):
-    cond = make_cond(
-        dose_ds=999.0,
-        dist_ds=999.0,
-        dose_list="[1, 5, 10]",
-        dist_list="[120, 110, 100]",
-    )
-    assert hebi.getDoseDistList(cond) == [
-        (1.0, 120.0),
-        (5.0, 110.0),
-        (10.0, 100.0),
-    ]
+def test_doHelical_generates_unique_prefixes_and_updates_cond():
+    hebi, zoo, lm = make_hebi()
+    cond = {
+        "total_osc": 40.0,
+        "ds_hbeam": 10.0,
+        "dose_ds": 10.0,
+        "dist_ds": 125.0,
+        "dose_list": "[1, 2]",
+        "dist_list": "[130, 140]",
+    }
+
+    hebi.doHelical((0.0, 0.0, 0.0), (0.0, 0.1, 0.0), cond, phi_face=45.0, prefix="cry03_hel")
+
+    assert [c["prefix"] for c in lm.helical_calls] == ["cry03_hel_00", "cry03_hel_01"]
+    assert lm.helical_calls[0]["cond"]["dose_ds"] == 1.0
+    assert lm.helical_calls[0]["cond"]["dist_ds"] == 130.0
+    assert lm.helical_calls[1]["cond"]["dose_ds"] == 2.0
+    assert lm.helical_calls[1]["cond"]["dist_ds"] == 140.0
+    assert len([c for c in zoo.calls if c[0] == "doDataCollection"]) == 2
 
 
-def test_getDoseDistList_dist_list_only_is_invalid(hebi):
-    cond = make_cond(
-        dose_ds=10.0,
-        dist_ds=120.0,
-        dose_list="",
-        dist_list="[120, 110]",
-    )
-    with pytest.raises(ZooMyException):
-        hebi.getDoseDistList(cond)
+def test_doHelical_with_single_entry_still_uses_helical_prefix():
+    hebi, _, lm = make_hebi()
+    cond = {
+        "total_osc": 40.0,
+        "ds_hbeam": 10.0,
+        "dose_ds": 10.0,
+        "dist_ds": 125.0,
+        "dose_list": "[3]",
+        "dist_list": "[150]",
+    }
+
+    hebi.doHelical((0.0, 0.0, 0.0), (0.0, 0.1, 0.0), cond, phi_face=45.0, prefix="cry07_hel")
+
+    assert [c["prefix"] for c in lm.helical_calls] == ["cry07_hel_00"]
 
 
-def test_getDoseDistList_length_mismatch_is_invalid(hebi):
-    cond = make_cond(
-        dose_ds=10.0,
-        dist_ds=120.0,
-        dose_list="[1, 5]",
-        dist_list="[120, 110, 100]",
-    )
-    with pytest.raises(ZooMyException):
-        hebi.getDoseDistList(cond)
+class DummyCrystal:
+    def __init__(self, rpos, lpos):
+        self._rpos = rpos
+        self._lpos = lpos
+
+    def getRoughEdges(self):
+        return self._rpos, self._lpos
 
 
-# -------------------------
-# doSingle loop behavior
-# -------------------------
+def test_mainLoop_small_crystal_calls_doSingle_with_single_prefix(monkeypatch):
+    hebi, _, _ = make_hebi()
 
-def test_doSingle_runs_once_without_dose_list(hebi, monkeypatch):
-    calls = []
+    monkeypatch.setattr(hebi, "getSortedCryList", lambda *args, **kwargs: [
+        DummyCrystal((0.0, 0.000, 0.0), (0.0, 0.005, 0.0))
+    ])
+    monkeypatch.setattr(hebi, "edgeCentering", lambda cond, phi_face, center_xyz, LorR="Left", cry_index=0: center_xyz)
 
-    def fake_do(schedule):
-        calls.append(schedule)
+    called = {}
+    def fake_doSingle(center_xyz, cond, phi_face, prefix):
+        called["prefix"] = prefix
+        called["center_xyz"] = center_xyz
 
-    hebi.zoo.doDataCollection = fake_do
+    monkeypatch.setattr(hebi, "doSingle", fake_doSingle)
 
-    cond = make_cond(dose_ds=8.0, dist_ds=125.0)
-    hebi.doSingle((0.0, 0.0, 0.0), cond, phi_face=0.0, prefix="single")
+    cond = {
+        "score_min": 10,
+        "score_max": 200,
+        "maxhits": 3,
+        "cry_min_size_um": 5.0,
+        "ds_hbeam": 10.0,
+    }
 
-    assert len(calls) == 1
-    assert calls[0]["dose_ds"] == 8.0
-    assert calls[0]["dist_ds"] == 125.0
+    n = hebi.mainLoop("dummy_path", "dummy_prefix", 30.0, cond, precise_face_scan=False)
 
-
-def test_doSingle_runs_multiple_with_dose_list(hebi, monkeypatch):
-    calls = []
-
-    def fake_do(schedule):
-        calls.append(schedule)
-
-    hebi.zoo.doDataCollection = fake_do
-
-    cond = make_cond(
-        dose_ds=999.0,
-        dist_ds=130.0,
-        dose_list="[1, 5, 10]",
-        dist_list="",
-    )
-    hebi.doSingle((0.0, 0.0, 0.0), cond, phi_face=0.0, prefix="single")
-
-    assert len(calls) == 3
-    assert [(c["dose_ds"], c["dist_ds"]) for c in calls] == [
-        (1.0, 130.0),
-        (5.0, 130.0),
-        (10.0, 130.0),
-    ]
+    assert n == 1
+    assert called["prefix"] == "cry00_single"
 
 
-def test_doSingle_runs_multiple_with_dose_and_dist_list(hebi, monkeypatch):
-    calls = []
+def test_mainLoop_large_crystal_calls_doHelical_with_helical_prefix(monkeypatch):
+    hebi, _, _ = make_hebi()
 
-    def fake_do(schedule):
-        calls.append(schedule)
+    monkeypatch.setattr(hebi, "getSortedCryList", lambda *args, **kwargs: [
+        DummyCrystal((0.0, 0.000, 0.0), (0.0, 0.050, 0.0))
+    ])
+    monkeypatch.setattr(hebi, "edgeCentering", lambda cond, phi_face, center_xyz, LorR="Left", cry_index=0: center_xyz)
 
-    hebi.zoo.doDataCollection = fake_do
+    called = {}
+    def fake_doHelical(left_xyz, right_xyz, cond, phi_face, prefix):
+        called["prefix"] = prefix
+        called["left_xyz"] = left_xyz
+        called["right_xyz"] = right_xyz
 
-    cond = make_cond(
-        dose_ds=999.0,
-        dist_ds=999.0,
-        dose_list="[1, 5]",
-        dist_list="[120, 110]",
-    )
-    hebi.doSingle((0.0, 0.0, 0.0), cond, phi_face=0.0, prefix="single")
+    monkeypatch.setattr(hebi, "doHelical", fake_doHelical)
 
-    assert len(calls) == 2
-    assert [(c["dose_ds"], c["dist_ds"]) for c in calls] == [
-        (1.0, 120.0),
-        (5.0, 110.0),
-    ]
+    cond = {
+        "score_min": 10,
+        "score_max": 200,
+        "maxhits": 3,
+        "cry_min_size_um": 5.0,
+        "ds_hbeam": 10.0,
+    }
+
+    n = hebi.mainLoop("dummy_path", "dummy_prefix", 30.0, cond, precise_face_scan=False)
+
+    assert n == 1
+    assert called["prefix"] == "cry00_hel"

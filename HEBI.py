@@ -200,17 +200,17 @@ class HEBI():
     def doSingle(self, center_xyz, cond, phi_face, prefix):
         start_phi = phi_face - cond['total_osc'] / 2.0
         end_phi = phi_face + cond['total_osc'] / 2.0
-
+    
         dose_dist_list = self.getDoseDistList(cond)
-
+    
         try:
             for data_index, (dose, dist) in enumerate(dose_dist_list):
                 cond_local = cond.copy()
                 cond_local["dose_ds"] = dose
                 cond_local["dist_ds"] = dist
-
-                prefix_local = f"{prefix}{data_index:02d}"
-
+    
+                prefix_local = f"{prefix}_{data_index:02d}"
+    
                 single_sch = self.lm.genSingleSchedule(
                     start_phi, end_phi, center_xyz,
                     cond_local, self.phosec_meas,
@@ -221,43 +221,45 @@ class HEBI():
                 )
                 self.zoo.doDataCollection(single_sch)
                 self.zoo.waitTillReady()
-
+    
         except Exception as e:
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("HEBI.doSingle: Errors occured in data collection loop.\n")
 
     def getDoseDistList(self, cond):
         """
-        cond から data collection 用の (dose, dist) リストを返す。
-    
-        仕様:
-          - dose_list が有効なら dose 条件は dose_list を優先
-          - dist_list があれば distance 条件に使う
-          - dist_list がなければ dist_ds を使う
-          - dist_list only は不正
-          - 長さ不一致は UserESA 側で正規化済み前提。ここではエラーにする
-          - dose_list が無効なら通常運用として (dose_ds, dist_ds) を1件返す
+        HEBI（helical系処理）で利用する data collection 用の (dose, dist) リストを返す。
+
+        前提:
+        - mode 制約の検証は UserESA / ZooNavigator 側で実施済み
+        - cond は ZOO 実行前に整合性確認済みである
+        - 本関数は helical / single irradiation in HEBI での利用を前提とする
+
+        動作:
+        - dose_list が有効なら dose 条件は dose_list を優先
+        - dist_list があれば distance 条件に使う
+        - dist_list がなければ dist_ds を使う
+        - dist_list only は不正
+        - 長さ不一致はエラー
+        - dose_list が無効なら通常運用として (dose_ds, dist_ds) を1件返す
         """
         dose_vals = self._parse_series_like_text(cond.get("dose_list", ""))
         dist_vals = self._parse_series_like_text(cond.get("dist_list", ""))
-    
-        # dist_list only は不正
+
         if len(dose_vals) == 0 and len(dist_vals) > 0:
             raise ZooMyException("dist_list only is invalid. dose_list is required.")
-    
-        # 通常運用
+
         if len(dose_vals) == 0:
             return [(float(cond["dose_ds"]), float(cond["dist_ds"]))]
-    
-        # helical では複数値許可。multi/mixed の制約は UserESA 側で済んでいる前提
+
         if len(dist_vals) == 0:
             return [(dose, float(cond["dist_ds"])) for dose in dose_vals]
-    
+
         if len(dose_vals) != len(dist_vals):
             raise ZooMyException(
                 f"dose_list and dist_list length mismatch: {len(dose_vals)} vs {len(dist_vals)}"
             )
-    
+
         return list(zip(dose_vals, dist_vals))
 
     def doHelical(self, left_xyz, right_xyz, cond, phi_face, prefix):
@@ -266,47 +268,30 @@ class HEBI():
         end_phi = phi_face + cond['total_osc'] / 2.0
         data_index=0
         try:
-            # crystal size is smaller than horizontal beam size
-            # helical data collection is switched to 'single irradiation mode'
-            cry_y_len = numpy.fabs(left_xyz[1] - right_xyz[1]) * 1000.0 # [um]
-            self.logger.info("Crystal length for this measurement: %8.3f [um]" % cry_y_len)
-
-            #if cry_y_len <= cond['ds_hbeam']:
-
-            if cry_y_len <= (2.0 * cond['ds_hbeam']):
-                self.logger.info("Crystal size is smaller than the horizontal beam size (%5.2f [um])" % cond['ds_hbeam'])
-                self.logger.info("Helical data collection is swithced to the single irradiation mode")
-            
-                # doSingle() 側で dose_list / dist_list ループを処理する
-                self.doSingle(left_xyz, cond, phi_face, "single")
-                self.logger.info("Single irradiation loop has been delegated to HEBI.doSingle")
-            
-            else:
-                self.logger.info("Now generating helical schedule file....")
-                # New version : 2025/07/08 
-                # dose_ds = "{0.1, 1.0, 1.0}", dist_ds = "{125, 100, 100}"
-                # のように情報が含まれてるので、ここでループを回す
-                dose_dist_list = self.getDoseDistList(cond)
-                self.logger.info(f"dose_dist_list={dose_dist_list}")
-                for dose, dist in dose_dist_list:
-                    prefix_local = "hel%02d" % data_index
-                    cond_local = cond.copy()
-                    cond_local['dose_ds'] = dose
-                    cond_local['dist_ds'] = dist
-                    helical_sch = self.lm.genHelical(
-                        start_phi, end_phi, left_xyz, right_xyz,
-                        prefix_local, self.phosec_meas, cond_local
-                    )
-                    self.logger.info(
-                        "Schedule file has been prepared with LM.genHelical {prefix=%s}" % prefix_local
-                    )
-                    self.zoo.doDataCollection(helical_sch)
-                    self.zoo.waitTillReady()
-                    data_index += 1
+            # New version : 2025/07/08 
+            # dose_ds = "{0.1, 1.0, 1.0}", dist_ds = "{125, 100, 100}"
+            # のように情報が含まれてるので、ここでループを回す
+            dose_dist_list = self.getDoseDistList(cond)
+            self.logger.info(f"dose_dist_list={dose_dist_list}")
+            for dose, dist in dose_dist_list:
+                prefix_local = f"{prefix}_{data_index:02d}"
+                cond_local = cond.copy()
+                cond_local['dose_ds'] = dose
+                cond_local['dist_ds'] = dist
+                helical_sch = self.lm.genHelical(
+                    start_phi, end_phi, left_xyz, right_xyz,
+                    prefix_local, self.phosec_meas, cond_local
+                )
+                self.logger.info(
+                    "Schedule file has been prepared with LM.genHelical {prefix=%s}" % prefix_local
+                )
+                self.zoo.doDataCollection(helical_sch)
+                self.zoo.waitTillReady()
+                data_index += 1
 
         except Exception as e:
             self.logger.info("Exception: %s\n" % e)
-            self.logger.info("HEBI.doHelical: ERRors occured in data collection loop.\n")
+            self.logger.info("HEBI.doHelical: Errors occured in data collection loop.\n")
 
     # Crystal edge: Left/Right vertical scan to define crystal position in 3D
     def edgeCentering(self, cond, phi_face, rough_xyz, LorR = "Left", cry_index=0):
@@ -450,39 +435,40 @@ class HEBI():
                 self.logger.info("%5.2f [um] crystal is smaller than %5.2f [um] limit." % (
                     rough_crystal_um, size_threshold))
                 self.logger.info("Data collection is switched to 'single' irradiation mode.")
-                # Left edge vertical centering (loop expansion should be considered)
-                newx = (left_face_xyz[0] + right_face_xyz[0])/2.0
-                newy = (left_face_xyz[1] + right_face_xyz[1])/2.0
-                newz = (left_face_xyz[2] + right_face_xyz[2])/2.0
+
+                newx = (left_face_xyz[0] + right_face_xyz[0]) / 2.0
+                newy = (left_face_xyz[1] + right_face_xyz[1]) / 2.0
+                newz = (left_face_xyz[2] + right_face_xyz[2]) / 2.0
                 center_xyz = newx, newy, newz
                 self.logger.info("Center of the coordinate (%8.4f %8.4f %8.4f) was chosen\n" % (newx, newy, newz))
-                final_xyz = self.edgeCentering(cond, phi_face, center_xyz, LorR = "Left", cry_index=cry_index)
-                self.doSingle(final_xyz, cond, phi_face, "single")
+
+                final_xyz = self.edgeCentering(cond, phi_face, center_xyz, LorR="Left", cry_index=cry_index)
+
+                single_prefix = f"cry{cry_index:02d}_single"
+                self.doSingle(final_xyz, cond, phi_face, single_prefix)
 
             else:
-                print("Entering normal helical sequence.")
-                # Left edge vertical centering
+                self.logger.info("Entering normal helical sequence.")
+
                 try:
-                    left_xyz = self.edgeCentering(cond, phi_face, left_face_xyz, LorR = "Left", cry_index=cry_index)
+                    left_xyz = self.edgeCentering(cond, phi_face, left_face_xyz, LorR="Left", cry_index=cry_index)
                 except:
                     self.logger.info("HEBI.mainLoop: Left vertical scan failed.\n")
                     self.logger.info("HEBI.mainLoop: Next crystal...\n")
                     continue
+
                 try:
-                    # Right edge vertical centering
-                    right_xyz = self.edgeCentering(cond, phi_face, right_face_xyz, LorR = "Right", cry_index=cry_index)
+                    right_xyz = self.edgeCentering(cond, phi_face, right_face_xyz, LorR="Right", cry_index=cry_index)
                 except:
                     self.logger.info("HEBI.mainLoop: Right vertical scan failed.\n")
                     self.logger.info("HEBI.mainLoop: Next crystal...\n")
                     continue
 
                 self.logger.info("Left and right edges are normally terminated.")
-                self.helical_cry_size = numpy.fabs(left_xyz[1] - right_xyz[1]) * 1000.0 # [um]
+                self.helical_cry_size = numpy.fabs(left_xyz[1] - right_xyz[1]) * 1000.0
 
-                # generate helical schedule file
-                # doHelical(self,left_xyz,right_xyz,cond,phi_face,prefix,phosec_meas):
-                ds_prefix = "cry%02d" % cry_index
-                sch_file = self.doHelical(left_xyz, right_xyz, cond, phi_face, "hel")
+                helical_prefix = f"cry{cry_index:02d}_hel"
+                self.doHelical(left_xyz, right_xyz, cond, phi_face, helical_prefix)
 
             # Crystal index
             cry_index += 1
