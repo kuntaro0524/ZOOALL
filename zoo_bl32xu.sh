@@ -14,6 +14,11 @@
 #python ~/PPPP/10.Zoo/Libs/zoom_out.py
 yamtbx.python ~/PPPP/zoomout.py
 
+# 2026/02/24 YK
+# restart cheetah server
+ssh bladmin@10.178.163.31 -T docker restart cheetah-server-centos6
+ssh bladmin@10.178.163.34 -T docker restart cheetah-server-centos6
+
 # Check the current beamsize.config
 #CONFDIR=/isilon/blconfig/bl32xu.rh7/bss/
 CONFDIR=/blconfig/bss/

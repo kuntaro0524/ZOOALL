@@ -395,7 +395,7 @@ class Zoo:
             self.logger.info("received log: %s" % recstr)
 
             cols = recstr.split('/')
-            print(cols)
+            #print(cols)
             if cols[3].isdigit() == True:
                 beamsize_index = int(cols[3])
                 return beamsize_index

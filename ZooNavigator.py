@@ -383,6 +383,9 @@ class ZooNavigator():
                 else:
                     message = "All measurements have been finished."
                 self.logger.info(message)
+                # dismount current pin
+                self.zoo.dismountCurrentPin()
+
                 return self.num_pins
 
             # Checking points
@@ -441,6 +444,9 @@ class ZooNavigator():
                 else:
                     message = "All measurements have been finished."
                 self.logger.info(message)
+                # Disumount pin
+                self.zoo.dismountCurrentPin()
+
                 return self.num_pins
             finally:
                 # Check for total consumed time
