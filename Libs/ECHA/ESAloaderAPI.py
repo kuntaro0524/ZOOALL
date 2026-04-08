@@ -14,11 +14,13 @@ class ESAloaderAPI:
         #self.data_request_url = "%szoo_measure/"%self.api_url
         self.data_request_url = "%szoo_samplepin/"%self.api_url
         self.measure_data_url = "%sparameter_measure/"%self.api_url
+        # NOTE:
+        # parameter_measure/ は measure_id, parameter_id, value を要求する別系統API。
+        # 現在の result 登録は zoo_result_samplepin/create_multiple_data/ を使用する。
         self.params_data_url = "%sparameter/"%self.api_url
-        #self.username = "admin"
-        #self.password = "000nimda"
-        self.username = "operator"
+        self.operator_id = "operator"
         self.password = "1tk2p3640"
+        self.username = None
         self.token_expiry = None
         self.access_token = None
         self.exid = exid
@@ -47,15 +49,24 @@ class ESAloaderAPI:
 
     def prep(self):
         auth_headers = self.make_authenticated_request()
-        # user info
         target_url = f"{self.api_url}/zoo/"
-        response = requests.get(target_url, headers=auth_headers,params={"exid":self.exid})
-        self.logger.info(f"User info response: {response.json()}")
-        # id -> self.zoo_id
-        # username -> self.username
-        self.zoo_id = response.json()[0]['id']
-        self.username = response.json()[0]['username']
-        self.isInit=True
+        response = requests.get(target_url, headers=auth_headers, params={"exid": self.exid})
+
+        zoo_list = response.json()
+        self.logger.info(f"User info response: {zoo_list}")
+
+        if not isinstance(zoo_list, list):
+            raise ValueError(f"Unexpected response type for /zoo/: {type(zoo_list)}")
+
+        if len(zoo_list) == 0:
+            raise ValueError(f"No zoo record found for exid={self.exid}")
+
+        if len(zoo_list) > 1:
+            raise ValueError(f"Multiple zoo records found for exid={self.exid}")
+
+        self.zoo_id = zoo_list[0]["id"]
+        self.username = zoo_list[0]["username"]
+        self.isInit = True
 
     def get_username(self):
         if self.isInit == False:
@@ -63,12 +74,19 @@ class ESAloaderAPI:
         return self.username
 
     def get_access_token(self):
-        self.logger.info(f"Attempting to login with username: {self.username}")
-        response = requests.post(self.login_url, data={"username": self.username, "password": self.password})
+        self.logger.info(f"Attempting to login with username: {self.operator_id}")
+        response = requests.post(
+        self.login_url,
+            data={"username": self.operator_id, "password": self.password}
+        )
         if response.status_code == 200:
             token_data = response.json()
-            self.logger.info(f"Login response: {token_data}")
             self.access_token = token_data['access_token']
+            safe_info = {
+                "user": token_data.get("user", {}),
+                "has_access_token": "access_token" in token_data,
+            }
+            self.logger.info(f"Login successful. Token data: {safe_info}")
             # トークンが作成された時刻は 'last_login' に格納されている
             # この時間に１時間を足した時間がトークンの有効期限
             # format '2024-04-25T07:21:34.153331+09:00'
@@ -82,40 +100,113 @@ class ESAloaderAPI:
             self.logger.error(f"Failed to login: {response.status_code} - {response.text}")
             raise Exception("Failed to login")
 
+    # zoo_samplepin_id がスキップされているかどうかを確認する
     def isSkipped(self, zoo_samplepin_id):
         start_time = datetime.now()
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_samplepin/"
         self.logger.info(f"Target URL: {target_url}")
-        response = requests.get(target_url, headers=auth_headers,params={"zoo_id":self.zoo_id})
-        json_data = response.json()
-        # zoo_samplepin_id に対応するデータを取得
+
+        response = requests.get(
+            target_url,
+            headers=auth_headers,
+            params={"zoo_id": self.zoo_id}
+        )
+
+        # APIからのレスポンスが200でない場合はエラーとする
+        if response.status_code != 200:
+            self.logger.error(f"isSkipped failed: {response.status_code} {response.text}")
+            raise Exception(f"Failed to get zoo_samplepin list: {response.status_code}")
+
+        # レスポンスの内容を辞書に変換
+        body = response.json()
+
+        # zoo_samplepin のリストは、APIのレスポンスの中の "results" というキーに格納されている場合と、レスポンス全体がリストになっている場合がある
+        # 例えば、{"results": [ {zoo_samplepin1}, {zoo_samplepin2}, ... ]} という形式の場合と、[ {zoo_samplepin1}, {zoo_samplepin2}, ... ] という形式の場合がある
+        if isinstance(body, dict) and "results" in body:
+            json_data = body["results"]
+        # APIのレスポンスがリストの場合は、そのまま利用する
+        # 例えば、[ {zoo_samplepin1}, {zoo_samplepin2}, ... ] という形式の場合
+        elif isinstance(body, list):
+            json_data = body
+        # それ以外の形式の場合はエラーとする
+        else:
+            raise ValueError(f"Unexpected response type for zoo_samplepin: {type(body)}")
+
+        # zoo_samplepin_id に対応するデータをリストから探す
+        # 例えば、zoo_samplepin_id が 123 の場合、json_data の中から id が 123 のデータを探す
+        # そして、そのデータの isSkip が 1 であればスキップされていると判断する
+        # もしも、zoo_samplepin_id に対応するデータが見つからない場合はエラーとする
         for data in json_data:
-            if data['id'] == zoo_samplepin_id:
-                # data['isSkip'] が 1 ならばTrue そうでないならばFalse
-                end_time = datetime.now()
-                consumed_time = end_time - start_time
-                print(f"Consumed Time: {consumed_time}")
-                return data['isSkip'] == 1
+            if data["id"] == zoo_samplepin_id:
+                consumed_time = datetime.now() - start_time
+                self.logger.info(f"isSkipped consumed time: {consumed_time}")
+                return data["isSkip"] == 1
+
+        raise ValueError(f"zoo_samplepin_id={zoo_samplepin_id} was not found")
 
     def getCond(self, zoo_samplepin_id):
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_parameter_samplepin/get_list/"
-        response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id":zoo_samplepin_id})
-        # dictionary に変換
+        response = requests.get(
+            target_url,
+            headers=auth_headers,
+            params={"zoo_samplepin_id": zoo_samplepin_id}
+        )
+
+        # APIからのレスポンスが200でない場合はエラーとする
+        if response.status_code != 200:
+            self.logger.error(f"getCond failed: {response.status_code} {response.text}")
+            raise Exception(f"Failed to get condition: {response.status_code}")
+
+        # レスポンスの内容を辞書に変換
         cond_dict = response.json()
+
+        # cond_dict が辞書でない場合はエラーとする
+        if not isinstance(cond_dict, dict):
+            raise ValueError(f"getCond returned non-dict: {type(cond_dict)}")
+
+        # cond_dict が空の場合はエラーとする
+        if len(cond_dict) == 0:
+            raise ValueError(f"Empty condition returned for zoo_samplepin_id={zoo_samplepin_id}")
+
+        # cond_dict の内容をログに出力
+        self.logger.info(f"getCond({zoo_samplepin_id}) keys={sorted(cond_dict.keys())}")
         return cond_dict
 
+    # zoo_samplepin のリストを取得する
     def getSamplePin(self):
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_samplepin/"
-        response = requests.get(target_url, headers=auth_headers, params={"zoo_id":self.zoo_id})
-        # この時点で取得したデータは以下が含まれている
-        # id, exid, o_index, p_index, isSkip, 
-        # isDone, created_at, updated_at, zoo_id
-        # response を pandas DataFrame に変換
-        df = pd.DataFrame(response.json())
-        self.logger.info(f"Dataframe: {df}")
+        response = requests.get(
+            target_url,
+            headers=auth_headers,
+            params={"zoo_id": self.zoo_id}
+        )
+
+        # APIからのレスポンスが200でない場合はエラーとする
+        if response.status_code != 200:
+            self.logger.error(f"getSamplePin failed: {response.status_code} {response.text}")
+            raise Exception(f"Failed to get sample pin list: {response.status_code}")
+
+        # レスポンスの内容を辞書に変換
+        body = response.json()
+
+        # zoo_samplepin のリストは、APIのレスポンスの中の "results" というキーに格納されている場合と、レスポンス全体がリストになっている場合がある
+        # 例えば、{"results": [ {zoo_samplepin1}, {zoo_samplepin2}, ... ]} という形式の場合と、[ {zoo_samplepin1}, {zoo_samplepin2}, ... ] という形式の場合がある   
+        if isinstance(body, dict) and "results" in body:
+            json_data = body["results"]
+        elif isinstance(body, list):
+            json_data = body
+        else:
+            raise ValueError(f"Unexpected response type for zoo_samplepin: {type(body)}")
+
+        # zoo_samplepin のリストをDataFrameに変換して返す
+        df = pd.DataFrame(json_data)
+        # DataFrameの内容をログに出力
+        self.logger.info(f"SamplePin DataFrame shape={df.shape}")
+        # DataFrameの列名をログに出力
+        self.logger.info(f"SamplePin DataFrame columns={df.columns.tolist()}")
 
         return df
 
@@ -123,7 +214,6 @@ class ESAloaderAPI:
     def getCondDataFrame(self):
         self.logger.info("getCondDataFrame starts")
         # zoo_samplepin の取得
-        auth_headers = self.make_authenticated_request()
         if self.isInit == False:
             self.prep()
 
@@ -141,13 +231,9 @@ class ESAloaderAPI:
             self.logger.info(f"zoo sample pin id: {zoo_samplepin_id}")
             # parameter を取得する
             # APIのメソッドを利用する
-            # zoo_parameter_samplepin/get_list/
-            target_url = f"{self.api_url}/zoo_parameter_samplepin/get_list/"
-            # params: {"zoo_samplepin_id":zoo_samplepin_id}
-            response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id":zoo_samplepin_id})
             # json を dictにして保存
             # 最終的にはリストに追加してDataFrameに変換する
-            tmp_dict = response.json()
+            tmp_dict = self.getCond(zoo_samplepin_id)
             data_list.append(tmp_dict)
 
         # DataFrame に変換
@@ -163,8 +249,6 @@ class ESAloaderAPI:
                 "Authorization": f"Bearer {self.access_token}"
             }
         else:
-            # 現在の時刻
-            currtime = datetime.now()
             if self.token_expiry is None or datetime.now() >= self.token_expiry:
                 self.get_access_token()
                 self.auth_headers = {
@@ -173,45 +257,62 @@ class ESAloaderAPI:
         return self.auth_headers
 
 
-    # 2025/02/12 coded
     def setDone(self, p_index, zoo_samplepin_id, isDone):
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
-        print(f"target_url: {target_url}")
-        params= {
+
+        self.logger.info(f"setDone target_url: {target_url}")
+        params = {
             "isDone": isDone,
             "p_index": p_index
         }
+        self.logger.info(f"setDone params: {params}")
 
         # params は data で渡す必要がある（三田さん情報）
         response = requests.put(target_url, headers=auth_headers, data=params)
-        print(f"Raw response={response}")
+
+        self.logger.info(f"setDone status={response.status_code}")
+        self.logger.info(f"setDone text={response.text[:1000]}")
+
+        if response.status_code not in (200, 202):
+            self.logger.error(f"setDone failed: status={response.status_code}")
+            return False
 
         try:
             json_data = response.json()
-            self.logger.info(f"Response: {json_data}")
-            return True
+            self.logger.info(f"setDone response json: {json_data}")
         except requests.exceptions.JSONDecodeError:
-            self.logger.info(f"Failed to setDone: {response.status_code}")
-            return False
+            self.logger.info("setDone response was not JSON, but status was successful")
+
+        return True
 
     def setSkip(self, p_index, zoo_samplepin_id, isSkip):
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_samplepin/{zoo_samplepin_id}/"
-        self.logger.info(f"target_url: {target_url}")
+
+        self.logger.info(f"setSkip target_url: {target_url}")
         data_params = {
             "isSkip": isSkip,
             "p_index": p_index
         }
+        self.logger.info(f"setSkip params: {data_params}")
+
         response = requests.put(target_url, headers=auth_headers, data=data_params)
-        self.logger.info(f"Raw response={response}")
+
+        self.logger.info(f"setSkip status={response.status_code}")
+        self.logger.info(f"setSkip text={response.text[:1000]}")
+
+        if response.status_code not in (200, 202):
+            self.logger.error(f"setSkip failed: status={response.status_code}")
+            return False
+
         try:
             json_data = response.json()
-            self.logger.info(f"Response: {json_data}")
-            return True
+            self.logger.info(f"setSkip response json: {json_data}")
         except requests.exceptions.JSONDecodeError:
-            self.logger.info(f"Failed to setSkip: {response.status_code}")
-            return False
+            self.logger.info("setSkip response was not JSON, but status was successful")
+
+        return True
         
     # post result 
     # param_jsonはJSON形式
@@ -219,148 +320,128 @@ class ESAloaderAPI:
     # https://docs.google.com/spreadsheets/d/1FOFIqBsO4myY7BVIsj6hlMz3fsNlrLBrxmJaJw7bSkQ/edit?gid=2077362619#gid=2077362619
     def postResult(self, sample_pin_id, param_json):
         target_url = f"{self.api_url}zoo_result_samplepin/create_multiple_data/"
-        print(f"target_url: {target_url}")
-    
+        self.logger.info(f"postResult target_url: {target_url}")
+
         payload = {
             "zoo_samplepin_id": sample_pin_id,
             "data": json.dumps(param_json["data"])
         }
-        print(payload)
-    
+        self.logger.info(f"postResult payload: {payload}")
+
         auth_headers = self.make_authenticated_request()
         response = requests.post(target_url, headers=auth_headers, json=payload)
-    
-        print("status:", response.status_code)
-        print("headers:", response.headers)
-        print("text:", response.text[:2000])
-        try:
-            print("json:", response.json())
-        except Exception:
-            pass
-    
-        print(f"response: {response}")
+
+        self.logger.info(f"postResult status: {response.status_code}")
+        self.logger.info(f"postResult headers: {dict(response.headers)}")
+        self.logger.info(f"postResult text: {response.text[:2000]}")
+
         if response.status_code not in (200, 201):
+            self.logger.error(f"postResult failed: status={response.status_code}")
             raise Exception(f"Failed to post result: {response.status_code}")
-    
-        print(response.json())
-        print("posted!!")
+
+        try:
+            json_data = response.json()
+            self.logger.info(f"postResult json: {json_data}")
+        except Exception:
+            self.logger.info("postResult response was not JSON, but status was successful")
+
+        self.logger.info("postResult posted!!")
         return True
 
     def getResult(self, sample_pin_id):
         target_url = f"{self.api_url}/zoo_result_samplepin/"
         auth_headers = self.make_authenticated_request()
-        response = requests.get(target_url, headers=auth_headers, params={"zoo_samplepin_id":sample_pin_id})
-        # 取得したJSONを辞書にする
-        result_dict = response.json()
-        # 結果について表示をする
-        result_df = pd.DataFrame(result_dict)
+        response = requests.get(
+            target_url,
+            headers=auth_headers,
+            params={"zoo_samplepin_id": sample_pin_id}
+        )
+
+        if response.status_code != 200:
+            self.logger.error(f"getResult failed: {response.status_code} {response.text}")
+            raise Exception(f"Failed to get result: {response.status_code}")
+
+        body = response.json()
+
+        if isinstance(body, dict) and "results" in body:
+            json_data = body["results"]
+        elif isinstance(body, list):
+            json_data = body
+        else:
+            raise ValueError(f"Unexpected response type for zoo_result_samplepin: {type(body)}")
+
+        result_df = pd.DataFrame(json_data)
+        self.logger.info(f"Result DataFrame shape={result_df.shape}")
         return result_df
 
     def getNextPin(self):
         if self.isInit == False:
             self.prep()
-        auth_headers = self.make_authenticated_request()
-        # URL for get the limited 
-        target_url = f"{self.api_url}/zoo_samplepin/"
 
-        # query parametersdmi
+        auth_headers = self.make_authenticated_request()
+
         query_params = {
-            "isDone":0,
-            "isSkip":0,
-            "limit":1,
-            "zoo_id":self.zoo_id
+            "isDone": 0,
+            "isSkip": 0,
+            "limit": 1,
+            "zoo_id": self.zoo_id
         }
 
-        # isDone=0 & isSkip=0 & p_index 
         response = requests.get(self.data_request_url, headers=auth_headers, params=query_params)
-        results_json = response.json()['results']
-        # dictionary 
-        # results_json が空の場合
+
+        if response.status_code != 200:
+            self.logger.error(f"getNextPin failed: {response.status_code} {response.text}")
+            raise Exception(f"Failed to get next pin: {response.status_code}")
+
+        body = response.json()
+
+        if isinstance(body, dict) and "results" in body:
+            results_json = body["results"]
+        elif isinstance(body, list):
+            results_json = body
+        else:
+            raise ValueError(f"Unexpected response type for zoo_samplepin: {type(body)}")
+
         if len(results_json) == 0:
             return None
-        dict_results = results_json[0]
-        # 'id' の名称を 'zoo_samplepin_id' に変更する
-        dict_results['zoo_samplepin_id'] = dict_results.pop('id')
 
+        dict_results = results_json[0]
+        dict_results["zoo_samplepin_id"] = dict_results.pop("id")
         return dict_results
-        
+
     def convParamname2Paramid(self, parameter_name):
-        # パラメータのリストを取得する
-        if self.isPrepParams == False:
+        if not self.isPrepParams:
             self.getParameterList()
 
-        print(self.paramtable_df)
-        # paramtable_df から 'parameter_name' に対応する 'parameter_id' を取得
-        # 例えば、'parameter_name' が 'isDone' の場合、'parameter_id' は 
-        # 1 になる
-        tmp_id = self.paramtable_df[self.paramtable_df['parameter_name'] == parameter_name]['id']
-        print("QQQQQQQQQQQQQQQQQQQQQQQQQQQ")
-        print(tmp_id)
-        print("QQQQQQQQQQQQQQQQQQQQQQQQQQQ")
-        param_id = self.paramtable_df[self.paramtable_df['parameter_name'] == parameter_name]['id'].values[0]
+        df = self.paramtable_df
 
+        matched = df[df['parameter_name'] == parameter_name]
+
+        if len(matched) == 0:
+            self.logger.error(f"Parameter not found: {parameter_name}")
+            raise ValueError(f"Parameter not found: {parameter_name}")
+
+        if len(matched) > 1:
+            self.logger.warning(f"Multiple parameter IDs found for {parameter_name}, using first")
+
+        param_id = matched.iloc[0]['id']
+
+        self.logger.info(f"param_name={parameter_name} -> param_id={param_id}")
         return param_id
 
     def getParameterList(self):
         auth_headers = self.make_authenticated_request()
         response = requests.get(self.params_data_url, headers=auth_headers)
+
+        if response.status_code != 200:
+            self.logger.error(f"getParameterList failed: {response.status_code}")
+            raise Exception("Failed to get parameter list")
+
         json_data = response.json()
         self.paramtable_df = pd.DataFrame(json_data)
-        self.isPrepParams=True
-        csv_file_path = 'received_params.csv'
-        self.paramtable_df.to_csv(csv_file_path)
+        self.isPrepParams = True
 
-    # zoo_id が 指定されたものの条件について新しく実験中用のパラメータを追加する
-    def addZOOparams(self):
-        # zoo_idが指定したもののmeasure_idを取得する
-        if self.isPrepConds == False:
-            self.getCondDataFrame()
-
-        # 追加するパラメータについては以下の通り
-        # ゆくゆくは config fileで記述するようにしたい
-        initial_params = {
-            'isDone' : 0,
-            'isSkip' : 0,
-            'isMount' : 0,
-            'isLoopCenter' : 0,
-            'isRaster' : 0,
-            # 'isDS' : 0,
-            'scan_height' : 0.0,
-            'scan_width' : 0.0,
-            'n_mount' : 0,
-            'nds_multi' : 0,
-            'nds_helical' : 0,
-            'nds_helpart' : 0,
-            't_meas_start' : "0",
-            't_mount_end' : "",
-            't_cent_start' : "0",
-            't_cent_end' : "0",
-            't_raster_start' : "0",
-            # 't_raster_end' : "0",
-            't_ds_start' : "0",
-            't_ds_end' : "0",
-            't_dismount_start' : "0",
-            't_dismount_end' : "0",
-            'data_index' : 0,
-            'n_mount_fails' : 0,
-            'log_mount' : "0",
-            'hel_cry_size' : 0.0,
-            'flux' : 0.0,
-            'phs_per_deg' : 0.0
-        }
-
-        starttime = datetime.now()
-        # self.cond_dfに含まれているmeasure_idに対して、上記のパラメータを追加する
-        for measure_id in self.conds_df['measure_id']:
-            print(measure_id)
-            for key in initial_params.keys():
-                print("###############################")
-                print("LOOPG: ", key, initial_params[key])
-                self.putCond(measure_id, key, initial_params[key])
-        endtime = datetime.now()
-        # consumed time
-        consumed_time = endtime - starttime
-        print("Consumed Time: ", consumed_time)
+        self.logger.info(f"Parameter list loaded: shape={self.paramtable_df.shape}")
 
 # もしもmainが定義されていない場合以下を実行
 if __name__ == '__main__':
@@ -387,7 +468,27 @@ if __name__ == '__main__':
     
     if pin is not None:
         cond = esa.getCond(pin["zoo_samplepin_id"])
-        print("cond=", cond)
+        ok = esa.setDone(pin["p_index"], pin["zoo_samplepin_id"], isDone=pin["isDone"])
+        print("setDone result=", ok)
+        ok = esa.setSkip(pin["p_index"], pin["zoo_samplepin_id"], pin["isSkip"])
+        print("setSkip result=", ok)
+
+        ok = esa.postResult(
+                    pin["zoo_samplepin_id"],
+            {"data": [
+                {"phs_per_deg": "120.0"},
+                {"flux": "1.2E12"}
+                ]}
+        )
+        print("postResult result=", ok)
+
+        print("cond keys=", sorted(cond.keys()))
+        result_df = esa.getResult(pin["zoo_samplepin_id"])
+        print(result_df.columns.tolist())
+        print(result_df)
+
+    df = esa.getSamplePin()
+    print(df.head())
 
     """
     zoo_id = 12
