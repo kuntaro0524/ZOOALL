@@ -32,15 +32,16 @@ class ESAloaderAPI:
         # logger 
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
-        # handler
-        handler = logging.StreamHandler()
-        handler.setLevel(logging.DEBUG)
-        self.logger.addHandler(handler)
-        # log file 
-        log_file = 'esa_loader.log'
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setLevel(logging.DEBUG)
-        self.logger.addHandler(file_handler)
+
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            handler.setLevel(logging.DEBUG)
+            self.logger.addHandler(handler)
+
+            log_file = 'esa_loader.log'
+            file_handler = logging.FileHandler(log_file)
+            file_handler.setLevel(logging.DEBUG)
+            self.logger.addHandler(file_handler)
 
         self.isInit = False
 
@@ -49,7 +50,7 @@ class ESAloaderAPI:
         # user info
         target_url = f"{self.api_url}/zoo/"
         response = requests.get(target_url, headers=auth_headers,params={"exid":self.exid})
-        print(response.json())
+        self.logger.info(f"User info response: {response.json()}")
         # id -> self.zoo_id
         # username -> self.username
         self.zoo_id = response.json()[0]['id']
@@ -62,13 +63,11 @@ class ESAloaderAPI:
         return self.username
 
     def get_access_token(self):
-        print(self.login_url,self.username, self.password)
+        self.logger.info(f"Attempting to login with username: {self.username}")
         response = requests.post(self.login_url, data={"username": self.username, "password": self.password})
         if response.status_code == 200:
             token_data = response.json()
-            print("####################")
-            print(token_data)
-            print("####################")
+            self.logger.info(f"Login response: {token_data}")
             self.access_token = token_data['access_token']
             # トークンが作成された時刻は 'last_login' に格納されている
             # この時間に１時間を足した時間がトークンの有効期限
@@ -78,16 +77,16 @@ class ESAloaderAPI:
             # Time zone が付いているので、取り除く
             self.token_expiry = self.token_expiry.replace(tzinfo=None)
             self.isLogin = True
-            print("Logged in!")
+            self.logger.info("Logged in!")
         else:
-            print("Exception!!!!!!!!!!!")
+            self.logger.error(f"Failed to login: {response.status_code} - {response.text}")
             raise Exception("Failed to login")
 
     def isSkipped(self, zoo_samplepin_id):
         start_time = datetime.now()
         auth_headers = self.make_authenticated_request()
         target_url = f"{self.api_url}/zoo_samplepin/"
-        print(f"target_url: {target_url}")
+        self.logger.info(f"Target URL: {target_url}")
         response = requests.get(target_url, headers=auth_headers,params={"zoo_id":self.zoo_id})
         json_data = response.json()
         # zoo_samplepin_id に対応するデータを取得
@@ -303,7 +302,7 @@ class ESAloaderAPI:
         return param_id
 
     def getParameterList(self):
-        auth_headers = self.make_authenticatedrequest()
+        auth_headers = self.make_authenticated_request()
         response = requests.get(self.params_data_url, headers=auth_headers)
         json_data = response.json()
         self.paramtable_df = pd.DataFrame(json_data)
@@ -365,16 +364,30 @@ class ESAloaderAPI:
 
 # もしもmainが定義されていない場合以下を実行
 if __name__ == '__main__':
+
+    """
     # class をインスタンス化
     esa_loader = ESAloaderAPI(sys.argv[1])
     esa_loader.prep()
-
     zoo_samplepin_id = 310
     #esa_loader.setDone(999, zoo_samplepin_id, isDone=1)
     #esa_loader.setDone(999, zoo_samplepin_id, isDone=1)
     #esa_loader.postResult(zoo_samplepin_id, {"data":[{"phs_per_deg":"2.3E12"}]})
     esa_loader.postResult(zoo_samplepin_id, {"data":[{"phs_per_deg":"1", "n_mount":"5", "isMount":"1"}]})
     #print(d['isDone'])
+    """
+    # 2026/04/08のテスト
+    exid = sys.argv[1]
+    esa = ESAloaderAPI(exid)
+    esa.prep()
+    print("username=", esa.get_username())
+    
+    pin = esa.getNextPin()
+    print("next pin=", pin)
+    
+    if pin is not None:
+        cond = esa.getCond(pin["zoo_samplepin_id"])
+        print("cond=", cond)
 
     """
     zoo_id = 12
