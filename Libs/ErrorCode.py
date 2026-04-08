@@ -32,7 +32,9 @@ class ErrorCode(Enum):
     UNKNOWN_ERROR = -1  # デフォルトの未知エラー
 
     # success
-    SUCCESS = 0
+    SUCCESS = 1
+
+    NOT_PROCESSED = 0 # 未処理
 
     @classmethod
     def from_code(cls, code: int):

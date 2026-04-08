@@ -1,6 +1,9 @@
 from ECHA import ESAloaderAPI as ESAloaderAPI
+import json
 
-echa_esa = ESAloaderAPI.ESAloaderAPI(13)
+exid ="ZOO_rikenbl_BL45XU_2026022612000000"
+
+echa_esa = ESAloaderAPI.ESAloaderAPI(exid)
 
 def updateDBinfo(cond, param_name, param_value):
     # ECHAを利用している場合
@@ -16,15 +19,16 @@ def updateDBinfo(cond, param_name, param_value):
             param_name: param_value
         }
         param_json = {
-            "data": [{
+            "data": json.dumps([{
                 param_name: param_value
-        }]
+        }])
         }
         echa_esa.postResult(zoo_samplepin_id, param_json)
 
-cond = {"zoo_samplepin_id": 207, "p_index": 0}
+cond = {"zoo_samplepin_id": 304, "p_index": 0}
 
 #updateDBinfo(cond, "flux", 1.0E12)
 #updateDBinfo(cond, "t_meas_time", "UNKO")
 #updateDBinfo(cond, "t_meas_start", "UNKO")
-updateDBinfo(cond,"isDone", 1)
+updateDBinfo(cond,"p_index", 999)
+

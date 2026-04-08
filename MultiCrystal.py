@@ -5,6 +5,7 @@ import logging
 from AttFactor import *
 # ConfigParser is used for reading beamline.ini
 from configparser import ConfigParser, ExtendedInterpolation
+import ECHA.ZooContext as ZooContext
 
 # 2014/05/28 K.Hirata
 # For multi-crystal data collection
@@ -49,6 +50,9 @@ class MultiCrystal:
         config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
         config.read(config_path)
         self.beamline = config.get("beamline", "beamline")
+
+        # ECHA mode flag
+        self.isECHA = config.get("ECHA", "isECHA")
 
         # data suffix from a configure file
         self.data_suffix = config.get("files", "data_suffix")
@@ -248,6 +252,15 @@ class MultiCrystal:
         ofile.write("Raster Rotation Range: 0.000 # [deg] rotation range\n")
         ofile.write("Raster Zig-Zag Flag: 1 # 0: off, 1:on\n")
         ofile.write("Comment:\n")
+        # if ECHA database is used
+        if self.isECHA == "True":
+            zoo_context = ZooContext.ZooContext()
+            username = zoo_context.get_username()
+            zoo_exid = zoo_context.get_zoo_exid()
+            print(username, zoo_exid)
+            ofile.write("User Name: %s\n" % username)
+            ofile.write("Zoo Number: %s\n" % zoo_exid)
+
         ofile.close()
 
     def makeMultiDoseSlicing(self, schedule_file, gonio_list, ntimes):
@@ -390,6 +403,14 @@ class MultiCrystal:
         schstr.append("Raster Rotation Range: 0.000 # [deg] rotation range\n")
         schstr.append("Raster Zig-Zag Flag: 1 # 0: off, 1:on\n")
         schstr.append("Comment:\n")
+        # if ECHA database is used
+        if self.isECHA == "True":
+            zoo_context = ZooContext.ZooContext()
+            username = zoo_context.get_username()
+            zoo_exid = zoo_context.get_zoo_exid()
+            print(username, zoo_exid)
+            schstr.append("User Name: %s\n" % username)
+            schstr.append("Zoo Number: %s\n" % zoo_exid)
 
         return schstr
 
@@ -438,7 +459,11 @@ class MultiCrystal:
 if __name__ == "__main__":
     t = MultiCrystal()
 
-    schedule_file = "/isilon/users/target/target/ikekekeke.sch"
+    schedule_file = "./ike.sch"
+
+    blcontext=ZooContext.ZooContext()
+    blcontext.set_username("test_user")
+    blcontext.set_zoo_exid("ZOO12345")
 
     gonio_list = []
     initial_y = -10.0000
@@ -449,7 +474,7 @@ if __name__ == "__main__":
         gonio_list.append((0.9829, y_value, -0.8553))
         index+=1
     ntimes = 1
-    t.setDir("/isilon/users/target/target/Staff/2019B/200120/04.BSStest/02/")
+    t.setDir("./")
     t.setScanCondition(0, 5, 0.1)
     t.setCameraLength(300.0)
     t.setExpTime(0.02)
