@@ -404,6 +404,55 @@ def simulate_other_mode(logger: logging.Logger, outdir: Path, cond: Dict[str, An
     path.write_text(json.dumps(summary, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
     return summary
 
+def convert_echa_cond_to_useresa_row(raw_cond: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    ECHA 由来 cond を、UserESA.read_new() 後の 1 行相当の dict に変換する。
+    UserESA.setDefaults() / defineScanCondition() が期待する列名を最低限そろえる。
+    """
+    cond = copy.deepcopy(raw_cond)
+
+    ds_hbeam = float(cond.get("ds_hbeam", cond.get("raster_hbeam", 10.0)))
+    ds_vbeam = float(cond.get("ds_vbeam", cond.get("raster_vbeam", 10.0)))
+
+    # UserESA は beamsize 文字列 "h x v" を期待
+    beamsize_str = cond.get("beamsize")
+    if beamsize_str is None or str(beamsize_str).strip() == "":
+        beamsize_str = f"{ds_hbeam}x{ds_vbeam}"
+
+    # ECHA cond には max_crystal_size がないことがある
+    max_crystal_size = cond.get("max_crystal_size")
+    if max_crystal_size is None or str(max_crystal_size).strip() == "":
+        if cond.get("cry_max_size_um") not in (None, ""):
+            max_crystal_size = cond["cry_max_size_um"]
+        elif cond.get("cry_min_size_um") not in (None, ""):
+            max_crystal_size = cond["cry_min_size_um"]
+        else:
+            max_crystal_size = 30.0
+
+    # ECHA cond には desired_exp / resolution_limit / loopsize がないことがある
+    row = {
+        "puckid": cond.get("puckid", cond.get("puck_id", "UNKNOWN")),
+        "pinid": cond.get("pinid", cond.get("pin_id", 0)),
+        "sample_name": cond.get("sample_name", "dummy_sample"),
+        "desired_exp": cond.get("desired_exp", "normal"),
+        "mode": cond.get("mode", "single"),
+        "wavelength": cond.get("wavelength", 1.0),
+        "loopsize": cond.get("loopsize", max_crystal_size),
+        "resolution_limit": cond.get("resolution_limit", 2.0),
+        "beamsize": beamsize_str,
+        "max_crystal_size": max_crystal_size,
+        "maxhits": cond.get("maxhits", 3),
+        "total_osc": cond.get("total_osc", 10.0),
+        "osc_width": cond.get("osc_width", 0.1),
+        "ln2_flag": cond.get("ln2_flag", 0),
+        "pin_flag": cond.get("pin_flag", "-"),
+        "zoomcap_flag": cond.get("zoomcap_flag", 0),
+        "confirmation_require": cond.get("confirmation_require", 0),
+        "dose_list": cond.get("dose_list", ""),
+        "dist_list": cond.get("dist_list", ""),
+    }
+
+    return row
 
 # ----------------------------------------------------------------------
 # main
