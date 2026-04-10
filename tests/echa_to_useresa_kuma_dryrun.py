@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import argparse
 import copy
 import importlib
@@ -9,6 +7,8 @@ import sys
 import types
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+
+import pandas as pd
 
 def add_candidate_paths(repo_root: str | None = None) -> List[str]:
     added: List[str] = []
@@ -46,7 +46,7 @@ def ensure_external_stubs():
         install_stub_module("ZooMyException", {"ZooMyException": ZooMyException})
     for name in [
         "Zoo", "AttFactor", "LoopMeasurement", "BeamsizeConfig", "StopWatch",
-        "Device", "DumpRecover", "AnaHeatmap", "ESA", "KUMA", "CrystalList",
+        "Device", "DumpRecover", "AnaHeatmap", "ESA", "CrystalList",
         "MyDate", "DiffscanMaster", "cv2"
     ]:
         if name not in sys.modules:
@@ -94,6 +94,13 @@ def ensure_external_stubs():
             def getBestCrystalCode(self):
                 return (0.0, 0.0, 0.0)
         sys.modules["CrystalList"].CrystalList = CrystalList
+    if "BeamsizeConfig" in sys.modules and not hasattr(sys.modules["BeamsizeConfig"], "BeamsizeConfig"):
+        class _DummyBS:
+            def getBeamIndexHV(self, h, v):
+                return 1
+            def getFluxAtWavelength(self, h, v, wavelength):
+                return 1.0e12
+        sys.modules["BeamsizeConfig"].BeamsizeConfig = _DummyBS
 
 class DummyZoo:
     def __init__(self, logger: logging.Logger):
@@ -119,7 +126,7 @@ class DummyLM:
         self.raster_calls = []
     def _write_schedule(self, filename: str, payload: dict) -> str:
         path = self.outdir / filename
-        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
         self.logger.info(f"schedule written: {path}")
         return str(path)
     def genSingleSchedule(self, start_phi, end_phi, center_xyz, cond, phosec, prefix, same_point=True):
@@ -161,26 +168,90 @@ class DummyCrystal:
     def getRoughEdges(self):
         return self._rpos, self._lpos
 
-def normalize_cond(cond: Dict[str, Any], mode: str) -> Dict[str, Any]:
+def import_required_modules():
+    ESAloaderAPI = importlib.import_module("ESAloaderAPI").ESAloaderAPI
+    UserESA = importlib.import_module("UserESA").UserESA
+    ZooNavigator = importlib.import_module("ZooNavigator").ZooNavigator
+    HEBI = importlib.import_module("HEBI").HEBI
+    return ESAloaderAPI, UserESA, ZooNavigator, HEBI
+
+def normalize_base_cond(cond: Dict[str, Any]) -> Dict[str, Any]:
     out = copy.deepcopy(cond)
-    out["mode"] = mode
     defaults = {
         "dose_ds": 10.0, "dist_ds": 125.0, "dose_list": "", "dist_list": "",
         "total_osc": 10.0, "ds_hbeam": 10.0, "ds_vbeam": 10.0, "raster_hbeam": 10.0,
         "raster_vbeam": 10.0, "score_min": 10, "score_max": 200, "maxhits": 3,
-        "cry_min_size_um": 5.0, "wavelength": 1.0, "hebi_att": 10.0,
-        "exp_raster": 0.02, "o_index": 0, "sample_name": "dummy_sample",
-        "root_dir": str(Path.cwd()),
+        "cry_min_size_um": 5.0, "cry_max_size_um": 30.0, "wavelength": 1.0,
+        "hebi_att": 10.0, "exp_raster": 0.02, "o_index": 0,
+        "sample_name": "dummy_sample", "root_dir": str(Path.cwd()),
+        "desired_exp": "normal", "resolution_limit": 2.0, "loopsize": 30.0,
+        "osc_width": 0.1, "ln2_flag": 0, "pin_flag": "-", "zoomcap_flag": 0,
+        "confirmation_require": 0,
     }
     for k, v in defaults.items():
         out.setdefault(k, v)
     return out
 
-def import_required_modules():
-    ESAloaderAPI = importlib.import_module("ESAloaderAPI").ESAloaderAPI
-    ZooNavigator = importlib.import_module("ZooNavigator").ZooNavigator
-    HEBI = importlib.import_module("HEBI").HEBI
-    return ESAloaderAPI, ZooNavigator, HEBI
+def convert_echa_cond_to_useresa_row(raw_cond: Dict[str, Any]) -> Dict[str, Any]:
+    cond = normalize_base_cond(raw_cond)
+    ds_hbeam = float(cond.get("ds_hbeam", cond.get("raster_hbeam", 10.0)))
+    ds_vbeam = float(cond.get("ds_vbeam", cond.get("raster_vbeam", 10.0)))
+    beamsize_str = cond.get("beamsize")
+    if beamsize_str is None or str(beamsize_str).strip() == "":
+        beamsize_str = f"{ds_hbeam}x{ds_vbeam}"
+    max_crystal_size = cond.get("cry_max_size_um", 30.0)
+    if max_crystal_size in (None, ""):
+        max_crystal_size = 30.0
+    loopsize = cond.get("loopsize")
+    if loopsize in (None, ""):
+        loopsize = max_crystal_size
+    return {
+        "puckid": cond.get("puckid", cond.get("puck_id", "UNKNOWN")),
+        "pinid": cond.get("pinid", cond.get("pin_id", 0)),
+        "sample_name": cond.get("sample_name", "dummy_sample"),
+        "desired_exp": cond.get("desired_exp", "normal"),
+        "mode": cond.get("mode", "single"),
+        "wavelength": float(cond.get("wavelength", 1.0)),
+        "loopsize": float(loopsize),
+        "resolution_limit": float(cond.get("resolution_limit", 2.0)),
+        "beamsize": beamsize_str,
+        "max_crystal_size": float(max_crystal_size),
+        "maxhits": int(cond.get("maxhits", 3)),
+        "total_osc": float(cond.get("total_osc", 10.0)),
+        "osc_width": float(cond.get("osc_width", 0.1)),
+        "ln2_flag": cond.get("ln2_flag", 0),
+        "pin_flag": cond.get("pin_flag", "-"),
+        "zoomcap_flag": cond.get("zoomcap_flag", 0),
+        "confirmation_require": cond.get("confirmation_require", 0),
+        "dose_list": cond.get("dose_list", ""),
+        "dist_list": cond.get("dist_list", ""),
+    }
+
+def preprocess_with_useresa(logger: logging.Logger, UserESA, raw_cond: Dict[str, Any]) -> Tuple[Dict[str, Any], List[str], pd.DataFrame]:
+    cond = normalize_base_cond(raw_cond)
+    useresa_row = convert_echa_cond_to_useresa_row(cond)
+    logger.info(f"[dryrun] UserESA input row keys = {sorted(useresa_row.keys())}")
+    df = pd.DataFrame([useresa_row])
+    ue = UserESA(fname="echa_dummy.xlsx", root_dir=cond.get("root_dir", "."))
+    ue.df = df.copy()
+    called_steps: List[str] = []
+    steps = ["setDefaults", "addDistance", "splitBeamsizeInfo", "fillFlux",
+             "checkScanSpeed", "defineScanCondition", "modifyExposureConditions", "sizeWarning"]
+    for step in steps:
+        if hasattr(ue, step):
+            logger.info(f"[UserESA] calling {step}()")
+            getattr(ue, step)()
+            called_steps.append(step)
+    if hasattr(ue, "validateDoseDist"):
+        logger.info("[UserESA] calling validateDoseDist(row)")
+        ue.validateDoseDist(ue.df.iloc[0])
+        called_steps.append("validateDoseDist")
+    if hasattr(ue, "checkDoseList"):
+        logger.info("[UserESA] calling checkDoseList()")
+        ue.checkDoseList()
+        called_steps.append("checkDoseList")
+    processed_cond = ue.df.iloc[0].to_dict()
+    return processed_cond, called_steps, ue.df.copy()
 
 def make_zn(logger: logging.Logger, outdir: Path, ZooNavigator):
     zn = ZooNavigator.__new__(ZooNavigator)
@@ -214,44 +285,43 @@ def simulate_single(logger: logging.Logger, outdir: Path, cond: Dict[str, Any], 
     dc_list = zn._build_dc_condition_list(cond)
     logger.info(f"[single] expanded conditions = {dc_list}")
     zn._run_single_dc_loop(cond, sphi=30.0, glist=[(0.0, 0.0, 0.0)], flux=1.23e12, data_prefix="single")
-    return {"mode":"single","expanded_conditions":dc_list,
-            "schedule_files":[str((outdir / f"{call['prefix']}.multi.json")) for call in zn.lm.multi_calls],
-            "multi_calls":zn.lm.multi_calls}
+    return {"mode":"single","expanded_conditions":dc_list,"multi_calls":zn.lm.multi_calls,
+            "schedule_files":[str((outdir / f"{call['prefix']}.multi.json")) for call in zn.lm.multi_calls]}
 
-def simulate_helical(logger: logging.Logger, outdir: Path, cond: Dict[str, Any], crystal_size_um: float, HEBI):
+def simulate_helical(logger: logging.Logger, outdir: Path, cond: Dict[str, Any], crystal_size_um: float, HEBI, mode_label: str):
     hebi, _, lm = make_hebi(logger, outdir, HEBI)
     delta_mm = crystal_size_um / 1000.0
     hebi.getSortedCryList = lambda *a, **k: [DummyCrystal((0.0, 0.000, 0.0), (0.0, delta_mm, 0.0))]
     hebi.edgeCentering = lambda cond, phi_face, center_xyz, LorR="Left", cry_index=0: center_xyz
     n = hebi.mainLoop("dummy_path", "dummy_prefix", 30.0, cond, precise_face_scan=False)
-    return {"mode":"helical","crystal_size_um":crystal_size_um,"n_crystals_processed":n,
+    return {"mode":mode_label,"crystal_size_um":crystal_size_um,"n_crystals_processed":n,
             "single_calls":lm.single_calls,"helical_calls":lm.helical_calls,
             "schedule_files":[str((outdir / f"{call['prefix']}.single.json")) for call in lm.single_calls] +
                              [str((outdir / f"{call['prefix']}.helical.json")) for call in lm.helical_calls]}
 
 def simulate_other_mode(logger: logging.Logger, outdir: Path, cond: Dict[str, Any], ZooNavigator):
     zn = make_zn(logger, outdir, ZooNavigator)
-    summary = {"mode":cond["mode"],
-               "note":"このモードは hardware 依存が強いため、offline dry-run では cond summary のみを出力",
-               "cond_summary":{"mode":cond["mode"],"dose_ds":cond.get("dose_ds"),"dist_ds":cond.get("dist_ds"),
+    summary = {"mode":cond["mode"],"note":"offline dry-run では cond summary のみ出力",
+               "cond_summary":{"mode":cond.get("mode"),"dose_ds":cond.get("dose_ds"),"dist_ds":cond.get("dist_ds"),
                                "dose_list":cond.get("dose_list"),"dist_list":cond.get("dist_list"),
                                "raster_vbeam":cond.get("raster_vbeam"),"raster_hbeam":cond.get("raster_hbeam"),
-                               "ds_vbeam":cond.get("ds_vbeam"),"ds_hbeam":cond.get("ds_hbeam")}}
+                               "ds_vbeam":cond.get("ds_vbeam"),"ds_hbeam":cond.get("ds_hbeam"),
+                               "cry_min_size_um":cond.get("cry_min_size_um"),"cry_max_size_um":cond.get("cry_max_size_um")}}
     try:
         dc_list = zn._build_dc_condition_list(cond)
         summary["dc_condition_list"] = dc_list
     except Exception as e:
         summary["dc_condition_error"] = str(e)
     path = outdir / f"{cond['mode']}.plan.json"
-    path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+    path.write_text(json.dumps(summary, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
     return summary
 
 def main():
-    parser = argparse.ArgumentParser(description="ECHA -> offline schedule dry-run")
+    parser = argparse.ArgumentParser(description="ECHA -> UserESA/KUMA -> dry-run schedule")
     parser.add_argument("exid")
     parser.add_argument("--pin-id", type=int, default=None)
     parser.add_argument("--modes", default="single,helical,helical-small,ssrox,multi,mixed,quick,screening")
-    parser.add_argument("--outdir", default="dryrun_out")
+    parser.add_argument("--outdir", default="dryrun_useresa_kuma_out")
     parser.add_argument("--repo-root", default=None, help="e.g. /user/target/JunkZoo")
     parser.add_argument("--dose-list", default=None)
     parser.add_argument("--dist-list", default=None)
@@ -262,13 +332,13 @@ def main():
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(name)s - %(levelname)s - %(message)s")
-    logger = logging.getLogger("dryrun")
+    logger = logging.getLogger("dryrun-useresa-kuma")
     added = add_candidate_paths(args.repo_root)
     logger.info(f"added import paths: {added}")
 
     ensure_external_stubs()
     try:
-        ESAloaderAPI, ZooNavigator, HEBI = import_required_modules()
+        ESAloaderAPI, UserESA, ZooNavigator, HEBI = import_required_modules()
     except ModuleNotFoundError as e:
         logger.error(f"import failed: {e}")
         logger.error("Hint: specify --repo-root /user/target/JunkZoo")
@@ -291,35 +361,36 @@ def main():
         zoo_samplepin_id = args.pin_id
         logger.info(f"Using explicit pin id: {zoo_samplepin_id}")
 
-    cond = esa.getCond(zoo_samplepin_id)
-    logger.info(f"Fetched cond keys = {sorted(cond.keys())}")
-
+    fetched_cond = esa.getCond(zoo_samplepin_id)
     if args.dose_list is not None:
-        cond["dose_list"] = args.dose_list
+        fetched_cond["dose_list"] = args.dose_list
+        fetched_cond["mode"] = "single"
     if args.dist_list is not None:
-        cond["dist_list"] = args.dist_list
+        fetched_cond["dist_list"] = args.dist_list
     if args.dose_ds is not None:
-        cond["dose_ds"] = args.dose_ds
+        fetched_cond["dose_ds"] = args.dose_ds
     if args.dist_ds is not None:
-        cond["dist_ds"] = args.dist_ds
+        fetched_cond["dist_ds"] = args.dist_ds
 
-    fetched_cond_path = outdir / "fetched_cond.json"
-    fetched_cond_path.write_text(json.dumps(cond, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
+    (outdir / "fetched_cond.json").write_text(json.dumps(fetched_cond, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
+    processed_cond, called_steps, processed_df = preprocess_with_useresa(logger, UserESA, fetched_cond)
+    (outdir / "processed_cond.json").write_text(json.dumps(processed_cond, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
+    processed_df.to_csv(outdir / "processed_df.csv", index=False)
 
     results = []
     mode_list = [x.strip() for x in args.modes.split(",") if x.strip()]
     for mode in mode_list:
         logger.info("=" * 80)
         logger.info(f"simulate mode = {mode}")
-        cond_local = normalize_cond(cond, "helical" if mode.startswith("helical") else mode)
+        cond_local = copy.deepcopy(processed_cond)
+        cond_local["mode"] = "helical" if mode.startswith("helical") else mode
         try:
             if mode == "single":
                 res = simulate_single(logger, outdir, cond_local, ZooNavigator)
             elif mode == "helical":
-                res = simulate_helical(logger, outdir, cond_local, args.large_crystal_um, HEBI)
+                res = simulate_helical(logger, outdir, cond_local, args.large_crystal_um, HEBI, "helical")
             elif mode == "helical-small":
-                res = simulate_helical(logger, outdir, cond_local, args.small_crystal_um, HEBI)
-                res["mode"] = "helical-small"
+                res = simulate_helical(logger, outdir, cond_local, args.small_crystal_um, HEBI, "helical-small")
             else:
                 res = simulate_other_mode(logger, outdir, cond_local, ZooNavigator)
             results.append(res)
@@ -328,7 +399,11 @@ def main():
             results.append({"mode": mode, "error": str(e)})
 
     summary = {"exid":args.exid,"zoo_samplepin_id":zoo_samplepin_id,"owner_username":esa.get_username(),
-               "fetched_cond_file":str(fetched_cond_path),"results":results}
+               "called_useresa_steps":called_steps,
+               "files":{"fetched_cond":str(outdir / "fetched_cond.json"),
+                        "processed_cond":str(outdir / "processed_cond.json"),
+                        "processed_df":str(outdir / "processed_df.csv")},
+               "results":results}
     summary_path = outdir / "summary.json"
     summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
     print(json.dumps(summary, indent=2, ensure_ascii=False, default=str))
