@@ -263,15 +263,36 @@ class UserESA():
         ] = 9999
 
         # 3) desired_exp が "ultra_high_dose_scan" のとき
-        # dose_ds = 9.0 とする
-        self.df.loc[self.df['desired_exp'] == "ultra_high_dose_scan", 'dose_ds'] = 9.0
-        # 4) desired_exp が "phaing" のとき
-        # dose_ds = 5.0 とする
-        self.df.loc[self.df['desired_exp'] == "phasing", 'dose_ds'] = 5.0
+        # dose_dsは固定値ではなく defineScanCondition() 内で dose_per_frame をもとに計算して設定することとする
+        pass
+        # 4) desired_exp が "phasing" のとき
+        # dose_dsの最終値は defineScanCondition() 内で dose_per_frame をもとに計算して設定することとする
+        pass
+
+    # modeごとにスキャン回数が異なるのでそれを考慮したDoseにしたときって話
+    # 正直、ここまで厳密ではなくてよいのだが
+    def getScanDoseRepeat(self, mode):
+        mode_norm = str(mode).strip().lower()
+
+        if mode_norm == "single":
+            return 2.0
+        elif mode_norm == "multi":
+            return 1.0
+        elif mode_norm == "helical":
+            return 2.0
+        elif mode_norm in ("mixed", "ssrox", "quick", "screening"):
+            return 1.0
+        else:
+            raise ValueError(f"[UserESA] Unknown mode for scan dose: {mode}")
 
     # ビームライン、実験モードと結晶のタイプから実験パラメータを取得する
     # 2023/05/09 type_crystal は使わない
     def getParams(self, desired_exp_string, mode):
+        # dose_ds はここでは確定しない。
+        # 最終的な dose_ds は defineScanCondition() で
+        # dose_ds = total_dose - dose_scan_total
+        # により決定する。
+        # phasing と ultra_high_dose_scan の dose_ds は beamline.ini から読む
         desired_exp_string = str(desired_exp_string).strip().lower()
         mode = str(mode).strip().lower()
 
@@ -290,44 +311,48 @@ class UserESA():
         att_raster  = self.config.getfloat("experiment", "att_raster")
         hebi_att    = self.config.getfloat("experiment", "hebi_att")
         cover_flag  = self.config.getint("experiment", "cover_flag")
+        # dose_ds はここでは確定しない。
+        # 最終的な dose_ds は defineScanCondition() で
+        # dose_ds = total_dose - dose_scan_total
+        # により決定する。
 
         # PARAMTER CONDITION
         self.param = {
             "scan_only":{
-                "single":   [9999, 9999, 0.3, dose_ds, 0, exp_raster, att_raster, hebi_att, 0],
-                "helical":  [9999, 9999, 0.3, dose_ds, 0, exp_raster, att_raster, hebi_att, 0],
-                "multi":    [9999, 9999, 0.3, dose_ds, 0, exp_raster, att_raster, hebi_att, 0],
-                "mixed":    [9999, 9999, 0.3, dose_ds, 0, exp_raster, att_raster, hebi_att, 0],
+                "single":   [9999, 9999, 0.3, None, 0, exp_raster, att_raster, hebi_att, 0],
+                "helical":  [9999, 9999, 0.3, None, 0, exp_raster, att_raster, hebi_att, 0],
+                "multi":    [9999, 9999, 0.3, None, 0, exp_raster, att_raster, hebi_att, 0],
+                "mixed":    [9999, 9999, 0.3, None, 0, exp_raster, att_raster, hebi_att, 0],
             },
             "normal":{
-                "single":   [score_min, score_max, 0.1, dose_ds, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "helical":  [score_min, 9999, 0.05, dose_ds, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "multi":    [score_min, score_max, 0.1, dose_ds, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "mixed":    [score_min, 9999, 0.1, dose_ds, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "single":   [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "helical":  [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "multi":    [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "mixed":    [score_min, 9999, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
             },
             "high_dose_scan":{
-                "single":   [score_min, 9999, 0.05, dose_ds, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "helical":  [score_min, 9999, 0.05, dose_ds, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "multi":    [score_min, 9999, 0.05, dose_ds, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "mixed":    [score_min, 9999, 0.05, dose_ds, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "single":   [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "helical":  [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "multi":    [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "mixed":    [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
             },
             "ultra_high_dose_scan":{
-                "single":   [score_min, score_max, 0.2, dose_ds, raster_roi, exp_raster, 100, 100, cover_flag],
-                "helical":  [score_min, score_max, 0.2, dose_ds, raster_roi, exp_raster, 100, 100, cover_flag],
-                "multi":    [score_min, score_max, 0.2, dose_ds, raster_roi, exp_raster, 100, 100, cover_flag],
-                "mixed":    [score_min, score_max, 0.2, dose_ds, raster_roi, exp_raster, 100, 100, cover_flag],
+                "single":   [score_min, score_max, 0.2, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "helical":  [score_min, score_max, 0.2, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "multi":    [score_min, score_max, 0.2, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "mixed":    [score_min, score_max, 0.2, None, raster_roi, exp_raster, 100, 100, cover_flag],
             },
             "phasing":{
-                "single":   [score_min, score_max, 0.1, 5, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "helical":  [score_min, 9999, 0.05, 5, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "multi":    [score_min, score_max, 0.1, 5, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "mixed":    [score_min, score_max, 0.1, 5, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "single":   [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "helical":  [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "multi":    [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "mixed":    [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
             },
             "rapid":{
-                "single":   [score_min, score_max, raster_dose, dose_ds, raster_roi, exp_raster, 100, 100, cover_flag],
-                "helical":  [score_min, score_max, raster_dose, dose_ds, raster_roi, exp_raster, 100, 100, cover_flag],
-                "multi":    [score_min, score_max, raster_dose, dose_ds, raster_roi, exp_raster, 100, 100, cover_flag],
-                "mixed":    [score_min, score_max, raster_dose, dose_ds, raster_roi, exp_raster, 100, 100, cover_flag],
+                "single":   [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "helical":  [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "multi":    [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "mixed":    [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
             },
         }
 
@@ -462,6 +487,7 @@ class UserESA():
             normal_dose_per_frame = pd.Series(dtype=float)
         
         mask2 = (self.df['desired_exp'] == 'high_dose_scan') & (~extended_mask)
+        # high_dose_scan: normal の dose_per_frame の 1.5 倍になるよう attenuation を決める
         if mask2.any():
             dose_for_raster = normal_dose_per_frame * 1.5
         
@@ -491,7 +517,7 @@ class UserESA():
         mask3 = (self.df['desired_exp'] == 'ultra_high_dose_scan') & (~extended_mask)
 
         if mask3.any():
-            dose_for_raster = normal_dose_per_frame * 0.5
+            dose_for_raster = normal_dose_per_frame * 3.0
         
             base_dose_mask3 = self.df.loc[mask3].apply(
                 lambda row: kuma.getDose(
@@ -541,11 +567,17 @@ class UserESA():
 
         dose_control_mask = mask1 | mask2 | mask3
 
-        total_dose_series = pd.Series(10.0, index=self.df.index)
-        total_dose_series.loc[self.df['desired_exp'] == 'phasing'] = 5.0
+        total_dose_default = self.config.getfloat("experiment", "dose_ds")
+        total_dose_phasing = self.config.getfloat("experiment", "dose_ds_phasing")
         
+        total_dose_series = pd.Series(total_dose_default, index=self.df.index)
+        total_dose_series.loc[self.df['desired_exp'] == 'phasing'] = total_dose_phasing
+
+        scan_multiplier = self.df['mode'].apply(self.getScanDoseRepeat)
+        dose_scan_total = self.df['dose_per_frame'] * scan_multiplier
+
         self.df.loc[dose_control_mask, 'dose_ds'] = (
-            total_dose_series.loc[dose_control_mask] - self.df.loc[dose_control_mask, 'dose_per_frame']
+            total_dose_series.loc[dose_control_mask] - dose_scan_total.loc[dose_control_mask]
         )
 
         neg_mask = (self.df['dose_ds'] < 0) & (~extended_mask)

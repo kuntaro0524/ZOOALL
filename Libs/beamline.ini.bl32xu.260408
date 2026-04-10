@@ -84,6 +84,7 @@ score_min = 10
 score_max = 100
 raster_dose = 0.1
 dose_ds = 10.0
+dose_ds_phasing = 5.0
 exp_raster = 0.01
 att_raster = 20
 hebi_att = 20
