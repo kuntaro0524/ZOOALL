@@ -1,0 +1,19 @@
+{
+  "kind": "helical",
+  "prefix": "cry00_hel_00",
+  "start_phi": 25.0,
+  "end_phi": 35.0,
+  "left_xyz": [
+    0.0,
+    0.05,
+    0.0
+  ],
+  "right_xyz": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "dose_ds": 9.88605,
+  "dist_ds": 197.7,
+  "mode": "helical"
+}

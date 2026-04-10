@@ -1,0 +1,21 @@
+{
+  "mode": "quick",
+  "note": "このモードは hardware 依存が強いため、offline dry-run では cond summary のみを出力",
+  "cond_summary": {
+    "mode": "quick",
+    "dose_ds": 9.88605,
+    "dist_ds": 197.7,
+    "dose_list": "",
+    "dist_list": "",
+    "raster_vbeam": 15.0,
+    "raster_hbeam": 10.0,
+    "ds_vbeam": 15.0,
+    "ds_hbeam": 10.0
+  },
+  "dc_condition_list": [
+    {
+      "dose": 9.88605,
+      "dist": 197.7
+    }
+  ]
+}

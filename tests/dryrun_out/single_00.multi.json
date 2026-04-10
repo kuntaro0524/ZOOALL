@@ -1,0 +1,16 @@
+{
+  "kind": "multi",
+  "prefix": "single_00",
+  "sphi": 30.0,
+  "glist": [
+    [
+      0.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "dose_ds": 9.88605,
+  "dist_ds": 197.7,
+  "mode": "single",
+  "flux": 1230000000000.0
+}

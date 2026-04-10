@@ -1,0 +1,15 @@
+{
+  "kind": "single",
+  "prefix": "cry00_single_00",
+  "start_phi": 25.0,
+  "end_phi": 35.0,
+  "center_xyz": [
+    0.0,
+    0.0025,
+    0.0
+  ],
+  "dose_ds": 9.88605,
+  "dist_ds": 197.7,
+  "same_point": true,
+  "mode": "helical"
+}

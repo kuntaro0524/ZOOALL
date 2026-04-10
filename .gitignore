@@ -12,3 +12,5 @@ wget-log*
 beamline.ini
 zoo.sh
 .DS_Store
+tests/*json
+tests/*/*json

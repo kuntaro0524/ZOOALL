@@ -1,0 +1,199 @@
+{
+  "exid": "ZOO_target_BL32XU_202604081457",
+  "zoo_samplepin_id": 427,
+  "owner_username": "target",
+  "fetched_cond_file": "dryrun_out/fetched_cond.json",
+  "results": [
+    {
+      "mode": "single",
+      "expanded_conditions": [
+        {
+          "dose": 9.88605,
+          "dist": 197.7
+        }
+      ],
+      "schedule_files": [
+        "dryrun_out/single_00.multi.json"
+      ],
+      "multi_calls": [
+        {
+          "kind": "multi",
+          "prefix": "single_00",
+          "sphi": 30.0,
+          "glist": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "dose_ds": 9.88605,
+          "dist_ds": 197.7,
+          "mode": "single",
+          "flux": 1230000000000.0
+        }
+      ]
+    },
+    {
+      "mode": "helical",
+      "crystal_size_um": 50.0,
+      "n_crystals_processed": 1,
+      "single_calls": [],
+      "helical_calls": [
+        {
+          "kind": "helical",
+          "prefix": "cry00_hel_00",
+          "start_phi": 25.0,
+          "end_phi": 35.0,
+          "left_xyz": [
+            0.0,
+            0.05,
+            0.0
+          ],
+          "right_xyz": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "dose_ds": 9.88605,
+          "dist_ds": 197.7,
+          "mode": "helical"
+        }
+      ],
+      "schedule_files": [
+        "dryrun_out/cry00_hel_00.helical.json"
+      ]
+    },
+    {
+      "mode": "helical-small",
+      "crystal_size_um": 5.0,
+      "n_crystals_processed": 1,
+      "single_calls": [
+        {
+          "kind": "single",
+          "prefix": "cry00_single_00",
+          "start_phi": 25.0,
+          "end_phi": 35.0,
+          "center_xyz": [
+            0.0,
+            0.0025,
+            0.0
+          ],
+          "dose_ds": 9.88605,
+          "dist_ds": 197.7,
+          "same_point": true,
+          "mode": "helical"
+        }
+      ],
+      "helical_calls": [],
+      "schedule_files": [
+        "dryrun_out/cry00_single_00.single.json"
+      ]
+    },
+    {
+      "mode": "ssrox",
+      "note": "このモードは hardware 依存が強いため、offline dry-run では cond summary のみを出力",
+      "cond_summary": {
+        "mode": "ssrox",
+        "dose_ds": 9.88605,
+        "dist_ds": 197.7,
+        "dose_list": "",
+        "dist_list": "",
+        "raster_vbeam": 15.0,
+        "raster_hbeam": 10.0,
+        "ds_vbeam": 15.0,
+        "ds_hbeam": 10.0
+      },
+      "dc_condition_list": [
+        {
+          "dose": 9.88605,
+          "dist": 197.7
+        }
+      ]
+    },
+    {
+      "mode": "multi",
+      "note": "このモードは hardware 依存が強いため、offline dry-run では cond summary のみを出力",
+      "cond_summary": {
+        "mode": "multi",
+        "dose_ds": 9.88605,
+        "dist_ds": 197.7,
+        "dose_list": "",
+        "dist_list": "",
+        "raster_vbeam": 15.0,
+        "raster_hbeam": 10.0,
+        "ds_vbeam": 15.0,
+        "ds_hbeam": 10.0
+      },
+      "dc_condition_list": [
+        {
+          "dose": 9.88605,
+          "dist": 197.7
+        }
+      ]
+    },
+    {
+      "mode": "mixed",
+      "note": "このモードは hardware 依存が強いため、offline dry-run では cond summary のみを出力",
+      "cond_summary": {
+        "mode": "mixed",
+        "dose_ds": 9.88605,
+        "dist_ds": 197.7,
+        "dose_list": "",
+        "dist_list": "",
+        "raster_vbeam": 15.0,
+        "raster_hbeam": 10.0,
+        "ds_vbeam": 15.0,
+        "ds_hbeam": 10.0
+      },
+      "dc_condition_list": [
+        {
+          "dose": 9.88605,
+          "dist": 197.7
+        }
+      ]
+    },
+    {
+      "mode": "quick",
+      "note": "このモードは hardware 依存が強いため、offline dry-run では cond summary のみを出力",
+      "cond_summary": {
+        "mode": "quick",
+        "dose_ds": 9.88605,
+        "dist_ds": 197.7,
+        "dose_list": "",
+        "dist_list": "",
+        "raster_vbeam": 15.0,
+        "raster_hbeam": 10.0,
+        "ds_vbeam": 15.0,
+        "ds_hbeam": 10.0
+      },
+      "dc_condition_list": [
+        {
+          "dose": 9.88605,
+          "dist": 197.7
+        }
+      ]
+    },
+    {
+      "mode": "screening",
+      "note": "このモードは hardware 依存が強いため、offline dry-run では cond summary のみを出力",
+      "cond_summary": {
+        "mode": "screening",
+        "dose_ds": 9.88605,
+        "dist_ds": 197.7,
+        "dose_list": "",
+        "dist_list": "",
+        "raster_vbeam": 15.0,
+        "raster_hbeam": 10.0,
+        "ds_vbeam": 15.0,
+        "ds_hbeam": 10.0
+      },
+      "dc_condition_list": [
+        {
+          "dose": 9.88605,
+          "dist": 197.7
+        }
+      ]
+    }
+  ]
+}
