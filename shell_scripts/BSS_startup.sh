@@ -122,7 +122,7 @@ python /isilon/BL32XU/BLsoft/PPPP/03.GUI/00.Pint/121008/zoom_pint.py &
 sleep 1
 ssh 192.168.163.6 "killall  videosrv"
 #ssh -XC -c arcfour 192.168.163.6 "/usr/local/bss/videosrv --artray 0" &
-ssh -XC -c arcfour 192.168.163.6 "/usr/local/bss/videosrv --artray --v4l2" &
+ssh -XC -c arcfour 192.168.163.6 "/usr/local/bss/videosrv --artray 3 --v4l2" &
 sleep 1
 
 #ssh 192.168.163.5 "killall  videosrv" &
@@ -137,7 +137,8 @@ xsetroot -cursor_name top_left_arrow
 ##### start BSS main routine
 # Normal user operation mode
 #/usr/local/bss/bss --quick
-/usr/local/bss/bss --console
+echo "\n\n" | /usr/local/bss/bss --server --console
+#/usr/local/bss/bss --server --console
 
 # For staff tuning
 #/usr/local/bss/bss --admin --notune
@@ -156,3 +157,46 @@ sleep 1
 ssh 192.168.163.6 "killall  videosrv"
 sleep 1
 killall  videosrv
+sleep 1
+ps auxww | grep zoom_pint.py | grep -v grep | awk '{print $2}'| xargs kill
+sleep 1
+
+
+if [ $selectCCD == "Q315r" ]; then 
+#########For Q315_local#############
+ ps auxww | grep det_api_workstation | grep -v grep | awk '{print $2}'| xargs kill
+ ps auxww | grep ccd_image_gather | grep -v grep | awk '{print $2}'| xargs kill
+ #rm -f /dkc/*
+
+ #########For Q315_remote_2##########
+ ssh -l $username 192.168.2.202 "killall -9 det_api_workstation" &
+ ssh -l $username 192.168.2.202 "killall -9 ccd_image_gather" &
+# rm -f /dkc/*
+fi
+
+if [ $selectCCD == "MX225HS" ]; then 
+  #########For MX225HS#########
+  sleep 1
+  ssh 192.168.163.32 "killall  marccd_server_socket" &
+  sleep 1
+  ssh 192.168.163.32 "killall  hsserver_legacy" &
+fi
+
+if [ $selectCCD == "MX225HE" ]; then 
+  #########For MX225HE#########
+  sleep 1
+  ssh 192.168.163.32 "killall  marccd" &
+  sleep 1
+  ssh 192.168.163.32 "killall  marccd_server_socket" &
+fi
+
+######### For Monitoring permittion of HOME dir ########
+#setenv pidEng  `ps -aef | grep ChkChmod.csh | grep -v grep | awk '{ print $2; }'`
+#kill $pidEng
+
+#echo "**************************************" >> ~/test.log
+#echo "" >> ~/test.log
+#echo "  shutting down BSS  " >> ~/test.log
+#echo "" >> ~/test.log
+#echo "**************************************" >> ~/test.log
+
