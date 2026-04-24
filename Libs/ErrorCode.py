@@ -25,6 +25,9 @@ class ErrorCode(Enum):
     DATA_COLLECTION_NO_CRYSTAL = 3002  # 測定の結晶が見つからなかった
     DATA_COLLECTION_UNKNOWN_ERROR = 3003
 
+    # Beam dump error
+    BEAM_DUMP_RECOVERED = 4001  # ビームダンプからの復旧
+
     # 測定モードエラー
     UNKNOWN_MEASUREMENT_MODE = 8001  # 測定モード不明エラー
 
@@ -60,6 +63,7 @@ class ErrorCode(Enum):
             self.DATA_COLLECTION_UNKNOWN_ERROR: "Unknown error occurred during data collection",
             self.UNKNOWN_MEASUREMENT_MODE: "Unknown measurement mode",
             self.UNKNOWN_ERROR: "Unknown error",
+            self.BEAM_DUMP_RECOVERED: "Beam dump recovered",
             self.SUCCESS: "Success"
         }
         return descriptions.get(self, "Undefined error")

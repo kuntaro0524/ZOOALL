@@ -562,6 +562,139 @@ class ZooNavigator():
         else:
             self.esa.addEventTimeAt(cond['o_index'], event_name)
 
+    # ビームダンプ用の修正　2026/04/24
+    def waitTillReadyWithBeamDumpCheck(self, cond, job_name="unknown"):
+        """
+        BSS の measurement query を監視しながら ready を待つ。
+
+        仕様:
+        - working_beam__dump__recovering は待機継続
+        - working_Tuning は待機継続
+        - ready_beam__dump__recovered を検知した場合:
+            1. 直前JOBを異常終了として記録
+            2. put/bss/reset_server_status を実行
+            3. ready 復帰を確認
+            4. 当該 pin の残り処理を中断する
+        """
+        self.logger.info(f"[BeamDump] waitTillReadyWithBeamDumpCheck starts. job={job_name}")
+
+        while True:
+            status = self.zoo.getMeasurementStatus()
+            status_lower = status.lower()
+
+            self.logger.debug(f"[BeamDump] BSS status={status}")
+
+            if status_lower == "ready":
+                self.logger.info(f"[BeamDump] BSS ready detected. job={job_name}")
+                return
+
+            if status_lower in (
+                "working_beam__dump__recovering",
+                "working_tuning",
+            ):
+                self.logger.warning(
+                    f"[BeamDump] BSS is recovering/tuning after beam dump. "
+                    f"job={job_name}, status={status}"
+                )
+                time.sleep(10.0)
+                continue
+
+            if status_lower == "ready_beam__dump__recovered":
+                self.logger.warning(
+                    f"[BeamDump] BSS returned ready_beam__dump__recovered. "
+                    f"job={job_name}"
+                )
+
+                self.recordBeamDumpFailure(cond, job_name, status)
+                self.resetBeamDumpStatusAndConfirmReady()
+
+                raise BeamDumpRecoveredException(
+                    f"Beam dump recovered during {job_name}. "
+                    "Skip remaining procedures for this pin."
+                )
+
+            if status_lower.startswith("fail"):
+                raise ZooMyException(f"BSS failure during {job_name}: {status}")
+
+            if status_lower.startswith("fatal"):
+                raise ZooMyException(f"BSS fatal error during {job_name}: {status}")
+
+            if status_lower.startswith("working"):
+                self.logger.info(f"[BeamDump] BSS working. job={job_name}, status={status}")
+                time.sleep(2.0)
+                continue
+
+            raise ZooMyException(f"Unknown BSS status during {job_name}: {status}")
+
+    def resetBeamDumpStatusAndConfirmReady(self):
+        """
+        ready_beam__dump__recovered を ready に戻し、ready復帰を確認する。
+        """
+        self.logger.warning("[BeamDump] reset_server_status will be sent to BSS.")
+
+        try:
+            self.zoo.resetServerStatus()
+        except Exception as e:
+            self.logger.error("[BeamDump] reset_server_status failed.", exc_info=True)
+            raise ZooMyException(
+                "Beam dump recovered, but reset_server_status failed. "
+                "Operator intervention is required."
+            )
+
+        for i in range(30):
+            status = self.zoo.getMeasurementStatus()
+            status_lower = status.lower()
+
+            self.logger.info(
+                f"[BeamDump] confirming ready after reset: "
+                f"trial={i+1}, status={status}"
+            )
+
+            if status_lower == "ready":
+                self.logger.info("[BeamDump] BSS status was reset to ready.")
+                return
+
+            time.sleep(2.0)
+
+        raise ZooMyException(
+            "reset_server_status was sent, but BSS did not return to ready. "
+            "Operator intervention is required."
+        )
+
+    def recordBeamDumpFailure(self, cond, job_name, status):
+        """
+        ビームダンプによって現在JOBが放棄されたことをDB/ログに記録する。
+        """
+        message = (
+            f"Beam dump occurred/recovered during job={job_name}. "
+            f"BSS status={status}. "
+            "Current JOB was aborted by BSS. "
+            "Remaining procedures for this pin will be skipped."
+        )
+
+        self.logger.warning("[BeamDump] " + message)
+
+        # ErrorCode.py に専用コードを作るのが本来は望ましい。
+        # 仮に未定義なら一時的に 9999 を使う。
+        try:
+            error_value = ErrorCode.BEAM_DUMP_RECOVERED.to_db_value()
+        except AttributeError:
+            error_value = 9999
+
+        self.updateDBinfo(cond, "isDone", error_value)
+        self.updateDBinfo(cond, "meas_record", error_value)
+        self.updateDBinfo(cond, "log_beam_dump", message)
+
+        # job_name に応じて時刻を閉じる
+        if "raster" in job_name:
+            self.updateTime(cond, "raster_end")
+
+        if "ds" in job_name or "data_collection" in job_name:
+            self.updateTime(cond, "ds_end")
+
+        self.updateTime(cond, "meas_end")
+
+
     def processLoop(self, cond, checkEnergyFlag=False, measFlux=False):
         # Root directory
         root_dir = cond['root_dir']
@@ -990,27 +1123,41 @@ class ZooNavigator():
                     f"mode={cond['mode']} does not support dose_list/dist_list."
                 )
 
-        self.logger.info("ZooNavigator starts MODE=%s" % (cond['mode']))
-        if cond['mode'] == "multi":
-            self.collectMulti(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "helical":
-            self.collectHelical(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "mixed":
-            self.collectMixed(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "single":
-            self.collectSingle(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "ssrox":
-            self.collectSSROX(cond, sphi)
-        elif cond['mode'] == "quick":
-            self.collectQuick(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "screening":
-            self.collectScreen(cond, sphi)
-        else:
-            self.logger.error("Unknown mode: %s" % cond['mode'])
-            error_code = ErrorCode.UNKNOWN_MODE
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            self.updateTime(cond, "meas_end")
+        try:
+            self.logger.info("ZooNavigator starts MODE=%s" % (cond['mode']))
+            if cond['mode'] == "multi":
+                self.collectMulti(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "helical":
+                self.collectHelical(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "mixed":
+                self.collectMixed(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "single":
+                self.collectSingle(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "ssrox":
+                self.collectSSROX(cond, sphi)
+            elif cond['mode'] == "quick":
+                self.collectQuick(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "screening":
+                self.collectScreen(cond, sphi)
+            else:
+                self.logger.error("Unknown mode: %s" % cond['mode'])
+                error_code = ErrorCode.UNKNOWN_MODE
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+                self.updateTime(cond, "meas_end")
+                return
+
+        except BeamDumpRecoveredException as e:
+            self.logger.warning(f"[BeamDump] Caught BeamDumpRecoveredException: {str(e)}")
+            self.logger.warning(f"[BeamDump] Remaining procedures for this pin are skipped due to beam dump recovery.")
+            try:
+                self.lm.closeCapture()
+            except Exception:
+                self.logger.error("[BeamDump] Failed to close Capture instance after beam dump recovery.", exc_info=True)
+            try: 
+                self.zoo.dismountCurrentPin()
+            except Exception:
+                self.logger.error("[BeamDump] Failed to dismount current pin after beam dump recovery.", exc_info=True)
             return
 
         self.num_pins += 1
@@ -1116,8 +1263,10 @@ class ZooNavigator():
         self.updateTime(cond, "raster_start")
         try:
             self.zoo.doRaster(raster_schedule)
-            self.zoo.waitTillReady()
-        except:
+            self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
+        except BeamDumpRecoveredException as e:
+            raise e
+        except ZooMyException as tttt:
             error_code = ErrorCode.RASTER_SCAN_FAILURE_MEASUREMENT
             self.updateDBinfo(cond, "isDone", error_code.to_db_value())
             self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
@@ -1235,7 +1384,7 @@ class ZooNavigator():
         # ds_start
         self.updateTime(cond, "ds_start")
         self.zoo.doDataCollection(multi_sch)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="data_collection_multi")
         self.updateTime(cond, "ds_end")
         self.updateDBinfo(cond, "isDS", 1)
 
@@ -1296,7 +1445,7 @@ class ZooNavigator():
         # ds_start
         self.updateTime(cond, "ds_start")
         self.zoo.doDataCollection(multi_sch)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="data_collection_multi")
         # ds_end
         self.updateTime(cond, "ds_end")
         self.updateDBinfo(cond, "isDS", 1)
@@ -1347,7 +1496,7 @@ class ZooNavigator():
             )
 
             self.zoo.doDataCollection(multi_sch)
-            self.zoo.waitTillReady()
+            self.waitTillReadyWithBeamDumpCheck(cond, job_name=f"data_collection_single_{i_dc:02d}")
 
     # Collect single
     def collectSingle(self, trayid, pinid, prefix, cond, sphi):
@@ -1374,7 +1523,7 @@ class ZooNavigator():
         self.updateTime(cond, "raster_start")
         self.logger.debug("[PROCESS] ZOO starts raster scan..")
         self.zoo.doRaster(schfile)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
         self.updateTime(cond, "raster_end")
         # Flag on
         self.updateDBinfo(cond, "isRaster", 1)
@@ -1469,7 +1618,7 @@ class ZooNavigator():
                 schfile, raspath = self.lm.rasterMaster(v_prefix, "Vert", mod_xyz,
                                                         scanv_um, scanh_um, vstep_um, hstep_um, phi_lv, cond)
                 self.zoo.doRaster(schfile)
-                self.zoo.waitTillReady()
+                self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
 
                 try:
                     # Final analysis for vertical scan
@@ -1487,6 +1636,8 @@ class ZooNavigator():
                     final_cxyz = crystals.getBestCrystalCode()
                 # もしかしてここもExceptionで結晶が検出されないことを判定しているのか。
                 # いつか修正したい
+                except BeamDumpRecoveredException:
+                    raise
                 except Exception as e:
                     self.logger.warning("Analyze vertical scans failed.\n")
                     self.logger.warning("ZN.collectSingle: Left vertical scan analysis failed.")
@@ -1613,7 +1764,7 @@ class ZooNavigator():
         # raster_start
         self.updateTime(cond, "raster_start")
         self.zoo.doRaster(schfile)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
         # raster_end
         self.updateTime(cond, "raster_end")
         # Flag on
@@ -1630,7 +1781,13 @@ class ZooNavigator():
                 cond['ds_hbeam'], cond['ds_vbeam'], flux))
 
         # HEBI instance
-        hebi = HEBI.HEBI(self.zoo, self.lm, self.stopwatch, flux)
+        hebi = HEBI.HEBI(
+            self.zoo,
+            self.lm,
+            self.stopwatch,
+            flux,
+            wait_ready_func=self.waitTillReadyWithBeamDumpCheck,
+        )
 
         # Log for dose list
         dose_dist_list = hebi.getDoseDistList(cond)
@@ -1666,7 +1823,9 @@ class ZooNavigator():
                 # meas_end
                 self.updateTime(cond, "meas_end")
         # Unknown exception captured
-        except:
+        except BeamDumpRecoveredException as e:
+            raise e
+        except Exception as e:
             self.logger.info("ZooNavigator.collectHelical failed.")
             # isDone, meas_record にエラーコードを入れる
             error_code = ErrorCode.DATA_COLLECTION_UNKNOWN_ERROR
@@ -1709,12 +1868,12 @@ class ZooNavigator():
         # Raster start
         self.updateTime(cond, "raster_start")
         self.zoo.doRaster(schfile)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
         self.updateDBinfo(cond, "isRaster", 1)
         self.updateTime(cond, "raster_end")
 
         # HITO instance
-        hito = DiffscanMaster.NOU(self.zoo, self.lm, sphi, self.phosec_meas)
+        hito = DiffscanMaster.HITO(self.zoo, self.lm, sphi, self.phosec_meas, wait_ready_func=self.waitTillReadyWithBeamDumpCheck)
         # Set the time limit for data collection from a pin.
         self.updateTime(cond, "ds_start")
         # HITO data collection time [mins] -> currently limited to 15 minutes.
@@ -1724,6 +1883,8 @@ class ZooNavigator():
             # isDS = 1
             self.updateDBinfo(cond, "isDS", 1)
             self.updateDBinfo(cond, "isDone", 1)
+        except BeamDumpRecoveredException as e:
+            raise e
         except Exception as e:
             self.logger.info(e.args[0])
             message = f"Data collection failed in unknown reasons: {e.args[0]}"
@@ -1766,7 +1927,7 @@ class ZooNavigator():
 
         # Do the raster scan with rotation
         self.zoo.doRaster(raster_schedule)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="ssrox")
         # ds_end
         self.updateTime(cond, "ds_end")
         self.updateDBinfo(cond, "isDS", 1)
@@ -1805,7 +1966,7 @@ class ZooNavigator():
         # raster_start
         self.updateTime(cond, "raster_start")
         self.zoo.doRaster(raster_schedule)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d_screen")
         self.updateTime(cond, "raster_end")
         # Flag on
         self.updateDBinfo(cond, "isRaster", 1)

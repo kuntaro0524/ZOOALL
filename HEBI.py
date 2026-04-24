@@ -13,7 +13,8 @@ import logging.config
 # version 2.0.0 2019/07/04
 
 class HEBI():
-    def __init__(self, zoo, loop_measurement, stopwatch, phosec):
+    def __init__(self, zoo, loop_measurement, stopwatch, phosec, wait_ready_func=None):
+        self.wait_ready_func = wait_ready_func
         self.min_score = 15
         self.max_score = 200
         self.naname_include = True
@@ -44,6 +45,12 @@ class HEBI():
 
         # My logfile
         self.logger = logging.getLogger('ZOO').getChild("HEBI")
+
+    def waitTillReady(self, cond, job_name):
+        if self.wait_ready_func is not None:
+            self.wait_ready_func(cond, job_name=job_name)
+        else:
+            self.zoo.waitTillReady()
 
     # getSortedCryList
     def getSortedCryList(self, scan_path, scan_prefix, phi_center, isWeakScan=False):
@@ -91,7 +98,9 @@ class HEBI():
             print(schfile)
 
             self.zoo.doRaster(schfile)
-            self.zoo.waitTillReady()
+            self.waitTillReady(cond, job_name="hebi_2d")
+        except BeamDumpRecoveredException:
+            raise
         except:
             raise ZooMyException("HEBI.do2Dscan : Failed.")
 
@@ -150,7 +159,12 @@ class HEBI():
         schfile, raspath = self.lm.rasterMaster(prefix, scan_mode, center, vrange_um, hrange_um,
                                                 vstep_um, hstep_um, phi, cond, isHEBI=True)
         self.zoo.doRaster(schfile)
-        self.zoo.waitTillReady()
+        try:
+            self.waitTillReady(cond, job_name="hebi_vscan")
+        except BeamDumpRecoveredException:
+            raise
+        except:
+            raise ZooMyException("HEBI.doVscan : Failed.")
 
         return raspath
 
@@ -220,8 +234,9 @@ class HEBI():
                     f"Single DC: prefix={prefix_local} dose={dose} dist={dist}"
                 )
                 self.zoo.doDataCollection(single_sch)
-                self.zoo.waitTillReady()
-    
+                self.waitTillReady(cond_local, job_name="hebi_single")
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("HEBI.doSingle: Errors occured in data collection loop.\n")
@@ -286,9 +301,10 @@ class HEBI():
                     "Schedule file has been prepared with LM.genHelical {prefix=%s}" % prefix_local
                 )
                 self.zoo.doDataCollection(helical_sch)
-                self.zoo.waitTillReady()
+                self.waitTillReady(cond_local, job_name="hebi_single")
                 data_index += 1
-
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("HEBI.doHelical: Errors occured in data collection loop.\n")
@@ -378,6 +394,9 @@ class HEBI():
                 try:
                     lface_prefix = "lface%02d" % cry_index
                     left_face_path = self.do2Dscan(lface_prefix, lpos, cond, phi_face)
+                except BeamDumpRecoveredException:
+                    raise
+
                 except:
                     print("L face scan failed.")
                     self.logger.info("HEBI.mainLoop: L face scan failed.\n")
@@ -385,6 +404,9 @@ class HEBI():
                 try:
                     rface_prefix = "rface%02d" % cry_index
                     right_face_path = self.do2Dscan(rface_prefix, rpos, cond, phi_face)
+                except BeamDumpRecoveredException:
+                    raise
+
                 except:
                     print("R face scan failed.")
                     self.logger.info("HEBI.mainLoop: R face scan failed.\n")
@@ -395,6 +417,8 @@ class HEBI():
                                                    isWeakScan=True)
                     self.logger.info("Left  position precise 2D scan: %9.4f %9.4f %9.4f\n" % (
                     left_face_xyz[0], left_face_xyz[1], left_face_xyz[2]))
+                except BeamDumpRecoveredException:
+                    raise
                 except:
                     print("Analyze left scan failed.")
                     self.logger.info("HEBI.mainLoop: Left face scan failed.\n")
@@ -404,6 +428,8 @@ class HEBI():
                                                     isWeakScan=True)
                     self.logger.info("Right position precise 2D scan: %9.4f %9.4f %9.4f\n" % (
                     right_face_xyz[0], right_face_xyz[1], right_face_xyz[2]))
+                except BeamDumpRecoveredException:
+                    raise
                 except:
                     print("Analyze left scan failed.")
                     self.logger.info("HEBI.mainLoop: Right face scan failed.\n")
@@ -452,6 +478,8 @@ class HEBI():
 
                 try:
                     left_xyz = self.edgeCentering(cond, phi_face, left_face_xyz, LorR="Left", cry_index=cry_index)
+                except BeamDumpRecoveredException:
+                    raise
                 except:
                     self.logger.info("HEBI.mainLoop: Left vertical scan failed.\n")
                     self.logger.info("HEBI.mainLoop: Next crystal...\n")
@@ -459,6 +487,8 @@ class HEBI():
 
                 try:
                     right_xyz = self.edgeCentering(cond, phi_face, right_face_xyz, LorR="Right", cry_index=cry_index)
+                except BeamDumpRecoveredException:
+                    raise
                 except:
                     self.logger.info("HEBI.mainLoop: Right vertical scan failed.\n")
                     self.logger.info("HEBI.mainLoop: Next crystal...\n")

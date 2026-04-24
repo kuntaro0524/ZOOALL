@@ -552,6 +552,55 @@ class Zoo:
         # RETURN(?): puck/get/(BSS pid)_pxbl_server/ret_val/errcode
         recstr = self.communicate(com)
 
+    # ビームダンプ用の関数を追加 2026/04/24
+    def getMeasurementStatus(self):
+        """
+        BSS measurement query の SVOC_C をそのまま返す。
+        例:
+        ready
+        working_xxx
+        working_beam__dump__recovering
+        working_Tuning
+        ready_beam__dump__recovered
+        fail/errcode
+        fatal/errorcode
+        """
+        if self.isConnect == False:
+            raise ZooMyException("getMeasurementStatus: BSS is not connected.")
+
+        command = "get/measurement/query"
+        recstr = self.communicate(command)
+        svoc_c = self.getSVOC_C(recstr).strip()
+
+        self.logger.debug(f"getMeasurementStatus: command={command}")
+        self.logger.debug(f"getMeasurementStatus: recstr={recstr}")
+        self.logger.debug(f"getMeasurementStatus: svoc_c={svoc_c}")
+
+        return svoc_c
+
+    def resetServerStatus(self):
+        """
+        BSS server status を ready_beam__dump__recovered から ready に戻す。
+
+        BSS command:
+        put/bss/reset_server_status
+        """
+        if self.isConnect == False:
+            raise ZooMyException("resetServerStatus: BSS is not connected.")
+
+        command = "put/bss/reset_server_status"
+        recstr = self.communicate(command)
+
+        self.logger.info(f"resetServerStatus: command={command}")
+        self.logger.info(f"resetServerStatus: recstr={recstr}")
+
+        # 返答仕様が未確定なら、ここでは通信できたことだけ確認する。
+        # 必要なら後段で waitTillReady / getMeasurementStatus により ready を確認する。
+        if recstr is False:
+            raise ZooMyException("resetServerStatus: communication failed.")
+
+        return recstr
+
 if __name__ == "__main__":
     # Logging setting
     # open configure file

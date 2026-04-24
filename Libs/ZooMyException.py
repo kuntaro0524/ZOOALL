@@ -16,3 +16,9 @@ class RecoverableCenteringError(ZooMyException):
 class FatalCenteringError(ZooMyException):
     """Critical error in centering : Experiment should be aborted."""
     pass
+class BeamDumpRecoveredException(Exception):
+    """
+    BSS が ready_beam__dump__recovered を返した場合に、
+    当該 pin の残り処理を中断して次 pin へ進むための内部例外。
+    """
+    pass
