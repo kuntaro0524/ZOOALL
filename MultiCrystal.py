@@ -34,6 +34,7 @@ class MultiCrystal:
         self.ainterval = 1  # Multi-crystal mode this should be always 1
         self.scan_interval = 1
         self.beamsize_idx = 0
+        self.sample_name = "unknown"
         self.crystal_id = "unknown"
         self.x1 = 1.0
         self.y1 = 1.0
@@ -120,6 +121,9 @@ class MultiCrystal:
         self.ainterval = ainterval
         self.isAdvanced = 1
 
+    def setSampleName(self, sample_name):
+        self.sample_name = sample_name
+
     def setAdvancedVector(self, start, end):
         self.x1 = float(start[0])
         self.y1 = float(start[1])
@@ -173,7 +177,7 @@ class MultiCrystal:
         ofile.write("Cleaning after mount: 0 # 0:no clean, 1:clean\n")
         ofile.write("Not dismount: 0 # 0:dismount, 1:not dismount\n")
         ofile.write("Data Directory: %s/\n" % self.dir)
-        ofile.write("Sample Name: %s\n" % self.prefix)
+        ofile.write("Sample Name: %s\n" % self.sample_name)
         ofile.write("Serial Offset: %5d\n" % self.offset)
         ofile.write("Number of Wavelengths: 1\n")
         ofile.write("File Name Suffix: %s\n"%(self.data_suffix))
@@ -321,7 +325,7 @@ class MultiCrystal:
         schstr.append("Cleaning after mount: 0 # 0:no clean, 1:clean\n")
         schstr.append("Not dismount: 0 # 0:dismount, 1:not dismount\n")
         schstr.append("Data Directory: %s/\n" % self.dir)
-        schstr.append("Sample Name: %s\n" % prefix)
+        schstr.append("Sample Name: %s\n" % self.sample_name)
         schstr.append("Serial Offset: %5d\n" % self.offset)
         schstr.append("Number of Wavelengths: 1\n")
         schstr.append("File Name Suffix: %s\n"%(self.data_suffix))

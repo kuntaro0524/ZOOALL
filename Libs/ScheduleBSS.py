@@ -60,6 +60,8 @@ class ScheduleBSS:
         self.beamline = self.config.get("beamline", "beamline")
         # is ECHA database is used? True or False
         self.isECHA = self.config.get("ECHA", "isECHA")
+        # sample name
+        self.sample_name = "unknown"
 
     def setBeamsizeIndex(self, index):
         self.beamsize_idx = index
@@ -86,6 +88,9 @@ class ScheduleBSS:
         self.startphi = startphi
         self.endphi = endphi
         self.stepphi = stepphi
+
+    def setSampleName(self, sample_name):
+        self.sample_name = sample_name
 
     def setCameraLength(self, cl):
         self.cl = cl
@@ -168,7 +173,7 @@ class ScheduleBSS:
         schstr.append("Cleaning after mount: 0 # 0:no clean, 1:clean\n")
         schstr.append("Not dismount: 0 # 0:dismount, 1:not dismount\n")
         schstr.append("Data Directory: %s\n" % self.dir)
-        schstr.append("Sample Name: %s\n" % self.dataname)
+        schstr.append("Sample Name: %s\n" % self.sample_name)
         schstr.append("Serial Offset: %5d\n" % self.offset)
         schstr.append("Number of Wavelengths: 1\n")
         schstr.append("Exposure Time: %8.2f 1.000000 1.000000 1.000000 # [sec]\n" % self.exptime)
@@ -251,7 +256,7 @@ class ScheduleBSS:
         ofile.write("Cleaning after mount: 0 # 0:no clean, 1:clean\n")
         ofile.write("Not dismount: 0 # 0:dismount, 1:not dismount\n")
         ofile.write("Data Directory: %s\n" % self.dir)
-        ofile.write("Sample Name: %s\n" % self.dataname)
+        ofile.write("Sample Name: %s\n" % self.sample_name)
         ofile.write("Serial Offset: %5d\n" % self.offset)
         ofile.write("Number of Wavelengths: 1\n")
         ofile.write("Beam Size: %d\n" % self.beamsize_idx)

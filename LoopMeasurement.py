@@ -299,6 +299,7 @@ class LoopMeasurement:
         best_transmission=100.0
 
         rss.setSSROX()
+        rss.setSampleName(cond['sample_name'])
         rss.setWL(self.wavelength)
         rss.setExpTime(exp_time)
         rss.setPrefix(scan_id)
@@ -483,6 +484,8 @@ class LoopMeasurement:
         rss.setImgDire(raster_path)
         rss.setStartPhi(phi)
         rss.setMode(scan_mode)
+        # sample name setting
+        rss.setSampleName(cond['sample_name'])
         # Setting v step in [mm]
         vstep_mm = vstep_um / 1000.0
         rss.setVstep(vstep_mm)
@@ -798,6 +801,7 @@ class LoopMeasurement:
         mc.setCameraLength(cond['dist_ds'])
         mc.setScanCondition(start_phi, end_phi, cond['osc_width'])
         mc.setDir(self.multi_dir)
+        mc.setSampleName(cond['sample_name'])
         mc.setShutterlessOn()
 
         if same_point == False:
@@ -855,12 +859,14 @@ class LoopMeasurement:
         # 160618 Added by K. Hirata
         mc.setPrefix(prefix)
         mc.setCrystalID(cond['sample_name'])
+        mc.setSampleName(cond['sample_name'])
         mc.setWL(self.wavelength)
         if self.isBeamsizeIndexOnScheduleFile == True:
             mc.setBeamsizeIndex(beamsize_index)
         mc.setExpTime(exp_time)
         mc.setCameraLength(cond['dist_ds'])
         mc.setScanCondition(phi_start, phi_end, cond['osc_width'])
+        mc.setSampleName(cond['sample_name'])
         mc.setDir(self.multi_dir)
         mc.setShutterlessOn()
 
@@ -1264,6 +1270,7 @@ class LoopMeasurement:
         schbss.setCameraLength(cond['dist_ds'])
         schbss.setAdvanced(n_irrad, step_length, nframes_per_point)
         schbss.setAdvancedVector(left_xyz, right_xyz)
+        schbss.setSampleName(cond['sample_name'])
         schbss.setScanCondition(startphi, endphi, stepphi)
 
         # ntimes is the number of time of same data collection
@@ -1306,7 +1313,6 @@ class LoopMeasurement:
         rs.setHpoints(1)
         rs.setExpTime(raster_exp)
         rs.makeMulti(sc_name, glist)
-
 
 if __name__ == "__main__":
     import ESA

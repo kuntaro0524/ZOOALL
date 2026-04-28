@@ -34,6 +34,7 @@ class RasterSchedule:
         self.h_step_mm = 0.01
         # Crystal ID for automatic data processing
         self.crystal_id = "unknown"
+        self.sample_name = "unknown"
         # Raster scan points
         self.v_points = 10
         self.h_points = 10
@@ -128,6 +129,9 @@ class RasterSchedule:
         self.startphi = startphi
         self.endphi = startphi + stepphi
 
+    def setSampleName(self, sample_name):
+        self.sample_name = sample_name
+
     def setCL(self, distance):
         self.distance = distance
 
@@ -186,7 +190,7 @@ class RasterSchedule:
         schstr.append("Cleaning after mount: 0 # 0:no clean, 1:clean")
         schstr.append("Not dismount: 0 # 0:dismount, 1:not dismount")
         schstr.append("Data Directory: %s" % self.imgdir)
-        schstr.append("Sample Name: %s" % self.prefix)
+        schstr.append("Sample Name: %s" % self.sample_name)
         schstr.append("File Name Suffix: %s" % self.img_suffix)
         schstr.append("Serial Offset: 0")
         schstr.append("Beam Size: %d" % self.beamsizeIndex)

@@ -368,6 +368,9 @@ class HEBI():
         sorted_crylist = self.getSortedCryList(scan_path_2dface, scan_prefix_2dface, phi_face, isWeakScan=False)
         self.logger.info("# of found crystals: %05d\n" % len(sorted_crylist))
 
+        # number of datasets
+        self.nds_measured = 0
+
         if len(sorted_crylist) == 0:
             self.logger.info("No crystals were found\n")
             return 0
