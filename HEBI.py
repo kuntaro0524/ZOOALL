@@ -235,6 +235,7 @@ class HEBI():
                 )
                 self.zoo.doDataCollection(single_sch)
                 self.waitTillReady(cond_local, job_name="hebi_single")
+                self.nds_measured += 1
         except BeamDumpRecoveredException:
             raise
         except Exception as e:
@@ -303,6 +304,7 @@ class HEBI():
                 self.zoo.doDataCollection(helical_sch)
                 self.waitTillReady(cond_local, job_name="hebi_single")
                 data_index += 1
+                self.nds_measured += 1
         except BeamDumpRecoveredException:
             raise
         except Exception as e:
@@ -368,8 +370,8 @@ class HEBI():
         sorted_crylist = self.getSortedCryList(scan_path_2dface, scan_prefix_2dface, phi_face, isWeakScan=False)
         self.logger.info("# of found crystals: %05d\n" % len(sorted_crylist))
 
-        # number of datasets
-        self.nds_measured = 0
+        # number of datasets (reset in this routine)
+        self.nds_measured = 0 
 
         if len(sorted_crylist) == 0:
             self.logger.info("No crystals were found\n")
@@ -507,9 +509,9 @@ class HEBI():
             cry_index += 1
 
             # Check the maximum number
-            if cry_index == n_max:
-                break
-        return cry_index
+            if self.nds_measured >= n_max:
+                return self.nds_measured
+        return self.nds_measured
 
     # テキストから数値のリストを抽出するユーティリティ関数
     def _parse_series_like_text(self, value):
