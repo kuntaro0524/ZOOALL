@@ -460,6 +460,8 @@ class HITO():
             self.logger.info("doSingle: ERRors occured in data collection loop.\n")
 
     def doSingle(self, center_xyz, cond, osc_start, osc_end, prefix):
+        cond_local = cond.copy()
+        cond_local["mode"] = "single"
         try:
             self.logger.info(
                 "doSingle starts: prefix=%s osc_start=%.3f osc_end=%.3f center=(%.4f %.4f %.4f)",
@@ -467,12 +469,12 @@ class HITO():
             )
             self.logger.info(
                 "doSingle cond: dose_ds=%s dist_ds=%s total_osc=%s exp_ds=%s",
-                cond.get("dose_ds"), cond.get("dist_ds"),
-                cond.get("total_osc"), cond.get("exp_ds")
+                cond_local.get("dose_ds"), cond_local.get("dist_ds"),
+                cond_local.get("total_osc"), cond_local.get("exp_ds")
             )
 
             multi_sch = self.lm.genSingleSchedule(
-                osc_start, osc_end, center_xyz, cond, self.phosec_meas, prefix=prefix
+                osc_start, osc_end, center_xyz, cond_local, self.phosec_meas, prefix=prefix
             )
 
             self.logger.info("Generated schedule file: %s", multi_sch)
