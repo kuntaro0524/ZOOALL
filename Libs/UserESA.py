@@ -652,7 +652,10 @@ class UserESA():
 
         # self.df['ppf_raster']が 4.0E10 を下回る場合には警告を出す
         # "Warning: ppf_raster is less than 4.0E10. Please check the exposure condition."
-        mask2 = (self.df['ppf_raster'] < 4.0E10)
+        mask2 = (
+            (self.df['ppf_raster'] < 4.0E10) &
+            (self.df['dose_list'].isna() | (self.df['dose_list'].astype(str).str.strip() == ""))
+        )
         if mask2.any():
             for i in range(len(self.df)):
                 if mask2[i]:
