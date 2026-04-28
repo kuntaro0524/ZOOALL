@@ -446,7 +446,7 @@ class HITO():
         else:
             return +1.0 * y_abs
 
-    def doSingle(self, center_xyz, cond, osc_start, osc_end, prefix):
+    def doSingle_obsoleted(self, center_xyz, cond, osc_start, osc_end, prefix):
         try:
             multi_sch = self.lm.genSingleSchedule(osc_start, osc_end, center_xyz, cond, self.phosec_meas, prefix=prefix)
             self.logger.info("MultiSchedule class was used to generate the schedule file.\n")
@@ -458,6 +458,38 @@ class HITO():
         except Exception as e:
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("doSingle: ERRors occured in data collection loop.\n")
+
+    def doSingle(self, center_xyz, cond, osc_start, osc_end, prefix):
+        try:
+            self.logger.info(
+                "doSingle starts: prefix=%s osc_start=%.3f osc_end=%.3f center=(%.4f %.4f %.4f)",
+                prefix, osc_start, osc_end, center_xyz[0], center_xyz[1], center_xyz[2]
+            )
+            self.logger.info(
+                "doSingle cond: dose_ds=%s dist_ds=%s total_osc=%s exp_ds=%s",
+                cond.get("dose_ds"), cond.get("dist_ds"),
+                cond.get("total_osc"), cond.get("exp_ds")
+            )
+
+            multi_sch = self.lm.genSingleSchedule(
+                osc_start, osc_end, center_xyz, cond, self.phosec_meas, prefix=prefix
+            )
+
+            self.logger.info("Generated schedule file: %s", multi_sch)
+
+            if not os.path.exists(multi_sch):
+                raise ZooMyException("doSingle: schedule file was not created: %s" % multi_sch)
+
+            self.zoo.doDataCollection(multi_sch)
+            self.waitTillReady(cond, job_name="hito_single")
+
+            self.logger.info("doSingle finished successfully: prefix=%s", prefix)
+
+        except BeamDumpRecoveredException:
+            raise
+        except Exception as e:
+            self.logger.exception("doSingle failed: prefix=%s", prefix)
+            raise
 
     # 2020/07/09 coded by K. Hirata
     def startHelical(self, left_xyz, right_xyz, cond, osc_start, osc_end, prefix):
@@ -484,8 +516,8 @@ class HITO():
         except BeamDumpRecoveredException:
             raise
         except Exception as e:
-            self.logger.info("Exception: %s\n" % e)
-            self.logger.info("HEBI.startHelical: ERRors occured in data collection loop.\n")
+            self.logger.exception("startHelical failed: prefix=%s", prefix)
+            raise
 
         # When the data collection finished.
         # self.sw.setTime("end")
