@@ -285,6 +285,46 @@ class UserESA():
         else:
             raise ValueError(f"[UserESA] Unknown mode for scan dose: {mode}")
 
+    def getMaxRasterFrequency(self):
+        """
+        raster detector frequency の最大値 [Hz] を返す。
+        beamline.ini に max_raster_frequency があればそれを使い、
+        なければ仕様上の既定値 220 Hz を使う。
+        """
+        return int(self.config.getfloat("experiment", "max_raster_frequency", fallback=220.0))
+
+    def selectRasterExposureByFrequency(self, required_exp_raster):
+        """
+        仕様 5.9.2:
+        exp_raster = 1 / f
+        f は整数、かつ 1 <= f <= max_freq。
+
+        required_exp_raster を下回らない範囲で、
+        最短の exp_raster を返す。
+        """
+        max_freq = self.getMaxRasterFrequency()
+
+        required_exp_raster = float(required_exp_raster)
+
+        if required_exp_raster <= 0.0:
+            f = max_freq
+        else:
+            f = math.floor(1.0 / required_exp_raster)
+
+            if f > max_freq:
+                f = max_freq
+
+            if f < 1:
+                raise ValueError(
+                    "[UserESA] required_exp_raster is too long for integer-frequency control: "
+                    f"required_exp_raster={required_exp_raster:.6f} s, "
+                    f"allowed maximum exposure is 1.0 s at 1 Hz"
+                )
+
+        exp_raster = 1.0 / float(f)
+
+        return exp_raster, f
+
     # ビームライン、実験モードと結晶のタイプから実験パラメータを取得する
     # 2023/05/09 type_crystal は使わない
     def getParams(self, desired_exp_string, mode):
@@ -425,214 +465,197 @@ class UserESA():
     # Raster scanの露光条件を定義する
     # Pandas dataframeに対して一気に処理を行う
     def defineScanCondition(self):
+        """
+        raster scan 条件を決定する。
+
+        仕様:
+        - exp_raster は整数 Hz の逆数のみ許容する。
+        - 1 <= f <= 220 Hz とする。
+        - 必要 photon 数または scan dose を満たす範囲で最短露光を選ぶ。
+        - att_raster <= 100% となるよう exp_raster を先に決定する。
+        - exp_raster 決定後に att_raster, ppf_raster, dose_per_frame, dose_ds を計算する。
+        """
         kuma = KUMA.KUMA()
 
         def _has_value(v):
             return (not pd.isna(v)) and str(v).strip() != ""
+
+        def _base_dose(row, exp_raster):
+            return kuma.getDose(
+                row["ds_hbeam"],
+                row["ds_vbeam"],
+                row["flux"],
+                row["wavelength"],
+                exp_raster
+            )
 
         if "dose_list" not in self.df.columns:
             self.df["dose_list"] = ""
         if "dist_list" not in self.df.columns:
             self.df["dist_list"] = ""
 
-        extended_mask = self.df["dose_list"].apply(_has_value)
+        photons_per_image_normal = 4.0E10
+        target_scan_dose_ext = 0.001  # MGy/frame
 
-        photons_per_image = 4E10
-        photons_per_exptime = self.df['flux'] * self.df['exp_raster']
+        max_scan_speed = self.config.getfloat("experiment", "max_hori_scan_speed")
+        if max_scan_speed <= 0.0:
+            raise ValueError("[UserESA] max_hori_scan_speed must be positive.")
 
-        base_mask1 = (
-            (self.df['desired_exp'] == 'normal') |
-            (self.df['desired_exp'] == 'scan_only') |
-            (self.df['desired_exp'] == 'phasing') |
-            (self.df['desired_exp'] == 'rapid')
-        )
-        mask1 = base_mask1 & (~extended_mask)
+        # 初期化
+        self.df["ppf_raster"] = np.nan
+        self.df["dose_per_frame"] = np.nan
 
-        if mask1.any():
-            self.df.loc[mask1, 'att_raster'] = photons_per_image / photons_per_exptime[mask1] * 100.0
-            self.df.loc[mask1, 'hebi_att'] = self.df.loc[mask1, 'att_raster']
-            self.df.loc[mask1, 'ppf_raster'] = photons_per_image
-        
-            base_dose_mask1 = self.df.loc[mask1].apply(
-                lambda row: kuma.getDose(
-                    row['ds_hbeam'],
-                    row['ds_vbeam'],
-                    row['flux'],
-                    row['wavelength'],
-                    row['exp_raster']
-                ),
-                axis=1
-            )
-        
-            self.df.loc[mask1, 'dose_per_frame'] = (
-                base_dose_mask1 * self.df.loc[mask1, 'att_raster'] / 100.0
-            )
+        for i, row in self.df.iterrows():
+            desired_exp = str(row["desired_exp"]).strip().lower()
+            has_dose_list = _has_value(row.get("dose_list", ""))
 
-        if len(self.df) > 0:
-            base_normal_dose = self.df.apply(
-                lambda row: kuma.getDose(
-                    row['ds_hbeam'],
-                    row['ds_vbeam'],
-                    row['flux'],
-                    row['wavelength'],
-                    row['exp_raster']
-                ),
-                axis=1
-            )
-        
-            normal_dose_per_frame = (
-                base_normal_dose * (photons_per_image / (self.df['flux'] * self.df['exp_raster']))
-            )
-        else:
-            normal_dose_per_frame = pd.Series(dtype=float)
-        
-        mask2 = (self.df['desired_exp'] == 'high_dose_scan') & (~extended_mask)
-        # high_dose_scan: normal の dose_per_frame の 1.5 倍になるよう attenuation を決める
-        if mask2.any():
-            dose_for_raster = normal_dose_per_frame * 1.5
-        
-            base_dose_mask2 = self.df.loc[mask2].apply(
-                lambda row: kuma.getDose(
-                    row['ds_hbeam'],
-                    row['ds_vbeam'],
-                    row['flux'],
-                    row['wavelength'],
-                    row['exp_raster']
-                ),
-                axis=1
-            )
-        
-            self.df.loc[mask2, 'att_raster'] = dose_for_raster[mask2] / base_dose_mask2 * 100.0
-            self.df.loc[mask2, 'hebi_att'] = self.df.loc[mask2, 'att_raster']
-            self.df.loc[mask2, 'ppf_raster'] = (
-                self.df.loc[mask2, 'flux'] *
-                self.df.loc[mask2, 'exp_raster'] *
-                self.df.loc[mask2, 'att_raster'] / 100.0
-            )
-            self.df.loc[mask2, 'dose_per_frame'] = (
-                base_dose_mask2 * self.df.loc[mask2, 'att_raster'] / 100.0
-            )
+            flux = float(row["flux"])
+            raster_hbeam = float(row["raster_hbeam"])
 
-        # ultra_high_dose_scan: normal の dose_per_frame の 3 倍になるよう attenuation を決める
-        mask3 = (self.df['desired_exp'] == 'ultra_high_dose_scan') & (~extended_mask)
+            if flux <= 0.0:
+                raise ValueError(f"[UserESA] flux must be positive. idx={i}, flux={flux}")
 
-        if mask3.any():
-            dose_for_raster = normal_dose_per_frame * 3.0
-        
-            base_dose_mask3 = self.df.loc[mask3].apply(
-                lambda row: kuma.getDose(
-                    row['ds_hbeam'],
-                    row['ds_vbeam'],
-                    row['flux'],
-                    row['wavelength'],
-                    row['exp_raster']
-                ),
-                axis=1
-            )
-        
-            self.df.loc[mask3, 'att_raster'] = dose_for_raster[mask3] / base_dose_mask3 * 100.0
-            self.df.loc[mask3, 'hebi_att'] = self.df.loc[mask3, 'att_raster']
-            self.df.loc[mask3, 'ppf_raster'] = (
-                self.df.loc[mask3, 'flux'] *
-                self.df.loc[mask3, 'exp_raster'] *
-                self.df.loc[mask3, 'att_raster'] / 100.0
-            )
-            self.df.loc[mask3, 'dose_per_frame'] = (
-                base_dose_mask3 * self.df.loc[mask3, 'att_raster'] / 100.0
+            # scan speed 制約
+            required_exp_by_speed = raster_hbeam / max_scan_speed
+
+            # photon/dose 制約
+            if has_dose_list:
+                # dose_list 運用では scan dose = 0.001 MGy/frame
+                dose_per_sec_full_att = _base_dose(row, 1.0)
+                if dose_per_sec_full_att <= 0.0:
+                    raise ValueError(
+                        f"[UserESA] base dose per second must be positive. idx={i}, "
+                        f"dose_per_sec_full_att={dose_per_sec_full_att}"
+                    )
+
+                required_exp_by_signal = target_scan_dose_ext / dose_per_sec_full_att
+                target_type = "dose_list"
+                target_ppf = None
+                target_dose = target_scan_dose_ext
+
+            else:
+                if desired_exp in ("normal", "scan_only", "phasing", "rapid"):
+                    factor = 1.0
+                elif desired_exp == "high_dose_scan":
+                    factor = 1.5
+                elif desired_exp == "ultra_high_dose_scan":
+                    factor = 3.0
+                else:
+                    raise ValueError(
+                        f"[UserESA] Unknown desired_exp='{desired_exp}' in defineScanCondition()."
+                    )
+
+                target_ppf = photons_per_image_normal * factor
+                required_exp_by_signal = target_ppf / flux
+                target_type = "photons"
+                target_dose = None
+
+            required_exp_raster = max(required_exp_by_speed, required_exp_by_signal)
+
+            exp_raster, freq = self.selectRasterExposureByFrequency(required_exp_raster)
+
+            base_dose_full_att = _base_dose(row, exp_raster)
+
+            if target_type == "dose_list":
+                att_raster = target_dose / base_dose_full_att * 100.0
+                ppf_raster = flux * exp_raster * att_raster / 100.0
+                dose_per_frame = target_dose
+            else:
+                att_raster = target_ppf / (flux * exp_raster) * 100.0
+                ppf_raster = target_ppf
+                dose_per_frame = base_dose_full_att * att_raster / 100.0
+
+            # 数値誤差を少し許容
+            if att_raster > 100.0 + 1.0E-6:
+                raise ValueError(
+                    "[UserESA] att_raster > 100 even after exposure selection. "
+                    f"idx={i}, puckid={row.get('puckid', '')}, pinid={row.get('pinid', '')}, "
+                    f"required_exp={required_exp_raster:.6f}, exp_raster={exp_raster:.6f}, "
+                    f"freq={freq}, att_raster={att_raster:.3f}"
+                )
+
+            att_raster = min(att_raster, 100.0)
+
+            self.df.at[i, "exp_raster"] = exp_raster
+            self.df.at[i, "att_raster"] = att_raster
+            self.df.at[i, "hebi_att"] = att_raster
+            self.df.at[i, "ppf_raster"] = ppf_raster
+            self.df.at[i, "dose_per_frame"] = dose_per_frame
+
+            self.logger.info(
+                "[RasterExposure] idx=%d puck=%s pin=%s desired_exp=%s mode=%s "
+                "required_speed=%.6f required_signal=%.6f selected_exp=%.6f freq=%dHz "
+                "att=%.3f ppf=%.3e dose_per_frame=%.6f",
+                i,
+                row.get("puckid", ""),
+                row.get("pinid", ""),
+                desired_exp,
+                row.get("mode", ""),
+                required_exp_by_speed,
+                required_exp_by_signal,
+                exp_raster,
+                freq,
+                att_raster,
+                ppf_raster,
+                dose_per_frame,
             )
 
-        extended_mask = self.df['dose_list'].notna() & (self.df['dose_list'] != "")
-        if extended_mask.any():
-            target_scan_dose = 0.001 # MGy/frame
-            base_dose_ext = self.df.loc[extended_mask].apply(
-                lambda row: kuma.getDose(
-                    row['ds_hbeam'],
-                    row['ds_vbeam'],
-                    row['flux'],
-                    row['wavelength'],
-                    row['exp_raster']
-                ),
-                axis=1
-            )
-        
-            self.df.loc[extended_mask, 'att_raster'] = target_scan_dose / base_dose_ext * 100.0
-            self.df.loc[extended_mask, 'hebi_att'] = self.df.loc[extended_mask, 'att_raster']
-
-            self.df.loc[extended_mask, 'ppf_raster'] = (
-                self.df.loc[extended_mask, 'flux'] *
-                self.df.loc[extended_mask, 'exp_raster'] *
-                self.df.loc[extended_mask, 'att_raster'] / 100.0
-            )
-            self.df.loc[extended_mask, 'dose_per_frame'] = target_scan_dose
-
-        dose_control_mask = mask1 | mask2 | mask3
-
+        # dose_ds の計算
         total_dose_default = self.config.getfloat("experiment", "dose_ds")
         total_dose_phasing = self.config.getfloat("experiment", "dose_ds_phasing")
-        
+
+        extended_mask = self.df["dose_list"].apply(_has_value)
+
         total_dose_series = pd.Series(total_dose_default, index=self.df.index)
-        total_dose_series.loc[self.df['desired_exp'] == 'phasing'] = total_dose_phasing
+        total_dose_series.loc[
+            self.df["desired_exp"].astype(str).str.strip().str.lower() == "phasing"
+        ] = total_dose_phasing
 
-        scan_multiplier = self.df['mode'].apply(self.getScanDoseRepeat)
-        dose_scan_total = self.df['dose_per_frame'] * scan_multiplier
+        scan_multiplier = self.df["mode"].apply(self.getScanDoseRepeat)
+        dose_scan_total = self.df["dose_per_frame"] * scan_multiplier
 
-        self.df.loc[dose_control_mask, 'dose_ds'] = (
-            total_dose_series.loc[dose_control_mask] - dose_scan_total.loc[dose_control_mask]
+        desired_norm = self.df["desired_exp"].astype(str).str.strip().str.lower()
+
+        dose_control_mask = (
+            (~extended_mask) &
+            (desired_norm != "scan_only")
         )
 
-        neg_mask = (self.df['dose_ds'] < 0) & (~extended_mask)
+        self.df.loc[dose_control_mask, "dose_ds"] = (
+            total_dose_series.loc[dose_control_mask] -
+            dose_scan_total.loc[dose_control_mask]
+        )
+
+        # scan_only は data collection しないので 0.0 を維持
+        self.df.loc[desired_norm == "scan_only", "dose_ds"] = 0.0
+
+        neg_mask = (self.df["dose_ds"] < 0) & (~extended_mask)
         if neg_mask.any():
             self.logger.error("dose_ds < 0 detected. total dose budget exceeded.")
-            self.logger.error(self.df.loc[neg_mask, ['puckid', 'pinid', 'desired_exp', 'dose_per_frame', 'dose_ds']])
-            self.df.loc[neg_mask, 'dose_ds'] = 0.0
+            self.logger.error(
+                self.df.loc[
+                    neg_mask,
+                    ["puckid", "pinid", "desired_exp", "dose_per_frame", "dose_ds"]
+                ]
+            )
+            self.df.loc[neg_mask, "dose_ds"] = 0.0
             self.isDoseError = True
         else:
             self.isDoseError = False
 
         self.logger.info("Scan conditions estimated results")
-        for i in range(len(self.df)):
+        for i, row in self.df.iterrows():
             self.logger.info(
-                f"PuckID: {self.df['puckid'][i]} PinID: {self.df['pinid'][i]} "
-                f"dose_per_frame: {self.df['dose_per_frame'][i]:.3f}"
+                "PuckID: %s PinID: %s exp_raster: %.6f att_raster: %.3f "
+                "ppf_raster: %.3e dose_per_frame: %.6f dose_ds: %.6f",
+                row.get("puckid", ""),
+                row.get("pinid", ""),
+                row.get("exp_raster", 0.0),
+                row.get("att_raster", 0.0),
+                row.get("ppf_raster", 0.0),
+                row.get("dose_per_frame", 0.0),
+                row.get("dose_ds", 0.0),
             )
-
-        # --- debug logging for scan dose ---
-        if hasattr(self, "logger") and self.logger is not None:
-            try:
-                for i, row in self.df.iterrows():
-                    dose_pf = row.get("dose_per_frame", None)
-                    if dose_pf is None:
-                        continue
-        
-                    self.logger.info(
-                        "[ScanDose] idx=%d puck=%s pin=%s mode=%s exp=%.4f att=%.2f beam=%sx%s flux=%.3e dose=%.6f MGy",
-                        i,
-                        row.get("puckid", ""),
-                        row.get("pinid", ""),
-                        row.get("mode", ""),
-                        row.get("exp_raster", 0.0),
-                        row.get("att_raster", 0.0),
-                        row.get("ds_hbeam", 0.0),
-                        row.get("ds_vbeam", 0.0),
-                        row.get("flux", 0.0),
-                        dose_pf
-                    )
-            except Exception as e:
-                self.logger.warning(f"[ScanDose] logging failed: {e}")
-
-        mask = self.df["dose_list"].apply(
-            lambda v: (not pd.isna(v)) and str(v).strip() != ""
-        )
-        
-        for i, row in self.df[mask].iterrows():
-            self.logger.info(
-                "[ScanDose-EXT] idx=%d exp=%.4f att=%.2f dose=%.6f MGy (should be 0.001)",
-                i,
-                row["exp_raster"],
-                row["att_raster"],
-                row["dose_per_frame"]
-            )
-
     # end of defineScanCondition()
 
     def makeExpWarning(self): 
@@ -681,29 +704,32 @@ class UserESA():
         
     # self.dfに格納されているから、データexp_rasterに変更を加える必要がある場合には変更を加える
     def modifyExposureConditions(self):
-        # self.df['att_raster']　が 100.0 を超えている場合
-        # さらにself.df['exp_raster']を長くして、その分 self.df['att_raster'] = 100.0とする
-        # その場合、self.df['hebi_att']も変更する必要がある
-        # extend_ratio = self.df['att_raster'] / 100.0
-        # new_exp_raster = self.df['exp_raster'] * extend_ratio
-        # この数値を self.df['exp_raster'] に代入する
-        mask = (self.df['att_raster'] > 100.0)
-        self.df.loc[mask, 'exp_raster'] = self.df['exp_raster'] * self.df['att_raster'] / 100.0
-        self.df.loc[mask, 'att_raster'] = 100.0
-        self.df.loc[mask, 'hebi_att'] = 100.0
-        # self.loggerにWarningを出す
-        # mask が Trueの場合のみ、Warningを出す
-        # そのとき 'puckid', 'pinid' を出力する
-        # さらに exp_raster の数値も同時に出力する
-        if mask.any():
-            self.logger.warning("att_raster > 100.0 -> 'exp_raster' was modified")
-            self.logger.warning("Please carefully check 'beam size' and 'desired experimental mode'")
-            self.logger.warning(self.df.loc[mask, ['puckid', 'pinid', 'sample_name', 'exp_raster']])
+        """
+        defineScanCondition() で exp_raster を整数 Hz 制約に従って決定済みである。
+        したがって、この関数では exp_raster を再変更しない。
 
-        # self.dfに含まれる露光条件で
-        # ppf_rasterが 4.0E10 を下回る場合
-        # dose_per_frameが 0.3 MGy を超える場合 にWarning messageを出す
-        # loggingに記録する
+        ここで exp_raster を変更すると、
+        att_raster / ppf_raster / dose_per_frame / dose_ds の再計算が必要になり、
+        条件不整合の原因になるため、異常検出と warning のみに限定する。
+        """
+        mask = self.df["att_raster"] > 100.0 + 1.0E-6
+
+        if mask.any():
+            self.logger.error(
+                "att_raster > 100.0 detected after defineScanCondition(). "
+                "This should not happen with integer-frequency exposure selection."
+            )
+            self.logger.error(
+                self.df.loc[
+                    mask,
+                    ["puckid", "pinid", "sample_name", "exp_raster", "att_raster"]
+                ]
+            )
+            raise RuntimeError(
+                "att_raster > 100.0 detected after raster exposure optimization."
+            )
+
+        # warning 出力のみ行う
         self.makeExpWarning()
 
     def makeCSV(self, zoo_csv=None):
@@ -1009,32 +1035,38 @@ class UserESA():
         self.logger.info(f"dist_raster: {self.df['dist_raster'].tolist()}")
 
     def checkScanSpeed(self):
-        # exp_raster　の数値について確認をする→水平方向のスキャン速度の上限に依存する
-        # self.df に含まれる exp_rasterの数値を確認する
-        # raster_hbeam [um] / exp_raster [s] = scan speed[um/s]
-        # max_scan_speed = self.config.getfloat("experiment", "max_scan_speed") を超える場合は
-        # exp_rasterの数値を変更する
-        # exp_raster = raster_hbeam / max_scan_speed
+        """
+        raster scan speed 制約から必要最小 exp_raster を計算し、
+        仕様 5.9.2 に従って整数 Hz に対応する離散 exposure へ補正する。
+
+        ここでは photon/dose 条件はまだ考慮しない。
+        それらは defineScanCondition() で再度まとめて最適化する。
+        """
+        max_scan_speed = self.config.getfloat("experiment", "max_hori_scan_speed")
+
         for i, row in self.df.iterrows():
-            # raster_hbeam の数値を取得する
-            raster_hbeam = row['raster_hbeam']
-            # exp_raster の数値を取得する
-            exp_raster = row['exp_raster']
-            # max_scan_speed の数値を取得する
-            max_scan_speed = self.config.getfloat("experiment", "max_hori_scan_speed")
-            # scan speed を計算する
-            scan_speed = raster_hbeam / exp_raster
-            
-            # scan speed が max_scan_speed を超える場合は exp_raster を変更する
-            if scan_speed > max_scan_speed:
-                new_exp_raster = raster_hbeam / max_scan_speed
-                self.df.at[i, 'exp_raster'] = new_exp_raster
-                self.logger.warning(f"Scan speed {scan_speed:.2f} um/s exceeds the maximum limit {max_scan_speed:.2f} um/s. Adjusting exp_raster to {new_exp_raster:.2f} s.")
+            raster_hbeam = float(row["raster_hbeam"])
+
+            if max_scan_speed <= 0.0:
+                raise ValueError("[UserESA] max_hori_scan_speed must be positive.")
+
+            required_exp_by_speed = raster_hbeam / max_scan_speed
+
+            new_exp_raster, freq = self.selectRasterExposureByFrequency(required_exp_by_speed)
+
+            old_exp_raster = float(row["exp_raster"])
+            self.df.at[i, "exp_raster"] = new_exp_raster
 
             self.logger.info(
-                f"[ScanSpeed] idx={i} raster_hbeam={raster_hbeam} "
-                f"exp_raster(before)={exp_raster} max_scan_speed={max_scan_speed} "
-                f"scan_speed={scan_speed}"
+                "[ScanSpeed] idx=%d raster_hbeam=%.3f max_scan_speed=%.3f "
+                "required_exp=%.6f old_exp=%.6f new_exp=%.6f freq=%d Hz",
+                i,
+                raster_hbeam,
+                max_scan_speed,
+                required_exp_by_speed,
+                old_exp_raster,
+                new_exp_raster,
+                freq,
             )
 
     def makeCondList(self):
