@@ -293,37 +293,88 @@ class UserESA():
         """
         return int(self.config.getfloat("experiment", "max_raster_frequency", fallback=220.0))
 
+    def isValidRasterFrequency(self, freq):
+        """
+        仕様 5.9.2:
+        exp_raster = 1 / f が有限小数として表現可能な周波数のみ許可する。
+
+        10進有限小数になる条件は、分母 f の素因数が 2 と 5 のみであること。
+        すなわち f = 2^a * 5^b。
+        """
+        freq = int(freq)
+
+        if freq < 1:
+            return False
+
+        while freq % 2 == 0:
+            freq //= 2
+
+        while freq % 5 == 0:
+            freq //= 5
+
+        return freq == 1
+
+    def getAllowedRasterFrequencies(self):
+        """
+        使用可能な raster detector frequency の候補を返す。
+
+        条件:
+        - 1 <= f <= max_raster_frequency
+        - f は整数
+        - exp_raster = 1/f が有限小数として表現可能
+        """
+        max_freq = self.getMaxRasterFrequency()
+
+        allowed = [
+            f for f in range(1, max_freq + 1)
+            if self.isValidRasterFrequency(f)
+        ]
+
+        if len(allowed) == 0:
+            raise ValueError(
+                "[UserESA] No valid raster frequency candidates were found."
+            )
+
+        return allowed
+
     def selectRasterExposureByFrequency(self, required_exp_raster):
         """
         仕様 5.9.2:
         exp_raster = 1 / f
-        f は整数、かつ 1 <= f <= max_freq。
 
-        required_exp_raster を下回らない範囲で、
+        f は以下を満たす:
+        - 整数 Hz
+        - 1 <= f <= max_raster_frequency
+        - 1/f が有限小数として表現可能
+
+        required_exp_raster 以上となる候補のうち、
         最短の exp_raster を返す。
         """
-        max_freq = self.getMaxRasterFrequency()
-
         required_exp_raster = float(required_exp_raster)
 
-        if required_exp_raster <= 0.0:
-            f = max_freq
-        else:
-            f = math.floor(1.0 / required_exp_raster)
+        allowed_freqs = self.getAllowedRasterFrequencies()
 
-            if f > max_freq:
-                f = max_freq
+        candidates = []
+        for f in allowed_freqs:
+            exp_raster = 1.0 / float(f)
 
-            if f < 1:
-                raise ValueError(
-                    "[UserESA] required_exp_raster is too long for integer-frequency control: "
-                    f"required_exp_raster={required_exp_raster:.6f} s, "
-                    f"allowed maximum exposure is 1.0 s at 1 Hz"
-                )
+            if exp_raster + 1.0e-12 >= required_exp_raster:
+                candidates.append((exp_raster, f))
 
-        exp_raster = 1.0 / float(f)
+        if len(candidates) == 0:
+            max_exp = max(1.0 / float(f) for f in allowed_freqs)
 
-        return exp_raster, f
+            raise ValueError(
+                "[UserESA] required_exp_raster is too long for finite-decimal "
+                "integer-frequency control: "
+                f"required_exp_raster={required_exp_raster:.6f} s, "
+                f"allowed maximum exposure is {max_exp:.6f} s"
+            )
+
+        exp_raster, freq = min(candidates, key=lambda x: x[0])
+
+        return exp_raster, freq
+
 
     # ビームライン、実験モードと結晶のタイプから実験パラメータを取得する
     # 2023/05/09 type_crystal は使わない

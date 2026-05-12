@@ -40,11 +40,12 @@ def test_getDose_monotonic_with_flux(kuma_env):
     kuma = kuma_env
     beam_h = 10.0
     beam_v = 10.0
-    energy = 12.0
+    energy = 12.3984
     exp_time = 0.02
+    wavelength = 12.3984 / energy
 
-    dose_low = kuma.getDose(beam_h, beam_v, 1.0e12, energy, exp_time)
-    dose_high = kuma.getDose(beam_h, beam_v, 2.0e12, energy, exp_time)
+    dose_low = kuma.getDose(beam_h, beam_v, 1.0e12, wavelength=wavelength, exp_time=exp_time)
+    dose_high = kuma.getDose(beam_h, beam_v, 2.0e12, wavelength=wavelength, exp_time=exp_time)
 
     assert dose_high > dose_low
     assert math.isclose(dose_high / dose_low, 2.0, rel_tol=1e-6)
@@ -52,12 +53,13 @@ def test_getDose_monotonic_with_flux(kuma_env):
 
 def test_getDose_monotonic_with_beam_area(kuma_env):
     kuma = kuma_env
-    energy = 12.0
+    energy = 12.3984
     flux = 1.0e12
     exp_time = 0.02
+    wavelength = 12.3984 / energy
 
-    dose_small_beam = kuma.getDose(10.0, 10.0, flux, energy, exp_time)
-    dose_large_beam = kuma.getDose(20.0, 20.0, flux, energy, exp_time)
+    dose_small_beam = kuma.getDose(10.0, 10.0, flux, wavelength=wavelength, exp_time=exp_time)
+    dose_large_beam = kuma.getDose(20.0, 20.0, flux, wavelength=wavelength, exp_time=exp_time)
 
     assert dose_large_beam < dose_small_beam
     # 面積4倍なら dose は1/4になるはず
@@ -69,36 +71,19 @@ def test_getDose_monotonic_with_exptime(kuma_env):
     beam_h = 10.0
     beam_v = 10.0
     flux = 1.0e12
-    energy = 12.0
+    energy = 12.3984
+    wavelength = 12.3984 / energy
 
-    dose_short = kuma.getDose(beam_h, beam_v, flux, energy, 0.01)
-    dose_long = kuma.getDose(beam_h, beam_v, flux, energy, 0.02)
+    dose_short = kuma.getDose(beam_h, beam_v, flux, wavelength=wavelength, exp_time=0.01)
+    dose_long = kuma.getDose(beam_h, beam_v, flux, wavelength=wavelength, exp_time=0.02)
 
     assert dose_long > dose_short
     assert math.isclose(dose_long / dose_short, 2.0, rel_tol=1e-6)
 
 
-def test_convDoseToExptimeLimit_roundtrip(kuma_env):
-    kuma = kuma_env
-    beam_h = 10.0
-    beam_v = 10.0
-    flux = 1.0e12
-    wavelength = 12.3984 / 12.0  # energy=12 keV
-    energy = 12.0
-    target_dose = 10.0
-
-    exptime_limit = kuma.convDoseToExptimeLimit(
-        target_dose, beam_h, beam_v, flux, wavelength
-    )
-    estimated_dose = kuma.getDose(beam_h, beam_v, flux, energy, exptime_limit)
-
-    # 実装が内部で一貫していれば target_dose に近いはず
-    assert math.isclose(estimated_dose, target_dose, rel_tol=1e-3)
-
-
 def test_getDoseLimitParams_density_matches_inverse_relation(kuma_env):
     kuma = kuma_env
-    energy = 12.0
+    energy = 12.3984
 
     dose_per_photon, density_limit = kuma.getDoseLimitParams(aimed_dose=10.0, energy=energy)
 
@@ -137,14 +122,14 @@ def test_convDoseToExptimeLimit_roundtrip(kuma_env):
     beam_h = 10.0
     beam_v = 10.0
     flux = 1.0e12
-    wavelength = 12.3984 / 12.0
-    energy = 12.0
+    wavelength = 1.0
+    energy = 12.3984/wavelength
     target_dose = 10.0
 
     exptime_limit = kuma.convDoseToExptimeLimit(
         target_dose, beam_h, beam_v, flux, wavelength
     )
-    estimated_dose = kuma.getDose(beam_h, beam_v, flux, energy, exptime_limit)
+    estimated_dose = kuma.getDose(beam_h, beam_v, flux, wavelength, exptime_limit)
 
     assert math.isclose(estimated_dose, target_dose, rel_tol=1e-3)
 
@@ -169,7 +154,7 @@ def test_getDose_matches_definition():
     exp_time = 0.1 # sec
 
     # KUMAの計算
-    dose = kuma.getDose(beam_h, beam_v, flux, energy, exp_time)
+    dose = kuma.getDose(beam_h, beam_v, flux, wavelength=1.0, exp_time=exp_time)
 
     # 手計算
     flux_density = flux / (beam_h * beam_v)
@@ -188,9 +173,10 @@ def test_getDose_linear_with_time():
     beam_v = 10
     flux = 1e12
     energy = 12.3984
+    wavelength = 12.3984 / energy
 
-    d1 = kuma.getDose(beam_h, beam_v, flux, energy, 0.1)
-    d2 = kuma.getDose(beam_h, beam_v, flux, energy, 0.2)
+    d1 = kuma.getDose(beam_h, beam_v, flux, wavelength=wavelength, exp_time=0.1)
+    d2 = kuma.getDose(beam_h, beam_v, flux, wavelength=wavelength, exp_time=0.2)
 
     assert abs(d2 - 2*d1) / d1 < 1e-6
 
@@ -201,10 +187,11 @@ def test_getDose_inverse_with_area():
 
     flux = 1e12
     energy = 12.3984
+    wavelength = 12.3984 / energy
     exp_time = 0.1
 
-    d1 = kuma.getDose(10, 10, flux, energy, exp_time)
-    d2 = kuma.getDose(20, 20, flux, energy, exp_time)
+    d1 = kuma.getDose(10, 10, flux, wavelength=wavelength, exp_time=exp_time)
+    d2 = kuma.getDose(20, 20, flux, wavelength=wavelength, exp_time=exp_time)
 
     assert d2 < d1
 
