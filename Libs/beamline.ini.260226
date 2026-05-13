@@ -89,7 +89,7 @@ hebi_att = 20
 cover_flag = 1
 exp_ds=0.02
 # unit [um/sec]
-max_hori_scan_speed = 500
+max_hori_scan_speed = 1000
 # Raster ROIにするかどうか (integer 0/1)
 raster_roi = 1
 # raster_roi=1の場合には
@@ -111,6 +111,8 @@ pin_uA_conv = 0.2
 pulse_for_noatt = 3500
 # wait time in changing energy @BL45XU [min]
 wait_time_change_energy = 15
+# The thinnest attenuator thickness [um]
+thinnest_att_thick = 100.0
 
 [detector]
 # カメラ長最短 [mm]

@@ -13,6 +13,7 @@ import configparser
 import pandas as pd
 import numpy as np
 import KUMA
+import AttFactor
 # logger の設定
 import logging
 from configparser import ConfigParser, ExtendedInterpolation
@@ -375,6 +376,86 @@ class UserESA():
 
         return exp_raster, freq
 
+    def getAllowedRasterExposureCandidates(self, required_exp_raster=0.0):
+        """
+        5.9.2 の条件を満たす exp_raster 候補を短い順に返す。
+        """
+        required_exp_raster = float(required_exp_raster)
+
+        candidates = []
+        for f in self.getAllowedRasterFrequencies():
+            exp_raster = 1.0 / float(f)
+            if exp_raster + 1.0e-12 >= required_exp_raster:
+                candidates.append((exp_raster, f))
+
+        candidates.sort(key=lambda x: x[0])
+
+        if len(candidates) == 0:
+            raise ValueError(
+                "[UserESA] No raster exposure candidate satisfies required_exp_raster: "
+                f"{required_exp_raster:.6f} s"
+            )
+
+        return candidates
+
+    def getThinnestAttenuatorThickness(self):
+        """
+        最薄 attenuator thickness [um] を beamline.ini から読む。
+        AttFactor.readAttConfig() は使わない。
+        """
+        return self.config.getfloat(
+            "experiment",
+            "thinnest_att_thick"
+        )
+
+    def calcThinnestAttenuatorTransmission(self, wavelength):
+        """
+        beamline.ini の thinnest_att_thick [um] と wavelength [Å] から、
+        最薄 attenuator の transmission を計算する。
+        戻り値は 0.0〜1.0。
+        """
+        thinnest_att_thick = self.getThinnestAttenuatorThickness()
+
+        attfac = AttFactor.AttFactor()
+        transmission = attfac.calcAttFac(
+            float(wavelength),
+            thinnest_att_thick,
+            material="Al"
+        )
+
+        if transmission <= 0.0 or transmission > 1.0:
+            raise ValueError(
+                "[UserESA] Invalid thinnest attenuator transmission: "
+                f"wavelength={wavelength}, "
+                f"thinnest_att_thick={thinnest_att_thick}, "
+                f"transmission={transmission}"
+            )
+
+        return transmission
+
+    def isAttenuationHardwareAllowed(self, wavelength, att_raster):
+        """
+        att_raster [%] が attenuator hardware constraint を満たすか判定する。
+
+        許容:
+        - att_raster == 100%
+        - att_raster <= 最薄 attenuator transmission [%]
+
+        禁止:
+        - thinnest_transmission*100 < att_raster < 100
+        """
+        att_raster = float(att_raster)
+
+        if att_raster > 100.0 + 1.0e-6:
+            return False
+
+        if abs(att_raster - 100.0) <= 1.0e-6:
+            return True
+
+        transmission = att_raster / 100.0
+        thinnest_transmission = self.calcThinnestAttenuatorTransmission(wavelength)
+
+        return transmission <= thinnest_transmission + 1.0e-12
 
     # ビームライン、実験モードと結晶のタイプから実験パラメータを取得する
     # 2023/05/09 type_crystal は使わない
@@ -513,18 +594,15 @@ class UserESA():
         self.df['ds_hbeam'], self.df['ds_vbeam'] = zip(*self.df['beamsize'].map(self.checkBeamsize))
         self.df['raster_hbeam'], self.df['raster_vbeam'] = zip(*self.df['beamsize'].map(self.checkBeamsize))
 
-    # Raster scanの露光条件を定義する
-    # Pandas dataframeに対して一気に処理を行う
     def defineScanCondition(self):
         """
         raster scan 条件を決定する。
 
         仕様:
-        - exp_raster は整数 Hz の逆数のみ許容する。
-        - 1 <= f <= 220 Hz とする。
-        - 必要 photon 数または scan dose を満たす範囲で最短露光を選ぶ。
-        - att_raster <= 100% となるよう exp_raster を先に決定する。
-        - exp_raster 決定後に att_raster, ppf_raster, dose_per_frame, dose_ds を計算する。
+        - exp_raster は 5.9.2 の有限小数・整数Hz制約を満たす。
+        - exp_raster は 5.9.3 の attenuator hardware constraint も満たす。
+        - att_raster は透過率 [%] として扱う。
+        - 最薄 attenuator 厚みは beamline.ini [experiment] thinnest_att_thick [um] から読む。
         """
         kuma = KUMA.KUMA()
 
@@ -552,26 +630,24 @@ class UserESA():
         if max_scan_speed <= 0.0:
             raise ValueError("[UserESA] max_hori_scan_speed must be positive.")
 
-        # 初期化
         self.df["ppf_raster"] = np.nan
         self.df["dose_per_frame"] = np.nan
 
         for i, row in self.df.iterrows():
             desired_exp = str(row["desired_exp"]).strip().lower()
+            mode = str(row["mode"]).strip().lower()
             has_dose_list = _has_value(row.get("dose_list", ""))
 
             flux = float(row["flux"])
+            wavelength = float(row["wavelength"])
             raster_hbeam = float(row["raster_hbeam"])
 
             if flux <= 0.0:
                 raise ValueError(f"[UserESA] flux must be positive. idx={i}, flux={flux}")
 
-            # scan speed 制約
             required_exp_by_speed = raster_hbeam / max_scan_speed
 
-            # photon/dose 制約
             if has_dose_list:
-                # dose_list 運用では scan dose = 0.001 MGy/frame
                 dose_per_sec_full_att = _base_dose(row, 1.0)
                 if dose_per_sec_full_att <= 0.0:
                     raise ValueError(
@@ -603,29 +679,54 @@ class UserESA():
 
             required_exp_raster = max(required_exp_by_speed, required_exp_by_signal)
 
-            exp_raster, freq = self.selectRasterExposureByFrequency(required_exp_raster)
+            selected = None
 
-            base_dose_full_att = _base_dose(row, exp_raster)
+            for exp_raster, freq in self.getAllowedRasterExposureCandidates(required_exp_raster):
+                base_dose_full_att = _base_dose(row, exp_raster)
 
-            if target_type == "dose_list":
-                att_raster = target_dose / base_dose_full_att * 100.0
-                ppf_raster = flux * exp_raster * att_raster / 100.0
-                dose_per_frame = target_dose
-            else:
-                att_raster = target_ppf / (flux * exp_raster) * 100.0
-                ppf_raster = target_ppf
-                dose_per_frame = base_dose_full_att * att_raster / 100.0
+                if target_type == "dose_list":
+                    att_raster = target_dose / base_dose_full_att * 100.0
+                    ppf_raster = flux * exp_raster * att_raster / 100.0
+                    dose_per_frame = target_dose
+                else:
+                    att_raster = target_ppf / (flux * exp_raster) * 100.0
+                    ppf_raster = target_ppf
+                    dose_per_frame = base_dose_full_att * att_raster / 100.0
 
-            # 数値誤差を少し許容
-            if att_raster > 100.0 + 1.0E-6:
+                if att_raster > 100.0 + 1.0E-6:
+                    continue
+
+                att_raster = min(att_raster, 100.0)
+
+                if self.isAttenuationHardwareAllowed(wavelength, att_raster):
+                    selected = {
+                        "exp_raster": exp_raster,
+                        "freq": freq,
+                        "att_raster": att_raster,
+                        "ppf_raster": ppf_raster,
+                        "dose_per_frame": dose_per_frame,
+                    }
+                    break
+
+            if selected is None:
+                thinnest_att_thick = self.getThinnestAttenuatorThickness()
+                thinnest_trans = self.calcThinnestAttenuatorTransmission(wavelength)
+
                 raise ValueError(
-                    "[UserESA] att_raster > 100 even after exposure selection. "
+                    "[UserESA] No valid raster exposure satisfies attenuator hardware constraint. "
                     f"idx={i}, puckid={row.get('puckid', '')}, pinid={row.get('pinid', '')}, "
-                    f"required_exp={required_exp_raster:.6f}, exp_raster={exp_raster:.6f}, "
-                    f"freq={freq}, att_raster={att_raster:.3f}"
+                    f"desired_exp={desired_exp}, mode={mode}, "
+                    f"required_exp={required_exp_raster:.6f}, "
+                    f"wavelength={wavelength:.6f}, "
+                    f"thinnest_att_thick={thinnest_att_thick:.3f} um, "
+                    f"thinnest_transmission={thinnest_trans:.6f}"
                 )
 
-            att_raster = min(att_raster, 100.0)
+            exp_raster = selected["exp_raster"]
+            freq = selected["freq"]
+            att_raster = selected["att_raster"]
+            ppf_raster = selected["ppf_raster"]
+            dose_per_frame = selected["dose_per_frame"]
 
             self.df.at[i, "exp_raster"] = exp_raster
             self.df.at[i, "att_raster"] = att_raster
@@ -633,15 +734,18 @@ class UserESA():
             self.df.at[i, "ppf_raster"] = ppf_raster
             self.df.at[i, "dose_per_frame"] = dose_per_frame
 
+            thinnest_trans = self.calcThinnestAttenuatorTransmission(wavelength)
+
             self.logger.info(
                 "[RasterExposure] idx=%d puck=%s pin=%s desired_exp=%s mode=%s "
                 "required_speed=%.6f required_signal=%.6f selected_exp=%.6f freq=%dHz "
-                "att=%.3f ppf=%.3e dose_per_frame=%.6f",
+                "att=%.3f ppf=%.3e dose_per_frame=%.6f "
+                "thinnest_trans=%.6f",
                 i,
                 row.get("puckid", ""),
                 row.get("pinid", ""),
                 desired_exp,
-                row.get("mode", ""),
+                mode,
                 required_exp_by_speed,
                 required_exp_by_signal,
                 exp_raster,
@@ -649,9 +753,9 @@ class UserESA():
                 att_raster,
                 ppf_raster,
                 dose_per_frame,
+                thinnest_trans,
             )
 
-        # dose_ds の計算
         total_dose_default = self.config.getfloat("experiment", "dose_ds")
         total_dose_phasing = self.config.getfloat("experiment", "dose_ds_phasing")
 
@@ -677,7 +781,6 @@ class UserESA():
             dose_scan_total.loc[dose_control_mask]
         )
 
-        # scan_only は data collection しないので 0.0 を維持
         self.df.loc[desired_norm == "scan_only", "dose_ds"] = 0.0
 
         neg_mask = (self.df["dose_ds"] < 0) & (~extended_mask)
@@ -707,7 +810,6 @@ class UserESA():
                 row.get("dose_per_frame", 0.0),
                 row.get("dose_ds", 0.0),
             )
-    # end of defineScanCondition()
 
     def makeExpWarning(self): 
         # 1 frameあたりのdoseが0.3MGyを超えていて、self.df['desired_exp'] が 'high_dose_scan' もしくは 'ultra_high_dose_scan'出ない場合は警告を出す
@@ -1048,13 +1150,13 @@ class UserESA():
 
         return camera_len
 
-    def calcDistFromLength(self, wavelength, resolution_limit, detector_radius):
+    def calcDistFromLength(self, wavelength, resolution_limit, detector_diameter_mm):
         # wavelength と resolution_limit から camera_len を計算する
         # camera_len が min_dim 以下なら min_dim を返す
         # camera_len が min_dim より大きいなら camera_len を返す
         theta = numpy.arcsin(wavelength / 2.0 / resolution_limit)
         bunbo = 2.0 * numpy.tan(2.0 * theta)
-        camera_len = detector_radius / bunbo
+        camera_len = detector_diameter_mm / bunbo
         return camera_len
 
     def checkBeamsize(self, beamsize_char):

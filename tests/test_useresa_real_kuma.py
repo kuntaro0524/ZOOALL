@@ -34,6 +34,7 @@ def useresa_env(monkeypatch, tmp_path):
         max_raster_frequency = 220
         dose_ds = 10.0
         dose_ds_phasing = 5.0
+        thinnest_att_thick = 100.0
     """))
 
     monkeypatch.setenv("ZOOCONFIGPATH", str(config_dir))
@@ -140,7 +141,7 @@ def test_define_scan_condition_high_dose_scan_real_kuma(useresa_env):
     row = u.df.iloc[0]
     freq = assert_exp_is_integer_hz(row["exp_raster"])
 
-    assert freq == 16
+    assert freq == 10
     assert row["ppf_raster"] == pytest.approx(6.0e10)
     assert row["att_raster"] <= 100.0
 
@@ -159,7 +160,7 @@ def test_define_scan_condition_ultra_high_dose_scan_real_kuma(useresa_env):
     row = u.df.iloc[0]
     freq = assert_exp_is_integer_hz(row["exp_raster"])
 
-    assert freq == 8
+    assert freq == 5
     assert row["ppf_raster"] == pytest.approx(1.2e11)
     assert row["att_raster"] <= 100.0
 
@@ -322,7 +323,131 @@ def test_define_scan_condition_ultra_high_dose_scan_avoids_36hz(useresa_env):
     freq = round(1.0 / row["exp_raster"])
 
     assert freq != 36
-    assert freq == 32
-    assert row["exp_raster"] == pytest.approx(0.03125)
+    assert freq == 20
+    assert row["exp_raster"] == pytest.approx(0.05)
     assert row["att_raster"] <= 100.0
     assert row["ppf_raster"] == pytest.approx(1.2e11)
+
+def test_thinnest_att_thick_is_read_from_beamline_ini(useresa_env):
+    u = useresa_env
+
+    u.config.set("experiment", "thinnest_att_thick", "100.0")
+
+    assert u.getThinnestAttenuatorThickness() == pytest.approx(100.0)
+
+
+def test_attenuation_hardware_allows_100_percent(useresa_env):
+    u = useresa_env
+
+    u.config.set("experiment", "thinnest_att_thick", "100.0")
+
+    assert u.isAttenuationHardwareAllowed(
+        wavelength=1.0,
+        att_raster=100.0,
+    )
+
+
+def test_attenuation_hardware_rejects_between_thinnest_and_100(useresa_env):
+    u = useresa_env
+
+    u.config.set("experiment", "thinnest_att_thick", "100.0")
+
+    thinnest_trans = u.calcThinnestAttenuatorTransmission(1.0)
+    thinnest_percent = thinnest_trans * 100.0
+
+    # 最薄アッテネータ透過率より少し大きく、100%未満
+    # → ハード的に実現不能
+    bad_att = (thinnest_percent + 100.0) / 2.0
+
+    assert thinnest_percent < bad_att < 100.0
+    assert not u.isAttenuationHardwareAllowed(
+        wavelength=1.0,
+        att_raster=bad_att,
+    )
+
+
+def test_attenuation_hardware_allows_below_thinnest(useresa_env):
+    u = useresa_env
+
+    u.config.set("experiment", "thinnest_att_thick", "100.0")
+
+    thinnest_trans = u.calcThinnestAttenuatorTransmission(1.0)
+    thinnest_percent = thinnest_trans * 100.0
+
+    good_att = thinnest_percent * 0.8
+
+    assert good_att < thinnest_percent
+    assert u.isAttenuationHardwareAllowed(
+        wavelength=1.0,
+        att_raster=good_att,
+    )
+
+
+def test_define_scan_condition_skips_unavailable_att_range(useresa_env):
+    u = useresa_env
+
+    u.config.set("experiment", "thinnest_att_thick", "100.0")
+
+    # flux を調整して、
+    # exp=0.1 s だと att=80% になるようにする。
+    #
+    # normal target_ppf = 4E10
+    # flux = 5E11
+    # exp = 0.1
+    # att = 4E10 / (5E11 * 0.1) * 100 = 80%
+    #
+    # Al 100um, 1A の最薄透過率はおよそ 75% 程度なので、
+    # 80% は禁止領域。
+    #
+    # 次の候補 exp=0.125 s なら
+    # att = 64%
+    # となり採用されるはず。
+    u.df = make_df(
+        desired_exp="normal",
+        mode="single",
+        flux=5.0e11,
+        wavelength=1.0,
+        raster_hbeam=1.0,
+    )
+
+    u.defineScanCondition()
+
+    row = u.df.iloc[0]
+
+    assert row["exp_raster"] == pytest.approx(0.125)
+    assert round(1.0 / row["exp_raster"]) == 8
+    assert row["att_raster"] == pytest.approx(64.0)
+    assert u.isAttenuationHardwareAllowed(
+        wavelength=row["wavelength"],
+        att_raster=row["att_raster"],
+    )
+
+
+def test_define_scan_condition_keeps_100_percent_without_attenuator(useresa_env):
+    u = useresa_env
+
+    u.config.set("experiment", "thinnest_att_thick", "100.0")
+
+    # target_ppf = 4E10
+    # flux = 4E11
+    # exp=0.1
+    # att=100%
+    # これは attenuator 不使用なので許可。
+    u.df = make_df(
+        desired_exp="normal",
+        mode="single",
+        flux=4.0e11,
+        wavelength=1.0,
+        raster_hbeam=1.0,
+    )
+
+    u.defineScanCondition()
+
+    row = u.df.iloc[0]
+
+    assert row["exp_raster"] == pytest.approx(0.1)
+    assert row["att_raster"] == pytest.approx(100.0)
+    assert u.isAttenuationHardwareAllowed(
+        wavelength=row["wavelength"],
+        att_raster=row["att_raster"],
+    )
