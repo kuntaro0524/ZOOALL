@@ -96,8 +96,13 @@ raster_roi = 1
 # RasterのROIの端までの最短半径（ビーム中心からの距離[mm]）を入力する
 # この距離によってRaster scanのカメラ距離を調整する
 raster_roi_edge_mm=40.0
+# raster ROI for sponge
+raster_roi_edge_sponge_mm = 100.0
+
 # Rasterのときの端分解能
 resol_raster=4.0
+# Raster (sponge)のときの端分解能
+resol_raster_sponge = 2.9
 # "" are not required to define 'character variable'
 gonio_direction =FROM_LEFT
 # pin channel

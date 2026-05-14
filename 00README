@@ -1,1 +1,30 @@
-これはREADMEファイルだ
+# UserESA仕様書 ver1.237 → ver1.310 主な変更点
+exp_raster の決定仕様を明確化
+任意の連続値ではなく、exp_raster = 1/f の整数Hz由来の値のみ許容
+CSV出力精度を考慮し、小数点以下4桁で安定に扱える露光時間を選ぶ仕様を追加
+raster scan の露光時間決定に、scan speed 制約を明示的に統合
+required_exp_raster = max(required_exp_by_signal, required_exp_by_speed) として決定
+dose_list 有効時でも scan speed 制約を適用することを明記
+attenuator hardware constraint を追加
+最薄 attenuator thickness を beamline.ini から読み取り
+実現不能な attenuation 領域を避けるため、exp_raster を再選定する仕様を追加
+defineScanCondition() の役割を整理
+exp_raster, att_raster, ppf_raster, dose_per_frame, dose_ds を最終決定する中心処理として明確化
+modifyExposureConditions() は再計算ではなく検証・warning 用に位置づけ変更
+raster scan 用 detector distance の決定仕様を追加
+resol_raster, wavelength, detector有効径から dist_raster を計算
+ROIあり/なしで detector有効径の扱いが変わることを明記
+mode="sponge" 用の raster distance 特例を追加
+sponge では強制的に raster_roi=1
+resol_raster_sponge
+raster_roi_edge_sponge_mm
+を beamline.ini から読み、ROI端で指定分解能になるよう dist_raster を計算
+外部依存に AttFactor を追加
+wavelength と attenuator thickness から transmission を計算するため
+makeCondList() の処理フローを更新
+checkScanSpeed は最終決定ではなく、scan speed 条件評価として整理
+defineScanCondition で signal条件・scan speed条件・attenuator制約を統合して最終条件を決める流れに修正
+dose_ds < 0 の扱いを明確化
+通常運用で total dose budget を超えた場合はエラーとし、最終CSVを出力しない仕様を明記
+
+根拠としては、ver1.237では5.9.1までが中心でしたが、ver1.310では5.9.2〜5.9.5が追加され、露光時間離散化、attenuator制約、raster detector distance、sponge特例が新たに仕様化されています。

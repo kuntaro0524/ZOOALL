@@ -60,7 +60,7 @@ class DoseDistanceHandler:
                     f"[UserESA] mode='{mode}' does not allow multiple values. "
                     f"dose_list={dose_vals}, dist_list={dist_vals}"
                 )
-        elif mode in ("single", "helical", "quick", "screening"):
+        elif mode in ("single", "helical", "quick", "screening","sponge"):
             pass
         else:
             raise ValueError(f"[UserESA] Unknown mode='{mode}' in condition.")
@@ -281,7 +281,7 @@ class UserESA():
             return 1.0
         elif mode_norm == "helical":
             return 2.0
-        elif mode_norm in ("mixed", "ssrox", "quick", "screening"):
+        elif mode_norm in ("mixed", "ssrox", "quick", "screening","sponge"):
             return 1.0
         else:
             raise ValueError(f"[UserESA] Unknown mode for scan dose: {mode}")
@@ -297,32 +297,27 @@ class UserESA():
     def isValidRasterFrequency(self, freq):
         """
         仕様 5.9.2:
-        exp_raster = 1 / f が有限小数として表現可能な周波数のみ許可する。
-
-        10進有限小数になる条件は、分母 f の素因数が 2 と 5 のみであること。
-        すなわち f = 2^a * 5^b。
+        exp_raster = 1 / f が小数点以下4桁までで正確に表現可能な
+        raster detector frequency のみ許可する。
         """
         freq = int(freq)
 
         if freq < 1:
             return False
 
-        while freq % 2 == 0:
-            freq //= 2
+        exp_raster = 1.0 / float(freq)
 
-        while freq % 5 == 0:
-            freq //= 5
-
-        return freq == 1
+        # 小数点以下4桁で丸めても値が変わらないものだけ許可
+        return abs(exp_raster - round(exp_raster, 4)) < 1.0e-12
 
     def getAllowedRasterFrequencies(self):
         """
         使用可能な raster detector frequency の候補を返す。
-
+        
         条件:
         - 1 <= f <= max_raster_frequency
         - f は整数
-        - exp_raster = 1/f が有限小数として表現可能
+        - exp_raster = 1/f が小数点以下4桁で正確に表現可能
         """
         max_freq = self.getMaxRasterFrequency()
 
@@ -342,11 +337,11 @@ class UserESA():
         """
         仕様 5.9.2:
         exp_raster = 1 / f
-
+        
         f は以下を満たす:
         - 整数 Hz
         - 1 <= f <= max_raster_frequency
-        - 1/f が有限小数として表現可能
+        - 1/f が小数点以下4桁で正確に表現可能
 
         required_exp_raster 以上となる候補のうち、
         最短の exp_raster を返す。
@@ -468,7 +463,7 @@ class UserESA():
         desired_exp_string = str(desired_exp_string).strip().lower()
         mode = str(mode).strip().lower()
 
-        if mode not in ("single", "multi", "helical", "mixed", "ssrox", "quick", "screening"):
+        if mode not in ("single", "multi", "helical", "mixed", "ssrox", "quick", "screening","sponge"):
             raise ValueError(f"[UserESA] Unknown mode: {mode}")
 
         # DEFAULT PARAMETER
@@ -489,42 +484,57 @@ class UserESA():
         # により決定する。
 
         # PARAMTER CONDITION
+        # raster_dose は初期補填値であり、最終的な raster scan 条件は
+        # defineScanCondition() において desired_exp / dose_list / scan speed /
+        # attenuator constraint を考慮して再計算される。
+        # spongeは ROI 前提であるため、raster_roi は 1 とする
         self.param = {
             "scan_only":{
-                "single":   [9999, 9999, 0.3, None, 0, exp_raster, att_raster, hebi_att, 0],
-                "helical":  [9999, 9999, 0.3, None, 0, exp_raster, att_raster, hebi_att, 0],
-                "multi":    [9999, 9999, 0.3, None, 0, exp_raster, att_raster, hebi_att, 0],
-                "mixed":    [9999, 9999, 0.3, None, 0, exp_raster, att_raster, hebi_att, 0],
+                "single":   [9999, 9999, raster_dose, None, 0, exp_raster, att_raster, hebi_att, 0],
+                "helical":  [9999, 9999, raster_dose, None, 0, exp_raster, att_raster, hebi_att, 0],
+                "multi":    [9999, 9999, raster_dose, None, 0, exp_raster, att_raster, hebi_att, 0],
+                "mixed":    [9999, 9999, raster_dose, None, 0, exp_raster, att_raster, hebi_att, 0],
+                "sponge":   [9999, 9999, raster_dose, None, 1, exp_raster, att_raster, hebi_att, 0],
             },
+
             "normal":{
-                "single":   [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "helical":  [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "multi":    [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "mixed":    [score_min, 9999, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "single":   [score_min, score_max, raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "helical":  [score_min, 9999,      raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "multi":    [score_min, score_max, raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "mixed":    [score_min, 9999,      raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "sponge":   [score_min, score_max, raster_dose, None, 1,           exp_raster, att_raster, hebi_att, cover_flag],
             },
+
             "high_dose_scan":{
-                "single":   [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "helical":  [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "multi":    [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "mixed":    [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "single":   [score_min, 9999, raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "helical":  [score_min, 9999, raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "multi":    [score_min, 9999, raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "mixed":    [score_min, 9999, raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "sponge":   [score_min, score_max, raster_dose, None, 1, exp_raster, att_raster, hebi_att, cover_flag],
             },
+
             "ultra_high_dose_scan":{
-                "single":   [score_min, score_max, 0.2, None, raster_roi, exp_raster, 100, 100, cover_flag],
-                "helical":  [score_min, score_max, 0.2, None, raster_roi, exp_raster, 100, 100, cover_flag],
-                "multi":    [score_min, score_max, 0.2, None, raster_roi, exp_raster, 100, 100, cover_flag],
-                "mixed":    [score_min, score_max, 0.2, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "single":   [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "helical":  [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "multi":    [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "mixed":    [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "sponge":   [score_min, score_max, raster_dose, None, 1, exp_raster, 100, 100, cover_flag],
             },
+
             "phasing":{
-                "single":   [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "helical":  [score_min, 9999, 0.05, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "multi":    [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
-                "mixed":    [score_min, score_max, 0.1, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "single":   [score_min, score_max, raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "helical":  [score_min, 9999,      raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "multi":    [score_min, score_max, raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "mixed":    [score_min, score_max, raster_dose, None, raster_roi, exp_raster, att_raster, hebi_att, cover_flag],
+                "sponge":   [score_min, score_max, raster_dose, None, 1, exp_raster, att_raster, hebi_att, cover_flag],
             },
+
             "rapid":{
                 "single":   [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
                 "helical":  [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
                 "multi":    [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
                 "mixed":    [score_min, score_max, raster_dose, None, raster_roi, exp_raster, 100, 100, cover_flag],
+                "sponge":   [score_min, score_max, raster_dose, None, 1, exp_raster, 100, 100, cover_flag],
             },
         }
 
@@ -1121,7 +1131,7 @@ class UserESA():
         # 6. new_df -> self.df
         self.df = new_df
 
-    def calcDist(self, wavelength, resolution_limit, isROI=False):
+    def calcDist(self, wavelength, resolution_limit, isROI=False, roi_edge_mm=None):
         # beamline.ini　の experiment セクション　から min_camera_lim を読んで min_camera_len に代入する
         min_camera_len = self.config.getfloat("detector", "min_camera_len")
 
@@ -1133,11 +1143,14 @@ class UserESA():
             min_camera_dim = self.config.getfloat("detector", "min_camera_dim")
         else:
             self.logger.info(f"ROI is True")
-            # ROIがある場合なんだが、calcDistFromLength()は半径でなく直径を要求する -> min_camera_dim = 2 * min_camera_dim
-            min_camera_dim = self.config.getfloat("experiment", "raster_roi_edge_mm") * 2.0
+
+            if roi_edge_mm is None:
+                roi_edge_mm = self.config.getfloat("experiment", "raster_roi_edge_mm")
+        
+            # calcDistFromLength() は直径を要求するため、ROI中心から端までの距離を2倍する
+            min_camera_dim = float(roi_edge_mm) * 2.0
 
         camera_len = self.calcDistFromLength(wavelength, resolution_limit, min_camera_dim)
-
         self.logger.info(f"calcuated camera_len: {camera_len}")
 
         # camera_len が　min_camera_len 以下なら min_camera_len を返す
@@ -1173,19 +1186,64 @@ class UserESA():
         self.df['wavelength'] = self.df['wavelength'].astype(float)
         self.df['resolution_limit'] = self.df['resolution_limit'].astype(float)
         self.df['dist_ds'] = self.df.apply(lambda x: self.calcDist(x['wavelength'], x['resolution_limit']), axis=1)
-        # resolution limit は beamline.iniから読み込む
-        # self.config : section=experiment, option=resol_raster
-        roi_value = self.config.getint("experiment", "raster_roi", fallback=0)
-        resol_raster = self.config.getfloat("experiment", "resol_raster")
-        is_roi = (roi_value == 1)
-        if is_roi:
-            self.logger.info(f"Using ROI for distance calculation with resol_raster: {resol_raster} Å")
-        else:
-            self.logger.info(f"Not using ROI for distance calculation, using resolution_limit from Excel")
+        dist_raster_list = []
 
-        self.df['dist_raster'] = self.df.apply(lambda x: self.calcDist(x['wavelength'], resol_raster, is_roi), axis=1)
+        default_roi = self.config.getint("experiment", "raster_roi", fallback=0)
+        default_resol_raster = self.config.getfloat("experiment", "resol_raster")
 
-        self.logger.info(f"dist_raster: {self.df['dist_raster'].tolist()}")
+        for _, row in self.df.iterrows():
+
+            mode = str(row["mode"]).strip().lower()
+
+            # sponge mode
+            if mode == "sponge":
+
+                resol_raster = self.config.getfloat(
+                    "experiment",
+                    "resol_raster_sponge"
+                )
+
+                roi_edge_mm = self.config.getfloat(
+                    "experiment",
+                    "raster_roi_edge_sponge_mm"
+                )
+
+                is_roi = True
+
+                dist_raster = self.calcDist(
+                    row["wavelength"],
+                    resol_raster,
+                    isROI=is_roi,
+                    roi_edge_mm=roi_edge_mm
+                )
+
+                # 最終CSVにも raster_roi=1 を出す
+                self.df.at[row.name, "raster_roi"] = 1
+
+                self.logger.info(
+                    f"[sponge] resol_raster={resol_raster} "
+                    f"roi_edge_mm={roi_edge_mm} "
+                    f"dist_raster={dist_raster}"
+                )
+
+            # normal modes
+            else:
+
+                is_roi = (default_roi == 1)
+
+                dist_raster = self.calcDist(
+                    row["wavelength"],
+                    default_resol_raster,
+                    isROI=is_roi
+                )
+
+            dist_raster_list.append(dist_raster)
+
+        self.df["dist_raster"] = dist_raster_list
+
+        self.logger.info(
+            f"dist_raster: {self.df['dist_raster'].tolist()}"
+        )
 
     def checkScanSpeed(self):
         """
@@ -1307,10 +1365,24 @@ class UserESA():
         self.df = self.df.astype(set_types)
 
         if self.isDoseError:
-            raise RuntimeError("dose_ds < 0 detected. CSV will not be generated.")
+            neg_rows = self.df[self.df['dose_ds'] < 0]
+
+            errmsgs = []
+            for _, row in neg_rows.iterrows():
+                errmsgs.append(
+                    f"{row['puckid']}-{row['pinid']} "
+                    f"(desired_exp={row['desired_exp']}, "
+                    f"dose/frame={row['dose_per_frame']:.3f} MGy, "
+                    f"dose_ds={row['dose_ds']:.3f} MGy)"
+                )
+
+            raise RuntimeError(
+                "dose_ds < 0 detected. CSV will not be generated. "
+                + "; ".join(errmsgs)
+            )
 
         zoo_csv_name = f"{self.csv_prefix}.csv"
-        self.df.to_csv(zoo_csv_name, columns=self.columns, index=False, float_format='%.5f')
+        self.df.to_csv(zoo_csv_name, columns=self.columns, index=False, float_format='%.4f')
         self.logger.info(f"Data types of all parameters in the DataFrame: {self.df.dtypes}")
 
 if __name__ == "__main__":
