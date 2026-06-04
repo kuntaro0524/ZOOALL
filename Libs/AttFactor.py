@@ -3,7 +3,7 @@ import socket
 import time
 import math
 from numpy import *
-#from Libs import BSSconfig
+from Libs import BSSconfig
 import logging
 from configparser import ConfigParser, ExtendedInterpolation
 
@@ -244,7 +244,6 @@ class AttFactor:
     # Here: 0 <= transmission <=1.0
     # Transmission here should have a unit of "%"
     # Only in classes for generating "schedule files", 'transmission' is between
-    """
     def checkThinnestAtt(self, wl, exptime, transmission):
         self.logger.info("HereHere")
         # Transmission = 1.0 -> Transmission 100%
@@ -277,7 +276,6 @@ class AttFactor:
             self.logger.info("No modifications are required by considering 'thinnest thickness of attenuator'")
             new_exptime = exptime
             return new_exptime, transmission
-    """
 
 if __name__ == "__main__":
     att = AttFactor()

@@ -495,9 +495,10 @@ if __name__ == "__main__":
     bssconf = BSSconfig()
 
     # Cmount position
-    x,y,z=bssconf.getCmount()
-    print(f"{x:.5f} {y:.5f} {z:.5f}")
-    #bssconf.getThinnestAtt()
+    #x,y,z=bssconf.getCmount()
+    #print(f"{x:.5f} {y:.5f} {z:.5f}")
+    print(bssconf.getThinnestAtt())
+
 
     """
     # axis_name="st1_col_1_z"
