@@ -30,6 +30,10 @@ backimg = ${dirs:zooroot}/BackImages/back.ppm
 data_suffix=h5
 
 [capture]
+#bright_default=3200
+#gain_default=3000
+#bright_default=3000
+#gain_default=2500
 bright_default=3800
 gain_default=3800
 contrast_default=9000
@@ -86,14 +90,15 @@ cover_flag = 1
 exp_ds=0.02
 # unit [um/sec]
 max_hori_scan_speed = 1000
-# Raster ROI (True = 1)
+# Raster ROIにするかどうか (integer 0/1)
 raster_roi = 1
-# raster_roi=1の場合にはRasterのROIの端までの最短半径
-#（ビーム中心からの距離[mm]）を入力する
+# raster_roi=1の場合には
+# RasterのROIの端までの最短半径（ビーム中心からの距離[mm]）を入力する
 # この距離によってRaster scanのカメラ距離を調整する
 raster_roi_edge_mm=40.0
 # raster ROI for sponge
 raster_roi_edge_sponge_mm = 100.0
+
 # Rasterのときの端分解能
 resol_raster=4.0
 # Raster (sponge)のときの端分解能
@@ -101,11 +106,10 @@ resol_raster_sponge = 2.9
 # "" are not required to define 'character variable'
 gonio_direction =FROM_RIGHT
 # pin channel
-pin_channel = 1
-# pin_uA convertion factor
+pin_channel = 3
+# pin_uA convetion factor
 # BL45XU : value / 10.0 * 2.0　という謎の計算式
 # BL32XU : value / 100.0 でOK
-pin_uA_conv = 0.2
 # pin_uA_conv = 0.01
 pin_uA_conv = 0.01
 # pulse for non-attenuated beam
