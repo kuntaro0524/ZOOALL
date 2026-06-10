@@ -1057,7 +1057,7 @@ class ZooNavigator():
             self.updateTime(cond, "cent_end")
             error_code = ErrorCode.CENTERING_FAILURE
             self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.getMessage())
+            self.updateDBinfo(cond, "meas_record", error_code.getMessage(error_code.to_db_value()))
             # Disconnecting capture in this loop's 'capture' instance
             self.logger.info("close Capture instance")
             self.lm.closeCapture()
