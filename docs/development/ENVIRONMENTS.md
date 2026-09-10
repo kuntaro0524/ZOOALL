@@ -46,7 +46,7 @@ BL32XUでの合格をBL45XUでの合格とは扱わない。Macでの検証も�
 
 - HEADは`7ebd3bd`、branchは`main`。originは`git@github.com:kuntaro0524/ZOOALL.git`。mainのupstream設定は確認できなかった。
 - 開始時点で` shell_scripts/BSS_startup.sh`に差分があった。由来を確定せず、編集・取り消し・commitしていない。
-- Git管理対象に大小文字だけが異なる4組があった：`Libs/Arg.py` / `Libs/arg.py`、`Libs/Flux.py` / `Libs/flux.py`、`Libs/Spline.py` / `Libs/spline.py`、`shell_scripts/BSS_startup.sh` / `shell_scripts/bss_startup.sh`。このcloneの`core.ignorecase`は`true`。MacとUbuntuでの互換性に関わるため、実ファイルと参照元を調べてから別作業で解消する。
+- 調査時点ではGit管理対象に大小文字だけが異なる4組があった。内容が完全一致し、リポジトリ内の参照もなかったため、`Libs/Arg.py`、`Libs/Flux.py`、`Libs/Spline.py`、`shell_scripts/BSS_startup.sh`を正として小文字側を削除した。このcloneの`core.ignorecase`は`true`であり、MacとUbuntuの独立clone運用に必要な整理である。外部から小文字名を直接呼び出していないことは別途確認する。
 - `beamline.ini`はgitignore対象。`Libs/`にはビームライン別・日付別のINIがGit管理されていた。ファイル名だけでは現用か判断できない。
 - `zoo.python`は`zoo.python.bl44xu`へのリンク。各`zoo.python.*`はPython環境や端末パスを指定している。`Libs/ConfigFile.py`には別形式の設定への固定パスも残る。
 - 標準的なPython依存定義・テストランナー設定・`.github/`は見当たらなかった。Git履歴にはPRマージがある。
