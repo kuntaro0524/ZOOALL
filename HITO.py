@@ -1,6 +1,6 @@
 import sys, math, numpy, os
 
-from MyException import *
+from ZooMyException import *
 import StopWatch
 import AnaHeatmap
 import CrystalList
@@ -9,11 +9,13 @@ import logging.config
 import LoopCrystals
 # python 3 sorted function
 from functools import cmp_to_key
+from ZooMyException import *
 
 beamline = "BL32XU"
 
-class NOU():
-    def __init__(self, zoo, loop_measurement, face_angle, phosec):
+class HITO():
+    def __init__(self, zoo, loop_measurement, face_angle, phosec, wait_ready_func=None):
+        self.wait_ready_func = wait_ready_func
         self.min_score = 10
         self.max_score = 200
         self.naname_include = True
@@ -53,6 +55,12 @@ class NOU():
 
         # Centering repetition number
         self.max_repeat = 5
+
+    def waitTillReady(self, cond, job_name=""):
+        if self.wait_ready_func is not None:
+            self.wait_ready_func(cond, job_name=job_name)
+        else:
+            self.zoo.waitTillReady()
 
     def setTimeLimit(self, limit_minutes):
         self.time_limit = limit_minutes
@@ -110,6 +118,8 @@ class NOU():
                 self.logger.info(">> Data collection: DC_INDEX=%5d started." % dc_index)
                 self.dododo(cond, dc_block, dc_index)
                 n_datasets += 1
+            except BeamDumpRecoveredException:
+                raise
             except Exception as e:
                 self.logger.info(self.commentException(e.args))
                 self.logger.info(">> DC_INDEX=%5d data collection failed." % dc_index)
@@ -144,9 +154,11 @@ class NOU():
                 self.do_single_noalign(cond, dc_block, dc_index)
             elif mode == "multi":
                 self.do_multi(cond, dc_block, dc_index)
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info(self.commentException(e.args))
-            raise MyException("dododo failed in data collection. Exception caught.")
+            raise ZooMyException("dododo failed in data collection. Exception caught.")
 
     def commentException(self, args):
         comment = ""
@@ -169,28 +181,35 @@ class NOU():
             left_phi = self.face_angle - 90.0  # [deg.]
             left_xyz = self.vertCentering(cond, left_phi, left_face_xyz, vscan_length, option="Left", dc_index=dc_index,
                                           max_repeat=self.max_repeat)
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("Left centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("Left centering failed.")
+            raise ZooMyException("Left centering failed.")
         # Right centering
         # max_repeat でセンタリングができなかった場合には例外になる→これは問題ない
         try:
             right_phi = self.face_angle + 90.0  # [deg.]
             right_xyz = self.vertCentering(cond, right_phi, right_face_xyz, vscan_length, option="Right", dc_index=dc_index,
                                            max_repeat=self.max_repeat)
+        except BeamDumpRecoveredException:
+            raise
+
         except Exception as e:
             self.logger.info("Right centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("Right centering failed.")
+            raise ZooMyException("Right centering failed.")
 
         # Data collection
         try:
             self.startHelical(left_xyz, right_xyz, cond, osc_start, osc_end, prefix)
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("startHelical failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("do_helical_full: startHelical failed.")
+            raise ZooMyException("do_helical_full: startHelical failed.")
 
     # Partial helical data collection
     def do_helical_part(self, cond, dc_block, dc_index):
@@ -205,28 +224,32 @@ class NOU():
         try:
             left_xyz = self.vertCentering(cond, osc_start, left_face_xyz, vscan_length, option="Left", dc_index=dc_index,
                                           max_repeat=self.max_repeat)
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("Left centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("hel_part: Left centering failed.")
+            raise ZooMyException("hel_part: Left centering failed.")
         # Right centering
         try:
             right_xyz = self.vertCentering(cond, osc_end, right_face_xyz, vscan_length, option="Right", dc_index=dc_index,
                                            max_repeat=self.max_repeat)
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("Right centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("hel_part: Right centering failed.")
+            raise ZooMyException("hel_part: Right centering failed.")
 
         # Data collection
         try:
             self.startHelical(left_xyz, right_xyz, cond, osc_start, osc_end, prefix)
-
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("startHelical failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("hel_part: startHelical failed.")
-
+            raise ZooMyException("hel_part: startHelical failed.")
 
     # Non-centering helical data collection
     def do_helical_noalign(self, cond, dc_block, dc_index):
@@ -240,10 +263,12 @@ class NOU():
         # Data collection
         try:
             self.startHelical(left_face_xyz, right_face_xyz, cond, osc_start, osc_end, prefix)
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("do_helical_noalign: startHelical failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("do_helical_noalign: startHelical failed.")
+            raise ZooMyException("do_helical_noalign: startHelical failed.")
 
 
     # Helical data collection
@@ -258,19 +283,22 @@ class NOU():
             centering_phi = self.face_angle + 90.0
             center_xyz = self.vertCentering(cond, centering_phi, center_face_xyz, vscan_length, option="center",
                                             dc_index=dc_index, max_repeat=self.max_repeat)
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("Side view centering failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("single_full: vertical centering failed.")
+            raise ZooMyException("single_full: vertical centering failed.")
         # Data collection
         try:
             self.doSingle(center_xyz, cond, osc_start, osc_end, prefix)
             # self.startHelical(left_xyz, right_xyz, cond, osc_start, osc_end, prefix)
-
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("doSingle failed.")
             self.logger.info(self.commentException(e.args))
-            raise MyException("single_full: doSingle failed.")
+            raise ZooMyException("single_full: doSingle failed.")
 
 
     # Single partial data collection
@@ -287,6 +315,8 @@ class NOU():
         try:
             center_xyz = self.vertCentering(cond, osc_end, center_face_xyz, vscan_length, option="center",
                                             dc_index=dc_index, max_repeat=self.max_repeat)
+        except BeamDumpRecoveredException:
+            raise   
         except Exception as e:
             self.logger.info("Side view centering failed.")
             self.logger.info(self.commentException(e.args))
@@ -310,6 +340,8 @@ class NOU():
         # Data collection
         try:
             self.doSingle(center_xyz, cond, osc_start, osc_end, prefix)
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("single:no-align failed.")
             self.logger.info(self.commentException(e.args))
@@ -324,6 +356,8 @@ class NOU():
         # Data collection
         try:
             self.doSingle(center_xyz, cond, osc_start, osc_end, prefix)
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("multi:do_multi failed.")
             self.logger.info(self.commentException(e.args))
@@ -380,9 +414,11 @@ class NOU():
         # Start diffraction scan for vertical direction
         try:
             self.zoo.doRaster(schfile)
-            self.zoo.waitTillReady()
+            self.waitTillReady(cond, job_name="hito_vscan")
+        except BeamDumpRecoveredException:
+            raise
         except:
-            raise MyException.VscanZOOfailed("During raster scan...failed.")
+            raise ZooMyException.VscanZOOfailed("During raster scan...failed.")
 
         return raspath
 
@@ -392,7 +428,7 @@ class NOU():
 
         # There are no good crystals
         if len(sorted_crystal_list) == 0:
-            raise MyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
+            raise ZooMyException("HEBI.anaVscan : no crystals are found in scan %s" % prefix)
 
         the_best_crystal = sorted_crystal_list[0]
         if method == "peak_xyz":
@@ -410,16 +446,52 @@ class NOU():
         else:
             return +1.0 * y_abs
 
-    def doSingle(self, center_xyz, cond, osc_start, osc_end, prefix):
+    def doSingle_obsoleted(self, center_xyz, cond, osc_start, osc_end, prefix):
         try:
             multi_sch = self.lm.genSingleSchedule(osc_start, osc_end, center_xyz, cond, self.phosec_meas, prefix=prefix)
             self.logger.info("MultiSchedule class was used to generate the schedule file.\n")
             self.logger.info("Data collection will be started by using %s.\n" % multi_sch)
             self.zoo.doDataCollection(multi_sch)
-            self.zoo.waitTillReady()
+            self.waitTillReady(cond, job_name="hito_single")
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
             self.logger.info("Exception: %s\n" % e)
             self.logger.info("doSingle: ERRors occured in data collection loop.\n")
+
+    def doSingle(self, center_xyz, cond, osc_start, osc_end, prefix):
+        cond_local = cond.copy()
+        cond_local["mode"] = "single"
+        try:
+            self.logger.info(
+                "doSingle starts: prefix=%s osc_start=%.3f osc_end=%.3f center=(%.4f %.4f %.4f)",
+                prefix, osc_start, osc_end, center_xyz[0], center_xyz[1], center_xyz[2]
+            )
+            self.logger.info(
+                "doSingle cond: dose_ds=%s dist_ds=%s total_osc=%s exp_ds=%s",
+                cond_local.get("dose_ds"), cond_local.get("dist_ds"),
+                cond_local.get("total_osc"), cond_local.get("exp_ds")
+            )
+
+            multi_sch = self.lm.genSingleSchedule(
+                osc_start, osc_end, center_xyz, cond_local, self.phosec_meas, prefix=prefix
+            )
+
+            self.logger.info("Generated schedule file: %s", multi_sch)
+
+            if not os.path.exists(multi_sch):
+                raise ZooMyException("doSingle: schedule file was not created: %s" % multi_sch)
+
+            self.zoo.doDataCollection(multi_sch)
+            self.waitTillReady(cond, job_name="hito_single")
+
+            self.logger.info("doSingle finished successfully: prefix=%s", prefix)
+
+        except BeamDumpRecoveredException:
+            raise
+        except Exception as e:
+            self.logger.exception("doSingle failed: prefix=%s", prefix)
+            raise
 
     # 2020/07/09 coded by K. Hirata
     def startHelical(self, left_xyz, right_xyz, cond, osc_start, osc_end, prefix):
@@ -435,17 +507,19 @@ class NOU():
             if cry_y_len <= (2.0 * cond['ds_hbeam']):
                 self.logger.info("Crystal size is smaller than the horizontal beam size (%5.2f [um])" % cond['ds_hbeam'])
                 self.logger.info("Helical data collection is swithced to the single irradiation mode")
-                self.doSingle(left_xyz, cond, phi_face, prefix)
+                self.doSingle(left_xyz, cond, osc_start, osc_end, prefix)
             else:
                 self.logger.info("Generate helical schedule file")
                 helical_sch = self.lm.genHelical(osc_start, osc_end, left_xyz, right_xyz, prefix, self.phosec_meas, cond)
 
                 self.logger.info("Schedule file has been prepared with LM.genHelical")
                 self.zoo.doDataCollection(helical_sch)
-                self.zoo.waitTillReady()
+                self.waitTillReady(cond, job_name="hito_helical")
+        except BeamDumpRecoveredException:
+            raise
         except Exception as e:
-            self.logger.info("Exception: %s\n" % e)
-            self.logger.info("HEBI.startHelical: ERRors occured in data collection loop.\n")
+            self.logger.exception("startHelical failed: prefix=%s", prefix)
+            raise
 
         # When the data collection finished.
         # self.sw.setTime("end")
@@ -463,7 +537,7 @@ class NOU():
         elif exp_min > 0.05 and exp_min <= 0.1:
             exptime = 0.1
         else:
-            raise MyException("fitExptime: No ideal exposure time is found!!")
+            raise ZooMyException("fitExptime: No ideal exposure time is found!!")
 
         return exptime
 
@@ -495,6 +569,8 @@ class NOU():
             # Vertical scan
             try:
                 scan_vert_path = self.doVscan(scan_prefix, mod_xyz, cond, scan_length, phi_scan)
+            except BeamDumpRecoveredException:
+                raise
             except Exception as e:
                 self.logger.info("Exception occurred.")
                 self.commentException(e.args)
@@ -505,6 +581,8 @@ class NOU():
                 # When the scan finds the good point for data collection
                 isFoundGoodPoint = True
                 break
+            except BeamDumpRecoveredException:
+                raise
             except Exception as e:
                 self.logger.info("Current %s scan failed: num of scans = %5d" % (option, nscan))
                 self.commentException(e.args)
@@ -512,7 +590,7 @@ class NOU():
         if isFoundGoodPoint == True:
             return new_xyz
         else:
-            raise MyException("%s vertical scan finally failed after %5d scans." % (option.lower(), nscan))
+            raise ZooMyException("%s vertical scan finally failed after %5d scans." % (option.lower(), nscan))
 
     # Sort the data collection blocks according to wedge sizes.
     def sortDCblocks(self, dc_blocks):
@@ -535,7 +613,6 @@ class NOU():
         # The bottom is the worst one
         # dc_blocks.sort(cmp=compOscRange)
         dc_blocks=sorted(dc_blocks, key=cmp_to_key(compOscRange))
-
 
         if self.debug == True:
             print("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")

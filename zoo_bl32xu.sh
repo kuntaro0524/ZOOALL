@@ -14,6 +14,11 @@
 #python ~/PPPP/10.Zoo/Libs/zoom_out.py
 yamtbx.python ~/PPPP/zoomout.py
 
+# 2026/02/24 YK
+# restart cheetah server
+ssh bladmin@10.178.163.31 -T docker restart cheetah-server-centos6
+ssh bladmin@10.178.163.34 -T docker restart cheetah-server-centos6
+
 # Check the current beamsize.config
 #CONFDIR=/isilon/blconfig/bl32xu.rh7/bss/
 CONFDIR=/blconfig/bss/
@@ -81,8 +86,10 @@ for i in {1..10}
 do
  sleep 1
  cheetah_ok=0
- ssh 10.178.163.34 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && \
- ssh 10.178.163.31 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
+# ssh 10.178.163.34 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && \
+# ssh 10.178.163.31 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
+ ssh 10.178.163.34 -T docker exec cheetah-server-centos6 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py"  && \
+ ssh 10.178.163.31 -T docker exec cheetah-server-centos6 "yamtbx.python /usr/local/cheetah_daemon/check_cheetah.py" && break
  notify-send "BSS startup" "Cheetah not up. retrying (${i})."
  notify-send "BSS startup" "`/usr/local/bss/startcheetah.sh`"
  cheetah_ok=1

@@ -5,7 +5,7 @@ import numpy as np
 import File
 import matplotlib
 import matplotlib.pyplot as plt
-from MyException import *
+from ZooMyException import *
 import CryImageProc
 import CoaxImage
 import BSSconfig
@@ -73,7 +73,7 @@ class INOCC:
 
         # Making today's directory
         if os.path.exists(self.todaydir):
-            print("%s already exists" % self.todaydir)
+            self.logger.info(f"Already exists: {self.todaydir}")
         else:
             os.makedirs(self.todaydir)
             os.system("chmod a+rw %s" % self.todaydir)
@@ -83,17 +83,17 @@ class INOCC:
         # Get the newest number in 4 digits: like "0001","0099"
         num_prefix = dp.getRoundHeadPrefix(ndigit=4)
         self.loop_dir = "%s/%s_%s" % (self.todaydir, num_prefix, self.sample_name)
-        print("SELF=", self.loop_dir)
+        self.logger.info(f"Loop directory: {self.loop_dir}")
 
         # Making today's directory
         if os.path.exists(self.loop_dir):
-            print("%s already exists" % self.loop_dir)
+            self.logger.info("%s already exists" % self.loop_dir)
         else:
             os.makedirs(self.loop_dir)
             os.system("chmod a+rw %s" % self.loop_dir)
 
         # self.raster_picpath = self.todaydir
-        print("Coax camera information will be acquired!")
+        self.logger.info("Coax camera information will be acquired!")
 
         self.cip = CryImageProc.CryImageProc()
 
@@ -117,8 +117,8 @@ class INOCC:
         """
         try:
             os.system("\\rm -Rf %s"%self.fname)
-        except MyException,ttt:
-            raise MyException("Centering:init fails to remove the previous 'test.ppm'")
+        except ZooMyException,ttt:
+            raise ZooMyException("Centering:init fails to remove the previous 'test.ppm'")
         return
         """
         self.isInit = True
@@ -306,7 +306,7 @@ class INOCC:
 
             # Check a distance from mount position
             if self.isYamagiwaSafe(gx, newgy, gz) == False:
-                raise MyException("Movement was larger than limited value (Yamagiwa safety)")
+                raise ZooMyException("Movement was larger than limited value (Yamagiwa safety)")
             else:
                 self.gonio.moveXYZPhi(gx, newgy, gz, phi)
             return False
@@ -328,8 +328,8 @@ class INOCC:
     def simpleCenter(self, phi, loop_size=600.0, option='top'):
         new_idx = self.ff.getNewIdx3()
         self.fname = "%s/%03d_center.ppm" % (self.loop_dir, new_idx)
-        self.logger.info("##################### TOP CENTERING %5.2f deg.\n" % phi)
-        self.logger.info("INOCC.coreCentering captures %s\n" % self.fname)
+        self.logger.info("##################### Tip centering process %5.2f deg." % phi)
+        self.logger.info("INOCC.coreCentering captures %s" % self.fname)
         self.gonio.rotatePhi(phi)
         cx, cy, cz, phi = self.gonio.getXYZPhi()
         self.coi.get_coax_image(self.fname)
@@ -347,12 +347,12 @@ class INOCC:
             self.logger.error(f"FatalCenteringError during simpleCenter at phi={phi:.2f}: {e}")
             # 受け取った例外をそのまま再スローする
             raise
-        except MyException as ttt:
+        except ZooMyException as ttt:
             # messageはそのまま継承して表示する
             self.logger.info("Simple centering failed but not fatal")
-            raise MyException("Simple centering failed but not fatal")
+            raise ZooMyException("Simple centering failed but not fatal")
 
-        self.logger.info("PHI: %5.2f deg Option=%s Centering: (Xtarget, Ytarget) = (%5d, %5d) HAMIDASHI = %s\n"
+        self.logger.info("PHI: %5.2f deg Option=%s Centering: (Xtarget, Ytarget) = (%5d, %5d) HAMIDASHI = %s"
                          % (phi, option, xtarget, ytarget, hamidashi_flag))
         x, y, z = self.coi.calc_gxyz_of_pix_at(xtarget, ytarget, cx, cy, cz, phi)
 
@@ -362,7 +362,7 @@ class INOCC:
         return area, hamidashi_flag
 
     def suribachiCentering(self, phi_center, loop_size=600.0):
-        self.logger.info("OOOOOOOOOOOOOOOOOO  SURIBACHI STARTS center: %5.2f OOOOOOOOOOOOOO\n" % phi_center)
+        self.logger.info("OOOOOOOOOOOOOOOOOO  SURIBACHI STARTS center: %5.2f OOOOOOOOOOOOOO" % phi_center)
         phi_range = 90.0
         phi_step = 10.0
         phi_min = phi_center - phi_range / 2.0
@@ -375,7 +375,7 @@ class INOCC:
             # At around phi_min
             if ok_min == False:
                 for phi in np.arange(phi_min, phi_center, phi_step):
-                    self.logger.info("Around minimum angle\n")
+                    self.logger.info("Around minimum angle")
                     try:
                         self.logger.info("move to simpleCenter function.")
                         area, hamidashi_flag = self.simpleCenter(phi, option="top")
@@ -426,7 +426,7 @@ class INOCC:
             area, hamidashi_flag = self.simpleCenter(phi_center, option="top")
             area_array.append((phi_center, area))
         except:
-            raise MyException("suribachiCentering failed")
+            raise ZooMyException("suribachiCentering failed")
 
         self.logfile.write("AAAAAAAAAAAREEE %s AREAERRE\n" % area_array)
         self.logfile.write("EEEEEEEEEEEEEEEEEE  SURIBACHI ENDS EEEEEEEEEEEEEEEEEE\n")
@@ -485,8 +485,8 @@ class INOCC:
                     # 受け取った例外をそのまま再スローする
                     raise
                 # Case when the loop was not found in the trial section
-                except MyException as ttt:
-                    # raise MyException("INOCC.coreCentering failed"
+                except ZooMyException as ttt:
+                    # raise ZooMyException("INOCC.coreCentering failed"
                     self.logfile.write("Go to next phi from %5.2f deg\n" % phi)
                     continue
             else:
@@ -494,7 +494,7 @@ class INOCC:
                 area, hamidashi_flag = self.simpleCenter(phi, loop_size=loop_size, option='top')
 
         if n_good == 0:
-            raise MyException("coreCentering failed")
+            raise ZooMyException("coreCentering failed")
 
         return n_good, phi_area_list
 
@@ -513,7 +513,9 @@ class INOCC:
     def edgeCentering(self, phi_list, ntimes, challenge=False, loop_size=600.0):
         if self.isInit == False:
             self.init()
+        self.logger.info("##########################################################")
         self.logger.info("################### EDGE CENTERING ######################")
+        self.logger.info("##########################################################")
         n_good = 0
         for i in range(0, ntimes):
             try:
@@ -529,19 +531,21 @@ class INOCC:
                 self.logger.error(f"FatalCenteringError during edgeCentering: {ttt}")
                 # 受け取った例外をそのまま再スローする
                 raise
-            except MyException as tttt:
+            except ZooMyException as tttt:
                 self.logger.info("INOCC.edgeCentering moves Y 2000um")
                 gx, gy, gz, phi = self.gonio.getXYZPhi()
                 move_ymm = self.cip.calcYdistAgainstGoniometer(2.0)
                 newgy = gy + move_ymm
                 if self.isYamagiwaSafe(gx, newgy, gz) == False:
-                    raise MyException("Movement was larger than threshold (Yamagiwa safety)")
+                    raise ZooMyException("Movement was larger than threshold (Yamagiwa safety)")
                 
                 self.gonio.moveXYZPhi(gx, newgy, gz, phi)
         if n_good == 0:
-            raise MyException("edgeCentering failed")
+            raise ZooMyException("edgeCentering failed")
 
-        print("################### EDGE CENTERING ENDED ######################")
+        self.logger.info("##########################################################")
+        self.logger.info("########## Edge centering finished successfully ##########")
+        self.logger.info("##########################################################")
         return n_good, phi_area_list
 
     def facing(self, phi_list):
@@ -564,7 +568,7 @@ class INOCC:
                 grav_x, grav_y, xwidth, ywidth, area, xedge, yedge = \
                     self.cip.getCenterInfo(self.fname, debug=False)
                 print("PHI AREA=", phi, area)
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 # print ttt.args[1]
                 continue
             if min_area > area:
@@ -577,7 +581,7 @@ class INOCC:
     # Largely modified on 190514 by K.Hirata
     # loop_size should have unit of "um"
     def cap4width(self, loop_size=600.0):
-        self.logger.info("++++++++++++++          cap4width starts")
+        self.logger.info("=======================          cap4width starts")
         if self.isInit == False:
             self.init()
 
@@ -591,10 +595,9 @@ class INOCC:
         # For small loop
         roi_cont = cip.getROIcontour(loop_size)
         # raster_pic = "%s/raster.png" % (self.loop_dir)
-        print("cap4width captures", self.raster_picpath)
+        self.logger.info(f"Processing {self.fname} for cap4width")
         roi_xmin, roi_xmax, roi_ymin, roi_ymax, roi_cenx, roi_ceny = cip.getRasterArea(roi_cont, self.raster_picpath)
         log_pic = "%s/raster.png" % (self.loop_dir)
-        print(log_pic)
         roi_xmin, roi_xmax, roi_ymin, roi_ymax, roi_cenx, roi_ceny = cip.getRasterArea(roi_cont, log_pic)
 
         # Raster width
@@ -628,7 +631,7 @@ class INOCC:
                 self.logger.debug(f"FatalCenteringError during edgeCentering: {ttt}")
                 # 受け取った例外をそのまま再スローする
                 raise
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 self.logger.debug("The first edge centering failed..")
                 try:
                     self.logger.debug("The second edge centering..")
@@ -638,23 +641,27 @@ class INOCC:
                     self.logger.debug(f"FatalCenteringError during edgeCentering: {ttt}")
                     # 受け取った例外をそのまま再スローする
                     raise
-                except MyException as tttt:
+                except ZooMyException as tttt:
                     self.logger.debug("The second edge centering failed. Raise exception")
                     self.logger.debug("%s" % tttt)
-                    raise MyException("Loop cannot be found after edgeCentering x 2 times. %s " % tttt)
+                    raise ZooMyException("Loop cannot be found after edgeCentering x 2 times. %s " % tttt)
 
             try:
                 phi_face = self.fitAndFace(phi_area_list)
                 self.logger.info(f"face_angle = {phi_face}deg")
 
                 # adds offset angles for plate-like crystals
-                self.logger.info(">>>> offset angle setting <<<<<")
+                self.logger.info(f"offset angle = {offset_angle}deg")
                 phi_face = phi_face + offset_angle
                 phi_small = phi_face + 90.0
-                self.logger.info(f">>>> Simple centering at {phi_small} <<<<<")
+                self.logger.info("##################################################")
+                self.logger.info(f"####  Simple centering at {phi_small:.2f}  ######")
+                self.logger.info(f"#### where 90deg apart from face angle <<<<<")
+                self.logger.info("##################################################")
                 self.simpleCenter(phi_small, loop_size, option="gravity")
-                print("#################<FACE>ANGLE ####################3")
-                print("phi_face=", phi_face)  
+                self.logger.info("##################################################")
+                self.logger.info("###### Again simple centering at face angle ######")
+                self.logger.info("##################################################")
                 area, hamidashi_flag = self.simpleCenter(phi_face, loop_size, option="gravity")
                 self.logger.info("Hamidashi_flag = %s" % hamidashi_flag)
                 # Re-centering if hamidashi_flag = True
@@ -665,28 +672,26 @@ class INOCC:
                 self.logger.debug(f"FatalCenteringError during fitAndFace: {ttt}")
                 # 受け取った例外をそのまま再スローする
                 raise
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 self.logger.debug("fitAndFace failed")
-                raise MyException("fitAndFace failed")
+                raise ZooMyException("fitAndFace failed")
 
         # Final centering
         cx, cy, cz, phi = self.gonio.getXYZPhi()
         # Raster area definition
-        print(f"########III phi = {phi} IIIIIIII########3")
+        self.logger.info(f"$$$$$$$$$ Raster area definition at {phi_face:.2f} deg $$$$$$$$$$$")
         xwidth, ywidth, r_cenx, r_ceny = self.cap4width(loop_size)
-        print("########IIIIIIIIIIIIIIIIIIIIIIII########3")
+        self.logger.info(f"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
         gonio_info = cx, cy, cz, phi
         pix_size_um = self.coi.get_pixel_size()
         raster_width = pix_size_um * float(xwidth)
         raster_height = pix_size_um * float(ywidth)
 
-        print("Width  = %8.1f[um]" % raster_width)
-        print("Height = %8.1f[um]" % raster_height)
-        print("Centering.doAll finished.")
+        self.logger.info(f"(width, height) = ({raster_width:8.1f}, {raster_height:8.1f}) [um]")
+        self.logger.info("Centering.doAll finished.")
 
         phi = self.gonio.getPhi()
-        print(phi)
 
         return raster_width, raster_height, phi_face, gonio_info
 
@@ -719,9 +724,9 @@ if __name__ == "__main__":
 
     # back image path read from 'beamline.ini'
     #backimg = config.get('files', 'backimg')
-    backimg = "/user/admin45/JunkZOO2/Libs/back.ppm"
-    backimg = "/user/admin41/JUNKZOO/Libs/back.ppm"
-    backimg = "/user/admin45/JunkZOO/BackImages/back.ppm"
+    #backimg = "/user/admin45/JunkZOO/BackImages/back-2510021439.ppm"
+    #backimg = "/user/admin45/JunkZOO/BackImages/back-2602251555.ppm"
+    backimg = "/user/target/JunkZoo/BackImages/back-2606102252.ppm"
     inocc.setBack(backimg)
     # inocc.setBack("/staff/bl41xu/BLsoft/ZOOALL/BackImages/back-2406271411.ppm")
     # For each sample raster.png
@@ -729,8 +734,18 @@ if __name__ == "__main__":
     inocc.setRasterPicture(raster_picpath)
 
     # def doAll(self, ntimes=3, skip=False, loop_size=600.0, offset_angle=0.0):
-    rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=800.0)
-
-    print(("Loop width/height=", rwidth, rheight))
-
-    # ms.close()
+    try:
+        raster_width, raster_height, phi_face, gonio_info = inocc.doAll(ntimes=3, skip=False, loop_size=600.0, offset_angle=0.0)
+        print(f"Raster width: {raster_width:.1f} um")
+        print(f"Raster height: {raster_height:.1f} um")
+        print(f"Face angle: {phi_face:.2f} deg")
+        print(f"Goniometer info (x, y, z, phi): {gonio_info}")
+    except ZooMyException as ttt:
+        logger.error(f"INOCC.doAll failed: {ttt}")
+        print(f"INOCC.doAll failed: {ttt}")
+    
+     
+     
+     
+     
+     

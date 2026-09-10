@@ -1,6 +1,5 @@
 import sys, os, math, numpy, scipy
 import scipy.spatial as ss
-import MyException
 import time
 import datetime
 import DiffscanLog
@@ -180,7 +179,7 @@ class AnaHeatmap:
         # Preparation of self.heatmap
         if self.isPrep == False:
             self.prep(prefix)
-            self.logger.info("Heatmap shape=", self.heatmap.shape)
+            self.logger.info(f"Heatmap shape={self.heatmap.shape}")
 
         # A new map array is prepared here based on self.heatmap
         check_map_array = []
@@ -284,7 +283,8 @@ class AnaHeatmap:
             # append Crystal class to the crystal_list
             crystal_array.append(crystal)
 
-        self.logger.info(f"Number of found crystals={len(crystal_array)}")
+        n_found_cry = len(crystal_array)
+        self.logger.info(f"Number of found crystals={n_found_cry}")
         self.logger.info(f"Checked grids={checked_grids}")
 
         for crystal in crystal_array:
@@ -347,13 +347,13 @@ class AnaHeatmap:
             if len(good_list) != 0:
                 cry_indices += good_list
             else:
-                print("Process finished")
+                self.logger.info("Process finished")
                 break
             self.logger.info(f"First good_list={good_list}")
             cycle_list = []
             while (1):
                 cycle_list = self.process_cycle(check_map, kdtree_map, kdtree, good_list)
-                print("The next good_list=", cycle_list)
+                self.logger.info(f"Cycle list={cycle_list}")
                 if len(cycle_list) != 0:
                     cry_indices += cycle_list
                     good_list = cycle_list
@@ -361,7 +361,7 @@ class AnaHeatmap:
                     break
             crystal_list.append(cry_indices)
 
-        print("Number of found crystal=", len(crystal_list))
+        self.logger.info(f"number of found crystals={len(crystal_list)}")
 
         # Logging
         if self.debug == True:

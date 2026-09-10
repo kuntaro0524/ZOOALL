@@ -15,7 +15,6 @@ logging_conf = config.get("files", "logging_conf")
 import Zoo
 import datetime
 import ZooNavigator
-from MyException import *
 import socket
 import MyDate
 import logging
@@ -76,13 +75,12 @@ if __name__ == "__main__":
     blf.initDevice()
 
     total_pins = 0
-    for zoo_id in sys.argv[1:]:
-        zoo_id = int(zoo_id)
-        logger.info(f"Start ZOO for {zoo_id}")
+    for exid in sys.argv[1:]:
+        logger.info(f"Start ZOO for {exid}")
         navi=ZooNavigator.ZooNavigator(blf)
         # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
         blf.zoo.setBeamsize(1)
-        num_pins = navi.goAroundECHA(zoo_id)
+        num_pins = navi.goAroundECHA(exid)
         total_pins += num_pins
 
     if total_pins == 0:

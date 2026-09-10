@@ -1,6 +1,7 @@
 from GonioVec import *
 import os
 from configparser import ConfigParser, ExtendedInterpolation
+import ECHA.ZooContext as ZooContext
 
 # 2013/10/11 K.Hirata
 # MX225HS readout mode is different from MX225HE
@@ -57,6 +58,10 @@ class ScheduleBSS:
         self.config = ConfigParser(interpolation=ExtendedInterpolation())
         self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
         self.beamline = self.config.get("beamline", "beamline")
+        # is ECHA database is used? True or False
+        self.isECHA = self.config.get("ECHA", "isECHA")
+        # sample name
+        self.sample_name = "unknown"
 
     def setBeamsizeIndex(self, index):
         self.beamsize_idx = index
@@ -83,6 +88,9 @@ class ScheduleBSS:
         self.startphi = startphi
         self.endphi = endphi
         self.stepphi = stepphi
+
+    def setSampleName(self, sample_name):
+        self.sample_name = sample_name
 
     def setCameraLength(self, cl):
         self.cl = cl
@@ -157,10 +165,9 @@ class ScheduleBSS:
     def makeSchStr(self):
         schstr = []
         schstr.append("Job ID: 0\n")
-        schstr.append(
-            "Status: 0 # -1:Undefined  0:Waiting  1:Processing  2:Success  3:Killed  4:Failure  5:Stopped  6:Skip  7:Pause\n")
+        schstr.append("Status: 0 # -1:Undefined  0:Waiting  1:Processing  2:Success  3:Killed  4:Failure  5:Stopped  6:Skip  7:Pause\n")
         schstr.append("Job Mode: 0 # 0:Check  1:XAFS  2:Single  3:Multi\n")
-        schstr.append("Crystal ID: %s\n" % self.crystal_id)
+        schstr.append("Crystal ID: %s\n" % self.sample_name)
         schstr.append("Tray ID: Not Used\n")
         schstr.append("Well ID: 0 # 0:Not Used\n")
         schstr.append("Cleaning after mount: 0 # 0:no clean, 1:clean\n")
@@ -175,8 +182,7 @@ class ScheduleBSS:
         schstr.append("Centering: 3 # 0:Database  1:Manual  2:Auto  3:None\n")
         schstr.append("Detector: 0 # 0:CCD  1:IP\n")
         schstr.append("Beam Size: %d\n" % self.beamsize_idx)
-        schstr.append(
-            "Scan Condition: %8.2f %8.2f %8.2f  # from to step [deg]\n" % (self.startphi, self.endphi, self.stepphi))
+        schstr.append("Scan Condition: %8.2f %8.2f %8.2f  # from to step [deg]\n" % (self.startphi, self.endphi, self.stepphi))
         schstr.append("Shutterless measurement: 1 # 0:no, 1:yes\n")
         schstr.append("Scan interval: %5d  # [points]\n" % self.scan_interval)
         schstr.append("Wedge number: 1  # [points]\n")
@@ -200,10 +206,10 @@ class ScheduleBSS:
         schstr.append("Oscillation delay: 100.000000  # [msec]\n")
         schstr.append("Anomalous Nuclei: Mn  # Mn-K\n")
         schstr.append("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
-        if self.beamline.upper() == "BL45XU":
-            schstr.append("Attenuator: %5d\n" % self.att_index)
-        elif self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU":
+        if self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU" or self.beamline.upper() == "BL45XU":
             schstr.append("Attenuator transmission: %9.6f\n" % self.transmission)
+        else:
+            schstr.append("Attenuator: %5d\n" % self.att_index)
         schstr.append("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]\n")
         schstr.append("XAFS Count time: 1.000000  # [sec]\n")
         schstr.append("XAFS Wait time: 30  # [msec]\n")
@@ -222,6 +228,14 @@ class ScheduleBSS:
         schstr.append(
             "Advanced gonio coordinates 2: %12.5f %12.5f %12.5f # id, x, y, z\n" % (self.x2, self.y2, self.z2))
         schstr.append("Comment:  \n")
+        # if ECHA database is used
+        if self.isECHA == "True":
+            zoo_context = ZooContext.ZooContext()
+            username = zoo_context.get_username()
+            zoo_exid = zoo_context.get_zoo_exid()
+            schstr.append("User Name: %s\n" % username)
+            schstr.append("Zoo Number: %s\n" % zoo_exid)
+
         return schstr
 
     def make(self, sch_file):
@@ -236,7 +250,7 @@ class ScheduleBSS:
         ofile.write(
             "Status: 0 # -1:Undefined  0:Waiting  1:Processing  2:Success  3:Killed  4:Failure  5:Stopped  6:Skip  7:Pause\n")
         ofile.write("Job Mode: 0 # 0:Check  1:XAFS  2:Single  3:Multi\n")
-        ofile.write("Crystal ID: %s\n" % self.crystal_id)
+        ofile.write("Crystal ID: %s\n" % self.sample_name)
         ofile.write("Tray ID: Not Used\n")
         ofile.write("Well ID: 0 # 0:Not Used\n")
         ofile.write("Cleaning after mount: 0 # 0:no clean, 1:clean\n")
@@ -284,10 +298,10 @@ class ScheduleBSS:
         ofile.write("Anomalous Nuclei: Mn  # Mn-K\n")
         ofile.write("XAFS Mode: 0  # 0:Final  1:Fine  2:Coarse  3:Manual\n")
 
-        if self.beamline.upper() == "BL45XU":
-            ofile.write("Attenuator: %5d\n" % self.att_index)
-        elif self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU":
+        if self.beamline.upper() == "BL41XU" or self.beamline.upper() == "BL32XU" or self.beamline.upper() == "BL45XU":
             ofile.write("Attenuator transmission: %9.6f\n" % self.transmission)
+        else:
+            ofile.write("Attenuator: %5d\n" % self.att_index)
 
         ofile.write("XAFS Condition: 1.891430 1.901430 0.000100  # from to step [A]\n")
         ofile.write("XAFS Count time: 1.000000  # [sec]\n")
@@ -305,6 +319,14 @@ class ScheduleBSS:
         ofile.write("Advanced gonio coordinates 1: %12.5f %12.5f %12.5f # id, x, y, z\n" % (self.x1, self.y1, self.z1))
         ofile.write("Advanced gonio coordinates 2: %12.5f %12.5f %12.5f # id, x, y, z\n" % (self.x2, self.y2, self.z2))
         ofile.write("Comment:  \n")
+
+        # if ECHA database is used
+        if self.isECHA == "True":
+            zoo_context = ZooContext.ZooContext()
+            username = zoo_context.get_username()
+            zoo_exid = zoo_context.get_zoo_exid()
+            ofile.write("User Name: %s\n" % username)
+            ofile.write("Zoo Number: %s\n" % zoo_exid)
 
         ofile.close()
 
@@ -336,5 +358,8 @@ if __name__ == "__main__":
     # t.stepAdvanced(svec,evec,adstep,1,startphi,stepphi,interval)
     # t.setDataName("low_%02d"%i)
     # t.make("tmp1%02d.sch"%i)
+    zoo_context = ZooContext.ZooContext()
+    zoo_context.set_username("test_user")
+    zoo_context.set_zoo_exid("ZOO12345")
 
     t.makeMulti("test.sch", 10)

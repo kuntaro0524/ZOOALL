@@ -12,7 +12,7 @@ class DSS(BaseAxis.BaseAxis):
     def __init__(self, server):
         # axis name for DSS
         axis_config = "dss"
-        BaseAxis.__init__(self, server, axis_config, axis_type="plc")
+        super().__init__(server, axis_config, axis_type="plc")
 
     def anaRes(self, recbuf):
         cols = recbuf.split("/")
@@ -36,7 +36,7 @@ class DSS(BaseAxis.BaseAxis):
         return repr(recstr)
 
     def getStatus(self):
-        com = "get/{self.full_axis_name}/status"
+        com = f"get/{self.full_axis_name}/status"
         # counter clear
         recbuf = self.communicate(com)
         # print recbuf
@@ -45,7 +45,7 @@ class DSS(BaseAxis.BaseAxis):
         return status
 
     def open(self):
-        com = "put/{self.full_axis_name}/open"
+        com = f"put/{self.full_axis_name}/open"
         # counter clear
         recbuf = self.communicate(com)
         # 30 sec trials
@@ -58,7 +58,7 @@ class DSS(BaseAxis.BaseAxis):
         return False
 
     def close(self):
-        com = "put/{self.full_axis_name}/close"
+        com = f"put/{self.full_axis_name}/close"
         # counter clear
         self.s.sendall(com)
         recbuf = self.s.recv(8000)
@@ -98,9 +98,9 @@ if __name__ == "__main__":
     s.connect((host, port))
 
     dss = DSS(s)
-    # print dss.getStatus()
+    print(dss.getStatus())
     # dss.isLocked()
-    dss.openTillOpen(wait_interval=5, ntrial=10)
+    #dss.openTillOpen(wait_interval=5, ntrial=10)
     # time.sleep(10)
     # print dss.close()
     # time.sleep(15)

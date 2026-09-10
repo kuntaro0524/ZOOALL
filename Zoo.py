@@ -2,7 +2,7 @@ import os, sys, glob
 import time, datetime
 import numpy as np
 import socket
-from MyException import *
+from ZooMyException import *
 import logging
 import logging.config
 from configparser import ConfigParser, ExtendedInterpolation
@@ -51,7 +51,7 @@ class Zoo:
                 self.bssr.connect((self.bss_srv, self.bss_port))
                 self.isConnect = True
                 return True
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 print("connect: failed. %s" % ttt.args[0])
                 time.sleep(20.0)
         return False
@@ -114,10 +114,10 @@ class Zoo:
             # 210415 K.Hirata (strange answer from BSS)
             if self.wait_flag: time.sleep(0.5)
             self.waitSPACE()
-        except MyException as ttt:
+        except ZooMyException as ttt:
             self.logger.info("Received message=%s" % ttt)
             message = ttt.args[0]
-            raise MyException(ttt.args[0])
+            raise ZooMyException(ttt.args[0])
 
     def exchangeSample(self, trayID, pinID):
         # print(trayID, pinID)
@@ -125,8 +125,8 @@ class Zoo:
         recstr = self.communicate(com)
         try:
             self.waitTillReady()
-        except MyException as ttt:
-            raise MyException("exchangeSample: failed. %s" % ttt.args[0])
+        except ZooMyException as ttt:
+            raise ZooMyException("exchangeSample: failed. %s" % ttt.args[0])
 
     def isMounted(self):
         com = "get/sample/on_gonio"
@@ -161,8 +161,8 @@ class Zoo:
             if self.wait_flag: time.sleep(0.5)
             print("Entering waiting loop for SPACE...")
             self.waitSPACE()
-        except MyException as ttt:
-            raise MyException("mountSample: failed. %s" % ttt.args[0])
+        except ZooMyException as ttt:
+            raise ZooMyException("mountSample: failed. %s" % ttt.args[0])
 
     def getCurrentPin(self):
         com = "get/sample/on_gonio"
@@ -174,7 +174,7 @@ class Zoo:
             self.logger.info("Error code = %s" % error_code)
             if int(error_code) == -1005000009:
                 self.logger.error("SPACE server does not know current pin information")
-                raise MyException("SPACE server does not know the current pin information")
+                raise ZooMyException("SPACE server does not know the current pin information")
 
         puck_pin = self.getSVOC_C(recstr)
         puck_char, pin_char = puck_pin.split('_')
@@ -207,9 +207,9 @@ class Zoo:
             # 210415 K.Hirata (strange answer from BSS)
             if self.wait_flag: time.sleep(0.5)
             self.waitSPACE()
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print("TTT=", ttt)
-            raise MyException("cleaning: failed. %s" % ttt.args[0])
+            raise ZooMyException("cleaning: failed. %s" % ttt.args[0])
 
     def capture(self, filename):
         command = "put/video/capture_%s" % filename
@@ -232,54 +232,42 @@ class Zoo:
         recstr = self.communicate(com)
         print(recstr)
 
-    def isBusy(self):
-        if self.isConnect == False:
-            print("Connection first!")
-            return False
-        else:
-            command = "get/measurement/query"
-            recstr = self.communicate(command)
-            svoc_c = self.getSVOC_C(recstr)
-            if svoc_c.rfind("ready") != -1:
-                return False
-            elif svoc_c.rfind("fail") != -1:
-                raise MyException("Something failed.")
-            else:
-                return True
-
     def doRaster(self, jobfile):
         # JOB FILE NAME MUST NOT INCLUDE "_"
         com = "put/measurement/start_1_3_1_schedule_%s" % jobfile
         recstr = self.communicate(com)
         self.logger.debug("a received message: %s" % recstr)
 
-    def waitTillReady(self):
+    def waitTillReady(self,isPE=False):
         while (1):
             try:
-                if self.isBusy():
+                if self.isBusy(isPE):
                     self.logger.info("Now busy...")
                     time.sleep(2.0)
                 else:
                     break
-            except MyException as ttt:
-                raise MyException("waitTillReady: Some error occurred : %s" % ttt.args[0])
+            except ZooMyException as ttt:
+                raise ZooMyException("waitTillReady: Some error occurred : %s" % ttt.args[0])
 
-    def isBusy(self):
-        if self.isConnect == False:
-            print("Connection first!")
-            return False
+    def isBusy(self, isPE=False):
+        if isPE:
+            command = "get/puck/query"
         else:
             command = "get/measurement/query"
+        if self.isConnect == False:
+            return False
+        else:
             recstr = self.communicate(command)
-            svoc_c = self.getSVOC_C(recstr)
+            svoc_c = self.getSVOC_C(recstr).lower()
             if self.isDebug:
                 self.logger.debug(f"Received buffer in isBusy: {recstr}")
                 self.logger.debug(f"SVOC_C in isBusy: {svoc_c}")
             if svoc_c.rfind("ready") != -1:
-                print("isBusy:RECBUF=", recstr)
+                self.logger.info(f"{command}: Ready was detected= {recstr}")
                 return False
-            elif svoc_c.rfind("fail") != -1:
-                raise MyException("Something failed.")
+            # svoc lower case
+            elif svoc_c.rfind("fail") != -1 or svoc_c.rfind("error") != -1:
+                raise ZooMyException("Something failed.")
             else:
                 return True
 
@@ -291,8 +279,9 @@ class Zoo:
         while (1):
             query_command = "get/measurement/query"
             recstr = self.communicate(query_command)
-            self.logger.debug("Sent command= %s" % query_command)
-            self.logger.debug("Received buffer = %s" % recstr)
+            if self.isDebug:
+                self.logger.debug("Sent command= %s" % query_command)
+                self.logger.debug("Received buffer = %s" % recstr)
             # print "Received buffer in isBusy: %s"%recstr
             svoc_c = self.getSVOC_C(recstr)
             if svoc_c.rfind("ready") != -1:
@@ -335,7 +324,7 @@ class Zoo:
                 else:
                     message = "unknown error code. (code = %s)" % error_code
                 self.logger.error(message)
-                raise MyException(message)
+                raise ZooMyException(message)
             else:
                 print("waiting...")
                 time.sleep(5.0)
@@ -348,8 +337,8 @@ class Zoo:
                     time.sleep(2.0)
                 else:
                     break
-            except MyException as ttt:
-                raise MyException("Some error occurred : %s" % ttt.args[0])
+            except ZooMyException as ttt:
+                raise ZooMyException("Some error occurred : %s" % ttt.args[0])
 
     def doDataCollection(self, jobfile):
         # JOB FILE NAME MUST NOT INCLUDE "_"
@@ -387,7 +376,7 @@ class Zoo:
                 # print "waitTillFinish:RECBUF=",recstr
                 break
             elif svoc_c.rfind("fail") != -1:
-                raise MyException("Something failed.")
+                raise ZooMyException("Something failed.")
             else:
                 time.sleep(2.0)
                 continue
@@ -406,7 +395,7 @@ class Zoo:
             self.logger.info("received log: %s" % recstr)
 
             cols = recstr.split('/')
-            print(cols)
+            #print(cols)
             if cols[3].isdigit() == True:
                 beamsize_index = int(cols[3])
                 return beamsize_index
@@ -415,7 +404,7 @@ class Zoo:
                 self.logger.info("Go to the next loop...")
 
                 continue
-        raise MyException("getBeamsize: failed. Check beamsize.config")
+        raise ZooMyException("getBeamsize: failed. Check beamsize.config")
 
     def getWavelength(self):
         self.logger.info("getting wavelength from BSS.")
@@ -447,7 +436,7 @@ class Zoo:
                 self.logger.info("Go to the next loop...")
                 time.sleep(2.0)
                 continue
-        raise MyException("getWavelength: failed. Check beamsize.config")
+        raise ZooMyException("getWavelength: failed. Check beamsize.config")
 
     def setWavelength(self, wavelength):
         com = "put/beamline/wavelength_%7.5fA" % wavelength
@@ -457,7 +446,7 @@ class Zoo:
             recstr = self.communicate(com)
             self.waitTillFinish(query_command)
         except:
-            raise MyException("getWavelength: failed. Check beamsize.config")
+            raise ZooMyException("getWavelength: failed. Check beamsize.config")
 
     def onlyQuery(self):
         com = "get/beamline/query"
@@ -493,6 +482,125 @@ class Zoo:
         recstr = self.communicate(com)
         return recstr
 
+    # Run a local script
+    def runScriptOnBSS(self, script_name):
+        com = "put/run_script/%s" % script_name
+        recstr = self.communicate(com)
+        return recstr
+
+    # Puck exchanger related functions are here
+    def pe_exchange_pucks(self, space_puck, target_puck):
+        com = "put/puck/exchange_%s_%s" % (space_puck, target_puck)
+        self.bssr.sendall(com)
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_mount_puck(self, target_puck):
+        com = "put/puck/mount_%s" % (target_puck)
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_unmount_puck(self, space_puck):
+        com = "put/puck/unmount_%s" % (space_puck)
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except ZooMyException as ttt:
+            # error handling with ZooMyException
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_clean_both(self):
+        com = "put/puck/cleaningall" % (space_puck)
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_clean_stock(self):
+        com = "put/puck/cleaningstock"
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_clean_robot(self):
+        com = "put/puck/cleaningrobo"
+        recstr = self.communicate(com)
+        try:
+            self.waitTillReady(isPE=True)
+        except:
+            raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
+
+    def pe_get_puck(self, puckid):
+        com = "get/puck/puckid_%s" % puckid
+        recstr = self.communicate(com)
+        puckid=(recstr.split('/'))[3]
+
+        return puckid
+        #RETURN?: puck/get/(BSS pid)_pxbl_server/bbb
+
+    def pe_query(self):
+        com = "put/puck/query"
+        # RETURN(?): puck/get/(BSS pid)_pxbl_server/ret_val/errcode
+        recstr = self.communicate(com)
+
+    # ビームダンプ用の関数を追加 2026/04/24
+    def getMeasurementStatus(self):
+        """
+        BSS measurement query の SVOC_C をそのまま返す。
+        例:
+        ready
+        working_xxx
+        working_beam__dump__recovering
+        working_Tuning
+        ready_beam__dump__recovered
+        fail/errcode
+        fatal/errorcode
+        """
+        if self.isConnect == False:
+            raise ZooMyException("getMeasurementStatus: BSS is not connected.")
+
+        command = "get/measurement/query"
+        recstr = self.communicate(command)
+        svoc_c = self.getSVOC_C(recstr).strip()
+
+        self.logger.debug(f"getMeasurementStatus: command={command}")
+        self.logger.debug(f"getMeasurementStatus: recstr={recstr}")
+        self.logger.debug(f"getMeasurementStatus: svoc_c={svoc_c}")
+
+        return svoc_c
+
+    def resetServerStatus(self):
+        """
+        BSS server status を ready_beam__dump__recovered から ready に戻す。
+
+        BSS command:
+        put/bss/reset_server_status
+        """
+        if self.isConnect == False:
+            raise ZooMyException("resetServerStatus: BSS is not connected.")
+
+        command = "put/bss/reset_server_status"
+        recstr = self.communicate(command)
+
+        self.logger.info(f"resetServerStatus: command={command}")
+        self.logger.info(f"resetServerStatus: recstr={recstr}")
+
+        # 返答仕様が未確定なら、ここでは通信できたことだけ確認する。
+        # 必要なら後段で waitTillReady / getMeasurementStatus により ready を確認する。
+        if recstr is False:
+            raise ZooMyException("resetServerStatus: communication failed.")
+
+        return recstr
+
 if __name__ == "__main__":
     # Logging setting
     # open configure file
@@ -509,7 +617,9 @@ if __name__ == "__main__":
     zoo = Zoo()
     zoo.connect()
     #zoo.exposeLN2(15)
-    zoo.stop()
+    #zoo.pe_mount_puck(sys.argv[1])
+    #zoo.stop()
+    #zoo.setWavelength(1.0)
     # zoo.setBeamsize(0)
     #print("BBBBBBBBBBBBBBBB")
     #print(zoo.getBeamsize())
@@ -524,7 +634,7 @@ if __name__ == "__main__":
     # zoo.setBeamsize(1)
 
     # while(1):
-    # zoo.skipSample()
+    #zoo.skipSample()
     # zoo.dismountCurrPin()
     # zoo.sampleQuery()
     #zoo.stop()
@@ -579,5 +689,10 @@ if __name__ == "__main__":
     # zoo.doDataCollection("/isilon/users/target/target/Staff/kuntaro/160715/Auto/KUN10-CPS1013-07/data/cry01.sch")
     # zoo.doDataCollection(schfile)
     # zoo.doDataCollection("/isilon/users/target/target/AutoUsers/kuntaro/161218/RR-test//mbeam09-CPS1716-02/data//multi.sch")
-    zoo.waitTillReady()
+    #zoo.waitTillReady()
+    while(True):
+        recbuf=zoo.getMeasurementStatus()
+        print(recbuf)
+        time.sleep(10)
+    #zoo.waitTillReady(isPE=True)
     zoo.disconnect()

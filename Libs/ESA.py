@@ -1,5 +1,5 @@
 import sqlite3, csv, os, sys, copy, datetime
-import MyException
+import ZooMyException
 import re
 
 import logging
@@ -19,7 +19,7 @@ class ESA:
         self.debug = False
         # ZOO schemes
         # 2019/04/17
-        self.scheme_list = ["multi", "helical", "single", "mixed", "screening", "quick","ssrox"]
+        self.scheme_list = ["multi", "helical", "single", "mixed", "screening", "quick","ssrox","dose_slice"]
 
         # my log file
         self.logger = logging.getLogger('ZOO').getChild("ESA")
@@ -147,7 +147,7 @@ class ESA:
 
         msg = "ESA.getPriorPin: Not found.\n"
         print(msg)
-        raise MyException.MyException(msg)
+        raise ZooMyException.MyException(msg)
 
     def updateValue(self, paramname, value, condition):
         con = sqlite3.connect(self.dbname)
@@ -226,7 +226,8 @@ class ESA:
         cur.execute(command)
         tmp_cond = cur.fetchone()
         previous_str = tmp_cond['t_meas_start']
-        d_index = tmp_cond['n_mount']
+        #d_index = tmp_cond['n_mount']
+        d_index = tmp_cond['data_index']
         event_tag = "%s_%02d" % (seq_name, d_index)
         timestr = self.makeEventTime(event_tag)
         self.logger.debug("previous_str = %s" % previous_str)
@@ -411,7 +412,7 @@ class ESA:
         ds_hbeam float,
         exp_ds float,
         dist_ds float,
-        dose_ds float,
+        dose_ds char,
         offset_angle float,
         reduced_fact float,
         ntimes int,
@@ -612,21 +613,23 @@ class ESA:
                     msg = "Duplication in CSV file: %s-%s and %s-%s. Please fix it!\n" % (
                         check_puck, check_pin, tmp_puck, tmp_pin)
                     #print msg
-                    raise MyException.MyException(msg)
+                    raise ZooMyException.MyException(msg)
 
         # experimental scheme check
         for cond in condition_list:
             ok_flag = False
+            tmp_scheme = cond[2].lower()
             for scheme in self.scheme_list:
+                print(f"scheme = {scheme} and tmp_scheme = {tmp_scheme}")
                 if scheme == cond[2].lower():
-                    # print cond[1],cond[2],cond[3],"Okay"
+                    print(f"scheme={scheme} found in {cond[2]}")
                     ok_flag = True
                     break
-                # SSROX made kiteitara error
-                if scheme == "ssrox":
-                    msg = "No such experimental scheme!! %s-%s : >> %s << Please fix it!\n" % (
-                        cond[3], cond[4], cond[2])
-                    raise MyException.MyException(msg)
+            # SSROX made kiteitara error
+            if ok_flag == False:
+                msg = "No such experimental scheme!! %s-%02d : >> %s << Please fix it!\n" % (
+                    cond[3], cond[4], cond[2])
+                raise ZooMyException.MyException(msg)
         # Check Mode
 
         return condition_list
@@ -654,9 +657,17 @@ class ESA:
         con.commit()
 
 if __name__ == "__main__":
-    esa = ESA(sys.argv[1])
+    esa = ESA("zoo.db")
+    esa.makeTable(sys.argv[1],force_to_make=True)
+    ppp=esa.getDict()
+
+    print(ppp)
+    
+    for p in ppp:
+        print(p['dose_ds_list'])
+
     #condlist= esa.readCSV(sys.argv[2])
-    esa.updateValueAt(0, "isDone", 9999)
+    #esa.updateValueAt(0, "isDone", 9999)
     #print(condlist)
     # esa.makeTable(sys.argv[2],force_to_make=True)
     # esa.prepReadDB()

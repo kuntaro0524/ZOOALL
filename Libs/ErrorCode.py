@@ -5,6 +5,7 @@ class ErrorCode(Enum):
     SPACE_WARNING_SUSPECTED = 9001  # 存在が疑われるもの
     SPACE_WARNING_LHEAD_PUSHED = 9002  # Lheadが過剰に押された場合
     SPACE_WARNING_ROTATE_TOO_MUCH = 9003  # ヘッドが掴めなかった系
+    SPACE_WARNING_GRAB_FAILED = 9004  # つかみとり失敗
 
     # SPACE accidents
     SPACE_ACCIDENT_LHEAD_PULLED = 9997  # Lheadが引っ張られた
@@ -25,6 +26,9 @@ class ErrorCode(Enum):
     DATA_COLLECTION_NO_CRYSTAL = 3002  # 測定の結晶が見つからなかった
     DATA_COLLECTION_UNKNOWN_ERROR = 3003
 
+    # Beam dump error
+    BEAM_DUMP_RECOVERED = 4001  # ビームダンプからの復旧
+
     # 測定モードエラー
     UNKNOWN_MEASUREMENT_MODE = 8001  # 測定モード不明エラー
 
@@ -32,7 +36,9 @@ class ErrorCode(Enum):
     UNKNOWN_ERROR = -1  # デフォルトの未知エラー
 
     # success
-    SUCCESS = 0
+    SUCCESS = 1
+
+    NOT_PROCESSED = 0 # 未処理
 
     @classmethod
     def from_code(cls, code: int):
@@ -49,6 +55,7 @@ class ErrorCode(Enum):
             self.SPACE_UNKNOWN_ACCIDENT: "SPACE accident: Unknown accident (requires classification: contact K. Hirata)",
             self.SPACE_ACCIDENT: "SPACE accident occurred",
             self.CENTERING_FAILURE: "Centering failed",
+            self.SPACE_WARNING_GRAB_FAILED: "SPACE warning: Grub failed to pick up the sample pin",
             self.RASTER_SCAN_FAILURE_MEASUREMENT: "Raster scan failed during measurement",
             self.RASTER_SCAN_FAILURE_ANALYSIS: "Raster scan failed during analysis",
             self.RASTER_SCAN_NO_CRYSTAL: "No crystal found after raster scan",
@@ -58,6 +65,7 @@ class ErrorCode(Enum):
             self.DATA_COLLECTION_UNKNOWN_ERROR: "Unknown error occurred during data collection",
             self.UNKNOWN_MEASUREMENT_MODE: "Unknown measurement mode",
             self.UNKNOWN_ERROR: "Unknown error",
+            self.BEAM_DUMP_RECOVERED: "Beam dump recovered",
             self.SUCCESS: "Success"
         }
         return descriptions.get(self, "Undefined error")
@@ -66,10 +74,30 @@ class ErrorCode(Enum):
         """ データベースに格納するための数値を取得 """
         return self.value
 
+    @classmethod
+    def getMessage(cls, code):
+        """
+        int または ErrorCode を受け取り、
+        meas_record 用の文字列を返す
+        """
+        if isinstance(code, int):
+            code = cls.from_code(code)
+    
+        if isinstance(code, cls):
+            return code.description()
+    
+        return f"Unknown error (code={code})"
+
 # mainが定義されていなかったら実行
 if __name__ == "__main__":
-    error_code = ErrorCode.DATA_COLLECTION_UNKNOWN_ERROR
-    # エラーコードの説明を表示
-    print(f"エラー: {error_code.name} - {error_code.description()}")
-    # データベースに格納するための数値を表示
-    print(f"データベース格納用の数値: {error_code.to_db_value()}")
+    test_values = [
+        ErrorCode.SPACE_ACCIDENT,
+        ErrorCode.SPACE_ACCIDENT.to_db_value(),
+        2001,
+        1001,
+        -1,
+        3001
+    ]
+
+    for value in test_values:
+        print(value, "->", ErrorCode.getMessage(value))

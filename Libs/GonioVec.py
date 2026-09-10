@@ -2,7 +2,7 @@ import numpy
 import scipy
 import sys
 import os
-from MyException import *
+from ZooMyException import *
 from numpy import *
 
 
@@ -91,7 +91,7 @@ class GonioVec:
 
     def yattane(self, orig, fast, slow, nfast, nslow):
         if nfast <= 1 or nslow <= 1:
-            raise MyException("Scan number is grater than 1\n")
+            raise ZooMyException("Scan number is grater than 1\n")
 
         # make origin vector
         orivec = self.makeVecFromXYZ(orig)
@@ -109,7 +109,7 @@ class GonioVec:
         self.slowlen = self.calcDist(self.slow_uvec)
 
         if self.fastlen < 0.0005 or self.slowlen < 0.0005:
-            raise MyException("Scan length is longer than 0.5um\n")
+            raise ZooMyException("Scan length is longer than 0.5um\n")
 
         # make start points
         start_list = []
@@ -172,7 +172,7 @@ class GonioVec:
         div_hori = self.ori_hori / float(hstep - 1)
 
         if self.calcDist(div_vert) < 0.0005 or self.calcDist(div_hori) < 0.0005:
-            raise MyException("Scan step should be greater than 0.5um!")
+            raise ZooMyException("Scan step should be greater than 0.5um!")
 
         start_points = []
         end_points = []
@@ -221,7 +221,7 @@ if __name__ == "__main__":
 # slist,elist,flen,slen=vecg.yattane(orig,fast,slow,nf,ns)
 # for i in range(0,len(slist)):
 # print slist[i],elist[i],flen,slen
-# except MyException,e:
+# except ZooMyException,e:
 # print e.args[0]
 
 
@@ -230,6 +230,6 @@ if __name__ == "__main__":
 
 # try:
 # start_points,end_points=vecg.makePlane(ori,v1,v2,5)
-# except MyException,e:
+# except ZooMyException,e:
 # print e.args[0]
 # sys.exit(1)

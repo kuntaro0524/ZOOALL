@@ -1,5 +1,5 @@
 import sys, os, math, numpy
-from MyException import *
+from ZooMyException import *
 import time
 import datetime
 import DiffscanLog
@@ -70,7 +70,7 @@ class CrystalList:
             self.getSortedCrystalList()
 
         if len(self.crystals) == 0:
-            raise MyException("CrystalList.getBestCrystalCode: No good crystals")
+            raise ZooMyException("CrystalList.getBestCrystalCode: No good crystals")
 
         best_crystal = self.crystals[0]
         if option == "gravity":

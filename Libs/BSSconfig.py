@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from Libs import MyException
+from Libs import ZooMyException
 import sys,os
 from configparser import ConfigParser, ExtendedInterpolation
 
@@ -400,7 +400,7 @@ class BSSconfig:
 
         # check if the string was found
         if isFound == False:
-            raise MyException("config string was not found:%s"%confstr)
+            raise ZooMyException("config string was not found:%s"%confstr)
 
         # strip after "#"
         if fstr.rfind("#") != -1:
@@ -495,9 +495,10 @@ if __name__ == "__main__":
     bssconf = BSSconfig()
 
     # Cmount position
-    x,y,z=bssconf.getCmount()
-    print(f"{x:.5f} {y:.5f} {z:.5f}")
-    #bssconf.getThinnestAtt()
+    #x,y,z=bssconf.getCmount()
+    #print(f"{x:.5f} {y:.5f} {z:.5f}")
+    print(bssconf.getThinnestAtt())
+
 
     """
     # axis_name="st1_col_1_z"
