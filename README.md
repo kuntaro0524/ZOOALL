@@ -1,3 +1,35 @@
+# ZOOALL
+
+ZOOの装置制御・測定・データ処理を扱うPythonシステムです。コードと共通知識はこのGitリポジトリ、作業状態はGitHub Issueを正本とします。各端末は独立したcloneを使用します。
+
+## 開発を始めるとき
+
+1. [開発ワークフロー](docs/development/WORKFLOW.md)を読み、Issue・branch・既存差分を確認してください。
+2. 中断作業はIssueにあるbranchとhandoffへのリンクから再開してください。mainにhandoffがなくても、中断作業がないとは限りません。
+3. [環境と設定の説明](docs/development/ENVIRONMENTS.md)で対象環境と検証上の制約を確認してください。AIは[AGENTS.md](AGENTS.md)も読みます。
+
+中断は通常運用です。未完成でも対象branchへcheckpointと[handoff](handoffs/TEMPLATE.md)をcommit・pushし、次の最初の操作を残します。詳細と例外時の扱いはワークフローを参照してください。
+
+設計を選んだ理由は[decision log](docs/development/decision_log.md)に残します。進捗や完了状態は転載しません。
+
+## 主な構成
+
+| 場所 | 主な内容 |
+| --- | --- |
+| ルートのPythonファイル | ZOO起動、測定の統括、測定操作 |
+| `Libs/` | 装置制御、DB/API、画像解析などのライブラリ |
+| `TestScripts/` | 実機・API操作を含む試験スクリプト |
+| `ZOOGUI/`, `KUMAGUI/` | GUI関連 |
+| `KAMOscripts/`, `AutoProcCommand/` | データ処理関連 |
+| `shell_scripts/` | 装置起動・運用関連のスクリプト |
+| `docs/development/`, `handoffs/` | 開発ルール・判断理由・再開情報 |
+
+`test`という名前は安全な自動テストであることを保証しません。実機・外部DBへの接続や更新がないか、実行前に確認してください。
+
+`scripts/start_work.sh`、`scripts/finish_work.sh`と管理用YAMLは未実装です。現在は文書の手順で運用します。
+
+## 過去の記録（既存本文）
+
 # New Centering.py
 ## Challenge is True
 #              if challenge==True and n_good == len(phi_list):
