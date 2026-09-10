@@ -2,7 +2,7 @@ import sys, os, math, socket, time
 import numpy as np
 import datetime
 
-from MyException import *
+from ZooMyException import *
 import INOCC
 import RasterSchedule
 import MultiCrystal
@@ -160,10 +160,10 @@ class LoopMeasurement:
             self.rwidth = rwidth
 
             return rwidth, rheight
-        except MyException as e:
+        except ZooMyException as e:
             self.logger.warning("Exception detected.{0}".format(e))
             self.logger.warning("Exception detected.")
-            raise MyException("Centering failed.")
+            raise ZooMyException("Centering failed.")
 
     # 2016/10/08 height_add was added. unit [um]
     def roughCentering(self, backimg, loop_size=600, offset_angle=0.0, height_add=0.0, largest_movement=5.0):
@@ -299,6 +299,7 @@ class LoopMeasurement:
         best_transmission=100.0
 
         rss.setSSROX()
+        rss.setSampleName(cond['sample_name'])
         rss.setWL(self.wavelength)
         rss.setExpTime(exp_time)
         rss.setPrefix(scan_id)
@@ -461,7 +462,7 @@ class LoopMeasurement:
                 self.raster_n_height = int(vscan_um / vstep_um)
             self.raster_n_width = 1
         else:
-            raise MyException("rasterMaster: scan setting failed")
+            raise ZooMyException("rasterMaster: scan setting failed")
 
         # Raster schedule file path
         raster_path = "%s/%s/" % (self.raster_dir, scan_id)
@@ -483,6 +484,8 @@ class LoopMeasurement:
         rss.setImgDire(raster_path)
         rss.setStartPhi(phi)
         rss.setMode(scan_mode)
+        # sample name setting
+        rss.setSampleName(cond['sample_name'])
         # Setting v step in [mm]
         vstep_mm = vstep_um / 1000.0
         rss.setVstep(vstep_mm)
@@ -601,8 +604,8 @@ class LoopMeasurement:
         sshika.waitingForSummary()
         try:
             glist = sshika.readSummary()
-        except MyException as tttt:
-            raise MyException("SHIKA could not get any good crystasl")
+        except ZooMyException as tttt:
+            raise ZooMyException("SHIKA could not get any good crystasl")
 
         left_xyz = [99.999, 99.999, 99.999]
         right_xyz = [99.999, 99.999, 99.999]
@@ -632,10 +635,10 @@ class LoopMeasurement:
 
         if xmin == 99.9999 or ymin == 99.9999 or zmin == 99.9999:
             print("shikaEdges:XMIN")
-            raise MyException("Left edge of the crystal: Wrong")
+            raise ZooMyException("Left edge of the crystal: Wrong")
         elif xmax == 99.9999 or ymax == 99.9999 or zmax == 99.9999:
             print("shikaEdges:XMAX")
-            raise MyException("Right edge of the crystal: Wrong")
+            raise ZooMyException("Right edge of the crystal: Wrong")
         else:
             left_code = xmin, ymin, zmin
             right_code = xmax, ymax, zmax
@@ -663,8 +666,8 @@ class LoopMeasurement:
             ashika.readSummary(prefix, ngrids, comp_thresh=comp_thresh, timeout=600)
             print("LoopMeasurement.readSummaryDat succeeded.")
 
-        except MyException as tttt:
-            raise MyException("shikaSumSkipStrong failed to wait summary.dat")
+        except ZooMyException as tttt:
+            raise ZooMyException("shikaSumSkipStrong failed to wait summary.dat")
 
         return ashika
 
@@ -798,6 +801,7 @@ class LoopMeasurement:
         mc.setCameraLength(cond['dist_ds'])
         mc.setScanCondition(start_phi, end_phi, cond['osc_width'])
         mc.setDir(self.multi_dir)
+        mc.setSampleName(cond['sample_name'])
         mc.setShutterlessOn()
 
         if same_point == False:
@@ -810,7 +814,7 @@ class LoopMeasurement:
 
     # 2020/07/09 K.Hirata coded.
     # multi_sch = self.lm.genMultiSchedule(phi_start, phi_end, center_xyz, cond, self.phosec_meas, prefix=prefix)
-    def genSingleSchedule(self, phi_start, phi_end, cenxyz, cond, flux, prefix="multi", same_point=True):
+    def genSingleSchedule(self, phi_start, phi_end, cenxyz, cond, flux, prefix="single", same_point=True):
         mc = MultiCrystal.MultiCrystal()
         single_sch = "%s/single.sch" % self.multi_dir
         # glist for generating the schedule file
@@ -828,7 +832,7 @@ class LoopMeasurement:
         # This line is very important for HITO
         cond['total_osc'] = total_osc
         kuma = KUMA.KUMA()
-        exp_time, best_transmission = kuma.getBestCondsMulti(cond, flux)
+        exp_time, best_transmission = kuma.getBestCondsSingle(cond, flux)
 
         if self.beamline == "BL32XU" or self.beamline == "BL41XU" or self.beamline == "BL45XU":
             # Check transmission with 'thinnest attenuator'
@@ -855,12 +859,14 @@ class LoopMeasurement:
         # 160618 Added by K. Hirata
         mc.setPrefix(prefix)
         mc.setCrystalID(cond['sample_name'])
+        mc.setSampleName(cond['sample_name'])
         mc.setWL(self.wavelength)
         if self.isBeamsizeIndexOnScheduleFile == True:
             mc.setBeamsizeIndex(beamsize_index)
         mc.setExpTime(exp_time)
         mc.setCameraLength(cond['dist_ds'])
         mc.setScanCondition(phi_start, phi_end, cond['osc_width'])
+        mc.setSampleName(cond['sample_name'])
         mc.setDir(self.multi_dir)
         mc.setShutterlessOn()
 
@@ -1167,6 +1173,9 @@ class LoopMeasurement:
         return multi_sch
 
     # 2019/05/22 Largely modified to use KUMA
+    # 2025/07/09 dose_listに対応はしているが、この関数の呼び出し以降は
+    # dose_listを使わず、cond['dose_ds']に数値が単体で入っている
+    # (HEBI.pyの中で展開してからこちらの呼び出しをしている)
     def genHelical(self, startphi, endphi, left_xyz, right_xyz, prefix, flux, cond):
         schbss = ScheduleBSS.ScheduleBSS()
         gv = GonioVec.GonioVec()
@@ -1183,7 +1192,7 @@ class LoopMeasurement:
         dist_vec = np.fabs(scanvec[1])
 
         if dist_vec < 0.005:
-            raise MyException("crystal size is too small for helical data collection")
+            raise ZooMyException("crystal size is too small for helical data collection")
 
         nframes_per_point = 1
         while (1):
@@ -1211,7 +1220,7 @@ class LoopMeasurement:
         cond['total_osc'] = total_osc
 
         exp_time, best_transmission = kuma.getBestCondsHelical(cond, flux, dist_vec)
-        self.logger.info("Best transmission = %8.2f" % best_transmission)
+        self.logger.info("Best transmission = %8.6f" % best_transmission)
         self.logger.info("Estimate best ends....")
         ntimes = cond['ntimes']
 
@@ -1261,6 +1270,7 @@ class LoopMeasurement:
         schbss.setCameraLength(cond['dist_ds'])
         schbss.setAdvanced(n_irrad, step_length, nframes_per_point)
         schbss.setAdvancedVector(left_xyz, right_xyz)
+        schbss.setSampleName(cond['sample_name'])
         schbss.setScanCondition(startphi, endphi, stepphi)
 
         # ntimes is the number of time of same data collection
@@ -1304,7 +1314,6 @@ class LoopMeasurement:
         rs.setExpTime(raster_exp)
         rs.makeMulti(sc_name, glist)
 
-
 if __name__ == "__main__":
     import ESA
 
@@ -1317,7 +1326,7 @@ if __name__ == "__main__":
     ppp = esa.getDict()
 
     root_dir = "/isilon/users/t_shimizu_4368/t_shimizu_4368/Junk/junk4/"
-    root_dir = "/isilon/users/target/target/AutoUsers/191114/kun/"
+    root_dir = os.environ("PWD")
     cxyz = [1.7601, -6.1756, 0.6280]
     phi = 0.00
     scan_id = "sample99"
@@ -1341,9 +1350,9 @@ if __name__ == "__main__":
     logfile = open("logfile.log", "w")
     #lm.genHelical(startphi, endphi, left_xyz, right_xyz, prefix, flux, ppp[0], logfile)
 
-    lm.multi_dir = "/isilon/BL32XU/BLsoft/PPPP/10.Zoo"
+    lm.multi_dir = os.path.join(os.environ("PWD"), "multi")
     glist=[left_xyz, right_xyz]
-    cond={'total_osc':10.0,'dist_ds':130.0, 'ds_hbeam':10.0, 'ds_vbeam':10.0, 'osc_width':0.1,'dose_ds':10.0, 'wavelength':1.0,'exp_ds':0.02, 'reduced_fact':1.0, 'sample_name':"TEST",'ntimes':1}
+    cond={'total_osc':10.0,'dist_ds':130.0, 'ds_hbeam':10.0, 'ds_vbeam':10.0, 'osc_width':0.1,'dose_ds':"{10.0,1.0,5.0}",'wavelength':1.0,'exp_ds':0.02, 'reduced_fact':1.0, 'sample_name':"TEST",'ntimes':1}
     lm.genMultiSchedule(0.0, glist, cond, flux, prefix="multi")
 
     ms.close()

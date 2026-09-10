@@ -143,7 +143,6 @@ class CoaxImage:
         zoom = self.get_zoom()
         origin_shift = self.coax_zoom2oshift[zoom]
         self.logger.info("Origin shift = %s %s" % origin_shift)
-        print("origin_shift = ", origin_shift)
         return origin_shift
 
     # get_coax_center()
@@ -200,8 +199,7 @@ class CoaxImage:
         origin_shift = [x / um_per_px * 1.e3 for x in origin_shift]
         w, h = self.width, self.height
         cen_x, cen_y = w / 2 + origin_shift[0], h / 2 - origin_shift[1]
-        print("cen_x = %8.2f" % cen_x)
-        print("cen_y = %8.2f" % cen_y)
+        self.logger.info(f"cen_x, cen_y = ({cen_x:8.2f}, {cen_y:8.2f})")
         return int(cen_x), int(cen_y)
 
     def calc_shift_by_img_px(self, sx, sy, units=("um",)):
@@ -256,8 +254,7 @@ class CoaxImage:
     # ph: pixel coordinate of horizontal axis
     # pv: pixel coordinate of vertical axis
     def calc_gxyz_of_pix_at(self, ph, pv, gcenx, gceny, gcenz, phi):
-        print("CoaxImage.calc_gxyz_of_pix_at is called")
-        print("EEEEEEE ", gcenx, gceny, gcenz, phi)
+        self.logger.info("CoaxImage.calc_gxyz_of_pix_at is called")
         if ph < 0 or pv < 0:
             print("Invalid ph or ph:", ph, pv)
             return
@@ -267,7 +264,7 @@ class CoaxImage:
         dh_mm = dh / 1000.0
         dv_mm = dv / 1000.0
         # print "%12.4f %12.4f %12.4f"%(gcenx,gceny,gcenz)
-        print("dH(mm),dV(mm)=", dh_mm, dv_mm)
+        self.logger.info(f"dH(mm),dV(mm)={dh_mm:12.4f},{dv_mm:12.4f}")
 
         # Horizontal direction -> Gonio Y axis
         gy = gceny + dh_mm  # unit [mm]
@@ -277,8 +274,8 @@ class CoaxImage:
         gx = gcenx + mm_dx  # unit [mm]
         gz = gcenz + mm_dz  # unit [mm]
 
-        print("(Xpix,Ypix,GX,GY,GZ)=%5d %5d %12.5f %12.5f %12.5f" % (ph, pv, gx, gy, gz))
-        print("CoaxImage.calc_gxyz_of_pix_at ends")
+        self.logger.info(f"(Xpix,Ypix,GX,GY,GZ)={ph:5d} {pv:5d} {gx:12.5f} {gy:12.5f} {gz:12.5f}")
+        self.logger.info("CoaxImage.calc_gxyz_of_pix_at ends")
         # print "GX,GY,GZ=",gx,gy,gz
         return gx, gy, gz
 
@@ -298,15 +295,14 @@ class CoaxImage:
 
     # 2016/04/13 Videoserv unstable
     def get_coax_image(self, imgout):
-        print("####################################")
-        print("%s size check" % imgout)
+        self.logger.info("size is checking...")
         for i in range(0, 10):
             try:
                 self.capture.capture(imgout)
                 while (os.path.getsize(imgout) != self.image_size):
                     print("Waiting...for generate the capture image on the storage")
                     time.sleep(1.0)
-                print("%s size check Okay" % imgout)
+                self.logger.info("size check Okay")
                 return True
             except:
                 return False

@@ -1,6 +1,6 @@
 import sys,os,math,numpy,scipy
 import scipy.spatial as ss
-import MyException
+import ZooMyException
 import time
 import datetime
 import CrystalSpot
@@ -68,7 +68,7 @@ class SummaryDat:
                 currtime=datetime.datetime.now()
                 print(currtime)
                 if (currtime-starttime).seconds > timeout:
-                    raise MyException.MyException("readSummary: summary.dat was not filled < 80%")
+                    raise ZooMyException.ZooMyException("readSummary: summary.dat was not filled < 80%")
                 else:
                     # closing the file definitely 2020.10.22 added by K.H
                     sumdatfile.close()

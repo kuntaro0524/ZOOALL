@@ -10,7 +10,7 @@ import datetime
 from Received import *
 from Motor import *
 import BSSconfig
-from MyException import *
+from ZooMyException import *
 from configparser import ConfigParser, ExtendedInterpolation
 
 # BL44XU specific beam defining aperture before the 2nd collimator

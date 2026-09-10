@@ -6,7 +6,7 @@ import Received
 import ScanAxis
 import Count
 import datetime
-import MyException
+import ZooMyException
 
 # from CounterInfo import *
 
@@ -137,7 +137,7 @@ class Motor(ScanAxis.ScanAxis):
         # Exception 
         try:
             self.checkScanCondition()
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print(ttt)
             raise ttt
 
@@ -184,7 +184,7 @@ class Motor(ScanAxis.ScanAxis):
         # Exception 
         try:
             self.checkScanCondition()
-        except MyException as ttt:
+        except ZooMyException as ttt:
             raise ttt
 
         saved_position = list()
@@ -255,6 +255,7 @@ class Motor(ScanAxis.ScanAxis):
 
         rrrr = Received.Received(recbuf)
         position = rrrr.readQuery()
+        print(f"position={position}")
 
         if position.find("kev") != -1:
             value = float(position.replace("kev", ""))

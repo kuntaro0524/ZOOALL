@@ -5,6 +5,7 @@ import logging
 from AttFactor import *
 # ConfigParser is used for reading beamline.ini
 from configparser import ConfigParser, ExtendedInterpolation
+import ECHA.ZooContext as ZooContext
 
 # 2014/05/28 K.Hirata
 # For multi-crystal data collection
@@ -33,12 +34,14 @@ class MultiCrystal:
         self.ainterval = 1  # Multi-crystal mode this should be always 1
         self.scan_interval = 1
         self.beamsize_idx = 0
+        self.sample_name = "unknown"
         self.crystal_id = "unknown"
         self.x1 = 1.0
         self.y1 = 1.0
         self.z1 = 1.0
         self.x2 = 1.0
         self.y2 = 1.0
+        self.trans = None
         self.z2 = 1.0
         self.isSlow = False
         self.isReadBeamSize = False
@@ -49,10 +52,11 @@ class MultiCrystal:
         config.read(config_path)
         self.beamline = config.get("beamline", "beamline")
 
-        if self.beamline == "BL32XU" or "BL41XU" or "BL44XU":
-            self.data_suffix = "h5"
-        if self.beamline == "BL45XU":
-            self.data_suffix = "cbf"
+        # ECHA mode flag
+        self.isECHA = config.get("ECHA", "isECHA")
+
+        # data suffix from a configure file
+        self.data_suffix = config.get("files", "data_suffix")
 
         # Is this valid only for BL32XU? K.Hirata 190412
         self.oscillation_delay = 100 #msec
@@ -117,6 +121,9 @@ class MultiCrystal:
         self.ainterval = ainterval
         self.isAdvanced = 1
 
+    def setSampleName(self, sample_name):
+        self.sample_name = sample_name
+
     def setAdvancedVector(self, start, end):
         self.x1 = float(start[0])
         self.y1 = float(start[1])
@@ -164,7 +171,7 @@ class MultiCrystal:
         ofile.write(
             "Status: 0 # -1:Undefined  0:Waiting  1:Processing  2:Success  3:Killed  4:Failure  5:Stopped  6:Skip  7:Pause\n")
         ofile.write("Job Mode: 0 # 0:Check  1:XAFS  2:Single  3:Multi\n")
-        ofile.write("Crystal ID: %s\n" % self.crystal_id)
+        ofile.write("Crystal ID: %s\n" % self.sample_name)
         ofile.write("Tray ID: Not Used\n")
         ofile.write("Well ID: 0 # 0:Not Used\n")
         ofile.write("Cleaning after mount: 0 # 0:no clean, 1:clean\n")
@@ -249,6 +256,15 @@ class MultiCrystal:
         ofile.write("Raster Rotation Range: 0.000 # [deg] rotation range\n")
         ofile.write("Raster Zig-Zag Flag: 1 # 0: off, 1:on\n")
         ofile.write("Comment:\n")
+        # if ECHA database is used
+        if self.isECHA == "True":
+            zoo_context = ZooContext.ZooContext()
+            username = zoo_context.get_username()
+            zoo_exid = zoo_context.get_zoo_exid()
+            print(username, zoo_exid)
+            ofile.write("User Name: %s\n" % username)
+            ofile.write("Zoo Number: %s\n" % zoo_exid)
+
         ofile.close()
 
     def makeMultiDoseSlicing(self, schedule_file, gonio_list, ntimes):
@@ -303,7 +319,7 @@ class MultiCrystal:
         schstr.append(
             "Status: 0 # -1:Undefined  0:Waiting  1:Processing  2:Success  3:Killed  4:Failure  5:Stopped  6:Skip  7:Pause\n")
         schstr.append("Job Mode: 0 # 0:Check  1:XAFS  2:Single  3:Multi\n")
-        schstr.append("Crystal ID: %s\n" % self.crystal_id)
+        schstr.append("Crystal ID: %s\n" % self.sample_name)
         schstr.append("Tray ID: Not Used\n")
         schstr.append("Well ID: 0 # 0:Not Used\n")
         schstr.append("Cleaning after mount: 0 # 0:no clean, 1:clean\n")
@@ -391,6 +407,14 @@ class MultiCrystal:
         schstr.append("Raster Rotation Range: 0.000 # [deg] rotation range\n")
         schstr.append("Raster Zig-Zag Flag: 1 # 0: off, 1:on\n")
         schstr.append("Comment:\n")
+        # if ECHA database is used
+        if self.isECHA == "True":
+            zoo_context = ZooContext.ZooContext()
+            username = zoo_context.get_username()
+            zoo_exid = zoo_context.get_zoo_exid()
+            print(username, zoo_exid)
+            schstr.append("User Name: %s\n" % username)
+            schstr.append("Zoo Number: %s\n" % zoo_exid)
 
         return schstr
 
@@ -439,7 +463,11 @@ class MultiCrystal:
 if __name__ == "__main__":
     t = MultiCrystal()
 
-    schedule_file = "/isilon/users/target/target/ikekekeke.sch"
+    schedule_file = "./ike.sch"
+
+    blcontext=ZooContext.ZooContext()
+    blcontext.set_username("test_user")
+    blcontext.set_zoo_exid("ZOO12345")
 
     gonio_list = []
     initial_y = -10.0000
@@ -450,7 +478,7 @@ if __name__ == "__main__":
         gonio_list.append((0.9829, y_value, -0.8553))
         index+=1
     ntimes = 1
-    t.setDir("/isilon/users/target/target/Staff/2019B/200120/04.BSStest/02/")
+    t.setDir("./")
     t.setScanCondition(0, 5, 0.1)
     t.setCameraLength(300.0)
     t.setExpTime(0.02)

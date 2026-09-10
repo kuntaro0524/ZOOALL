@@ -3,8 +3,7 @@ import time
 import numpy as np
 import socket
 
-#sys.path.append("/isilon/BL32XU/BLsoft/PPPP/10.Zoo/Libs/")
-from MyException import *
+from ZooMyException import *
 #import MXserver
 import Zoo
 import Date
@@ -24,6 +23,12 @@ if __name__ == "__main__":
     zoo = Zoo.Zoo()
     zoo.connect()
     zoo.getSampleInformation()
+
+    # Puck ID
+    puckid = sys.argv[1]
+    # puck range
+    startpin = int(sys.argv[2])
+    endpin = int(sys.argv[3])
 
     # Logging setting
     d = Date.Date()
@@ -53,8 +58,8 @@ if __name__ == "__main__":
     num = 0
     total_pins = 0
     while num < 10:
-        for trayid in ["CPS1023"]:
-            for pinid in [6,7,8,9,10]:
+        for trayid in [puckid]:
+            for pinid in range(startpin, endpin + 1):
                 logger.info("Tray %s - Pin %02d mount started." % (trayid, pinid))
                 try:
                     zoo.mountSample(trayid, pinid)
@@ -62,7 +67,7 @@ if __name__ == "__main__":
                     # def doAll(self, ntimes=3, skip=False, loop_size=600.0, offset_angle=0.0):
                     blf.device.prepCentering()
                     rwidth, rheight, phi_face, gonio_info = inocc.doAll(ntimes=2, skip=False, loop_size=500.0)
-                except MyException as ttt:
+                except ZooMyException as ttt:
                     exception_message = ttt.args[0]
                     #print("Sample mounting failed. Contact BL staff!")
                     #sys.exit(1)

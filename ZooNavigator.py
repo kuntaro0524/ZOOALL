@@ -23,15 +23,17 @@ from Libs import BSSconfig
 import cv2
 import time
 import math
-from MyException import *
+from ZooMyException import *
 from html_log_maker import ZooHtmlLog
 from ErrorCode import ErrorCode
 
 import logging
 import logging.config
+import json
 
 import os
 from configparser import ConfigParser, ExtendedInterpolation
+from datetime import datetime, timezone, timedelta
 
 def check_abort(lm):
     print("Abort check")
@@ -212,7 +214,7 @@ class ZooNavigator():
                                                                         self.meas_flux_list, self.meas_wavelength_list):
                 if beamh_check == beamh and beamv_check == beamv and wave_check == cond['wavelength']:
                     self.logger.info("The flux has been measured already. Return to the main routine.")
-                    nownownow = datetime.datetime.now()
+                    nownownow = datetime.now()
                     logstr = "%s %f(H)[um] x %f(V)[um] PIN PHOSEC=%8.2e phs/sec." % \
                              (nownownow, beamh, beamv, float(flux_check))
                     self.logger.info("%s\n" % logstr)
@@ -251,7 +253,7 @@ class ZooNavigator():
         self.meas_flux_list.append(self.phosec_meas)
 
         # Writing down the log file
-        nownownow = datetime.datetime.now()
+        nownownow = datetime.now()
         self.logger.info("================================================================")
         self.logger.info("-- Flux will be measured at the time when beam size is changed--")
         self.logger.info("================================================================")
@@ -267,11 +269,11 @@ class ZooNavigator():
         # Check if the pin is mounted or not
         try:
             self.zoo.dismountCurrentPin()
-        except MyException as tttt:
+        except ZooMyException as tttt:
             self.logger.info("dismounting sample for capturing background image failed.")
             sys.exit()
         # Background image for centering
-        self.backimg = "%s/%s" % (self.backimage_dir, datetime.datetime.now().strftime("back-%y%m%d%H%M.ppm"))
+        self.backimg = "%s/%s" % (self.backimage_dir, datetime.now().strftime("back-%y%m%d%H%M.ppm"))
         self.logger.debug("Before while loop for capturing.")
         while (True):
             try:
@@ -282,9 +284,9 @@ class ZooNavigator():
                 self.dev.capture.capture(self.backimg, wait_time=1.0)
                 time.sleep(0.5)
                 self.logger.debug("The 2nd image..")
-                self.dev.capture.capture(self.backimg, wait_time=1.0)
-            except MyException as tttt:
-                raise MyException("Capture background file failed")
+                self.dev.capture.capture(self.backimg)
+            except ZooMyException as tttt:
+                raise ZooMyException("Capture background file failed")
                 sys.exit()
 
             timg = cv2.imread(self.backimg)
@@ -335,11 +337,19 @@ class ZooNavigator():
 
         return change_flag
 
-    def goAroundECHA(self, zoo_id):
+    def goAroundECHA(self, exid):
         # ECHA class 
         # zoo_id is identical for each 'ZOOPREP' sheet.
         from ECHA.ESAloaderAPI import ESAloaderAPI
-        self.echa_esa = ESAloaderAPI(zoo_id)
+        self.echa_esa = ESAloaderAPI(exid=exid)
+        # prepare ESA
+        self.echa_esa.prep()
+        user_name = self.echa_esa.get_username()
+        # Zoo context 
+        import ECHA.ZooContext as ZooContext
+        self.zoo_context = ZooContext.ZooContext()
+        self.zoo_context.set_zoo_exid(exid)
+        self.zoo_context.set_username(self.echa_esa.get_username())
 
         # Zoom out
         self.dev.zoom.zoomOut()
@@ -373,7 +383,7 @@ class ZooNavigator():
                 self.processLoop(cond, checkEnergyFlag=True)
                 self.logger.info("ZN: processLoop has been finished for this pin.")
 
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 # Logging a caught exception message from modules.
                 exception_message = ttt.args[0]
                 self.logger.info("+++ Caught exception in a main loop.:%s +++" % exception_message)
@@ -383,6 +393,9 @@ class ZooNavigator():
                 else:
                     message = "All measurements have been finished."
                 self.logger.info(message)
+                # dismount current pin
+                self.zoo.dismountCurrentPin()
+
                 return self.num_pins
 
             # Checking points
@@ -431,7 +444,7 @@ class ZooNavigator():
                 cond = self.esa.getPriorPinCond()
                 self.processLoop(cond, checkEnergyFlag=True)
                 self.logger.info("ZN: processLoop has been finished for this pin.")
-            except MyException as ttt:
+            except ZooMyException as ttt:
                 # Logging a caught exception message from modules.
                 exception_message = ttt.args[0]
                 self.logger.info("+++ Caught exception in a main loop.:%s +++" % exception_message)
@@ -441,6 +454,9 @@ class ZooNavigator():
                 else:
                     message = "All measurements have been finished."
                 self.logger.info(message)
+                # Disumount pin
+                self.zoo.dismountCurrentPin()
+
                 return self.num_pins
             finally:
                 # Check for total consumed time
@@ -513,10 +529,11 @@ class ZooNavigator():
     # event_name: "meas_start", "meas_end", "mount_start", "mount_end", 
     # "cent_start", "cent_end", "raster_start", "raster_end", "ds_start", 
     # "ds_end", "dismount_start", "dismount_end"
-    # ZOODBの方では "t_meas_start", "t_meas_end"のように読み替えて記録しているはず
-    # これに注意して読み勧めてください
-    # ECHAでは時間は登録時に勝手に記録するのでわかりやすいコメントを入れます。
-    def updateTime(self, cond, event_name, comment=""):
+    # ここでは時間を文字列として記録する。ECHAを利用する場合登録時間は当然
+    # サーバーが持っているが、それとは別にZOO側での記録時間を登録する。
+    # 2026/02/27時点ではECHAでRESULTSを一覧取得すると時間を単体で見るのが
+    # 難しいため、時間を文字列で登録することにした。
+    def updateTime(self, cond, event_name):
         # 許容される時間文字列
         list_event = ["meas_start", "meas_end", "mount_start", "mount_end",
                         "cent_start", "cent_end", "raster_start", "raster_end",
@@ -525,6 +542,10 @@ class ZooNavigator():
         if event_name not in list_event:
             self.logger.error("event_name is not correct.")
             return
+        # JSTでの時間を文字列で取得
+        jst = timezone(timedelta(hours=+9), 'JST')
+        now_jst = datetime.now(jst)
+        jst_timestr = now_jst.isoformat()
         # ECHAを利用している場合 (commentsを利用)
         if self.isECHA == True:
             zoo_samplepin_id = cond['zoo_samplepin_id']
@@ -533,13 +554,146 @@ class ZooNavigator():
             # JSON
             param_json = {
                 "data":[{
-                    echa_paramname: comment
+                    echa_paramname: jst_timestr
                 }]
             }
             self.echa_esa.postResult(zoo_samplepin_id, param_json)
         # ZOODBを利用している場合
         else:
             self.esa.addEventTimeAt(cond['o_index'], event_name)
+
+    # ビームダンプ用の修正　2026/04/24
+    def waitTillReadyWithBeamDumpCheck(self, cond, job_name="unknown"):
+        """
+        BSS の measurement query を監視しながら ready を待つ。
+
+        仕様:
+        - working_beam__dump__recovering は待機継続
+        - working_Tuning は待機継続
+        - ready_beam__dump__recovered を検知した場合:
+            1. 直前JOBを異常終了として記録
+            2. put/bss/reset_server_status を実行
+            3. ready 復帰を確認
+            4. 当該 pin の残り処理を中断する
+        """
+        self.logger.info(f"[BeamDump] waitTillReadyWithBeamDumpCheck starts. job={job_name}")
+
+        while True:
+            status = self.zoo.getMeasurementStatus()
+            status_lower = status.lower()
+
+            self.logger.debug(f"[BeamDump] BSS status={status}")
+
+            if status_lower == "ready":
+                self.logger.info(f"[BeamDump] BSS ready detected. job={job_name}")
+                return
+
+            if status_lower in (
+                "working_beam__dump__recovering",
+                "working_tuning",
+            ):
+                self.logger.warning(
+                    f"[BeamDump] BSS is recovering/tuning after beam dump. "
+                    f"job={job_name}, status={status}"
+                )
+                time.sleep(10.0)
+                continue
+
+            if status_lower == "ready_beam__dump__recovered":
+                self.logger.warning(
+                    f"[BeamDump] BSS returned ready_beam__dump__recovered. "
+                    f"job={job_name}"
+                )
+
+                self.recordBeamDumpFailure(cond, job_name, status)
+                self.resetBeamDumpStatusAndConfirmReady()
+
+                raise BeamDumpRecoveredException(
+                    f"Beam dump recovered during {job_name}. "
+                    "Skip remaining procedures for this pin."
+                )
+
+            if status_lower.startswith("fail"):
+                raise ZooMyException(f"BSS failure during {job_name}: {status}")
+
+            if status_lower.startswith("fatal"):
+                raise ZooMyException(f"BSS fatal error during {job_name}: {status}")
+
+            if status_lower.startswith("working"):
+                self.logger.info(f"[BeamDump] BSS working. job={job_name}, status={status}")
+                time.sleep(2.0)
+                continue
+
+            raise ZooMyException(f"Unknown BSS status during {job_name}: {status}")
+
+    def resetBeamDumpStatusAndConfirmReady(self):
+        """
+        ready_beam__dump__recovered を ready に戻し、ready復帰を確認する。
+        """
+        self.logger.warning("[BeamDump] reset_server_status will be sent to BSS.")
+
+        try:
+            self.zoo.resetServerStatus()
+        except Exception as e:
+            self.logger.error("[BeamDump] reset_server_status failed.", exc_info=True)
+            raise ZooMyException(
+                "Beam dump recovered, but reset_server_status failed. "
+                "Operator intervention is required."
+            )
+
+        for i in range(30):
+            status = self.zoo.getMeasurementStatus()
+            status_lower = status.lower()
+
+            self.logger.info(
+                f"[BeamDump] confirming ready after reset: "
+                f"trial={i+1}, status={status}"
+            )
+
+            if status_lower == "ready":
+                self.logger.info("[BeamDump] BSS status was reset to ready.")
+                return
+
+            time.sleep(2.0)
+
+        raise ZooMyException(
+            "reset_server_status was sent, but BSS did not return to ready. "
+            "Operator intervention is required."
+        )
+
+    def recordBeamDumpFailure(self, cond, job_name, status):
+        """
+        ビームダンプによって現在JOBが放棄されたことをDB/ログに記録する。
+        """
+        message = (
+            f"Beam dump occurred/recovered during job={job_name}. "
+            f"BSS status={status}. "
+            "Current JOB was aborted by BSS. "
+            "Remaining procedures for this pin will be skipped."
+        )
+
+        self.logger.warning("[BeamDump] " + message)
+
+        # ErrorCode.py に専用コードを作るのが本来は望ましい。
+        # 仮に未定義なら一時的に 9999 を使う。
+        try:
+            error_value = ErrorCode.BEAM_DUMP_RECOVERED.to_db_value()
+        except AttributeError:
+            error_value = 9999
+
+        self.updateDBinfo(cond, "isDone", error_value)
+        self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_value))
+        self.updateDBinfo(cond, "log_beam_dump", message)
+
+        # job_name に応じて時刻を閉じる
+        if "raster" in job_name:
+            self.updateTime(cond, "raster_end")
+
+        if "ds" in job_name or "data_collection" in job_name:
+            self.updateTime(cond, "ds_end")
+
+        self.updateTime(cond, "meas_end")
+
 
     def processLoop(self, cond, checkEnergyFlag=False, measFlux=False):
         # Root directory
@@ -574,7 +728,9 @@ class ZooNavigator():
             return
 
         # Write log string
+        self.logger.info(f"ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ Wellcome to our ZOO ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
         self.logger.info(f">>>>>>>>>>>>>>>> Processing {cond['puckid']}-{cond['pinid']:02d} <<<<<<<<<<<<<<<<<")
+        self.logger.info(f"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
 
         # Making root directory
         if os.path.exists(root_dir):
@@ -601,8 +757,9 @@ class ZooNavigator():
                 if self.beamline.upper() == "BL45XU":
                     self.logger.info("Wavelength will be changed.")
                     self.zoo.setWavelength(cond['wavelength'])
-                    self.logger.info("Wavelength has been changed. You should wait for 15 minutes")
-                    time.sleep(15 * 60)
+                    sleep_time_mins = float(self.config.get("experiment", "wait_time_change_energy"))
+                    self.logger.info("Wavelength has been changed. Waiting time is {sleep_time_mins} minutes.")
+                    time.sleep(sleep_time_mins * 60)
                     self.logger.info("Tuning is required.")
                     # 2020/04/06 Dtheta1 tune will be conducted
                     self.logger.info("BOSS command : BLdtheta_tune will be run.")
@@ -673,10 +830,9 @@ class ZooNavigator():
         # d_index was defined as 'the newest directory number' of scan??/data??.
         d_index = self.lm.prepDataCollection()
         self.logger.info("Directory preparation finished.")
-        # n_mount is not useful then 'directory index' is stored to 'n_mount'
 
         # ラップタイムを記録
-        self.updateTime(cond, "meas_start", comment="Measurement start")
+        self.updateTime(cond, "meas_start")
 
         # Setting wavelength for schedule file
         self.lm.setWavelength(cond['wavelength'])
@@ -689,7 +845,7 @@ class ZooNavigator():
 
         self.logger.info("[PROCESS] Mounting sample starts.")
         # ラップタイムの記録
-        self.updateTime(cond, "mount_start", comment="Sample mounting started")
+        self.updateTime(cond, "mount_start")
 
         # ErrorCode module
         """
@@ -704,7 +860,7 @@ class ZooNavigator():
         """
         try:
             self.zoo.mountSample(trayid, pinid)
-        except MyException as ttt:
+        except ZooMyException as ttt:
             exception_message = ttt.args[0]
             self.logger.info("Failed to mount a sample pin:%s" % ttt)
             # Accident case
@@ -717,7 +873,8 @@ class ZooNavigator():
                 error_code = ErrorCode.SPACE_ACCIDENT
                 # update
                 # isDoneもZOODB用に入れておくことに
-                self.updateDBinfo(cond, "isDone", error_code)
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+                self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
                 self.updateDBinfo(cond, "log_mount", log_message)
                 return
 
@@ -729,7 +886,8 @@ class ZooNavigator():
                 error_code = ErrorCode.SPACE_WARNING_LHEAD_PUSHED
                 # update
                 # isDoneもZOODB用に入れておくことに
-                self.updateDBinfo(cond, "isDone", error_code)
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+                self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
                 self.updateDBinfo(cond, "log_mount", log_message)
                 return
 
@@ -742,8 +900,9 @@ class ZooNavigator():
                 # Let BSS know about this should be skipped. (reset SPACE)
                 self.zoo.skipSample()
                 self.logger.info("SPACE output a warning message. Next sample")
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
+                self.updateTime(cond, "meas_end")
                 self.updateDBinfo(cond, "log_mount", message)
+                self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
                 self.logger.info("Breaking the loop of %s-%02d" % (trayid, pinid))
                 return
             elif exception_message.rfind('-1005100002') != -1:
@@ -751,10 +910,11 @@ class ZooNavigator():
                 # ここも特殊
                 self.logger.warning(message)
                 self.zoo.skipSample()
-                error_code = ErrorCode.SPACE_WARNING_SUSPECTED
+                error_code = ErrorCode.SPACE_WARNING_LHEAD_PUSHED
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "log_mount", message)
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
+                self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
+                self.updateTime(cond, "meas_end")
                 self.logger.info("SPACE output a warning message. Next sample")
                 self.logger.info("Breaking the loop of %s-%02d" % (trayid, pinid))
                 return
@@ -763,8 +923,9 @@ class ZooNavigator():
                 self.logger.warning(message)
                 error_code = ErrorCode.SPACE_WARNING_ROTATE_TOO_MUCH
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
+                self.updateTime(cond, "meas_end")
                 self.updateDBinfo(cond, "log_mount", message)
+                self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
                 self.zoo.skipSample()
                 self.logger.info("Go to the next sample...")
                 self.logger.info("SPACE output a warning message. Next sample")
@@ -774,11 +935,12 @@ class ZooNavigator():
             elif exception_message.rfind('-1005100007') != -1:
                 message = "'Failed to pickup the sample pin from the tray. %s_%s'" % (trayid, pinid)
                 self.logger.warning(message)
-                error_code = ErrorCode.SPACE_WARNING_SUSPECTED
+                error_code = ErrorCode.SPACE_WARNING_GRAB_FAILED
                 self.zoo.skipSample()
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "log_mount", message)
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
+                self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
+                self.updateTime(cond, "meas_end")
                 self.logger.info("SPACE output a warning message. Next sample")
                 self.logger.info("Breaking the loop of %s-%02d" % (trayid, pinid))
                 return
@@ -788,7 +950,8 @@ class ZooNavigator():
                 error_code = ErrorCode.SPACE_UNKNOWN_ACCIDENT
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "log_mount", message)
-                self.updateTime(cond, "meas_end", comment="skipped with SPACE warning")
+                self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
+                self.updateTime(cond, "meas_end")
                 sys.exit()
             return
 
@@ -799,7 +962,10 @@ class ZooNavigator():
         # isMount = d_index + 1
         isMount = d_index + 1
         self.updateDBinfo(cond, "isMount", isMount)
-        self.updateTime(cond, "mount_end", comment="Sample mounting finished")
+        self.updateDBinfo(cond, "n_mount", isMount)
+        # 251029 K.Hirata added
+        self.updateDBinfo(cond, "data_index", d_index)
+        self.updateTime(cond, "mount_end")
 
         # Time for waiting for the elongation
         time.sleep(self.time_for_elongation)
@@ -865,7 +1031,7 @@ class ZooNavigator():
 
         #### Centering
         # 2015/11/21 Loop size can be set
-        self.updateTime(cond, "cent_start", comment="Centering starts")
+        self.updateTime(cond, "cent_start")
         try:
             self.logger.info("ZooNavigator starts centering procedure...")
             height_add = 0.0
@@ -880,7 +1046,7 @@ class ZooNavigator():
             self.updateDBinfo(cond, "scan_width", self.rwidth)
 
         # exception reason
-        except MyException as ttt:
+        except ZooMyException as ttt:
             self.logger.error("ZOO detects exception in centering")
             # reason
             exception_message = ttt.args[0]
@@ -888,10 +1054,10 @@ class ZooNavigator():
             self.logger.error("Go to next sample")
             # isLoopCenter = 9999
             self.updateDBinfo(cond, "isLoopCenter", 9999)
-            self.updateTime(cond, "cent_end", comment="Centering failed")
+            self.updateTime(cond, "cent_end")
             error_code = ErrorCode.CENTERING_FAILURE
             self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+            self.updateDBinfo(cond, "meas_record", error_code.getMessage(error_code.to_db_value()))
             # Disconnecting capture in this loop's 'capture' instance
             self.logger.info("close Capture instance")
             self.lm.closeCapture()
@@ -899,7 +1065,7 @@ class ZooNavigator():
 
         #### /Centering
         # Succeeded
-        self.updateTime(cond, "cent_end", comment="Centering finished")
+        self.updateTime(cond, "cent_end")
 
         # Save Gonio XYZ to the previous pins
         self.sx, self.sy, self.sz, sphi = self.dev.gonio.getXYZPhi()
@@ -955,27 +1121,50 @@ class ZooNavigator():
         if self.beamline.upper() == "BL44XU":
             self.zoo.setBeamsize(self.beamsize_index)
 
-        self.logger.info("ZooNavigator starts MODE=%s" % (cond['mode']))
-        if cond['mode'] == "multi":
-            self.collectMulti(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "helical":
-            self.collectHelical(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "mixed":
-            self.collectMixed(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "single":
-            self.collectSingle(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "ssrox":
-            self.collectSSROX(cond, sphi)
-        elif cond['mode'] == "quick":
-            self.collectQuick(trayid, pinid, prefix, cond, sphi)
-        elif cond['mode'] == "screening":
-            self.collectScreen(cond, sphi)
-        else:
-            self.logger.error("Unknown mode: %s" % cond['mode'])
-            error_code = ErrorCode.UNKNOWN_MODE
-            self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            self.updateTime(cond, "meas_end", comment="Unknown mode in a condition")
+        dose_list_raw = str(cond.get("dose_list", "")).strip()
+        dist_list_raw = str(cond.get("dist_list", "")).strip()
+        
+        if cond["mode"] in ("quick", "screening"):
+            if dose_list_raw != "" or dist_list_raw != "":
+                raise ZooMyException(
+                    f"mode={cond['mode']} does not support dose_list/dist_list."
+                )
+
+        try:
+            self.logger.info("ZooNavigator starts MODE=%s" % (cond['mode']))
+            if cond['mode'] == "multi":
+                self.collectMulti(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "helical":
+                self.collectHelical(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "mixed":
+                self.collectMixed(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "single":
+                self.collectSingle(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "ssrox":
+                self.collectSSROX(cond, sphi)
+            elif cond['mode'] == "quick":
+                self.collectQuick(trayid, pinid, prefix, cond, sphi)
+            elif cond['mode'] == "screening":
+                self.collectScreen(cond, sphi)
+            else:
+                self.logger.error("Unknown mode: %s" % cond['mode'])
+                error_code = ErrorCode.UNKNOWN_MODE
+                self.updateDBinfo(cond, "isDone", error_code.to_db_value())
+                self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
+                self.updateTime(cond, "meas_end")
+                return
+
+        except BeamDumpRecoveredException as e:
+            self.logger.warning(f"[BeamDump] Caught BeamDumpRecoveredException: {str(e)}")
+            self.logger.warning(f"[BeamDump] Remaining procedures for this pin are skipped due to beam dump recovery.")
+            try:
+                self.lm.closeCapture()
+            except Exception:
+                self.logger.error("[BeamDump] Failed to close Capture instance after beam dump recovery.", exc_info=True)
+            try: 
+                self.zoo.dismountCurrentPin()
+            except Exception:
+                self.logger.error("[BeamDump] Failed to dismount current pin after beam dump recovery.", exc_info=True)
             return
 
         self.num_pins += 1
@@ -986,6 +1175,75 @@ class ZooNavigator():
     def finishZoo(self):
         open(os.path.join(os.environ["HOME"], ".zoo_current"), "w").write("%s %s finished\n" \
                                                                           % (self.name, self.root_dir))
+
+    def _parse_series_like_text(self, value):
+        """
+        UserESA が出力する dose_list / dist_list を list[float] に変換する。
+        許容例:
+          ""            -> []
+          "5"           -> [5.0]
+          "[5, 10, 20]" -> [5.0, 10.0, 20.0]
+        """
+        if value is None:
+            return []
+    
+        s = str(value).strip()
+        if s == "" or s.lower() == "nan":
+            return []
+    
+        # 角括弧を除去
+        if s.startswith("[") and s.endswith("]"):
+            s = s[1:-1].strip()
+    
+        if s == "":
+            return []
+    
+        return [float(x.strip()) for x in s.split(",") if x.strip() != ""]    
+
+    def _build_dc_condition_list(self, cond):
+        """
+        data collection 用の条件リストを返す。
+        返り値: list[dict]  各dictは {"dose": ..., "dist": ...}
+        """
+        dose_list = self._parse_series_like_text(cond.get("dose_list", ""))
+        dist_list = self._parse_series_like_text(cond.get("dist_list", ""))
+    
+        # dist_list only は不正
+        if len(dose_list) == 0 and len(dist_list) > 0:
+            raise ZooMyException("dist_list only is invalid. dose_list is required.")
+    
+        # 通常運用
+        if len(dose_list) == 0:
+            return [{
+                "dose": float(cond["dose_ds"]),
+                "dist": float(cond["dist_ds"]),
+            }]
+    
+        # mode 制約
+        if cond["mode"] in ("multi", "mixed", "ssrox"):
+            if len(dose_list) > 1 or len(dist_list) > 1:
+                raise ZooMyException(
+                    f"mode={cond['mode']} does not allow multiple dose_list/dist_list values."
+                )
+    
+        # dose_list only
+        if len(dist_list) == 0:
+            return [
+                {"dose": dose, "dist": float(cond["dist_ds"])}
+                for dose in dose_list
+            ]
+    
+        # dose_list + dist_list
+        if len(dose_list) != len(dist_list):
+            raise ZooMyException(
+                f"dose_list and dist_list length mismatch in ZooNavigator: "
+                f"{len(dose_list)} vs {len(dist_list)}"
+            )
+    
+        return [
+            {"dose": dose, "dist": dist}
+            for dose, dist in zip(dose_list, dist_list)
+        ]
 
     def collectMulti(self, trayid, pinid, prefix, cond, sphi):
         o_index = cond['o_index']
@@ -1009,22 +1267,24 @@ class ZooNavigator():
                                                             scanv_um, scanh_um, vstep_um, hstep_um,
                                                             sphi, cond)
         # To catch a detailed exception
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
+        self.updateTime(cond, "raster_start")
         try:
             self.zoo.doRaster(raster_schedule)
-            self.zoo.waitTillReady()
-        except:
+            self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
+        except BeamDumpRecoveredException as e:
+            raise e
+        except ZooMyException as tttt:
             error_code = ErrorCode.RASTER_SCAN_FAILURE_MEASUREMENT
             self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-            self.updateTime(cond, "raster_end", comment="Raster scan failed in unknown exception.")
-            self.updateTime(cond, "meas_end", comment="Raster scan failed in unknown exception.")
+            self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
+            self.updateTime(cond, "raster_end")
+            self.updateTime(cond, "meas_end")
             raise Exception("Raster scan by BSS failed.")
 
         # Recording time
         isRaster = 1
         self.updateDBinfo(cond, "isRaster", isRaster)
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
+        self.updateTime(cond, "raster_end")
 
         # Analyzing raster scan results
         try:
@@ -1066,16 +1326,17 @@ class ZooNavigator():
             gfile.close()
 
         # Raster scan analysis failed.
-        except MyException as tttt:
+        except ZooMyException as tttt:
             logstring = tttt.args[0]
             self.logger.warning(f"Raster scan failed: {logstring}")
             # isDone, meas_record にエラーコードを入れる
             error_code = ErrorCode.RASTER_SCAN_FAILURE_ANALYSIS
             self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+            self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
+            self.updateDBinfo(cond, "nds_multi", 0)
             # end_time も入れておく
-            self.updateTime(cond, "raster_end", comment="Exception in analyzing raster scan result")
-            self.updateTime(cond, "meas_end", comment="Exception in analyzing raster scan result")
+            self.updateTime(cond, "raster_end")
+            self.updateTime(cond, "meas_end")
             # Disconnecting capture in this loop's 'capture' instance
             self.logger.info("Disconnecting capture")
             self.lm.closeCapture()
@@ -1087,10 +1348,11 @@ class ZooNavigator():
             # isDone, meas_record にエラーコードを入れる
             error_code = ErrorCode.RASTER_SCAN_NO_CRYSTAL
             self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-            self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+            self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
+            self.updateDBinfo(cond, "nds_multi", 0)
             # end_time も入れておく
-            self.updateTime(cond, "raster_end", comment="No crystal was found")
-            self.updateTime(cond, "meas_end", comment="No crystals were found after the analysis")
+            self.updateTime(cond, "raster_end")
+            self.updateTime(cond, "meas_end")
             # Disconnecting capture in this loop's 'capture' instance
             self.logger.warning("Disconnecting capture")
             self.lm.closeCapture()
@@ -1098,7 +1360,8 @@ class ZooNavigator():
 
         # Data collection
         time.sleep(0.1)
-        data_prefix = "%s-%02d-multi" % (trayid, pinid)
+        #data_prefix = "%s-%02d-multi" % (trayid, pinid)
+        data_prefix = "multi"
 
         # Photon flux is extracted from beamsize.config
         if self.phosec_meas == 0.0:
@@ -1126,10 +1389,10 @@ class ZooNavigator():
         time.sleep(0.1)
 
         # ds_start
-        self.updateTime(cond, "ds_start", comment="Data collection started")
+        self.updateTime(cond, "ds_start")
         self.zoo.doDataCollection(multi_sch)
-        self.zoo.waitTillReady()
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="data_collection_multi")
+        self.updateTime(cond, "ds_end")
         self.updateDBinfo(cond, "isDS", 1)
 
         # Writing CSV file for data processing
@@ -1141,7 +1404,7 @@ class ZooNavigator():
 
         # end of measurement
         self.updateDBinfo(cond, "isDone", 1)
-        self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+        self.updateTime(cond, "meas_end")
         self.logger.info("Disconnecting capture")
         self.lm.closeCapture()
         # end of collectMulti
@@ -1187,15 +1450,15 @@ class ZooNavigator():
         time.sleep(0.1)
 
         # ds_start
-        self.updateTime(cond, "ds_start", comment="Data collection started")
+        self.updateTime(cond, "ds_start")
         self.zoo.doDataCollection(multi_sch)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="data_collection_multi")
         # ds_end
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
+        self.updateTime(cond, "ds_end")
         self.updateDBinfo(cond, "isDS", 1)
         self.updateDBinfo(cond, "isDone", 1)
         # measurement finished
-        self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+        self.updateTime(cond, "meas_end")
 
         # Writing CSV file for data processing
         sample_name = cond['sample_name']
@@ -1206,6 +1469,41 @@ class ZooNavigator():
 
         self.logger.info("Disconnecting capture")
         self.lm.closeCapture()
+
+    def _run_single_dc_loop(self, cond, sphi, glist, flux, data_prefix="single"):
+        """
+        single mode の data collection 実行部。
+        dose_list / dist_list が有効な場合は、その条件数ぶんループする。
+        通常運用では 1 回だけ実行する。
+        """
+        dc_list = self._build_dc_condition_list(cond)
+
+        self.logger.info(
+            f"[single-dc-loop] number of data collections = {len(dc_list)}"
+        )
+
+        for i_dc, dc in enumerate(dc_list):
+            cond_local = cond.copy()
+            cond_local["dose_ds"] = dc["dose"]
+            cond_local["dist_ds"] = dc["dist"]
+
+            prefix_local = f"{data_prefix}_{i_dc:02d}"
+
+            self.logger.info(
+                f"[single-dc-loop] #{i_dc+1}: prefix={prefix_local} "
+                f"dose_ds={cond_local['dose_ds']} dist_ds={cond_local['dist_ds']}"
+            )
+
+            multi_sch = self.lm.genMultiSchedule(
+                sphi,
+                glist,
+                cond_local,
+                flux,
+                prefix=prefix_local,
+            )
+
+            self.zoo.doDataCollection(multi_sch)
+            self.waitTillReadyWithBeamDumpCheck(cond, job_name=f"data_collection_single_{i_dc:02d}")
 
     # Collect single
     def collectSingle(self, trayid, pinid, prefix, cond, sphi):
@@ -1229,11 +1527,11 @@ class ZooNavigator():
                                                 scanv_um, scanh_um, vstep_um, hstep_um, sphi, cond)
 
         # time for start raster scan
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
+        self.updateTime(cond, "raster_start")
         self.logger.debug("[PROCESS] ZOO starts raster scan..")
         self.zoo.doRaster(schfile)
-        self.zoo.waitTillReady()
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
+        self.updateTime(cond, "raster_end")
         # Flag on
         self.updateDBinfo(cond, "isRaster", 1)
         self.logger.info("Raster scan has been finished. Analyzing the result...")
@@ -1259,10 +1557,10 @@ class ZooNavigator():
                 # isDone, meas_record にエラーコードを入れる
                 error_code = ErrorCode.DATA_COLLECTION_NO_CRYSTAL
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+                self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
                 # end_time
-                self.updateTime(cond, "raster_end", comment="No crystal was found")
-                self.updateTime(cond, "meas_end", comment="No crystals were found after the analysis")
+                self.updateTime(cond, "raster_end")
+                self.updateTime(cond, "meas_end")
                 # Disconnecting capture in this loop's 'capture' instance
                 self.logger.info("Disconnecting capture")
                 self.lm.closeCapture()
@@ -1327,7 +1625,7 @@ class ZooNavigator():
                 schfile, raspath = self.lm.rasterMaster(v_prefix, "Vert", mod_xyz,
                                                         scanv_um, scanh_um, vstep_um, hstep_um, phi_lv, cond)
                 self.zoo.doRaster(schfile)
-                self.zoo.waitTillReady()
+                self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
 
                 try:
                     # Final analysis for vertical scan
@@ -1345,6 +1643,8 @@ class ZooNavigator():
                     final_cxyz = crystals.getBestCrystalCode()
                 # もしかしてここもExceptionで結晶が検出されないことを判定しているのか。
                 # いつか修正したい
+                except BeamDumpRecoveredException:
+                    raise
                 except Exception as e:
                     self.logger.warning("Analyze vertical scans failed.\n")
                     self.logger.warning("ZN.collectSingle: Left vertical scan analysis failed.")
@@ -1356,11 +1656,11 @@ class ZooNavigator():
                         # isDone, meas_record にエラーコードを入れる
                         error_code = ErrorCode.DATA_COLLECTION_NO_CRYSTAL
                         self.updateDBinfo(cond, "isDone", error_code.to_db_value())
-                        self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
+                        self.updateDBinfo(cond, "meas_record", ErrorCode.getMessage(error_code.to_db_value()))
                         # end_time
                         comment=f"Vertical scan failed after {n_try} trials..."
-                        self.updateTime(cond, "raster_end", comment)
-                        self.updateTime(cond, "meas_end", comment)
+                        self.updateTime(cond, "raster_end")
+                        self.updateTime(cond, "meas_end")
                         # Disconnecting capture in this loop's 'capture' instance
                         self.logger.info("Disconnecting capture")
                         self.lm.closeCapture()
@@ -1371,7 +1671,7 @@ class ZooNavigator():
                     break
 
             # raster_end
-            self.updateTime(cond, "raster_end", comment="3D centering with raster scans finished")
+            self.updateTime(cond, "raster_end")
             glist.append(final_cxyz)
             # Writing down the goniometer coordinate list
             gfile = open("%s/final_code.dat" % self.lm.raster_dir, "w")
@@ -1379,7 +1679,7 @@ class ZooNavigator():
             gfile.close()
 
         # Raster scan failed
-        except MyException as message:
+        except ZooMyException as message:
             self.logger.info("Caught error: %s " % message)
             self.logger.info("Skipping this loop: diffraction based centering loop.")
             # isDone, meas_record にエラーコードを入れる
@@ -1388,8 +1688,8 @@ class ZooNavigator():
             self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             # comment
             comment = f"Raster scan failed in inknown reasons: {message}"
-            self.updateTime(cond, "raster_end", comment)
-            self.updateTime(cond, "meas_end", comment)  
+            self.updateTime(cond, "raster_end")
+            self.updateTime(cond, "meas_end")
             # Disconnecting capture in this loop's 'capture' instance
             self.logger.info("Disconnecting capture")
             self.lm.closeCapture()
@@ -1398,7 +1698,7 @@ class ZooNavigator():
         # Data collection
         # Why is this wait required?
         time.sleep(0.1)
-        data_prefix = "%s-%02d-single" % (trayid, pinid)
+        data_prefix = "single"
 
         # Dose to limit exposure time
         self.logger.info("KUMA will be called from now!!")
@@ -1414,28 +1714,22 @@ class ZooNavigator():
             self.logger.info(
                 "Single: Beam size = %5.2f %5.2f um Measured flux : %5.2e" % (cond['ds_hbeam'], cond['ds_vbeam'], flux))
 
-        # Generate Schedule file
-        self.logger.info("Preparing the schedule file for a single data collection.")
-        multi_sch = self.lm.genMultiSchedule(sphi, glist, cond, flux, prefix=data_prefix)
-
-        # Why is this wait required?
-        # For waiting the schedule file???
+        # data collection loop (single / multiple conditions)
         time.sleep(0.1)
-
-        # ds_start
-        self.updateTime(cond, "ds_start", comment="Data collection started")
-        self.logger.info("Now ZOO starts single data collection.")
-        self.zoo.doDataCollection(multi_sch)
-        self.zoo.waitTillReady()
-        # ds_end
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
+        
+        self.updateTime(cond, "ds_start")
+        self.logger.info("Now ZOO starts single data collection loop.")
+        
+        self._run_single_dc_loop(cond, sphi, glist, flux, data_prefix=data_prefix)
+        
+        self.updateTime(cond, "ds_end")
         self.updateDBinfo(cond, "isDS", 1)
         self.updateDBinfo(cond, "isDone", 1)
-        self.updateDBinfo(cond, "meas_end", "Measurement normally finished")
-        self.logger.info("Now ZOO finishes single data collection.")
+        self.updateTime(cond, "meas_end")
+        self.logger.info("Now ZOO finishes single data collection loop.")
+
         # Data proc
         sample_name = cond['sample_name']
-        prefix = "%s-%02d" % (trayid, pinid)
         root_dir = cond['root_dir']
         self.data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
         self.data_proc_file.flush()
@@ -1475,11 +1769,11 @@ class ZooNavigator():
                                                 sphi, cond)
 
         # raster_start
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
+        self.updateTime(cond, "raster_start")
         self.zoo.doRaster(schfile)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
         # raster_end
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
+        self.updateTime(cond, "raster_end")
         # Flag on
         self.updateDBinfo(cond, "isRaster", 1)
 
@@ -1494,49 +1788,60 @@ class ZooNavigator():
                 cond['ds_hbeam'], cond['ds_vbeam'], flux))
 
         # HEBI instance
-        hebi = HEBI.HEBI(self.zoo, self.lm, self.stopwatch, flux)
+        hebi = HEBI.HEBI(
+            self.zoo,
+            self.lm,
+            self.stopwatch,
+            flux,
+            wait_ready_func=self.waitTillReadyWithBeamDumpCheck,
+        )
 
-        # Log for dose
-        self.logger.info("Dose limit  = %3.1f[MGy]" % cond['dose_ds'])
+        # Log for dose list
+        dose_dist_list = hebi.getDoseDistList(cond)
+        for dose, dist in dose_dist_list:
+            self.logger.info(f"dose/dist for helical data collection: dose={dose}, dist={dist}")
+        
         n_crystals = 0
         try:
-            self.updateTime(cond, "ds_start", comment="Data collection started")
+            self.updateTime(cond, "ds_start")
             # Processing all found crystals for helical data collections
             n_crystals = hebi.mainLoop(raspath, scan_id, sphi, cond, precise_face_scan=False)
             if n_crystals > 0:
                 self.updateDBinfo(cond, "nds_helical", n_crystals)
                 # Data proc
-                sample_name = cond['sample_name']
+                sample_name = cond['sample_name'] 
                 root_dir = cond['root_dir']
                 self.data_proc_file.write("%s/_kamoproc/%s/,%s,no\n" % (root_dir, prefix, sample_name))
                 self.data_proc_file.flush()
                 # Log file for time stamp
-                self.updateTime(cond, "ds_end", comment="Helical data collection finished")
+                self.updateTime(cond, "ds_end")
                 self.logger.info("Helical data collection ended.")
                 # meas_end
                 self.updateDBinfo(cond, "isDS", 1)
                 self.updateDBinfo(cond,"isDone", 1)
-                self.updateTime(cond, "meas_end", comment="Helical data collection finished")
+                self.updateTime(cond, "meas_end")
             else:
                 self.logger.info("No crystals were found in HEBI.")
                 # isDone, meas_record にエラーコードを入れる
                 error_code = ErrorCode.DATA_COLLECTION_NO_CRYSTAL
                 self.updateDBinfo(cond, "isDone", error_code.to_db_value())
                 self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
-                self.updateTime(cond, "ds_end", comment="No crystals were found in HEBI.")
+                self.updateTime(cond, "ds_end")
                 # meas_end
-                self.updateTime(cond, "meas_end", comment="No crystals were found in HEBI.")
+                self.updateTime(cond, "meas_end")
         # Unknown exception captured
-        except:
+        except BeamDumpRecoveredException as e:
+            raise e
+        except Exception as e:
             self.logger.info("ZooNavigator.collectHelical failed.")
             # isDone, meas_record にエラーコードを入れる
             error_code = ErrorCode.DATA_COLLECTION_UNKNOWN_ERROR
             self.updateDBinfo(cond, "isDone", error_code.to_db_value()) 
             self.updateDBinfo(cond, "meas_record", error_code.to_db_value())
             # end_time
-            self.updateTime(cond, "ds_end", comment="Helical data collection failed in unknown reasons.")
+            self.updateTime(cond, "ds_end")
             # meas_end
-            #self.updateTime(cond, "meas_end", comment="Helical data collection failed in unknown reasons.")
+            self.updateTime(cond, "meas_end")
 
         self.lm.closeCapture()
         self.logger.info("Return to the main loop of 'process'")
@@ -1568,16 +1873,16 @@ class ZooNavigator():
                                                 scanv_um, scanh_um, vstep_um, hstep_um,
                                                 sphi, cond)
         # Raster start
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
+        self.updateTime(cond, "raster_start")
         self.zoo.doRaster(schfile)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d")
         self.updateDBinfo(cond, "isRaster", 1)
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
+        self.updateTime(cond, "raster_end")
 
         # HITO instance
-        hito = DiffscanMaster.NOU(self.zoo, self.lm, sphi, self.phosec_meas)
+        hito = DiffscanMaster.HITO(self.zoo, self.lm, sphi, self.phosec_meas, wait_ready_func=self.waitTillReadyWithBeamDumpCheck)
         # Set the time limit for data collection from a pin.
-        self.updateTime(cond, "ds_start", comment="Data collection started")
+        self.updateTime(cond, "ds_start")
         # HITO data collection time [mins] -> currently limited to 15 minutes.
         hito.setTimeLimit(15.0)
         try:
@@ -1585,10 +1890,12 @@ class ZooNavigator():
             # isDS = 1
             self.updateDBinfo(cond, "isDS", 1)
             self.updateDBinfo(cond, "isDone", 1)
+        except BeamDumpRecoveredException as e:
+            raise e
         except Exception as e:
             self.logger.info(e.args[0])
             message = f"Data collection failed in unknown reasons: {e.args[0]}"
-            self.updateTime(cond, "ds_end", comment=message)
+            self.updateTime(cond, "ds_end")
             error_code = ErrorCode.DATA_COLLECTION_UNKNOWN_ERROR
             self.updateDBinfo(cond, "isDone", error_code.to_db_value())
 
@@ -1602,11 +1909,11 @@ class ZooNavigator():
         self.lm.closeCapture()
 
         # Log file for time stamp
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
+        self.updateTime(cond, "ds_end")
         if n_datasets == 0:
-            self.updateTime(cond, "meas_end", comment="No data was collected")
+            self.updateTime(cond, "meas_end")
         else:
-            self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+            self.updateTime(cond, "meas_end")
         self.logger.info("mixed end")
 
     # 2020/06/02 Major revision in order to activate this function for BL45XU.
@@ -1623,17 +1930,17 @@ class ZooNavigator():
         raster_schedule, raster_path = self.lm.prepSSROX(scan_id, self.center_xyz, sphi, cond, self.phosec_meas)
         self.logger.info("ZOO has finished SSROX preparation.")
         # ds_start
-        self.updateTime(cond, "ds_start", comment="Data collection started")
+        self.updateTime(cond, "ds_start")
 
         # Do the raster scan with rotation
         self.zoo.doRaster(raster_schedule)
-        self.zoo.waitTillReady()
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="ssrox")
         # ds_end
-        self.updateTime(cond, "ds_end", comment="Data collection finished")
+        self.updateTime(cond, "ds_end")
         self.updateDBinfo(cond, "isDS", 1)
         self.updateDBinfo(cond, "isDone", 1)
         # meas_end
-        #self.updateTime(cond, "meas_end", comment="Measurement normally finished")
+        self.updateTime(cond, "meas_end")
         self.logger.info("Disconnecting capture")
         self.lm.closeCapture()
 
@@ -1664,10 +1971,10 @@ class ZooNavigator():
                                                             exptime=cond['exp_raster'], roi_index=0)
 
         # raster_start
-        self.updateTime(cond, "raster_start", comment="Raster scan started")
+        self.updateTime(cond, "raster_start")
         self.zoo.doRaster(raster_schedule)
-        self.zoo.waitTillReady()
-        self.updateTime(cond, "raster_end", comment="Raster scan finished")
+        self.waitTillReadyWithBeamDumpCheck(cond, job_name="raster_2d_screen")
+        self.updateTime(cond, "raster_end")
         # Flag on
         self.updateDBinfo(cond, "isRaster", 1)
 
@@ -1713,7 +2020,7 @@ class ZooNavigator():
             # end_time
             #self.updateTime(cond, "meas_end", comment="Measurement normally finished")
 
-        except MyException as tttt:
+        except ZooMyException as tttt:
             self.logger.warning("Skipping this loop!!")
             # logging
             logstr = f"Raster scan failed during analysis: {tttt.args[0]}"
@@ -1721,7 +2028,7 @@ class ZooNavigator():
             self.updateDBinfo(cond, "isDone", 4444)
             self.updateDBinfo(cond, "meas_record", 4444)
             # end_time
-            self.updateTime(cond, "raster_end", comment="Raster scan failed during analysis")
+            self.updateTime(cond, "raster_end")
             #self.updateTime(cond, "meas_end", comment="Raster scan failed during analysis")
 
             # Disconnecting capture in this loop's 'capture' instance

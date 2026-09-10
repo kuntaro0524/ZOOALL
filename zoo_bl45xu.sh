@@ -74,5 +74,3 @@ ps auxww | grep videosrv | grep -v grep | awk '{print $2}'| xargs kill
 #echo "  shutting down BSS  " >> ~/test.log
 #echo "" >> ~/test.log
 #echo "**************************************" >> ~/test.log
-
-

@@ -1,4 +1,6 @@
 {
     "editor.suggestLineHeight": 2,
-    "CodeGPT.apiKey": "CodeGPT Plus Beta"
+    "CodeGPT.apiKey": "CodeGPT Plus Beta",
+    "python.defaultInterpreterPath": "/opt/dials/dials-v3-23-0/build/bin/kpython"
+
 }

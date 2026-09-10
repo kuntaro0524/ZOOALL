@@ -1,4 +1,4 @@
-import MyException
+import ZooMyException
 
 class ScanAxis:
 
@@ -19,7 +19,7 @@ class ScanAxis:
 	def checkScanCondition(self):
 		self.nscan=float(self.scan_end-self.scan_start)/float(self.scan_step)
 		if self.nscan<=0:
-			raise MyException("Scanning conidtion is not correct!!\n")
+			raise ZooMyException("Scanning conidtion is not correct!!\n")
 		else:
 			pass
 
@@ -41,6 +41,6 @@ if __name__=="__main__":
 
 	try:
 		k.checkScanCondition()
-	except MyException as ttt:
+	except ZooMyException as ttt:
 		print(ttt.args[0])
 		

@@ -1,6 +1,6 @@
 import os
 import sys
-from MyException import *
+from ZooMyException import *
 
 
 class ConfigFile:
@@ -73,7 +73,7 @@ class ConfigFile:
         if key in self.block:
             return float(self.block[key])
         else:
-            raise MyException("getCondition:No such a key!\n")
+            raise ZooMyException("getCondition:No such a key!\n")
 
     def getCondition2(self, key1, key2):
         if self.isReady != True:
@@ -83,9 +83,9 @@ class ConfigFile:
             if key2 in self.block[key1]:
                 return float(self.block[key1][key2])
             else:
-                raise MyException("getCondition:No such a key!\n")
+                raise ZooMyException("getCondition:No such a key!\n")
         else:
-            raise MyException("getCondition:No such a key!\n")
+            raise ZooMyException("getCondition:No such a key!\n")
 
 
 if __name__ == "__main__":
@@ -99,5 +99,5 @@ if __name__ == "__main__":
     try:
         tmp = conf.getCondition2(sys.argv[1], sys.argv[2])
         print(tmp)
-    except MyException as ttt:
+    except ZooMyException as ttt:
         print(ttt.args[0])

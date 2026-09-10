@@ -21,14 +21,14 @@ import Colli
 import Cover
 import CCDlen
 import CoaxPint
-#import MBS
-#import DSS
+import MBS
+import DSS
 import BeamsizeConfig
 import Flux
 import PreColli
 from configparser import ConfigParser, ExtendedInterpolation
 import WebSocketBSS
-import MyException
+import ZooMyException
 
 class Device(Singleton.Singleton):
     def __init__(self, ms_port):
@@ -71,7 +71,7 @@ class Device(Singleton.Singleton):
             self.total_num=conf.getCondition2("FIXED_POINT","total_num")
             self.count_time=conf.getCondition2("FIXED_POINT","time")
 
-        except MyException.MyException as ttt:
+        except ZooMyException.MyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
             sys.exit(1)
@@ -90,8 +90,8 @@ class Device(Singleton.Singleton):
         self.clen=CCDlen.CCDlen(self.s)
         self.covz=Cover.Cover(self.s)
         # Optics
-        #self.mbs=MBS.MBS(self.s)
-        #self.dss=DSS.DSS(self.s)
+        self.mbs=MBS.MBS(self.s)
+        self.dss=DSS.DSS(self.s)
         # BL32XU specific
         # BL44XU specific
         if self.beamline.lower() == "bl44xu":
@@ -102,7 +102,7 @@ class Device(Singleton.Singleton):
         print("Device. initialization finished")
         self.isInit=True
 
-    def tuneDt1(self,logpath):
+    def tuneDt1_obsoleted(self,logpath):
         if os.path.exists(logpath)==False:
             os.makedirs(logpath)
         self.f=File.File(logpath)
@@ -123,11 +123,11 @@ class Device(Singleton.Singleton):
         en=self.mono.getE()
         # Prep scan
         self.prepScan()
+        # convertion 
+        conv_factor = self.config.getfloat("experiment","pin_uA_conv")
         # Measurement
         ipin,iic=self.countPin(pin_ch=self.pin_channel)
-        print(ipin,iic)
-        pin_uA=ipin/100.0
-        iic_nA=iic/100.0
+        pin_uA=ipin * conv_factor
         # Photon flux estimation
         ff=Flux.Flux(en)
         phosec=ff.calcFluxFromPIN(pin_uA)
@@ -318,18 +318,19 @@ class Device(Singleton.Singleton):
         return x,y
     
     def checkRingCurrent(self,current_threshold=50.0):
-        self.get_current_str="get/bl_dbci_ringcurrent/present"
+        self.get_current_str="get/bl_dbci_ringcurrent/present".encode()
         self.s.sendall(self.get_current_str)
         recbuf = self.s.recv(8000)
-        strs=recbuf.split("/")
+        return_str=repr(recbuf)
+        strs=return_str.split("/")
         ring_current=float(strs[len(strs)-2].replace("mA",""))
     
         if ring_current > current_threshold:
-            print("Ring current %5.1f"%ring_current)
+            print("Ring current %8.3f"%ring_current)
             return True
         else:
             print("Ring aborted.")
-            print("Ring current %5.1f"%ring_current)
+            print("Ring current %8.3f"%ring_current)
             return False
 
 if __name__=="__main__":
@@ -348,7 +349,9 @@ if __name__=="__main__":
     dev.init()
 
     import time
-    dev.prepCentering()
+    #dev.prepCentering()
+    #pwd = os.getcwd()
+    #dev.tuneDt1(logpath=pwd+"/")
     #dev.prepScan()
     #dev.gonio.rotatePhi(225.0)
     #dev.measureFlux()
@@ -357,3 +360,6 @@ if __name__=="__main__":
     #dev.prepScan()
     #dev.prepCentering()
     #dev.finishCentering()
+
+    # Check ring current
+    dev.checkRingCurrent(current_threshold=50.0)

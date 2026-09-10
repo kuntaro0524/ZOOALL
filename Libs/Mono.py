@@ -10,7 +10,7 @@ from Motor import *
 from AxesInfo import *
 #from ConfigFile import *
 from TCS import *
-from MyException import *
+from ZooMyException import *
 
 import BSSconfig
 from configparser import ConfigParser, ExtendedInterpolation
@@ -20,14 +20,25 @@ class Mono:
         self.bssconf = BSSconfig.BSSconfig()
         self.bl_object = self.bssconf.getBLobject()
 
-        self.m_dtheta1 = Motor(srv, "bl_%s_tc1_stmono_1_dtheta1" % self.bl_object, "pulse")
-        self.m_theta = Motor(srv, "bl_%s_tc1_stmono_1" % self.bl_object, "pulse")
-        self.m_thetay1 = Motor(srv, "bl_%s_tc1_stmono_1_thetay1" % self.bl_object, "pulse")
-        self.m_zt = Motor(srv, "bl_%s_tc1_stmono_1_zt" % self.bl_object, "pulse")
-        self.m_z2 = Motor(srv, "bl_%s_tc1_stmono_1_z2" % self.bl_object, "pulse")
+        # Configure file
+        # beamlineの名前はconfigから読む
+        self.config = ConfigParser(interpolation=ExtendedInterpolation())
+        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+        print(f"config_path={config_path}")
+        self.config.read(config_path)
 
-        self.m_energy = Motor(srv, "bl_%s_tc1_stmono_1" % self.bl_object, "kev")
-        self.m_wave = Motor(srv, "bl_%s_tc1_stmono_1" % self.bl_object, "angstrom")
+        # dtheta1 axis
+        dt1_axis = self.config.get("axes","mono_dtheta1_axis")
+        dt1_unit = self.config.get("axes","mono_dtheta1_unit")
+        self.m_dtheta1 = Motor(srv, dt1_axis, dt1_unit)
+        # theta axis
+        theta_axis = self.config.get("axes","mono_theta_axis")
+        theta_unit = self.config.get("axes","mono_theta_unit")
+        self.m_theta = Motor(srv, theta_axis, theta_unit)
+        # energy axis
+        energy_axis = self.config.get("axes","mono_energy_axis")
+        energy_unit = self.config.get("axes","mono_energy_unit")
+        self.m_energy = Motor(srv, energy_axis, energy_unit)
         self.s = srv
 
     def getE(self):
@@ -78,19 +89,6 @@ class Mono:
 
     def moveDt1Rel(self, value):
         self.m_dtheta1.relmove(value)
-
-    def moveTy1(self, position):
-        self.m_thetay1.move(position)
-
-    def moveZ2(self, position):
-        self.m_z2.move(position)
-
-    def moveZt(self, position):
-        if position < -5000 or position > 5000:
-            print("Zt error!")
-            return False
-
-        self.m_zt.move(position)
 
     def scanEnergy(self, prefix, start, end, step, cnt_ch1, cnt_ch2, time):
         # Setting
@@ -182,7 +180,7 @@ class Mono:
             tcsh = conf.getCondition2(confchar, "tcsh")
             detune_pls = int(conf.getCondition2(confchar, "detune"))
 
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
 
@@ -219,7 +217,7 @@ class Mono:
             tcsh = conf.getCondition2(confchar, "tcsh")
             detune_pls = int(conf.getCondition2(confchar, "detune"))
 
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
 
@@ -250,11 +248,11 @@ class Mono:
         comment = AxesInfo(self.s).getLeastInfo()
         try:
             fwhm, center = ana.analyzeAll("dtheta1[pulse]", "Intensity", outfig, comment, "OBS", "PEAK")
-        except MyException as ttt:
-            raise MyException("Dtheta1 tune peak analysis failed.%s" % ttt.args[0])
+        except ZooMyException as ttt:
+            raise ZooMyException("Dtheta1 tune peak analysis failed.%s" % ttt.args[0])
 
         if fwhm == 0.0:
-            raise MyException("Bad peak shape!!")
+            raise ZooMyException("Bad peak shape!!")
 
         # back lash position
         bl_pos = counter_1_max - backlash
@@ -286,7 +284,7 @@ class Mono:
             tcsh = conf.getCondition2(confchar, "tcsh")
             detune_pls = int(conf.getCondition2(confchar, "detune"))
 
-        except MyException as ttt:
+        except ZooMyException as ttt:
             print(ttt.args[0])
             print("Check your config file carefully.\n")
 
@@ -315,11 +313,11 @@ class Mono:
         comment = AxesInfo(self.s).getLeastInfo()
         try:
             fwhm, center = ana.analyzeAll("dtheta1[pulse]", "Intensity", outfig, comment, "OBS", "PEAK")
-        except MyException as ttt:
-            raise MyException("Dtheta1 tune peak analysis failed.%s" % ttt.args[0])
+        except ZooMyException as ttt:
+            raise ZooMyException("Dtheta1 tune peak analysis failed.%s" % ttt.args[0])
 
         if fwhm == 0.0:
-            raise MyException("Bad peak shape!!")
+            raise ZooMyException("Bad peak shape!!")
 
         # back lash position
         bl_pos = counter_1_max - backlash
@@ -339,7 +337,7 @@ class Mono:
 
 
 if __name__ == "__main__":
-    host = '172.24.242.41'
+    host = "172.24.242.59"
     port = 10101
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))

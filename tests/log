@@ -1,0 +1,52 @@
+
+================================================================================
+HEBI.getDoseDistList simulation
+================================================================================
+
+--- A1: normal single condition ---
+result: [(10.0, 125.0)]
+
+--- A2: dose_list only ---
+result: [(1.0, 125.0), (2.0, 125.0)]
+
+--- A3: dose_list + dist_list ---
+result: [(1.0, 130.0), (2.0, 140.0)]
+
+--- A4: dist_list only (invalid) ---
+ERROR: dist_list only is invalid. dose_list is required.
+
+--- A5: length mismatch (invalid) ---
+ERROR: dose_list and dist_list length mismatch: 2 vs 1
+
+================================================================================
+HEBI.mainLoop branching simulation
+================================================================================
+
+--- B1: small crystal -> single ---
+[single schedules]
+  prefix=cry00_single_00, dose_ds=1.0, dist_ds=130.0
+  prefix=cry00_single_01, dose_ds=2.0, dist_ds=140.0
+
+--- B2: large crystal -> helical ---
+[helical schedules]
+  prefix=cry00_hel_00, dose_ds=1.0, dist_ds=130.0
+  prefix=cry00_hel_01, dose_ds=2.0, dist_ds=140.0
+
+================================================================================
+ZooNavigator single-loop simulation
+================================================================================
+
+--- C1: single + dose_list/dist_list ---
+expanded conditions: [{'dose': 1.0, 'dist': 100.0}, {'dose': 2.0, 'dist': 110.0}]
+[multi schedules]
+  prefix=single_00, dose_ds=1.0, dist_ds=100.0
+  prefix=single_01, dose_ds=2.0, dist_ds=110.0
+
+--- C2: single + dose_list only ---
+expanded conditions: [{'dose': 1.0, 'dist': 125.0}, {'dose': 2.0, 'dist': 125.0}]
+[multi schedules]
+  prefix=single_00, dose_ds=1.0, dist_ds=125.0
+  prefix=single_01, dose_ds=2.0, dist_ds=125.0
+
+--- C3: ssrox + multiple dose_list (invalid) ---
+ERROR: mode=ssrox does not allow multiple dose_list/dist_list values.
