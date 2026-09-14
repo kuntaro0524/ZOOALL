@@ -119,3 +119,25 @@ initialization orderの差異を切り分けにくくなる。
 **影響:** 今回の移行ではconfig object共有、singleton化、constructor変更、initialization
 order変更、hardware/device/measurement logic変更を行わない。既存のpath表示と`BLFactory.config`
 属性は維持し、offline testでloader接続と代表的な設定値を確認する。
+
+## 2026-09-14：Phase 1 migrationの完了境界とCoaxImageのPhase 2扱い
+
+**判断:** Phase 1の対象moduleについて、`ZooConfig.load_config()`へのloader委譲と
+offline回帰確認を完了した。`Libs/CoaxImage.py`はPhase 1から除外し、Phase 2の明示的課題
+として残す。Phase 1の状態は「implementation complete / offline verified」とするが、
+実機によるhardware verificationは未実施でありpendingとする。
+
+**根拠:** CoaxImageのconstructorは`self.blf.config`を`self.config`として再利用し、同じ
+parserへ`beamline.ini`を読み込む（`Libs/CoaxImage.py:50-54`）。単純なloader置換は
+config object identity、constructor relationship、hidden couplingを変更する可能性があり、
+Phase 1の責任範囲を越える。残存するstandalone utility、launcher variant、legacy/dead
+example、test/fixtureの直接読み込みも、通常測定coreの安全なloader移行対象とは扱わない。
+
+**検証:** 移行module・A分類・B分類constructor baseline・CoaxImage baselineを含むfocused
+offline suiteは`42 passed`。一方、`Libs/tests`全体は`105 passed, 18 failed`で停止した。
+失敗はUserESA既存テストのfixture/config/logging/import条件に集中し、full-suite全体の
+完了とは扱わない。
+
+**影響:** CoaxImageのconfig object identityを維持したままPhase 2で扱いを決めるまで、
+production codeは変更しない。full-suite failureの原因整理とhardware verificationは
+別の確認事項として残す。関連Issue/PRは未設定であり、番号を仮定しない。

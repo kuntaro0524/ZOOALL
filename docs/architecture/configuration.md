@@ -8,7 +8,7 @@ change the runtime configuration format or deployment method.
 
 ## Current structure
 
-Many ZOO modules independently perform the following sequence:
+Historically, many ZOO modules independently performed the following sequence:
 
 ```text
 os.environ["ZOOCONFIGPATH"]
@@ -16,11 +16,10 @@ os.environ["ZOOCONFIGPATH"]
     -> ConfigParser(interpolation=ExtendedInterpolation())
 ```
 
-Examples in the current production code are:
-
-- `Libs/BLFactory.py:14-17`
-- `Libs/BSSconfig.py:16-18`
-- `Libs/Device.py:39-41`
+For the Phase 1 production migrations, this mechanical sequence is now
+delegated to `Libs/ZooConfig.py`. The migrated modules still retain their own
+configuration attribute and initialization behavior; Phase 1 does not make
+the parser a shared singleton.
 
 The modules generally retain their own configuration attribute and their own
 initialization behavior. This document does not imply that all configuration
@@ -115,19 +114,65 @@ Phase 1 does not introduce:
 - beamline-specific configuration deployment changes
 - hardware, device, or measurement logic changes
 
-## Initial migration candidates
+## Phase 1 implementation status
 
-The initial production migration candidates are:
+The following production modules have been migrated to delegate the
+`beamline.ini` load to `ZooConfig.load_config()` while preserving their local
+configuration attributes and initialization order:
 
+Core and startup path:
+
+- `Libs/BLFactory.py`
+- `Libs/BSSconfig.py`
 - `Libs/Device.py`
+- `Zoo.py`
+- `ZooNavigator.py`
+- `lets_goto_zoo.py`
 
-`Libs/BLFactory.py`, `Libs/BSSconfig.py`, `Libs/Device.py`, `Zoo.py`,
-`ZooNavigator.py`, and `lets_goto_zoo.py` are the first
-migration targets after standalone loader verification. Their existing
-configuration attributes, path behavior, key reads, and constructor order are
-preserved while only path construction and parser loading are delegated to
-`ZooConfig`. The remaining modules are evaluated in separate small
-checkpoints.
+Configuration-only modules:
+
+- `KUMA.py`
+- `MultiCrystal.py`
+- `Libs/CryImageProc.py`
+- `Libs/AttFactor.py`
+- `Libs/BeamsizeConfig.py`
+- `Libs/ESA.py`
+- `Libs/RasterSchedule.py`
+- `Libs/ScheduleBSS.py`
+- `Libs/UserESA.py`
+- `Libs/BSSconfig41.py`
+
+Constructor-tested hardware-facing modules whose constructors were verified
+offline before migration:
+
+- `Libs/Capture.py`
+- `Libs/Gonio44.py`
+- `Libs/Count.py`
+- `Libs/Zoom.py`
+- `Libs/CoaxPint.py`
+- `Libs/CCDlen.py`
+- `Libs/Mono.py`
+- `Libs/PreColli.py`
+- `Libs/BaseAxis.py`
+- `Libs/Gonio.py`
+
+The focused Phase 1 regression and constructor suite passes offline. Full
+`Libs/tests` collection currently remains blocked by 18 pre-existing or
+environment/fixture-related UserESA failures; this is not treated as proof of
+full-suite completion. Therefore the current state is **offline verified for
+the migrated Phase 1 scope, with full-suite follow-up pending; hardware
+verification pending**.
+
+`Libs/CoaxImage.py` is intentionally not migrated in Phase 1. Its constructor
+reuses the `BLFactory` configuration object (`Libs/CoaxImage.py:50-54`), so a
+direct replacement with `ZooConfig.load_config()` could change object identity
+and hidden coupling. It is an explicit Phase 2 decision, not a missed safe
+migration.
+
+Remaining direct reads are limited to standalone hardware utilities and
+launcher variants, legacy/dead example blocks, tests/fixtures, and the
+CoaxImage Phase 2 case. These paths are not evidence that a safe normal
+measurement-core migration was missed.
 
 ## Later considerations
 

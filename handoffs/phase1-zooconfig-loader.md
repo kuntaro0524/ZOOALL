@@ -166,6 +166,57 @@ Commit 1のコード差分:
 
 ## Next action
 
+### Phase 1 completion audit status (2026-09-14)
+
+The direct-read audit found no missed safe normal-measurement Phase 1 target.
+Residual direct reads are classified as follows:
+
+- Intentional Phase 1 exclusion / launcher or hardware path: `lets_goto_zoo_PE3.py:17-19`,
+  `lets_goto_zoo_echa.py:4-8`, and the standalone `__main__` paths in
+  `get_e.py:14-17`, `move_to_cmount.py:14-17`, `get_gonio.py:14-17`,
+  `INOCC.py:704-707`, `Libs/PreColli.py:155-159`, `Libs/Colli.py:501-506`,
+  `Libs/CCDlen.py:74-78`, and the hardware-oriented `TestScripts/`/utility scripts.
+- Explicit Phase 2: `Libs/CoaxImage.py:50-54`, because `self.blf.config` is reused and
+  parser identity/hidden coupling must not be changed in Phase 1.
+- Test/fixture: `Libs/tests/*` and `tests/test_useresa_real_kuma.py:44`.
+- Legacy/dead: triple-quoted example blocks at `Libs/Device.py:335-339` and
+  `Libs/BSSconfig.py:506-509`.
+- Standalone utility: `Libs/Capture.py:243` and similar `__main__` configuration setup.
+
+No remaining active direct read was identified as a safe normal-measurement Phase 1
+miss. The migrated production modules are the six core/startup modules, ten A-class
+configuration-only modules, and ten B-class constructor-tested modules recorded in
+`docs/architecture/configuration.md`. CoaxImage is unchanged.
+
+Focused offline regression and constructor coverage for the migrated scope, including
+the CoaxImage baseline, passes: `42 passed in 1.21s` under
+`/oys/xtal/dials/dials-v3-23-0/build/bin/yamtbx.python` with repository import paths.
+The broader `Libs/tests` offline run is not clean: `105 passed, 18 failed`. The failures
+are concentrated in existing UserESA tests (missing manually-created config attributes,
+fixture/validation mismatches, repo-root log-file creation on the read-only checkout,
+and incomplete fixture keys). Because the complete-suite failure cause is not part of
+this migration and the WORKFLOW STOP condition applies, Phase 1 is not marked full-suite
+complete.
+
+Current status: **Phase 1 implementation complete for the migrated scope; focused
+offline verified; full-suite follow-up pending; hardware verification pending**.
+
+Changed production modules:
+
+- Core/startup: `Libs/BLFactory.py`, `Libs/BSSconfig.py`, `Libs/Device.py`, `Zoo.py`,
+  `ZooNavigator.py`, `lets_goto_zoo.py`.
+- A: `KUMA.py`, `MultiCrystal.py`, `Libs/CryImageProc.py`, `Libs/AttFactor.py`,
+  `Libs/BeamsizeConfig.py`, `Libs/ESA.py`, `Libs/RasterSchedule.py`,
+  `Libs/ScheduleBSS.py`, `Libs/UserESA.py`, `Libs/BSSconfig41.py`.
+- B: `Libs/Capture.py`, `Libs/Gonio44.py`, `Libs/Count.py`, `Libs/Zoom.py`,
+  `Libs/CoaxPint.py`, `Libs/CCDlen.py`, `Libs/Mono.py`, `Libs/PreColli.py`,
+  `Libs/BaseAxis.py`, `Libs/Gonio.py`.
+
+Unchanged and residual-risk modules include `Libs/CoaxImage.py` (Phase 2 identity
+decision), standalone hardware utilities and launcher variants, legacy/dead example
+blocks, and tests/fixtures. Hardware verification of all migrated constructors and
+the normal measurement path remains pending. Do not merge to `main`/`develop`.
+
 A分類のloader委譲が完了した。残存する直接読込には、hardware/device初期化経路の
 `Libs/Mono.py`、`Libs/Capture.py`、`Libs/Zoom.py`、`Libs/Count.py`、
 `Libs/Gonio.py`、`Libs/Gonio44.py`、`Libs/CCDlen.py`、`Libs/PreColli.py`、
