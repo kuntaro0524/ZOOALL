@@ -45,6 +45,9 @@ Commit 1として、`ZOOCONFIGPATH/beamline.ini`の機械的な読込だけを
   constructor testとloader委譲確認を`484bc79`としてcommit・pushした。
 - `Libs/Gonio44.py`のconfig読込を`ZooConfig.load_config()`へ委譲し、
   constructor testとloader委譲確認を`4dfec53`としてcommit・pushした。
+- `Libs/Count.py`のconfig読込を`ZooConfig.load_config()`へ委譲し、
+  fake BSSconfig/serverとfail-fast socket/processを使うconstructor testを
+  `c4f6c67`としてcommit・pushした。
 - B分類候補のconstructor/import経路を静的に確認した。対象constructor内に
   `socket.connect`、`sendall`、`recv`の直接呼出しは見つからなかった。
 - `Libs/Motor.py:14-25`のconstructorはserver参照・軸名・unitの保持だけで、通信は
@@ -118,6 +121,8 @@ Commit 1のコード差分:
   `18 passed in 0.21s`。
 - Gonio44移行後、同runtimeでCapture/Gonio44、ZooConfig、A分類、初期6候補のtestを
   実行し、`25 passed in 0.30s`。
+- Count移行後、同runtimeでCount、Capture/Gonio44、ZooConfig、A分類、初期6候補のtestを
+  実行し、`27 passed in 0.29s`。
 - `/usr/bin/python3`にはpytestがないが、正式runtimeの実行結果には影響しない。
 - hardware接続、測定、外部process起動は行っていない。
 
@@ -183,7 +188,8 @@ constructor/importそのものがsocket接続するC候補は、今回の静的�
 
 Capture/Gonio44のbaselineは成功し、`Libs/Capture.py`は`484bc79`、
 `Libs/Gonio44.py`は`4dfec53`で移行済み。次は中リスクB分類のうち、constructorが
-単純な`Libs/Count.py`、`Libs/Zoom.py`、`Libs/CoaxPint.py`を候補とする。
+単純な`Libs/Zoom.py`、`Libs/CoaxPint.py`を候補とする。`Libs/Count.py`は
+`c4f6c67`で移行済み。
 いずれも`BSSconfig`読込とMotor生成を含むため、fake `BSSconfig`/`Motor`と
 socket fail-fastを使うconstructor testを先に追加・実行する。test成功前のproduction
 移行は行わない。
@@ -228,6 +234,7 @@ constructor移行の安全性とは分離する。
 - Capture/Gonio44についてはbaseline constructor testを追加・実行済み。
 - Captureについてはloader移行後のconstructor testも成功済み。
 - Gonio44についてはloader移行後のconstructor testも成功済み。
+- Countについてはloader移行後のconstructor testも成功済み。
 - C候補がないことは静的調査の範囲の結論であり、import実行時副作用を全面保証するものではない。
 
 ## Last verified commit
@@ -247,6 +254,8 @@ Capture/Gonio44 baseline test commit: `844ae31`
 Capture migration commit: `484bc79`
 
 Gonio44 migration commit: `4dfec53`
+
+Count migration commit: `c4f6c67`
 
 BSSconfig migration commit: `9faaf57`
 
