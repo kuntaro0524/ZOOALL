@@ -8,7 +8,7 @@ import os
 import numpy
 from socket import error as socket_error
 from Libs import ZooMyException
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 class Capture:
     def __init__(self):
@@ -22,9 +22,7 @@ class Capture:
 
         # Read configure file
         # Get information from beamline.ini file.
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path="%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        self.config.read(config_path)
+        self.config = ZooConfig.load_config()
 
         self.contrast_default=self.config.getint("capture", "contrast_default")
         self.bright_default=self.config.getint("capture", "bright_default")

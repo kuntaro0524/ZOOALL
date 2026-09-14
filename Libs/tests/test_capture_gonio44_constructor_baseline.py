@@ -3,6 +3,7 @@ import os
 import socket
 import sys
 import types
+from configparser import ConfigParser, ExtendedInterpolation
 from pathlib import Path
 
 
@@ -35,6 +36,11 @@ def _load_module(path, name):
     return module
 
 
+def _install_real_zooconfig(monkeypatch):
+    module = _load_module(ROOT / "Libs/ZooConfig.py", "ZooConfig_for_test")
+    monkeypatch.setitem(sys.modules, "ZooConfig", module)
+
+
 class _FailFastSocket:
     def __init__(self, *args, **kwargs):
         raise AssertionError("socket creation during constructor")
@@ -58,6 +64,7 @@ def test_capture_constructor_has_no_socket_or_process_side_effects(
     monkeypatch.setattr(os, "system", lambda *args, **kwargs: (_ for _ in ()).throw(
         AssertionError("external process during constructor")
     ))
+    _install_real_zooconfig(monkeypatch)
 
     module = _load_module(ROOT / "Libs/Capture.py", "Capture_baseline_under_test")
     capture = module.Capture()
@@ -69,6 +76,30 @@ def test_capture_constructor_has_no_socket_or_process_side_effects(
     assert capture.bright_default == 22
     assert capture.gain_default == 33
     assert capture.isDark is False
+
+
+def test_capture_constructor_uses_zooconfig_loader(monkeypatch, tmp_path):
+    _write_beamline_ini(tmp_path)
+    monkeypatch.setenv("ZOOCONFIGPATH", str(tmp_path))
+    monkeypatch.setenv("USER", "offline-test")
+
+    calls = []
+    config_module = types.ModuleType("ZooConfig")
+
+    def load_config():
+        calls.append("load")
+        config = ConfigParser(interpolation=ExtendedInterpolation())
+        config.read(tmp_path / "beamline.ini")
+        return config
+
+    config_module.load_config = load_config
+    monkeypatch.setitem(sys.modules, "ZooConfig", config_module)
+
+    module = _load_module(ROOT / "Libs/Capture.py", "Capture_loader_under_test")
+    capture = module.Capture()
+
+    assert calls == ["load"]
+    assert capture.contrast_default == 11
 
 
 def test_gonio44_constructor_has_no_socket_or_hardware_side_effects(
