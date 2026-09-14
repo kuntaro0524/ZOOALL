@@ -34,6 +34,10 @@ Commit 1として、`ZOOCONFIGPATH/beamline.ini`の機械的な読込だけを
   `Libs/BSSconfig41.py`である。
 - A分類のloader委譲を確認するoffline testを
   `Libs/tests/test_a_config_modules_zooconfig.py`として追加した。
+- B分類候補のconstructor/import経路を静的に確認した。対象constructor内に
+  `socket.connect`、`sendall`、`recv`の直接呼出しは見つからなかった。
+- `Libs/Motor.py:14-25`のconstructorはserver参照・軸名・unitの保持だけで、通信は
+  `communicate()`以降のmethod（`Libs/Motor.py:27-30`）で行われる。
 - 正式runtimeで新規unit test 5件が成功した。
 - BLFactory移行を含む対象test 6件が正式runtimeで成功した。
 - BSSconfig移行を含む対象test 7件が正式runtimeで成功した。
@@ -112,6 +116,55 @@ fake server・socket fail-fast stubを使ったconstructor offline testを設計
 constructor/import自体の外部接続が確認されたmoduleはC/Dとして移行しない。B分類の
 test結果と影響範囲が明確になるまで、追加のproduction migrationを停止する。
 
+### B分類constructor候補
+
+以下はfake server、fake `Motor`、fakeまたはfixture化した`BSSconfig`を使えば、
+constructorのloader委譲と「通信を発生させない」ことをofflineで確認できる候補である。
+
+| module | constructor evidence | offline test scope | status |
+| --- | --- | --- | --- |
+| `Libs/Capture.py:14-41` | config読込とdefault値設定。接続は`connect()`の`112-117`以降 | config fixture、socket fail-fast、constructor属性 | B候補 |
+| `Libs/Gonio44.py:19-28` | config読込のみ。通信は`communicate()`の`30-34`以降 | fake server、constructor属性、send/recv未呼出し | B候補 |
+| `Libs/Mono.py:19-41` | `BSSconfig`、3個の`Motor`生成。通信はMotor method以降 | fake server/BSSconfig/Motor、axis値確認 | B候補 |
+| `Libs/Zoom.py:11-29` | `BSSconfig`、Motor生成、pulse情報取得 | fake server/BSSconfig/Motor、axis値確認 | B候補 |
+| `Libs/Count.py:16-28` | configと`BSSconfig`のみ。通信は`communicate()`の`31-37`以降 | fake server/BSSconfig、axis値確認 | B候補 |
+| `Libs/Gonio.py:14-65` | 5個の`Motor`生成とBSS設定解析 | fake server/BSSconfig/Motor、全axis確認 | B候補 |
+| `Libs/CCDlen.py:15-33` | Motor生成とBSS設定解析 | fake server/BSSconfig/Motor、limit値確認 | B候補 |
+| `Libs/PreColli.py:18-56` | 条件付きMotor生成とBSS設定解析 | 軸なし/片軸/両軸fixtureを分けて確認 | B候補 |
+| `Libs/BaseAxis.py:10-53` | 分岐ごとにMotor生成、BSSの退避情報を取得 | `pulse`/`plc`/BS/col分岐をfake化 | B候補 |
+| `Libs/CoaxPint.py:13-29` | Motor生成とBSS設定解析 | fake server/BSSconfig/Motor、axis値確認 | B候補 |
+| `Libs/CoaxImage.py:37-99` | 既存BLFactoryを前提に設定・camera.inf・bss.configを読込、Capture生成 | fake BLFactory、temporary auxiliary files、fake Capture | B候補（複雑） |
+
+### C/D境界
+
+constructor/importそのものがsocket接続するC候補は、今回の静的調査では確認できなかった。
+一方、以下は同じmodule内のstandalone実行部で接続するため、その実行部はDとして扱う。
+
+- `Libs/Mono.py:342-343`
+- `Libs/Zoom.py:67-68`
+- `Libs/Count.py:242-243`
+- `Libs/Gonio.py:904-905`
+- `Libs/PreColli.py:158-166`
+- `Libs/CCDlen.py:74-79`（BLFactory初期化を含む）
+
+これらのstandalone実行部はoffline移行対象に含めない。constructor移行を検討する場合も、
+`__main__`の実機動作確認を代替したとは扱わない。
+
+### B分類offline test設計
+
+1. temporary `beamline.ini`と必要なauxiliary configを作成する。
+2. `ZOOCONFIGPATH`をfixture directoryへ設定する。
+3. `ZooConfig.load_config()`をfakeまたは実loaderで注入し、代表的section/keyを確認する。
+4. `BSSconfig`、`Motor`、`Capture`、socket相当をfake化し、constructor中の通信呼出しを
+   fail-fastで検出する。
+5. server objectの`sendall`/`recv`がconstructor中に呼ばれないことをassertする。
+6. 既存constructorの属性、axis名、beamline、limit値を旧実装相当のfixtureで比較する。
+7. `__main__`ブロックは実行しない。
+
+優先順は、まず`Capture`と`Gonio44`、次にMotor/BSSconfig依存の単純な
+`Count`・`Zoom`・`CoaxPint`、その後に分岐の多い`Gonio`・`PreColli`・`BaseAxis`、
+最後に`CoaxImage`とする。これらのtestが成功するまでproduction migrationは行わない。
+
 ## Do not do
 
 - 既存checkpointへ追加commitを作成しない。launcherのruntime構築変更、
@@ -128,6 +181,8 @@ test結果と影響範囲が明確になるまで、追加のproduction migratio
 - `/usr/bin/python3`にはpytestがない。正式runtimeでは対象test実行済み。
 - このhandover更新自体は未commitであり、GitHub Issueとの対応付けも未設定。
 - 初期migration後の残存moduleについては、hardware/measurement影響を伴うため未移行。
+- B分類constructorの実行test自体はまだ追加・実行していない。今回の確認は静的解析のみ。
+- C候補がないことは静的調査の範囲の結論であり、import実行時副作用を全面保証するものではない。
 
 ## Last verified commit
 
