@@ -7,8 +7,8 @@ import datetime
 # My library
 from Received import *
 from Motor import *
-from configparser import ConfigParser, ExtendedInterpolation
 import BSSconfig
+import ZooConfig
 
 class CoaxPint:
     def __init__(self, server):
@@ -17,8 +17,7 @@ class CoaxPint:
 
         self.s = server
         # beamline.ini 
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH']) 
+        self.config = ZooConfig.load_config()
 
         # axis name of CoaxPint
         self.coax_name = self.config.get("axes", "coax_x_axis")
