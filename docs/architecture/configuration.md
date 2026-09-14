@@ -120,10 +120,10 @@ Phase 1 does not introduce:
 The initial production migration candidates are:
 
 - `Libs/Device.py`
-- `ZooNavigator.py`
 - `lets_goto_zoo.py`
 
-`Libs/BLFactory.py`, `Libs/BSSconfig.py`, `Libs/Device.py`, and `Zoo.py` are the first
+`Libs/BLFactory.py`, `Libs/BSSconfig.py`, `Libs/Device.py`, `Zoo.py`, and
+`ZooNavigator.py` are the first
 migration targets after standalone loader verification. Their existing
 configuration attributes, path behavior, key reads, and constructor order are
 preserved while only path construction and parser loading are delegated to

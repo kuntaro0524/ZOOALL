@@ -32,8 +32,8 @@ import logging.config
 import json
 
 import os
-from configparser import ConfigParser, ExtendedInterpolation
 from datetime import datetime, timezone, timedelta
+from Libs import ZooConfig
 
 def check_abort(lm):
     print("Abort check")
@@ -69,8 +69,7 @@ class ZooNavigator():
 
         # BSS configure file path
         # beamline.ini から読み込む 
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        self.config = ZooConfig.load_config()
         self.config_file = self.config.get("files", "bssconfig_file")
         # directory to store background images.
         self.backimage_dir = self.config.get("dirs", "backimage_dir")
