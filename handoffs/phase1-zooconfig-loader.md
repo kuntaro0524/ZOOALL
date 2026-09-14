@@ -34,6 +34,9 @@ Commit 1として、`ZOOCONFIGPATH/beamline.ini`の機械的な読込だけを
   `Libs/BSSconfig41.py`である。
 - A分類のloader委譲を確認するoffline testを
   `Libs/tests/test_a_config_modules_zooconfig.py`として追加した。
+- `22f812a`までのPhase 1 commitとhandoverを、作業branch
+  `codex/phase1-zooconfig-loader`としてoriginへpushした。
+- push後にlocal `HEAD`と`origin/codex/phase1-zooconfig-loader`が一致することを確認した。
 - B分類候補のconstructor/import経路を静的に確認した。対象constructor内に
   `socket.connect`、`sendall`、`recv`の直接呼出しは見つからなかった。
 - `Libs/Motor.py:14-25`のconstructorはserver参照・軸名・unitの保持だけで、通信は
@@ -165,6 +168,26 @@ constructor/importそのものがsocket接続するC候補は、今回の静的�
 `Count`・`Zoom`・`CoaxPint`、その後に分岐の多い`Gonio`・`PreColli`・`BaseAxis`、
 最後に`CoaxImage`とする。これらのtestが成功するまでproduction migrationは行わない。
 
+### B分類constructor詳細監査
+
+| module | constructorで起こること | socket/hardware command | filesystem/process | mock/offline評価 | 移行リスク |
+| --- | --- | --- | --- | --- | --- |
+| `Capture.py:14-41` | 環境変数、INI読込、capture default設定 | constructor接続・commandなし | constructorはINI読込のみ。接続・`os.system`は`connect`/restart後 | socket fail-fastで容易 | 低〜中 |
+| `Gonio44.py:19-28` | server保持、INIからbeamline読込 | constructor commandなし。通信はmethod後 | INI読込のみ | fake serverで容易 | 低 |
+| `Mono.py:19-41` | BSSconfig、INI、3 Motor生成 | Motor生成時commandなし。移動は後続method | BSS config読込 | fake BSSconfig/Motorで可能 | 中 |
+| `Zoom.py:11-29` | BSSconfig、INI、Motor生成、pulse情報 | constructor commandなし。通信は`stop`等の後続method | BSS config読込 | fake server/BSSconfig/Motorで可能 | 中 |
+| `Count.py:16-28` | INI、BSSconfig、counter axis名生成 | constructor commandなし。通信は`communicate`後 | BSS config読込 | fake server/BSSconfigで可能 | 中 |
+| `Gonio.py:14-65` | BSSconfig、5 Motor生成、pulse情報 | constructor commandなし。移動は後続method | BSS config読込とprint | fake BSSconfig/Motorで可能 | 中〜高 |
+| `CCDlen.py:15-33` | INI、BSSconfig、Motor、limit値 | constructor commandなし | BSS config読込 | fake server/BSSconfig/Motorで可能 | 中 |
+| `PreColli.py:18-56` | BSSconfig、条件付きMotor、pulse情報 | constructor commandなし | BSS config読込とprint | 軸なし/片軸/両軸fixtureが必要 | 中〜高 |
+| `BaseAxis.py:10-53` | axis種別ごとにBSS設定・Motor生成 | constructor commandなし | BSS config読込とprint | `pulse`/`plc`/BS/col分岐をmock可能 | 中〜高 |
+| `CoaxPint.py:13-29` | BSSconfig、INI、Motor、pulse情報 | constructor commandなし | BSS config読込 | fake server/BSSconfig/Motorで可能 | 中 |
+| `CoaxImage.py:37-99` | BLFactory既存config/deviceを前提、補助ファイル読込、Capture生成 | constructor自身のsocket commandなし。既存`ms`は保持 | `camera.inf`/`bss.config`読込。process起動なし | fake BLFactory、補助fixture、fake Captureが必要 | 高（依存多） |
+
+今回の判定はconstructorの静的追跡と呼出し先確認に基づく。実際のconstructor
+offline testはまだ追加・実行していない。`__main__`内のsocket接続はD扱いとして
+constructor移行の安全性とは分離する。
+
 ## Do not do
 
 - 既存checkpointへ追加commitを作成しない。launcherのruntime構築変更、
@@ -179,7 +202,7 @@ constructor/importそのものがsocket接続するC候補は、今回の静的�
 ## Known issues
 
 - `/usr/bin/python3`にはpytestがない。正式runtimeでは対象test実行済み。
-- このhandover更新自体は未commitであり、GitHub Issueとの対応付けも未設定。
+- GitHub Issueとの対応付けは未設定。Issueなしでもbranchとhandoverで再開可能。
 - 初期migration後の残存moduleについては、hardware/measurement影響を伴うため未移行。
 - B分類constructorの実行test自体はまだ追加・実行していない。今回の確認は静的解析のみ。
 - C候補がないことは静的調査の範囲の結論であり、import実行時副作用を全面保証するものではない。
@@ -193,6 +216,8 @@ constructor/importそのものがsocket接続するC候補は、今回の静的�
 直近のproduction migration commit: `88d7372`
 
 A分類移行commit: `88d7372`
+
+直近のhandover/remote同期確認commit: `22f812a`
 
 BSSconfig migration commit: `9faaf57`
 
