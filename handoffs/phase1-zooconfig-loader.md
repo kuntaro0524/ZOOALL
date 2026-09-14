@@ -60,6 +60,16 @@ Commit 1として、`ZOOCONFIGPATH/beamline.ini`の機械的な読込だけを
 - `Libs/Mono.py`のconfig読込を`ZooConfig.load_config()`へ委譲し、
   fake BSSconfig/Motor/serverとfail-fast socket/processを使うconstructor testを
   `7291d20`としてcommit・pushした。
+- `Libs/PreColli.py`のconfig読込を`ZooConfig.load_config()`へ委譲し、
+  条件付きY/Z Motorとfail-fast socket/processを使うconstructor testを
+  `6f45a12`としてcommit・pushした。
+- `Libs/BaseAxis.py`のconfig読込を`ZooConfig.load_config()`へ委譲し、
+  pulse/plc分岐とfail-fast socket/processを使うconstructor testを
+  `1a99ab3`としてcommit・pushした。
+- `Libs/Gonio.py`のconfig読込を`ZooConfig.load_config()`へ委譲し、
+  5軸Motorとfail-fast socket/processを使うconstructor testを
+  `9c00171`としてcommit・pushした。
+- `CoaxImage.py`のconstructor baseline testを`d68ba9f`として追加・pushした。
 - B分類候補のconstructor/import経路を静的に確認した。対象constructor内に
   `socket.connect`、`sendall`、`recv`の直接呼出しは見つからなかった。
 - `Libs/Motor.py:14-25`のconstructorはserver参照・軸名・unitの保持だけで、通信は
@@ -143,6 +153,14 @@ Commit 1のコード差分:
   A分類、初期6候補のtestを実行し、`33 passed in 0.33s`。
 - Mono移行後、同runtimeでMono、CCDlen、CoaxPint、Zoom、Count、Capture/Gonio44、
   ZooConfig、A分類、初期6候補のtestを実行し、`35 passed in 0.37s`。
+- PreColli移行後、同runtimeでPreColli、Mono、CCDlen、CoaxPint、Zoom、Count、
+  Capture/Gonio44、ZooConfig、A分類、初期6候補のtestを実行し、`37 passed in 0.36s`。
+- BaseAxis移行後、同runtimeでBaseAxis、PreColli、Mono、CCDlen、CoaxPint、Zoom、
+  Count、Capture/Gonio44、ZooConfig、A分類、初期6候補のtestを実行し、`39 passed in 0.38s`。
+- Gonio移行後、同runtimeでGonio、BaseAxis、PreColli、Mono、CCDlen、CoaxPint、
+  Zoom、Count、Capture/Gonio44、ZooConfig、A分類、初期6候補のtestを実行し、
+  `41 passed in 1.28s`。
+- CoaxImage baselineを含む同runtimeの対象testを実行し、`42 passed in 1.33s`。
 - `/usr/bin/python3`にはpytestがないが、正式runtimeの実行結果には影響しない。
 - hardware接続、測定、外部process起動は行っていない。
 
@@ -210,11 +228,18 @@ Capture/Gonio44のbaselineは成功し、`Libs/Capture.py`は`484bc79`、
 `Libs/Gonio44.py`は`4dfec53`で移行済み。次は中リスクB分類のうち、constructorが
 単純な`Libs/Zoom.py`、`Libs/CoaxPint.py`を候補とする。`Libs/Count.py`は
 `c4f6c67`で、`Libs/Zoom.py`は`3862abe`で、`Libs/CoaxPint.py`は`57f1355`で
-移行済み。残るB分類は、次に分岐のある`PreColli`、`BaseAxis`、`Gonio`、
-最後に依存の多い`CoaxImage`を評価する。
-いずれも`BSSconfig`読込とMotor生成を含むため、fake `BSSconfig`/`Motor`と
-socket fail-fastを使うconstructor testを先に追加・実行する。test成功前のproduction
-移行は行わない。
+移行済み。残るB分類は最後に依存の多い`CoaxImage`である。PreColli、BaseAxis、
+Gonioは移行済み。CoaxImageのbaselineは成功したが、production migrationはSTOPする。
+`CoaxImage.__init__`は`self.blf.config`を`self.config`へ代入して再利用し
+（`Libs/CoaxImage.py:50-54`）、その後同じparserへ`beamline.ini`をreadしている。
+`ZooConfig.load_config()`へ単純置換するとconfig object identityとBLFactoryとの
+hidden couplingが変わるため、Phase 1のconfig object共有/constructor挙動維持の境界を
+越える可能性がある。path取得だけを`ZooConfig.get_config_path()`へ委譲する案も、
+loader集約の意図と既存object再利用の両立を明示的に判断するまで実装しない。
+この判断が未確定のため、現時点でPhase 1 production migrationを停止する。
+完了済みmoduleではfake `BSSconfig`/`Motor`とsocket fail-fastを使うconstructor testを
+先行し、test成功後にのみproduction migrationを行った。CoaxImageはobject identityの
+判断が未解決のため、そのmigrationを行わない。
 
 ### B分類constructor詳細監査
 
@@ -252,16 +277,22 @@ constructor移行の安全性とは分離する。
 - `/usr/bin/python3`にはpytestがない。正式runtimeでは対象test実行済み。
 - GitHub Issueとの対応付けは未設定。Issueなしでもbranchとhandoverで再開可能。
 - 初期migration後の残存moduleについては、hardware/measurement影響を伴うため未移行。
-- B分類constructorの実行test自体はまだ追加・実行していない。今回の確認は静的解析のみ。
+- B分類のうちCapture、Gonio44、Count、Zoom、CoaxPint、CCDlen、Mono、PreColli、
+  BaseAxis、Gonioはconstructor offline testを追加・実行済み。
 - Capture/Gonio44についてはbaseline constructor testを追加・実行済み。
 - Captureについてはloader移行後のconstructor testも成功済み。
 - Gonio44についてはloader移行後のconstructor testも成功済み。
+- PreColli、BaseAxis、Gonioについてはloader移行後のconstructor testも成功済み。
 - Countについてはloader移行後のconstructor testも成功済み。
 - Zoomについてはloader移行後のconstructor testも成功済み。
 - CoaxPintについてはloader移行後のconstructor testも成功済み。
+- CCDlen、Monoについてはloader移行後のconstructor testも成功済み。
+- CoaxImageについてはbaseline constructor testのみ成功。production migrationは未実施。
 - CCDlenについてはloader移行後のconstructor testも成功済み。
 - Monoについてはloader移行後のconstructor testも成功済み。
 - C候補がないことは静的調査の範囲の結論であり、import実行時副作用を全面保証するものではない。
+- CoaxImageの`self.blf.config`再利用を維持したままloader集約する方式は未決定。
+- CoaxImageのconfig object identityを変更するmigrationはPhase 1 STOP条件に抵触する可能性がある。
 
 ## Last verified commit
 
@@ -290,6 +321,14 @@ CoaxPint migration commit: `57f1355`
 CCDlen migration commit: `747afe0`
 
 Mono migration commit: `7291d20`
+
+PreColli migration commit: `6f45a12`
+
+BaseAxis migration commit: `1a99ab3`
+
+Gonio migration commit: `9c00171`
+
+CoaxImage baseline test commit: `d68ba9f`
 
 BSSconfig migration commit: `9faaf57`
 
