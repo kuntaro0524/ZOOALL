@@ -8,7 +8,7 @@ from pylab import *
 
 from Motor import *
 import BSSconfig
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 class Gonio:
     def __init__(self,server):
@@ -17,8 +17,7 @@ class Gonio:
         self.bl_object = self.bssconf.getBLobject()
 
         # beamline name is extracted from beamline.ini
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        self.config = ZooConfig.load_config()
         # section: beamline, option: beamline
         self.beamline = self.config.get("beamline", "beamline")
 
