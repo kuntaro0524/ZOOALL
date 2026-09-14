@@ -10,7 +10,7 @@ import Received
 import File
 import AnalyzePeak
 import BSSconfig
-from configparser import ConfigParser, ExtendedInterpolation    
+import ZooConfig
 
 class Count:
     def __init__(self,server,ch1,ch2):
@@ -20,8 +20,7 @@ class Count:
         self.is_count=0
 
         # configure file "beamline.ini"
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        self.config = ZooConfig.load_config()
         axisname = self.config.get("axes", "counter_pin")
 
         self.bssconf = BSSconfig.BSSconfig()
