@@ -13,7 +13,7 @@ from TCS import *
 from ZooMyException import *
 
 import BSSconfig
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 class Mono:
     def __init__(self, srv):
@@ -22,10 +22,9 @@ class Mono:
 
         # Configure file
         # beamlineの名前はconfigから読む
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+        config_path = ZooConfig.get_config_path()
         print(f"config_path={config_path}")
-        self.config.read(config_path)
+        self.config = ZooConfig.load_config()
 
         # dtheta1 axis
         dt1_axis = self.config.get("axes","mono_dtheta1_axis")
