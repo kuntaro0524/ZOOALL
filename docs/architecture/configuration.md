@@ -189,9 +189,10 @@ Hardware verification has not been performed and is a separate pending step.
 The existing UserESA failures are recorded as independent test technical debt,
 not as a reason to alter the Phase 1 loader migration.
 
-The branch handover contains the final production module/test mapping, closure
-evidence, and a conservative hardware verification plan. No hardware access is
-implied by the offline tests.
+The branch handover and
+`docs/operations/phase1-hardware-verification-checklist.md` contain the final
+production module/test mapping, closure evidence, and a conservative hardware
+verification plan. No hardware access is implied by the offline tests.
 
 `Libs/CoaxImage.py` remains a Phase 2 follow-up because its constructor reuses
 the `BLFactory` configuration object. No Phase 1 closure action changes that

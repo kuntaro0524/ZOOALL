@@ -459,6 +459,11 @@ is part of this closure.
 
 ### Hardware verification plan (not executed)
 
+The executable operator checklist is
+`docs/operations/phase1-hardware-verification-checklist.md`. It fixes this
+branch's verification target at `ee593fea2ea6f55814c816d0e7eeb32ffa31bdb1`
+and separates software-only checks from operator-approved hardware steps.
+
 Use the exact verification commit recorded in the handover and do not treat
 one beamline result as proof for another. Execute only with the beamline
 operator's approval and record beamline, host, runtime, `ZOOCONFIGPATH`/live
@@ -512,15 +517,15 @@ current hardware state; reverting Git alone does not undo hardware state.
 ## Current next action
 
 Do not change Phase 1 production code or repair UserESA tests in this audit.
-The next action is a separately scoped test-infrastructure investigation for
-the 17 failures reproduced at the Phase 1 base and current branch, plus the
-read-only-cwd logging condition. Only after that evidence is reviewed should
-the full-suite status be reconsidered. Hardware verification remains pending;
-do not merge to `main`/`develop`.
+The next action for the designated human verifier is to use
+`docs/operations/phase1-hardware-verification-checklist.md` at the fixed
+`ee593fe` commit. Hardware verification remains pending; do not merge to
+`main`/`develop`. UserESA test-infrastructure follow-up remains a separate
+technical-debt task.
 
 ## Last verified commit
 
-Current branch commit: `9087236`
+Current branch commit: `ee593fe`
 
 コードcommit: `b29bb94`
 
