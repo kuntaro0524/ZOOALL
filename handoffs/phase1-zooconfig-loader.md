@@ -2,18 +2,119 @@
 
 - Issue: 未設定
 - Branch: `codex/phase1-zooconfig-loader`
-- コードcommit: `b29bb94`（Commit 1: Add shared ZooConfig loader）
-- 記録者: Codex
-- Host: `robo04`
-- 環境: ZOO開発clone（実機操作なし）
-- 記録日時: 2026-09-14（Asia/Tokyo）
+- 最新コードcommit: `346d40b8a277f01096572feb12532c965b50aebb` (DiffscanMaster restoration)
+- 記録者: Codex（検証結果は担当者からの提供記録）
+- 実機検証Host: `bl32upc4.spring8.or.jp`
+- 記録更新日: 2026-09-15（Asia/Tokyo。実機検証実施時刻は未提供）
+- 今回の作業範囲: 指定2文書の記録更新、文書のみcommit・push
 
-## Goal
+## Current checkpoint
+
+| item | current status |
+| --- | --- |
+| implementation | COMPLETE |
+| focused offline tests | PASS 42/42 (previously recorded; not rerun in this documentation update) |
+| regression comparison | Phase 1による新規regressionなし |
+| BL32XU limited live verification | PASS |
+| full hardware-dependent verification | DEFERRED |
+| CoaxImage | Phase 2 |
+| launcher/runtime import-path cleanup | future work |
+| main/develop integration | NOT YET DONE |
+
+## BL32XU limited live verification record
+
+This record reflects the verifier's supplied results, recorded on 2026-09-15
+(Asia/Tokyo). The execution timestamp and verifier name were not supplied.
+No tests, imports, hardware communication, or live configuration changes were
+performed as part of this documentation update. BL32XU results do not establish
+BL41XU or BL45XU verification.
+
+### Environment
+
+| item | recorded value |
+| --- | --- |
+| repository | `/staff/bl32xu/Staff/kuntaro/zoo_project/zoo_phase1_verify` |
+| branch | `codex/phase1-zooconfig-loader` |
+| latest code / restoration commit | `346d40b8a277f01096572feb12532c965b50aebb` |
+| host | `bl32upc4.spring8.or.jp` |
+| runtime | `/oys/xtal/dials/dials-v3-23-0/build/bin/yamtbx.python` |
+| Python | `3.11.11` |
+| ZOOCONFIGPATH | `/staff/bl32xu/BLsoft/ZOO32XU` |
+| actual configuration file | `/staff/bl32xu/BLsoft/ZOO32XU/beamline.ini` |
+| beamline.ini SHA256 | `7c26879a5b0f648809290a420f8ad9adba4470deb1a8fb1174de2dd7b2834b65` |
+
+### Results
+
+| check | result | boundary |
+| --- | --- | --- |
+| ZooConfig import | PASS | software import |
+| ZooConfig.get_config_path() | PASS | configuration path resolution |
+| ZooConfig.load_config() | PASS | configuration load |
+| Actual BL32XU beamline.ini read | PASS | recorded live file above |
+| Major application imports | PASS | repository root and root/Libs added to sys.path after Python startup; includes ZooNavigator after DiffscanMaster restoration |
+| BLFactory constructor | PASS | constructor only; initDevice() not called |
+| Zoo constructor | PASS | constructor generation |
+| TCP connection to BSS server 192.168.163.2:5555 | PASS | connection only; no BSS command sent |
+| Local socket close | PASS | socket closed locally without sending a BSS command |
+| Read-only BSS command | DEFERRED | hardware not sufficiently started |
+| BLFactory.initDevice() | DEFERRED | hardware not sufficiently started |
+| Device.init() | DEFERRED | hardware not sufficiently started |
+| Hardware object initialization | DEFERRED | hardware not sufficiently started |
+| Hardware position/status query | DEFERRED | hardware not sufficiently started |
+| Device movement | DEFERRED | hardware not sufficiently started |
+| ZOO startup-to-idle test | DEFERRED | hardware not sufficiently started |
+| Measurement test | DEFERRED | hardware not sufficiently started |
+
+DEFERRED means not performed and postponed, not FAIL. The beamline hardware
+was not sufficiently started during this verification window. Constructor and
+TCP connection PASS do not establish device initialization, BSS command,
+startup-to-idle, or measurement success. No dry-run/emulator result was supplied.
+
+### DiffscanMaster.py repository consistency issue
+
+During live verification, importing ZooNavigator initially failed because
+`DiffscanMaster.py` was absent from the Phase 1 branch. `ZooNavigator.py` uses
+both `import DiffscanMaster` and `DiffscanMaster.HITO(...)`.
+
+The verifier inspected the working BL32XU repository `/user/target/JunkZoo`:
+branch `develop`, commit `4fbaf9be974ca728d23c3281b76b881c6f5509d8`.
+It contains `DiffscanMaster.py` with `class HITO():`; `origin/develop` also
+contains the same file. History showed its deletion in commit `c500557`,
+`DiffscanMaster.py was renamed to HITO.py`.
+
+The file was restored from `origin/develop:DiffscanMaster.py` in commit
+`346d40b Restore DiffscanMaster.py lost during branch merge`. The verifier ran
+`cmp DiffscanMaster.py <(git show origin/develop:DiffscanMaster.py)` and
+confirmed `IDENTICAL TO origin/develop`.
+
+This is a pre-existing repository consistency issue originating in past branch
+merge / rename history, not a regression introduced by ZooConfig Phase 1.
+The restoration was already committed before this documentation-only update.
+
+### Launcher/runtime import-path finding
+
+The standard `/oys/xtal/dials/dials-v3-23-0/build/bin/yamtbx.python` rebuilds
+PYTHONPATH at startup, so simply setting ZOO repository root / Libs in the
+shell PYTHONPATH did not preserve those import paths. For the successful
+application import check, repository root and repository root/Libs were added
+to `sys.path` after Python startup. Historical `zoo.python` launchers were
+also confirmed to add ZOO root / Libs themselves.
+
+This is a separate launcher/runtime/import-path architecture issue, not a
+ZooConfig Phase 1 defect. Cleanup is future work; no launcher or runtime fix
+is included here.
+
+The historical implementation/audit notes below retain their checkpoint-time
+facts. Their pending/not-executed statements describe earlier checkpoints;
+the current live-verification status is the record above. The next action is
+specified in **Current next action** near the end of this handover.
+
+## Historical implementation goal
 
 Commit 1として、`ZOOCONFIGPATH/beamline.ini`の機械的な読込だけを
 `Libs/ZooConfig.py`へ切り出し、単体テストを追加する。
 
-## Current state
+## Implementation history
 
 - `Libs/ZooConfig.py`を新設済み。
 - `Libs/tests/test_zoo_config.py`を新設済み。
@@ -164,7 +265,7 @@ Commit 1のコード差分:
 - `/usr/bin/python3`にはpytestがないが、正式runtimeの実行結果には影響しない。
 - hardware接続、測定、外部process起動は行っていない。
 
-## Next action
+## Historical audit and migration notes
 
 ### Phase 1 completion audit status (2026-09-14)
 
@@ -373,7 +474,7 @@ constructor移行の安全性とは分離する。
 
 ## Do not do
 
-- 既存checkpointへ追加commitを作成しない。launcherのruntime構築変更、
+- 今回は指定2文書のcommit・pushのみ。追加のproduction code変更、launcherのruntime構築変更、
   config object共有へ進まない。
 - 残存hardware/device module、測定module、launcher runtime構築を変更しない。
 - B分類候補をconstructor offline testなしに移行しない。C/D分類候補は実機確認なしに触らない。
@@ -457,12 +558,13 @@ hidden coupling. Phase 2 must first decide how to preserve or intentionally
 replace that relationship, with dedicated regression coverage. No Phase 2 work
 is part of this closure.
 
-### Hardware verification plan (not executed)
+### Hardware verification plan (limited checks completed; hardware-dependent checks deferred)
 
 The executable operator checklist is
 `docs/operations/phase1-hardware-verification-checklist.md`. It fixes this
-branch's verification target at `ee593fea2ea6f55814c816d0e7eeb32ffa31bdb1`
-and separates software-only checks from operator-approved hardware steps.
+latest code checkpoint at `346d40b8a277f01096572feb12532c965b50aebb`.
+BL32XU limited checks passed as recorded above; full hardware-dependent
+verification is DEFERRED. The remaining plan requires separate operator approval.
 
 Use the exact verification commit recorded in the handover and do not treat
 one beamline result as proof for another. Execute only with the beamline
@@ -511,21 +613,37 @@ current hardware state; reverting Git alone does not undo hardware state.
   identical writable-cwd conditions; the 17 failures predate Phase 1.
 - **Remaining risks:** UserESA test technical debt, unverified real-beamline
   startup/device behavior, and CoaxImage config-object coupling.
-- **Hardware verification:** pending; no hardware access was performed.
+- **Hardware verification:** BL32XU limited live verification PASS (including TCP
+  connection/local close without BSS commands); full hardware-dependent verification DEFERRED.
 - **Phase 2:** decide and test the CoaxImage config identity/ownership boundary.
 
 ## Current next action
 
-Do not change Phase 1 production code or repair UserESA tests in this audit.
-The next action for the designated human verifier is to use
-`docs/operations/phase1-hardware-verification-checklist.md` at the fixed
-`ee593fe` commit. Hardware verification remains pending; do not merge to
-`main`/`develop`. UserESA test-infrastructure follow-up remains a separate
-technical-debt task.
+This documentation update ends after reviewing the two-document diff and git
+status, committing only those documents, and pushing
+`codex/phase1-zooconfig-loader` to origin. No Issue is assigned; no Issue update
+is included. Commit/push outcome is reported in the final work report and Git
+history, rather than assuming success in advance here.
+
+Phase 1 implementation is COMPLETE. Remaining verification is the eight
+DEFERRED hardware-dependent checks listed above. Main/develop integration is
+NOT YET DONE. Recommend first reviewing this recorded boundary and arranging a
+later operator-approved verification window when the hardware is ready; verify
+the then-current hardware state and code/config identity before any operation.
+Do not automatically repeat constructors, TCP connections, or hardware steps
+when resuming documentation/development work.
+
+STOP here: no additional hardware communication or verification, no Python
+production code or live beamline.ini changes, no main/develop merge, and no
+Phase 2 start. CoaxImage remains Phase 2; launcher/runtime import-path cleanup
+and the existing UserESA test technical debt remain separate future work.
 
 ## Last verified commit
 
-Current branch commit: `ee593fe`
+Latest code / BL32XU limited verification checkpoint: `346d40b8a277f01096572feb12532c965b50aebb`
+
+The offline results below predate this restoration; no offline tests were rerun
+in this documentation update. Earlier checkpoint references follow.
 
 コードcommit: `b29bb94`
 

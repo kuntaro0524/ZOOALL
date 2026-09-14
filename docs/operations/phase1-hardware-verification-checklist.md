@@ -8,18 +8,32 @@ step. The checklist must be completed separately for each beamline.
 Phase 1 production code is closed for this verification. Do not edit code,
 `beamline.ini`, launchers, or runtime configuration during verification.
 
+## Current Phase 1 status
+
+| item | current status |
+| --- | --- |
+| implementation | COMPLETE |
+| focused offline tests | PASS 42/42 (previously recorded; not rerun in this documentation update) |
+| regression comparison | Phase 1による新規regressionなし |
+| BL32XU limited live verification | PASS |
+| full hardware-dependent verification | DEFERRED |
+| CoaxImage | Phase 2 |
+| launcher/runtime import-path cleanup | future work |
+| main/develop integration | NOT YET DONE |
+
 ## 1. Fixed verification target
 
-Fill these values before starting:
+The completed BL32XU limited run is recorded in section 4. For any future run,
+confirm these entries and obtain separate approval before executing the runbook:
 
 | item | fixed value / entry |
 | --- | --- |
 | branch | `codex/phase1-zooconfig-loader` |
-| verification commit | `ee593fea2ea6f55814c816d0e7eeb32ffa31bdb1` |
+| verification commit | `346d40b8a277f01096572feb12532c965b50aebb` |
 | remote ref | `origin/codex/phase1-zooconfig-loader` |
 | rollback commit | `<last operator-approved known-good commit>` |
-| beamline | `<BL32XU / BL41XU / BL45XU / other>` |
-| host | `<host>` |
+| beamline | `BL32XU` |
+| host | `bl32upc4.spring8.or.jp` |
 | verifier | `<name>` |
 | scheduled window | `<date/time and timezone>` |
 
@@ -40,7 +54,7 @@ git status --short --branch
 git rev-parse HEAD
 git rev-parse origin/codex/phase1-zooconfig-loader
 git diff --quiet HEAD origin/codex/phase1-zooconfig-loader
-git show --no-patch --format='%H%n%s' ee593fea2ea6f55814c816d0e7eeb32ffa31bdb1
+git show --no-patch --format='%H%n%s' 346d40b8a277f01096572feb12532c965b50aebb
 ```
 
 Expected result: clean status, HEAD equals the fixed verification commit, and
@@ -87,7 +101,10 @@ steps 4 onward require operator judgment.
 
 ### Step 1 — Import/startup smoke check (no hardware command)
 
-Command, from the fixed clone and approved runtime:
+Historical smoke-check command examples, not the exact successful BL32XU
+invocation. The standard runtime rebuilds PYTHONPATH; the completed run added
+repository root and root/Libs to sys.path after startup (see section 4).
+These examples alone do not reproduce that import-path setup:
 
 ```bash
 yamtbx.python -c 'from Libs import ZooConfig; print(ZooConfig.get_config_path())'
@@ -204,16 +221,88 @@ measurement is outside this checklist and requires a new explicit approval.
 
 ## 4. Result record
 
-| step | PASS/FAIL/N/A | date/time (TZ) | beamline | commit | runtime | config identity/hash | comment / stop reason |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 import |  |  |  |  |  |  |  |
-| 2 config read |  |  |  |  |  |  |  |
-| 3 object init |  |  |  |  |  |  |  |
-| 4 read-only query |  |  |  |  |  |  |  |
-| 5 individual operation |  |  |  |  |  |  |  |
-| 6 ZOO idle startup |  |  |  |  |  |  |  |
-| 7 dry-run/emulator |  |  |  |  |  |  |  |
-| 8 measurement gate |  |  |  |  |  |  |  |
+### BL32XU limited live verification record
+
+This record reflects the verifier's supplied results, recorded on 2026-09-15
+(Asia/Tokyo). The execution timestamp and verifier name were not supplied.
+No tests, imports, hardware communication, or live configuration changes were
+performed as part of this documentation update. BL32XU results do not establish
+BL41XU or BL45XU verification.
+
+#### Environment
+
+| item | recorded value |
+| --- | --- |
+| repository | `/staff/bl32xu/Staff/kuntaro/zoo_project/zoo_phase1_verify` |
+| branch | `codex/phase1-zooconfig-loader` |
+| latest code / restoration commit | `346d40b8a277f01096572feb12532c965b50aebb` |
+| host | `bl32upc4.spring8.or.jp` |
+| runtime | `/oys/xtal/dials/dials-v3-23-0/build/bin/yamtbx.python` |
+| Python | `3.11.11` |
+| ZOOCONFIGPATH | `/staff/bl32xu/BLsoft/ZOO32XU` |
+| actual configuration file | `/staff/bl32xu/BLsoft/ZOO32XU/beamline.ini` |
+| beamline.ini SHA256 | `7c26879a5b0f648809290a420f8ad9adba4470deb1a8fb1174de2dd7b2834b65` |
+
+#### Results
+
+| check | result | boundary |
+| --- | --- | --- |
+| ZooConfig import | PASS | software import |
+| ZooConfig.get_config_path() | PASS | configuration path resolution |
+| ZooConfig.load_config() | PASS | configuration load |
+| Actual BL32XU beamline.ini read | PASS | recorded live file above |
+| Major application imports | PASS | repository root and root/Libs added to sys.path after Python startup; includes ZooNavigator after DiffscanMaster restoration |
+| BLFactory constructor | PASS | constructor only; initDevice() not called |
+| Zoo constructor | PASS | constructor generation |
+| TCP connection to BSS server 192.168.163.2:5555 | PASS | connection only; no BSS command sent |
+| Local socket close | PASS | socket closed locally without sending a BSS command |
+| Read-only BSS command | DEFERRED | hardware not sufficiently started |
+| BLFactory.initDevice() | DEFERRED | hardware not sufficiently started |
+| Device.init() | DEFERRED | hardware not sufficiently started |
+| Hardware object initialization | DEFERRED | hardware not sufficiently started |
+| Hardware position/status query | DEFERRED | hardware not sufficiently started |
+| Device movement | DEFERRED | hardware not sufficiently started |
+| ZOO startup-to-idle test | DEFERRED | hardware not sufficiently started |
+| Measurement test | DEFERRED | hardware not sufficiently started |
+
+DEFERRED means not performed and postponed, not FAIL. The beamline hardware
+was not sufficiently started during this verification window. Constructor and
+TCP connection PASS do not establish device initialization, BSS command,
+startup-to-idle, or measurement success. No dry-run/emulator result was supplied.
+
+#### DiffscanMaster.py repository consistency issue
+
+During live verification, importing ZooNavigator initially failed because
+`DiffscanMaster.py` was absent from the Phase 1 branch. `ZooNavigator.py` uses
+both `import DiffscanMaster` and `DiffscanMaster.HITO(...)`.
+
+The verifier inspected the working BL32XU repository `/user/target/JunkZoo`:
+branch `develop`, commit `4fbaf9be974ca728d23c3281b76b881c6f5509d8`.
+It contains `DiffscanMaster.py` with `class HITO():`; `origin/develop` also
+contains the same file. History showed its deletion in commit `c500557`,
+`DiffscanMaster.py was renamed to HITO.py`.
+
+The file was restored from `origin/develop:DiffscanMaster.py` in commit
+`346d40b Restore DiffscanMaster.py lost during branch merge`. The verifier ran
+`cmp DiffscanMaster.py <(git show origin/develop:DiffscanMaster.py)` and
+confirmed `IDENTICAL TO origin/develop`.
+
+This is a pre-existing repository consistency issue originating in past branch
+merge / rename history, not a regression introduced by ZooConfig Phase 1.
+The restoration was already committed before this documentation-only update.
+
+#### Launcher/runtime import-path finding
+
+The standard `/oys/xtal/dials/dials-v3-23-0/build/bin/yamtbx.python` rebuilds
+PYTHONPATH at startup, so simply setting ZOO repository root / Libs in the
+shell PYTHONPATH did not preserve those import paths. For the successful
+application import check, repository root and repository root/Libs were added
+to `sys.path` after Python startup. Historical `zoo.python` launchers were
+also confirmed to add ZOO root / Libs themselves.
+
+This is a separate launcher/runtime/import-path architecture issue, not a
+ZooConfig Phase 1 defect. Cleanup is future work; no launcher or runtime fix
+is included here.
 
 ## 5. Verification boundary
 
@@ -225,10 +314,12 @@ Step 8 is not authorized by this document.
 
 ## 6. Final PR hardware-verification addendum
 
-Append this section to the PR summary only after the checklist is completed:
+When preparing a later PR, report the limited PASS and full hardware DEFERRED
+separately; do not describe this checklist as fully passed:
 
 ```text
-Hardware verification: PENDING / PASS / FAIL
+BL32XU limited live verification: PASS
+Full hardware-dependent verification: DEFERRED
 Beamline(s):
 Verification commit:
 Runtime:
