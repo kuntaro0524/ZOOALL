@@ -5,7 +5,14 @@
 - [README](README.md)
 - [共通ワークフロー](docs/development/WORKFLOW.md)：作業状態、変更規模、中断・再開・終了の規則の正本。
 - [環境と設定](docs/development/ENVIRONMENTS.md)：端末の役割と実機検証の制約。
-- 対象Issue、対象branchのhandoff、関連する[設計判断](docs/development/decision_log.md)。
+- 対応するIssue（存在する場合）、対象branchのhandover、関連する[設計判断](docs/development/decision_log.md)。
+
+作業開始時には、上記に加えて現在のbranch、対応するhandover、関連architecture文書、
+関連decision log、`git status`、`git log`を確認する。特に現在の作業branchに
+未commit差分がある場合は、差分の所有者と対象範囲を確認してから作業する。
+AI間の引き継ぎでは、handoverをcheckpoint時点の事実と次の一手の入口として使い、
+大きな仕様をAGENTS.mdへ複製しない。設定architectureの詳細は
+[`docs/architecture/configuration.md`](docs/architecture/configuration.md)を参照する。
 
 ## 開始と作業範囲
 
@@ -20,7 +27,7 @@
 - `TestScripts/`や`test*.py`を一括実行しない。importだけでも外部接続・ファイル更新が起こり得るため、対象コードを確認する。
 - `beamline.ini`、端末固有パス、装置接続先を開発管理整備に伴って書き換えない。
 - 運転中のcloneでcheckout・pull・mergeや実行コードの変更を行わない。運転状態が不明なら装置に影響する変更を進める前に確認する。
-- 開発の再開を装置操作の再実行と同一視しない。handoffの再実行禁止事項と現在の状態を確認する。
+- 開発の再開を装置操作の再実行と同一視しない。handoverの再実行禁止事項と現在の状態を確認する。
 
 ## 終了
 

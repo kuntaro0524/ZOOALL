@@ -1,11 +1,11 @@
 # ZOOALL
 
-ZOOの装置制御・測定・データ処理を扱うPythonシステムです。コードと共通知識はこのGitリポジトリ、作業状態はGitHub Issueを正本とします。各端末は独立したcloneを使用します。
+ZOOの装置制御・測定・データ処理を扱うPythonシステムです。コードと共通知識はこのGitリポジトリを正本とし、Issueは任意の課題管理手段として使用します。各端末は独立したcloneを使用します。
 
 ## 開発を始めるとき
 
-1. [開発ワークフロー](docs/development/WORKFLOW.md)を読み、Issue・branch・既存差分を確認してください。
-2. 中断作業はIssueにあるbranchとhandoffへのリンクから再開してください。mainにhandoffがなくても、中断作業がないとは限りません。
+1. [開発ワークフロー](docs/development/WORKFLOW.md)を読み、Issue（存在する場合）・branch・既存差分を確認してください。
+2. 中断作業は、IssueがあればIssueのbranchとhandoverへのリンクから、なければcurrent branchのhandoverから再開してください。mainにhandoverがなくても、中断作業がないとは限りません。
 3. [環境と設定の説明](docs/development/ENVIRONMENTS.md)で対象環境と検証上の制約を確認してください。AIは[AGENTS.md](AGENTS.md)も読みます。
 
 中断は通常運用です。未完成でも対象branchへcheckpointと[handoff](handoffs/TEMPLATE.md)をcommit・pushし、次の最初の操作を残します。詳細と例外時の扱いはワークフローを参照してください。
