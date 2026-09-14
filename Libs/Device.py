@@ -26,9 +26,9 @@ import DSS
 import BeamsizeConfig
 import Flux
 import PreColli
-from configparser import ConfigParser, ExtendedInterpolation
 import WebSocketBSS
 import ZooMyException
+import ZooConfig
 
 class Device(Singleton.Singleton):
     def __init__(self, ms_port):
@@ -36,9 +36,7 @@ class Device(Singleton.Singleton):
         self.s=ms_port
         # beamline.ini is a configure file.
         # reading config file.
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        self.config.read(config_path)
+        self.config = ZooConfig.load_config()
         # PIN diode channel
         self.pin_channel = self.config.getint("experiment", "pin_channel")
         # coax x pulse is read from 'beamline.ini'
