@@ -134,9 +134,13 @@ Phase 1の責任範囲を越える。残存するstandalone utility、launcher v
 example、test/fixtureの直接読み込みも、通常測定coreの安全なloader移行対象とは扱わない。
 
 **検証:** 移行module・A分類・B分類constructor baseline・CoaxImage baselineを含むfocused
-offline suiteは`42 passed`。一方、`Libs/tests`全体は`105 passed, 18 failed`で停止した。
-失敗はUserESA既存テストのfixture/config/logging/import条件に集中し、full-suite全体の
-完了とは扱わない。
+offline suiteは`42 passed`。Phase 1開始直前のbase commit
+`1996d2c4aca0ac5f2cf4272320d105869c740fa5`を別worktreeへ展開し、同じruntime・同じ
+書込み可能cwdで比較した結果、baseは`64 passed, 17 failed`、currentは`106 passed,
+17 failed`だった。17件はtest名・失敗箇所・例外が一致した。repo直下のread-only cwdでの
+current実行では`105 passed, 18 failed`となり、追加1件は`useresa.log`作成失敗である。
+したがってPhase 1由来の新規regressionは0件であり、残る17件とlogging条件はUserESAの
+既存test/fixture・実行環境課題として別途扱う。
 
 **影響:** CoaxImageのconfig object identityを維持したままPhase 2で扱いを決めるまで、
 production codeは変更しない。full-suite failureの原因整理とhardware verificationは

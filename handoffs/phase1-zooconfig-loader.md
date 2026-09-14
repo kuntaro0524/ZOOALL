@@ -201,6 +201,65 @@ complete.
 Current status: **Phase 1 implementation complete for the migrated scope; focused
 offline verified; full-suite follow-up pending; hardware verification pending**.
 
+### Failure attribution audit (2026-09-14)
+
+Comparison base: `1996d2c4aca0ac5f2cf4272320d105869c740fa5` (the parent of
+Commit 1, Phase 1 start). The base was run in detached worktree
+`/tmp/zooall-phase1-base`; current was run from the working repository. Both
+used `/oys/xtal/dials/dials-v3-23-0/build/bin/yamtbx.python`, Python 3.11.11,
+pytest with `-p no:cacheprovider`, the same repository import paths, and the
+same test selection. For the controlled comparison both used the same writable
+cwd `/tmp/zoo-phase1-test-cwd` and excluded only
+`Libs/tests/test_inventory_webdb_smoke.py`.
+
+Controlled full-suite result:
+
+- base: `64 passed, 17 failed`
+- current: `106 passed, 17 failed`
+- The pass-count difference is due to Phase 1 tests added on the current
+  branch. The 17 failures below occurred in both revisions at the same
+  logical test/exception locations.
+
+| test | failure evidence | classification |
+| --- | --- | --- |
+| `test_useresa_define_scan_condition_dose_ratio.py::test_high_and_ultra_follow_normal_dose_ratio` | `UserESA.__new__` object has no `config` at `UserESA.py:637/639` | B: pre-existing test setup |
+| `test_useresa_define_scan_condition_updates_dose_ds.py::test_define_scan_condition_updates_dose_ds_from_dose_per_frame` | same missing `config` at `defineScanCondition` | B: pre-existing test setup |
+| `test_useresa_dose_distance_handler.py::test_check_dose_list_normalizes_and_pads` | length mismatch ValueError at `DoseDistanceHandler.validate_dose_dist` | B: pre-existing fixture/expectation mismatch |
+| `test_useresa_dose_distance_handler.py::test_check_dose_list_requires_both_columns` | expected ValueError not raised | B: pre-existing fixture/expectation mismatch |
+| `test_useresa_dose_error_flag.py::test_dose_error_flag_is_set_when_negative` | same missing `config` at `defineScanCondition` | B: pre-existing test setup |
+| `test_useresa_logger_handler_duplication.py::test_useresa_does_not_duplicate_logger_handlers` | only repo-readonly run: `FileHandler('useresa.log')` raises `OSError: [Errno 30]` | C: cwd/filesystem condition; passes in controlled writable cwd |
+| `test_useresa_reject_ssrox.py::test_ssrox_is_rejected` | `KeyError: 'ssrox'` from `getParams` | B: pre-existing behavior/test mismatch |
+| `test_useresa_spec.py::test_check_dose_list_normalization[5,10...]` | length mismatch ValueError | B: pre-existing fixture/expectation mismatch |
+| `test_useresa_spec.py::test_check_dose_list_normalization[[5, 10]...]` | length mismatch ValueError | B: pre-existing fixture/expectation mismatch |
+| `test_useresa_spec.py::test_check_dose_list_rejects_multi_values_for_multi_and_mixed[multi]` | message mismatch: `does not allow` vs expected `prohibits` | B: pre-existing assertion mismatch |
+| `test_useresa_spec.py::test_check_dose_list_rejects_multi_values_for_multi_and_mixed[mixed]` | same message mismatch | B: pre-existing assertion mismatch |
+| `test_useresa_spec.py::test_validate_dose_dist_rejects_multiple_values_in_multi_and_mixed[multi]` | length validation occurs before expected mode message | B: pre-existing assertion/order mismatch |
+| `test_useresa_spec.py::test_validate_dose_dist_rejects_multiple_values_in_multi_and_mixed[mixed]` | same validation-order mismatch | B: pre-existing assertion/order mismatch |
+| `test_useresa_spec.py::test_define_scan_condition_expected_dose_math` | fixture lacks `experiment.thinnest_att_thick` | B: pre-existing fixture/config mismatch |
+| `test_useresa_spec.py::test_mode_does_not_change_define_scan_condition_numeric_result_without_lists[single]` | fixture lacks `experiment.thinnest_att_thick` | B: pre-existing fixture/config mismatch |
+| `test_useresa_spec.py::test_mode_does_not_change_define_scan_condition_numeric_result_without_lists[helical]` | same missing config key | B: pre-existing fixture/config mismatch |
+| `test_useresa_spec.py::test_mode_does_not_change_define_scan_condition_numeric_result_without_lists[multi]` | same missing config key | B: pre-existing fixture/config mismatch |
+| `test_useresa_spec.py::test_mode_does_not_change_define_scan_condition_numeric_result_without_lists[mixed]` | same missing config key | B: pre-existing fixture/config mismatch |
+
+The current/base diff for `Libs/UserESA.py` is limited to replacing the local
+parser construction/read with `ZooConfig.load_config()` plus the import; no
+UserESA algorithm or assertion behavior was changed by Phase 1. The focused
+Phase 1 suite remains `42 passed`. No Phase 1 regression was observed, so
+offline verification is valid for the migrated scope, not for claiming the
+entire pre-existing UserESA suite is green.
+
+Separate follow-up issues, not to be repaired in this audit:
+
+- tests using `UserESA.__new__` need an explicit config fixture before calling
+  methods that read `self.config`;
+- dose/distance fixtures and expected validation messages/order are inconsistent;
+- UserESA fixtures need the `experiment.thinnest_att_thick` key;
+- logger tests should use a writable temporary directory rather than the repo
+  root.
+
+No UserESA test, fixture, or production code was changed. The phase remains
+**offline verified for the migrated scope; hardware verification pending**.
+
 Changed production modules:
 
 - Core/startup: `Libs/BLFactory.py`, `Libs/BSSconfig.py`, `Libs/Device.py`, `Zoo.py`,
@@ -345,7 +404,18 @@ constructor移行の安全性とは分離する。
 - CoaxImageの`self.blf.config`再利用を維持したままloader集約する方式は未決定。
 - CoaxImageのconfig object identityを変更するmigrationはPhase 1 STOP条件に抵触する可能性がある。
 
+## Current next action
+
+Do not change Phase 1 production code or repair UserESA tests in this audit.
+The next action is a separately scoped test-infrastructure investigation for
+the 17 failures reproduced at the Phase 1 base and current branch, plus the
+read-only-cwd logging condition. Only after that evidence is reviewed should
+the full-suite status be reconsidered. Hardware verification remains pending;
+do not merge to `main`/`develop`.
+
 ## Last verified commit
+
+Current branch commit: `66bd1c0`
 
 コードcommit: `b29bb94`
 

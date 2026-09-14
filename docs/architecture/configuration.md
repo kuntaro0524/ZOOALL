@@ -156,12 +156,18 @@ offline before migration:
 - `Libs/BaseAxis.py`
 - `Libs/Gonio.py`
 
-The focused Phase 1 regression and constructor suite passes offline. Full
-`Libs/tests` collection currently remains blocked by 18 pre-existing or
-environment/fixture-related UserESA failures; this is not treated as proof of
-full-suite completion. Therefore the current state is **offline verified for
-the migrated Phase 1 scope, with full-suite follow-up pending; hardware
-verification pending**.
+The focused Phase 1 regression and constructor suite passes offline. The
+failure attribution audit compared the Phase 1 base commit
+`1996d2c4aca0ac5f2cf4272320d105869c740fa5` with the current branch under the
+same runtime and writable working directory. The base had `64 passed, 17
+failed`; the current branch had `106 passed, 17 failed` because the current
+branch contains additional Phase 1 tests. The same 17 UserESA failures
+occurred at the same test/exception locations in both revisions. A separate
+run from the read-only repository directory added one logging failure
+(`useresa.log`), which is an execution-directory condition rather than a Phase
+1 regression. Therefore the current state is **offline verified for the
+migrated Phase 1 scope; unrelated UserESA test-infrastructure follow-up
+pending; hardware verification pending**.
 
 `Libs/CoaxImage.py` is intentionally not migrated in Phase 1. Its constructor
 reuses the `BLFactory` configuration object (`Libs/CoaxImage.py:50-54`), so a
