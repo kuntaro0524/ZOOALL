@@ -145,3 +145,14 @@ current実行では`105 passed, 18 failed`となり、追加1件は`useresa.log`
 **影響:** CoaxImageのconfig object identityを維持したままPhase 2で扱いを決めるまで、
 production codeは変更しない。full-suite failureの原因整理とhardware verificationは
 別の確認事項として残す。関連Issue/PRは未設定であり、番号を仮定しない。
+
+## 2026-09-14：Phase 1 closure preparationの境界
+
+**判断:** Phase 1のproduction migrationは現在のmigrated scopeで閉じ、これ以上の
+production code変更は行わない。focused offline suiteは`42 passed`、base/current比較で
+Phase 1由来の新規regressionは0件である。hardware verificationは未実施として別工程に
+残す。UserESAの既存test failureはPhase 1とは独立したtechnical debtとして記録する。
+
+**影響:** closureではmodule/test対応表、base/current evidence、低リスク順のhardware
+verification plan、rollbackとcommit traceabilityだけを文書化する。実機接続やcommand送信、
+CoaxImage移行、Phase 2のconfig object共有は行わない。main/developへのmergeは行わない。

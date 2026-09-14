@@ -180,6 +180,23 @@ launcher variants, legacy/dead example blocks, tests/fixtures, and the
 CoaxImage Phase 2 case. These paths are not evidence that a safe normal
 measurement-core migration was missed.
 
+## Phase 1 closure boundary
+
+Phase 1 production changes are closed for further implementation on this
+branch. The migrated scope is offline verified, with focused coverage at
+`42 passed`; the base/current comparison found zero Phase 1 regressions.
+Hardware verification has not been performed and is a separate pending step.
+The existing UserESA failures are recorded as independent test technical debt,
+not as a reason to alter the Phase 1 loader migration.
+
+The branch handover contains the final production module/test mapping, closure
+evidence, and a conservative hardware verification plan. No hardware access is
+implied by the offline tests.
+
+`Libs/CoaxImage.py` remains a Phase 2 follow-up because its constructor reuses
+the `BLFactory` configuration object. No Phase 1 closure action changes that
+object identity or its initialization relationship.
+
 ## Later considerations
 
 Phase 2 or later may evaluate:

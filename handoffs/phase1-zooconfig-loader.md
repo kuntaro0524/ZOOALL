@@ -404,6 +404,111 @@ constructor移行の安全性とは分離する。
 - CoaxImageの`self.blf.config`再利用を維持したままloader集約する方式は未決定。
 - CoaxImageのconfig object identityを変更するmigrationはPhase 1 STOP条件に抵触する可能性がある。
 
+## Phase 1 closure preparation
+
+### Final production module list and offline evidence
+
+The following production modules were changed by Phase 1. `ZooConfig.py` is
+the new loader; all other entries delegate only the mechanical config read and
+retain their local config attributes and initialization order.
+
+| group | production module(s) | offline test | guarantee |
+| --- | --- | --- | --- |
+| loader | `Libs/ZooConfig.py` | `Libs/tests/test_zoo_config.py` | path construction, parser read, ExtendedInterpolation, legacy KeyError/missing-file behavior, old/new value equivalence |
+| core/startup | `Libs/BLFactory.py`, `Libs/BSSconfig.py`, `Libs/Device.py`, `Zoo.py`, `ZooNavigator.py`, `lets_goto_zoo.py` | `test_blfactory_zooconfig.py`, `test_bssconfig_zooconfig.py`, `test_device_zooconfig.py`, `test_zoo_zooconfig.py`, `test_zoonavigator_zooconfig.py`, `test_lets_goto_zoo_zooconfig.py` | loader delegation plus representative config values and preserved initialization/observable state; no hardware connection in the tested path |
+| config-only A | `KUMA.py`, `MultiCrystal.py`, `Libs/AttFactor.py`, `Libs/BeamsizeConfig.py`, `Libs/CryImageProc.py`, `Libs/ESA.py`, `Libs/RasterSchedule.py`, `Libs/ScheduleBSS.py`, `Libs/UserESA.py`, `Libs/BSSconfig41.py` | `Libs/tests/test_a_config_modules_zooconfig.py` | each module delegates config loading to ZooConfig without changing its local config access contract |
+| constructor-tested B | `Libs/Capture.py`, `Libs/Gonio44.py`, `Libs/Count.py`, `Libs/Zoom.py`, `Libs/CoaxPint.py`, `Libs/CCDlen.py`, `Libs/Mono.py`, `Libs/PreColli.py`, `Libs/BaseAxis.py`, `Libs/Gonio.py` | `test_capture_gonio44_constructor_baseline.py`, `test_count_constructor_baseline.py`, `test_zoom_constructor_baseline.py`, `test_coaxpint_constructor_baseline.py`, `test_ccdlen_constructor_baseline.py`, `test_mono_constructor_baseline.py`, `test_precolli_constructor_baseline.py`, `test_baseaxis_constructor_baseline.py`, `test_gonio_constructor_baseline.py` | fixture-based constructor completion, no socket communication, no hardware command, no external process, and preserved observable constructor state before/after loader migration |
+
+`Libs/CoaxImage.py` is not in the changed production list. Its baseline is
+covered by `Libs/tests/test_coaximage_constructor_baseline.py`; that test
+documents the offline constructor boundary only. It does not authorize a
+Phase 1 migration.
+
+### Closure evidence
+
+- Phase 1 focused suite: `42 passed in 1.21s` under
+  `/oys/xtal/dials/dials-v3-23-0/build/bin/yamtbx.python`.
+- Base: `1996d2c4aca0ac5f2cf4272320d105869c740fa5`; controlled full
+  `Libs/tests` run: `64 passed, 17 failed`.
+- Current: `9087236`; same controlled run: `106 passed, 17 failed`.
+- The 17 failing UserESA tests occurred at the same logical locations in base
+  and current. The repo-readonly run's additional `useresa.log` failure is a
+  writable-cwd issue and passes from `/tmp/zoo-phase1-test-cwd`.
+- Therefore Phase 1 regression count is **zero**. The migrated scope is
+  **offline verified**; the entire legacy UserESA suite is not claimed green.
+
+### UserESA technical debt (out of scope)
+
+Do not repair these during Phase 1 closure. The independent issues are:
+
+- tests constructing `UserESA` with `__new__` without a `config` fixture;
+- dose/distance fixture values inconsistent with current validation and
+  expected error message/order;
+- missing `experiment.thinnest_att_thick` in numeric UserESA fixtures;
+- logger test writing `useresa.log` in the repository rather than a temporary
+  writable directory.
+
+### CoaxImage Phase 2 task
+
+Keep `Libs/CoaxImage.py` unchanged. Its constructor reuses `self.blf.config`
+as `self.config` and reads into that object (`Libs/CoaxImage.py:50-54`). A
+simple `ZooConfig.load_config()` replacement could change parser identity and
+hidden coupling. Phase 2 must first decide how to preserve or intentionally
+replace that relationship, with dedicated regression coverage. No Phase 2 work
+is part of this closure.
+
+### Hardware verification plan (not executed)
+
+Use the exact verification commit recorded in the handover and do not treat
+one beamline result as proof for another. Execute only with the beamline
+operator's approval and record beamline, host, runtime, `ZOOCONFIGPATH`/live
+config identity, commit, command, result, and rollback point.
+
+1. **Import/startup:** on an isolated operational clone, invoke the standard
+   `yamtbx.python` runtime and import the migrated modules. Confirm no import
+   error, unexpected process, or device command.
+2. **Configuration read:** select the existing live configuration without
+   editing it; confirm `ZOOCONFIGPATH/beamline.ini`, beamline identity, and
+   representative sections/keys. Compare only read-only values.
+3. **Device object initialization:** instantiate the normal objects in the
+   approved startup order with communication monitoring. Confirm expected
+   attributes and no unintended movement or write command.
+4. **Read-only hardware query:** query status/position/limits only, one device
+   at a time, with an operator-defined stop condition.
+5. **Individual operation:** only after the preceding checks pass, test one
+   approved low-risk device operation at a time, recording before/after state.
+6. **ZOO startup:** launch the normal ZOO entry path and verify initialization
+   and idle readiness without starting a measurement.
+7. **Dry-run equivalent:** use an existing documented emulator/dry-run mode
+   only if it already exists for that beamline; do not invent a new mode or
+   infer that constructor tests are a dry-run.
+8. **Before measurement:** confirm beamline identity, live config backup or
+   recovery point, software commit, runtime, device idle state, and operator
+   approval. No exposure or sample movement is part of this plan.
+
+Rollback is to stop before the next step, restore the previously verified
+working clone/commit, and restore any explicitly backed-up live configuration
+only under the beamline's operational procedure. Record the failed step and
+current hardware state; reverting Git alone does not undo hardware state.
+
+### PR summary
+
+- **Why:** remove duplicated `ZOOCONFIGPATH/beamline.ini` parser setup while
+  preserving Phase 1 runtime behavior.
+- **What changed:** added `Libs/ZooConfig.py` and migrated the listed core,
+  A-class, and constructor-tested B-class modules; added offline tests.
+- **Intentionally unchanged:** INI schema/values, constructors and order,
+  config object sharing, singletonization, launchers, hardware logic,
+  measurement logic, live config, and CoaxImage.
+- **Tests:** focused Phase 1 suite `42 passed`; controlled base/current
+  comparison found no new regression.
+- **Regression comparison:** base `64/17`, current `106/17` (pass/fail) under
+  identical writable-cwd conditions; the 17 failures predate Phase 1.
+- **Remaining risks:** UserESA test technical debt, unverified real-beamline
+  startup/device behavior, and CoaxImage config-object coupling.
+- **Hardware verification:** pending; no hardware access was performed.
+- **Phase 2:** decide and test the CoaxImage config identity/ownership boundary.
+
 ## Current next action
 
 Do not change Phase 1 production code or repair UserESA tests in this audit.
@@ -415,7 +520,7 @@ do not merge to `main`/`develop`.
 
 ## Last verified commit
 
-Current branch commit: `66bd1c0`
+Current branch commit: `9087236`
 
 コードcommit: `b29bb94`
 
