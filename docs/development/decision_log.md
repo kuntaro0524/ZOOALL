@@ -104,3 +104,18 @@ Git操作へ結合すると、実行環境と装置設定の変更範囲が不�
 
 **影響:** 歴史的な`zoo.python`は直ちに削除・変更しない。canonical/live比較、beamline
 identity確認、backup、explicit applyは将来の検討事項であり、今回はscriptを追加しない。
+
+## 2026-09-14：Phase 1 production migrationを小さなcheckpointに分割する
+
+**判断:** `ZooConfig`の正式test確認後、Phase 1のproduction migrationは一度に全moduleへ
+適用せず、まず`Libs/BLFactory.py`の設定path構築・parser読込だけをloaderへ委譲する。
+`BSSconfig.py`、`Device.py`、`Zoo.py`、`ZooNavigator.py`、`lets_goto_zoo.py`は別checkpoint
+で評価する。
+
+**理由:** `BLFactory`は設定読込後に既存のconfig属性、key取得、BSSconfig生成、hardware初期化
+へ進むため、loader委譲だけを独立に検証できる。複数moduleを同時変更すると、constructorや
+initialization orderの差異を切り分けにくくなる。
+
+**影響:** 今回の移行ではconfig object共有、singleton化、constructor変更、initialization
+order変更、hardware/device/measurement logic変更を行わない。既存のpath表示と`BLFactory.config`
+属性は維持し、offline testでloader接続と代表的な設定値を確認する。

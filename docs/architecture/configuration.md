@@ -119,15 +119,17 @@ Phase 1 does not introduce:
 
 The initial production migration candidates are:
 
-- `Libs/BLFactory.py`
 - `Libs/BSSconfig.py`
 - `Libs/Device.py`
 - `Zoo.py`
 - `ZooNavigator.py`
 - `lets_goto_zoo.py`
 
-Phase 1 does not itself modify these files. Special cases and remaining
-modules are evaluated only after the loader and its tests are verified.
+`Libs/BLFactory.py` is the first migration target after the standalone loader
+verification. Its constructor keeps the existing `config` attribute, path
+printing, key reads, BSSconfig construction, and initialization order while
+delegating only path construction and parser loading to `ZooConfig`. The
+remaining modules are evaluated in separate small checkpoints.
 
 ## Later considerations
 
