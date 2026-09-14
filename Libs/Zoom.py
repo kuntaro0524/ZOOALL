@@ -3,8 +3,8 @@ import sys
 import socket
 import time
 import BSSconfig
-from configparser import ConfigParser, ExtendedInterpolation
 import os
+import ZooConfig
 
 from Motor import *
 class Zoom:
@@ -13,8 +13,7 @@ class Zoom:
         self.bl_object = self.bssconf.getBLobject()
 
         # beamline.ini 
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH']) 
+        self.config = ZooConfig.load_config()
 
         self.s = server
         #self.axis = "bl_44in_st1_video_2_zoom"
