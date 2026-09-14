@@ -8,16 +8,15 @@ import os
 # My library
 from Received import *
 from Motor import *
-from configparser import ConfigParser, ExtendedInterpolation
 import BSSconfig
+import ZooConfig
 
 class CCDlen:
     def __init__(self, server):
         self.s = server
 
         # beamline.ini file
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        self.config = ZooConfig.load_config()
 
         # axis definition is read from 'beamline.ini' file
         # section: axes, option: ccdlen
