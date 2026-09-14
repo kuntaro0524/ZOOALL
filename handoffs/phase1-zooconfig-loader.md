@@ -27,6 +27,13 @@ Commit 1として、`ZOOCONFIGPATH/beamline.ini`の機械的な読込だけを
 - `ZooNavigator.py`のloader委譲とoffline testを`91ccdd1`として作成済み。
 - `lets_goto_zoo.py`のloader委譲とoffline testを`53c3dd3`として作成済み。
 - 初期migration候補6ファイルのloader委譲を完了した。
+- A分類（設定読み込みのみ）の10 moduleを`88d7372`としてloaderへ移行した。
+- A分類の対象は`KUMA.py`、`MultiCrystal.py`、`Libs/CryImageProc.py`、
+  `Libs/AttFactor.py`、`Libs/BeamsizeConfig.py`、`Libs/ESA.py`、
+  `Libs/RasterSchedule.py`、`Libs/ScheduleBSS.py`、`Libs/UserESA.py`、
+  `Libs/BSSconfig41.py`である。
+- A分類のloader委譲を確認するoffline testを
+  `Libs/tests/test_a_config_modules_zooconfig.py`として追加した。
 - 正式runtimeで新規unit test 5件が成功した。
 - BLFactory移行を含む対象test 6件が正式runtimeで成功した。
 - BSSconfig移行を含む対象test 7件が正式runtimeで成功した。
@@ -90,24 +97,27 @@ Commit 1のコード差分:
 - 同runtimeでZooConfig、BLFactory、BSSconfig、Device、Zoo、ZooNavigatorの対象testを実行し、`10 passed in 0.17s`。
 - 同runtimeでZooConfig、BLFactory、BSSconfig、Device、Zoo、ZooNavigator、lets_goto_zooの対象testを実行し、`11 passed in 0.22s`。
 - 初期migration完了後の同対象testを再実行し、`11 passed in 0.20s`。
+- A分類移行後に対象testを再実行し、`21 passed in 0.27s`。
 - `/usr/bin/python3`にはpytestがないが、正式runtimeの実行結果には影響しない。
 - hardware接続、測定、外部process起動は行っていない。
 
 ## Next action
 
-初期migration候補6ファイルのloader委譲が完了した。残存する直接読込には、通常測定の
-hardware/device初期化経路にある`Libs/Mono.py`、`Libs/Capture.py`、`Libs/Zoom.py`、
-`Libs/Count.py`、`Libs/Gonio.py`、`Libs/Gonio44.py`、`Libs/CCDlen.py`、
-`Libs/PreColli.py`、`Libs/AttFactor.py`等がある。これらは設定値がhardware制御・
-measurement初期化へ接続するため、次の移行はSTOP条件（測定ロジックやhardware制御に
-影響する可能性）に該当する。個別のoffline test設計と範囲レビューが終わるまで、追加の
-production migrationを停止する。
+A分類のloader委譲が完了した。残存する直接読込には、hardware/device初期化経路の
+`Libs/Mono.py`、`Libs/Capture.py`、`Libs/Zoom.py`、`Libs/Count.py`、
+`Libs/Gonio.py`、`Libs/Gonio44.py`、`Libs/CCDlen.py`、`Libs/PreColli.py`、
+`Libs/BaseAxis.py`、`Libs/CoaxPint.py`、`Libs/CoaxImage.py`等のB分類候補と、
+実行時にsocket/device操作へ進むD分類候補がある。次のactionは、B分類候補ごとに
+fake server・socket fail-fast stubを使ったconstructor offline testを設計・実行すること。
+constructor/import自体の外部接続が確認されたmoduleはC/Dとして移行しない。B分類の
+test結果と影響範囲が明確になるまで、追加のproduction migrationを停止する。
 
 ## Do not do
 
 - 既存checkpointへ追加commitを作成しない。launcherのruntime構築変更、
   config object共有へ進まない。
 - 残存hardware/device module、測定module、launcher runtime構築を変更しない。
+- B分類候補をconstructor offline testなしに移行しない。C/D分類候補は実機確認なしに触らない。
 - package install/updateを行わない。
 - hardware、BSS、外部API、測定processへ接続しない。
 - `beamline.ini`やruntime設定を変更しない。
@@ -125,7 +135,9 @@ production migrationを停止する。
 
 直近の文書commit: `6a59bdd`
 
-直近のproduction migration commit: `53c3dd3`
+直近のproduction migration commit: `88d7372`
+
+A分類移行commit: `88d7372`
 
 BSSconfig migration commit: `9faaf57`
 
