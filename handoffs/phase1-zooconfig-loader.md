@@ -37,6 +37,10 @@ Commit 1として、`ZOOCONFIGPATH/beamline.ini`の機械的な読込だけを
 - `22f812a`までのPhase 1 commitとhandoverを、作業branch
   `codex/phase1-zooconfig-loader`としてoriginへpushした。
 - push後にlocal `HEAD`と`origin/codex/phase1-zooconfig-loader`が一致することを確認した。
+- Capture/Gonio44のbaseline constructor offline testを`844ae31`として追加した。
+- baseline testではtemporary `beamline.ini`、fake server、socket fail-fast、
+  process fail-fastを使用し、constructor中の通信・hardware access・外部process起動が
+ ないことを確認した。
 - B分類候補のconstructor/import経路を静的に確認した。対象constructor内に
   `socket.connect`、`sendall`、`recv`の直接呼出しは見つからなかった。
 - `Libs/Motor.py:14-25`のconstructorはserver参照・軸名・unitの保持だけで、通信は
@@ -105,6 +109,7 @@ Commit 1のコード差分:
 - 同runtimeでZooConfig、BLFactory、BSSconfig、Device、Zoo、ZooNavigator、lets_goto_zooの対象testを実行し、`11 passed in 0.22s`。
 - 初期migration完了後の同対象testを再実行し、`11 passed in 0.20s`。
 - A分類移行後に対象testを再実行し、`21 passed in 0.27s`。
+- 正式runtimeでCapture/Gonio44 baselineとZooConfig/A分類testを実行し、`17 passed in 0.22s`。
 - `/usr/bin/python3`にはpytestがないが、正式runtimeの実行結果には影響しない。
 - hardware接続、測定、外部process起動は行っていない。
 
@@ -168,6 +173,10 @@ constructor/importそのものがsocket接続するC候補は、今回の静的�
 `Count`・`Zoom`・`CoaxPint`、その後に分岐の多い`Gonio`・`PreColli`・`BaseAxis`、
 最後に`CoaxImage`とする。これらのtestが成功するまでproduction migrationは行わない。
 
+Capture/Gonio44のbaselineは成功したため、次の小さいmigration単位としてまず
+`Libs/Capture.py`、続いて`Libs/Gonio44.py`の直接loader委譲を評価する。
+各migration後に同じconstructor testと既存対象testを再実行する。
+
 ### B分類constructor詳細監査
 
 | module | constructorで起こること | socket/hardware command | filesystem/process | mock/offline評価 | 移行リスク |
@@ -205,6 +214,7 @@ constructor移行の安全性とは分離する。
 - GitHub Issueとの対応付けは未設定。Issueなしでもbranchとhandoverで再開可能。
 - 初期migration後の残存moduleについては、hardware/measurement影響を伴うため未移行。
 - B分類constructorの実行test自体はまだ追加・実行していない。今回の確認は静的解析のみ。
+- Capture/Gonio44についてはbaseline constructor testを追加・実行済み。
 - C候補がないことは静的調査の範囲の結論であり、import実行時副作用を全面保証するものではない。
 
 ## Last verified commit
@@ -218,6 +228,8 @@ constructor移行の安全性とは分離する。
 A分類移行commit: `88d7372`
 
 直近のhandover/remote同期確認commit: `22f812a`
+
+Capture/Gonio44 baseline test commit: `844ae31`
 
 BSSconfig migration commit: `9faaf57`
 
