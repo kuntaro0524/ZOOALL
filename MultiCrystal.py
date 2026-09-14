@@ -4,8 +4,8 @@ import logging
 
 from AttFactor import *
 # ConfigParser is used for reading beamline.ini
-from configparser import ConfigParser, ExtendedInterpolation
 import ECHA.ZooContext as ZooContext
+from Libs import ZooConfig
 
 # 2014/05/28 K.Hirata
 # For multi-crystal data collection
@@ -47,9 +47,7 @@ class MultiCrystal:
         self.isReadBeamSize = False
         self.isShutterless = False
         # Read 'beamline' name from beamline.ini  
-        config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        config.read(config_path)
+        config = ZooConfig.load_config()
         self.beamline = config.get("beamline", "beamline")
 
         # ECHA mode flag
