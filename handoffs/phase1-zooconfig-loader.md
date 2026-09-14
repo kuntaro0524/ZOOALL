@@ -43,6 +43,8 @@ Commit 1として、`ZOOCONFIGPATH/beamline.ini`の機械的な読込だけを
   ないことを確認した。
 - `Libs/Capture.py`のconfig読込を`ZooConfig.load_config()`へ委譲し、
   constructor testとloader委譲確認を`484bc79`としてcommit・pushした。
+- `Libs/Gonio44.py`のconfig読込を`ZooConfig.load_config()`へ委譲し、
+  constructor testとloader委譲確認を`4dfec53`としてcommit・pushした。
 - B分類候補のconstructor/import経路を静的に確認した。対象constructor内に
   `socket.connect`、`sendall`、`recv`の直接呼出しは見つからなかった。
 - `Libs/Motor.py:14-25`のconstructorはserver参照・軸名・unitの保持だけで、通信は
@@ -114,6 +116,8 @@ Commit 1のコード差分:
 - 正式runtimeでCapture/Gonio44 baselineとZooConfig/A分類testを実行し、`17 passed in 0.22s`。
 - Capture移行後、同runtimeでCapture/Gonio44、ZooConfig、A分類testを実行し、
   `18 passed in 0.21s`。
+- Gonio44移行後、同runtimeでCapture/Gonio44、ZooConfig、A分類、初期6候補のtestを
+  実行し、`25 passed in 0.30s`。
 - `/usr/bin/python3`にはpytestがないが、正式runtimeの実行結果には影響しない。
 - hardware接続、測定、外部process起動は行っていない。
 
@@ -177,9 +181,12 @@ constructor/importそのものがsocket接続するC候補は、今回の静的�
 `Count`・`Zoom`・`CoaxPint`、その後に分岐の多い`Gonio`・`PreColli`・`BaseAxis`、
 最後に`CoaxImage`とする。これらのtestが成功するまでproduction migrationは行わない。
 
-Capture/Gonio44のbaselineは成功した。`Libs/Capture.py`は`484bc79`で移行済み。
-次の小さいmigration単位として`Libs/Gonio44.py`の直接loader委譲を評価する。
-Gonio44移行後に同じconstructor testと既存対象testを再実行する。
+Capture/Gonio44のbaselineは成功し、`Libs/Capture.py`は`484bc79`、
+`Libs/Gonio44.py`は`4dfec53`で移行済み。次は中リスクB分類のうち、constructorが
+単純な`Libs/Count.py`、`Libs/Zoom.py`、`Libs/CoaxPint.py`を候補とする。
+いずれも`BSSconfig`読込とMotor生成を含むため、fake `BSSconfig`/`Motor`と
+socket fail-fastを使うconstructor testを先に追加・実行する。test成功前のproduction
+移行は行わない。
 
 ### B分類constructor詳細監査
 
@@ -220,6 +227,7 @@ constructor移行の安全性とは分離する。
 - B分類constructorの実行test自体はまだ追加・実行していない。今回の確認は静的解析のみ。
 - Capture/Gonio44についてはbaseline constructor testを追加・実行済み。
 - Captureについてはloader移行後のconstructor testも成功済み。
+- Gonio44についてはloader移行後のconstructor testも成功済み。
 - C候補がないことは静的調査の範囲の結論であり、import実行時副作用を全面保証するものではない。
 
 ## Last verified commit
@@ -237,6 +245,8 @@ A分類移行commit: `88d7372`
 Capture/Gonio44 baseline test commit: `844ae31`
 
 Capture migration commit: `484bc79`
+
+Gonio44 migration commit: `4dfec53`
 
 BSSconfig migration commit: `9faaf57`
 
