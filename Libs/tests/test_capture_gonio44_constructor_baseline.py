@@ -111,6 +111,7 @@ def test_gonio44_constructor_has_no_socket_or_hardware_side_effects(
 
     for name in ("Motor", "BSSconfig", "Zoo"):
         monkeypatch.setitem(sys.modules, name, types.ModuleType(name))
+    _install_real_zooconfig(monkeypatch)
 
     module = _load_module(ROOT / "Libs/Gonio44.py", "Gonio44_baseline_under_test")
     server = _FailFastServer()
@@ -119,3 +120,29 @@ def test_gonio44_constructor_has_no_socket_or_hardware_side_effects(
     assert gonio.s is server
     assert gonio.beamline == "BL32XU"
     assert gonio.debug is False
+
+
+def test_gonio44_constructor_uses_zooconfig_loader(monkeypatch, tmp_path):
+    _write_beamline_ini(tmp_path)
+    monkeypatch.setenv("ZOOCONFIGPATH", str(tmp_path))
+
+    for name in ("Motor", "BSSconfig", "Zoo"):
+        monkeypatch.setitem(sys.modules, name, types.ModuleType(name))
+
+    calls = []
+    config_module = types.ModuleType("ZooConfig")
+
+    def load_config():
+        calls.append("load")
+        config = ConfigParser(interpolation=ExtendedInterpolation())
+        config.read(tmp_path / "beamline.ini")
+        return config
+
+    config_module.load_config = load_config
+    monkeypatch.setitem(sys.modules, "ZooConfig", config_module)
+
+    module = _load_module(ROOT / "Libs/Gonio44.py", "Gonio44_loader_under_test")
+    gonio = module.Gonio44(_FailFastServer())
+
+    assert calls == ["load"]
+    assert gonio.beamline == "BL32XU"
