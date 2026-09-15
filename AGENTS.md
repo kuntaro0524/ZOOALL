@@ -2,6 +2,7 @@
 
 ## 必読
 
+- cross-repository architecture入口（`git@github.com:kuntaro0524/zoo-hub.git`）：ZOOおよび関連ツール群の作業開始前に`zoo-hub/START_HERE.md`を確認する。
 - [README](README.md)
 - [共通ワークフロー](docs/development/WORKFLOW.md)：作業状態、変更規模、中断・再開・終了の規則の正本。
 - [環境と設定](docs/development/ENVIRONMENTS.md)：端末の役割と実機検証の制約。

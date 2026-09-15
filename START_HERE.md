@@ -4,6 +4,16 @@
 ここには個別作業の詳細や技術仕様を複製しません。現在の状態は、Git、handover、
 管理文書、実コードを確認して復元してください。
 
+## Cross-repositoryの入口
+
+ZOOおよび関連ツール群のrepository固有作業を開始する前に、cross-repository architectureの正本である`zoo-hub/START_HERE.md`を確認してください。
+
+```text
+git@github.com:kuntaro0524/zoo-hub.git
+```
+
+その後、このrepositoryの`START_HERE.md`、`AGENTS.md`、handover、workflow、関連architecture文書を読み、branch・status・HEADと現在地点を復元します。
+
 ## 最初に読む文書
 
 1. [README.md](README.md)：repositoryの概要
