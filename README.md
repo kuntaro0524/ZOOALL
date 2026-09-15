@@ -2,6 +2,8 @@
 
 ZOOの装置制御・測定・データ処理を扱うPythonシステムです。コードと共通知識はこのGitリポジトリを正本とし、Issueは任意の課題管理手段として使用します。各端末は独立したcloneを使用します。
 
+ZOOの開発・保守作業を開始または再開するときは、まず[START_HERE.md](START_HERE.md)を読んでください。
+
 ## 開発を始めるとき
 
 1. [開発ワークフロー](docs/development/WORKFLOW.md)を読み、Issue（存在する場合）・branch・既存差分を確認してください。
