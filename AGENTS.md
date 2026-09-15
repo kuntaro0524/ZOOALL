@@ -6,9 +6,9 @@
 - [README](README.md)
 - [共通ワークフロー](docs/development/WORKFLOW.md)：作業状態、変更規模、中断・再開・終了の規則の正本。
 - [環境と設定](docs/development/ENVIRONMENTS.md)：端末の役割と実機検証の制約。
-- 対応するIssue（存在する場合）、対象branchのhandover、関連する[設計判断](docs/development/decision_log.md)。
+- zoo-hubのwork-item registryと対応するwork-item file、対象branchのhandover、関連する[設計判断](docs/development/decision_log.md)。Issueは任意で、存在する場合だけ確認する。
 
-作業開始時には、上記に加えて現在のbranch、対応するhandover、関連architecture文書、
+作業開始時には、上記に加えて現在のbranch、対応するwork-itemとhandover、関連architecture文書、
 関連decision log、`git status`、`git log`を確認する。特に現在の作業branchに
 未commit差分がある場合は、差分の所有者と対象範囲を確認してから作業する。
 AI間の引き継ぎでは、handoverをcheckpoint時点の事実と次の一手の入口として使い、

@@ -14,6 +14,10 @@ git@github.com:kuntaro0524/zoo-hub.git
 
 その後、このrepositoryの`START_HERE.md`、`AGENTS.md`、handover、workflow、関連architecture文書を読み、branch・status・HEADと現在地点を復元します。
 
+複数repositoryを横断する作業状態は、zoo-hub（`git@github.com:kuntaro0524/zoo-hub.git`）の
+work-item registryと対応するwork-item fileを先に確認します。ZOO固有のhandoverはcheckpoint
+時点の事実を補足します。Issueは任意であり、作業状態の必須正本ではありません。
+
 ## 最初に読む文書
 
 1. [README.md](README.md)：repositoryの概要
@@ -34,7 +38,8 @@ git@github.com:kuntaro0524/zoo-hub.git
 | configuration architecture | [docs/architecture/configuration.md](docs/architecture/configuration.md) |
 | hardware verification手順 | [docs/operations/phase1-hardware-verification-checklist.md](docs/operations/phase1-hardware-verification-checklist.md) |
 | 設計判断 | [docs/development/decision_log.md](docs/development/decision_log.md) |
-| 現在進行中の作業・未完了事項・次の一手 | current branchのhandover（[handoffs/](handoffs/)） |
+| ZOO固有のcheckpoint・未確認事項・再実行上の注意 | current branchのhandover（[handoffs/](handoffs/)） |
+| 全repositoryのwork一覧・作業scope・branch/HEAD・exact next action | zoo-hubの`docs/work-items/registry.md`と対応するwork-item file |
 | handoverの書式 | [handoffs/TEMPLATE.md](handoffs/TEMPLATE.md) |
 
 `docs/decisions/`はこのrepositoryには存在しません。設計判断の正本は
@@ -54,8 +59,9 @@ git@github.com:kuntaro0524/zoo-hub.git
 
 > 過去の作業状態を記憶や推測から復元しない。Git、handover、管理文書、実コードを確認する。
 
-Issueは必須ではありません。Issueがある場合は目的・受入条件・共有課題を確認し、
-Issueがない場合もbranch、commit、handover、関連文書から再開してください。
+Issueは必須ではありません。Issueがある場合は目的・受入条件・共有課題を確認しますが、
+作業状態の正本はzoo-hubのwork-item、Git、ZOO固有handover、関連文書です。Issueがない
+場合も同じ情報から再開してください。
 
 ## 作業時の注意
 

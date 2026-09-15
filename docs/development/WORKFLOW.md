@@ -2,10 +2,11 @@
 
 ## 基本原則と正本
 
-各端末は独立したGit cloneを持つ。コードと共通知識はGitを正本とする。
-Issueは必須ではなく、bug、future task、idea、未着手課題、複数人で共有する課題を
-管理する任意の手段とする。実作業開始後の現在状態は、current branch、branch-specific
-handover、Git commits、関連architecture/decision文書から復元できるようにする。
+各端末は独立したGit cloneを持つ。コードと共通知識はGitを正本とする。複数repositoryに
+またがる作業のidentity・scope・acceptance criteria・branch/HEAD・exact next actionは、
+zoo-hubのwork-item registryと対応するwork-item fileから復元する。ZOO固有のhandoverは
+checkpoint時点の事実と再実行上の注意を記録する。Issueは必須ではなく、bug、future task、
+idea、未着手課題、複数人で共有する課題を管理する任意の手段とする。
 中断は通常運用として扱い、一週間後でも数分で次の操作を特定できる記録を残す。
 
 | 対象 | 役割 |
@@ -13,8 +14,9 @@ handover、Git commits、関連architecture/decision文書から復元できる�
 | Issue（任意） | bug、future task、idea、未着手課題、複数人で共有する課題、受入条件、担当 |
 | Branch | 実際の作業コードと未完成のcheckpoint |
 | PR | 完成した変更をmainに統合するためのレビュー・最終確認 |
+| zoo-hub work-item | 作業identity、scope、受入条件、branch/base/HEAD、完了・未完了、次の一手 |
 | decision log | 設計・仕様を選んだ理由と代替案。進捗は書かない |
-| handover | 特定checkpoint時点の事実、未確認事項、次の一手、再実行上の注意 |
+| handover | repository固有の特定checkpoint時点の事実、未確認事項、次の一手、再実行上の注意 |
 
 新しいADR制度は作らない。Issueのopen/closedや中断状態を別の表・文書・Projectへ手入力で複製しない。
 
@@ -33,8 +35,8 @@ handover、Git commits、関連architecture/decision文書から復元できる�
 
 1. `git status --short --branch`、`git branch -vv`、`git rev-parse HEAD`でrepositoryの
    更新状態、current branch、upstream、HEADを確認する。
-2. 対応するIssueがあれば目的、受入条件、担当、関連する中断情報を読む。Issueがなくても
-   作業開始を妨げない。
+2. zoo-hubのregistryから対応するwork-itemを確認し、目的、scope、受入条件、tests、
+   branch/base/HEAD、exact next actionを読む。Issueは存在する場合だけ補助的に読む。
 3. branch-specific handoverを作成または確認し、README、本文書、ENVIRONMENTS、
    relevant architecture/decision文書、AIの場合はAGENTSも読む。
 4. 必要ならmainからwork branchを作る。既存の作業branchを無用に改名しない。
@@ -43,8 +45,9 @@ handover、Git commits、関連architecture/decision文書から復元できる�
 
 既存差分があれば内容と由来を確認し、勝手にstash・削除・commitしない。運転用cloneでは稼働中にcheckout・pull・mergeしない。開始時の自動pullは導入しない。
 
-Issueを作成しない作業では、Issue参照を作らず、branch、commit、handover、関連文書で
-目的と状態を復元可能にする。Issueへ接続できない場合もIssue番号を捏造しない。
+work-itemを作成しないlegacy作業では、branch、commit、handover、関連文書で目的と状態を
+復元可能にする。Issueへ接続できない場合もIssue番号を捏造しない。新しい横断作業では、
+実装前にzoo-hubへwork-itemを登録する。
 
 ## STOP / 中断
 
@@ -60,8 +63,10 @@ handoverには独立した完了状態を作らず、checkpoint時点の事実�
 3. [テンプレート](../../handoffs/TEMPLATE.md)からbranch-specific handoverを作成・更新する。
    コードcommit、使用環境、実行したtest、未確認事項、次のactionを記録する。
 4. 必要に応じてcheckpoint commitを作成する。handoverのcommitはコードcommitと分けてもよい。
-5. push可能ならbranchをpushする。Issueがある場合はbranchとhandoverを関連付ける。
-   Issueがない場合も、branchとGit上のhandoverから再開できる状態を残す。
+5. work-itemがある場合はCurrent HEAD、Remaining、Known issues、Exact next action、
+   Statusを更新する。branch-specific handoverにもcheckpoint事実を記録する。
+6. push可能ならbranchをpushする。Issueがある場合はbranchとhandoverを関連付ける。
+   Issueがない場合も、work-item、branch、Git上のhandoverから再開できる状態を残す。
 
 実施できるtestがない場合も、未実行理由をhandoverに記録する。実機・DB・外部API操作を
 行った場合は、成否・現在状態・設定・復旧上の注意を記録する。
@@ -70,12 +75,14 @@ push失敗時は「ローカル保存済み・共有未完了」とする。Issu
 
 ## 再開
 
-1. Issueがある場合はIssueから、ない場合はcurrent branchとhandoverから再開先を特定する。
-   mainの`handoffs/`だけを探して中断作業の有無を判断しない。
+1. zoo-hubのwork-item registryからWork IDと再開対象を特定する。work-itemがないlegacy作業は
+   current branchとhandoverから再開先を特定する。mainの`handoffs/`だけを探して中断作業の
+   有無を判断しない。Issueは補助情報であり、必須ではない。
 2. 手元の差分と運転状況を確認後、remoteの対象branchを取得し、そのbranchで作業する。古いローカルbranchを無条件に上書きしない。
 3. handoffのコードcommit、取得したHEAD、設定・検証環境を照合する。handoffの後に変更があれば、その差分を先に確認する。
 4. 装置・試料・測定・DBの現在状態を現場の手順で確認する。中断時の状態を現在も同じと仮定しない。
-5. Issueがある場合は担当と`paused`を確認し、handoverの「次に最初にやること」から始める。
+5. work-itemのStatusとExact next actionを確認し、handoverのcheckpoint事実と矛盾しない
+   場合だけ最初の操作を行う。Issueがある場合は担当・共有課題も確認する。
 
 測定・DB更新などを繰り返す前に、前回操作の成否と二重実行の影響を確認する。コードを再開するために装置の初期化からやり直す必要があるとは限らない。
 
@@ -87,7 +94,7 @@ push失敗時は「ローカル保存済み・共有未完了」とする。Issu
 | paused | 実装途中、実機試験待ち、後日継続など。上記の中断手順を実施する |
 | no meaningful change | 引き継ぐ成果がなければ日報や空commitは不要。既存差分や未pushを消さず、その存在を報告する |
 
-FINISHでは、tests、documentation、handover最終更新、PR/review、merge後の
+FINISHでは、tests、documentation、work-itemとhandoverの最終更新、PR/review、merge後の
 branch/handover整理を確認する。Issueがある場合のみ、その受入条件とopen/closedを
 更新する。実装終了とIssue完了は同義ではない。実機試験が受入条件なら、実装済みでも
 試験待ちは未完了として扱う。
@@ -133,12 +140,12 @@ hotfixでも実機影響と未確認事項をhandoverに残す。通常の修正
 
 ## 補助スクリプトの仕様（未実装）
 
-`scripts/start_work.sh`はbranch・HEAD・差分・upstream・未push、現在branchのhandover、
-Issueがあればそこから得た中断作業、必読文書を表示する。Issueがない場合も「Issueなし」
-として継続できる。自動pull・checkout・装置接続はしない。
+`scripts/start_work.sh`はbranch・HEAD・差分・upstream・未push、work-item registryで
+特定した作業、現在branchのhandover、Issueがあればそこから得た補助情報、必読文書を表示する。
+work-itemやIssueがないlegacy作業も「未登録」として継続できる。自動pull・checkout・装置接続はしない。
 
 `scripts/finish_work.sh`は上記3区分を選択し、STOP/FINISH時のhandover作成・更新を支援する。
-branch、コードcommit、host、タイムゾーン付き日時を自動取得し、Issue参照は任意とする。
+branch、コードcommit、host、タイムゾーン付き日時を自動取得し、work-item更新とIssue参照は任意とする。
 人間の入力は事実・未確認・次の一手・注意に絞る。commit・pushの前に対象差分を表示し、
 一括`git add .`を前提としない。
 

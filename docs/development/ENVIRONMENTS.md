@@ -2,7 +2,9 @@
 
 ## 環境の役割
 
-各端末は独立cloneを使用する。端末間のコード共有はcommit・push・取得で行う。作業状態と再開先はIssueから確認する。
+各端末は独立cloneを使用する。端末間のコード共有はcommit・push・取得で行う。複数repositoryに
+またがる作業状態と再開先は、zoo-hubのwork-item registryと対応するwork-item fileから確認する。
+ZOO固有のcheckpointはhandoverとGitから確認する。Issueは任意の補助情報であり、必須の正本ではない。
 
 | 環境ID（予定） | OS | 役割 | 検証上の扱い |
 | --- | --- | --- | --- |
@@ -42,7 +44,9 @@ BL32XUでの合格をBL45XUでの合格とは扱わない。Macでの検証も�
 
 ## 2026-09-10の調査記録
 
-この節はローカルcloneを調査した時点の事実であり、現在の作業状態や課題の進捗表ではない。対応作業の状態はIssueで管理する。
+この節はローカルcloneを調査した時点の事実であり、現在の作業状態や課題の進捗表ではない。
+対応作業の状態はzoo-hubのwork-item、対象branch/commit、ZOO固有handoverから確認する。
+Issueは任意の課題共有手段であり、作業状態の必須正本ではない。
 
 - HEADは`7ebd3bd`、branchは`main`。originは`git@github.com:kuntaro0524/ZOOALL.git`。mainのupstream設定は確認できなかった。
 - 開始時点で` shell_scripts/BSS_startup.sh`に差分があった。由来を確定せず、編集・取り消し・commitしていない。

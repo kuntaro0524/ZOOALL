@@ -1,6 +1,9 @@
 # Decision log
 
-長期的に残す設計・仕様の選択理由を記録する。作業進捗、open/closed、中断状態はIssueで管理する。新しいADR制度は導入しない。
+長期的に残す設計・仕様の選択理由を記録する。作業進捗、open/closed、中断状態は、現在は
+zoo-hubのwork-item systemで管理する。Issueは任意の補助的な課題共有手段である。新しい
+ADR制度は導入しない。以下の過去項目にあるIssue中心の記述はhistorical decisionとして保持し、
+後続のwork-item decisionが現在の運用を置き換える。
 
 追加時は日付、判断、背景・理由、検討した代替案、影響、関連Issue/PRを短く記す。判断を変更する場合は新しい項目から以前の項目を参照し、過去の理由を消さない。
 
@@ -156,3 +159,21 @@ Phase 1由来の新規regressionは0件である。hardware verificationは未�
 **影響:** closureではmodule/test対応表、base/current evidence、低リスク順のhardware
 verification plan、rollbackとcommit traceabilityだけを文書化する。実機接続やcommand送信、
 CoaxImage移行、Phase 2のconfig object共有は行わない。main/developへのmergeは行わない。
+
+## 2026-09-15：zoo-hub work-item systemを現在の作業状態索引とする
+
+**判断:** ZOOおよび関連repositoryをまたぐ独立作業は、zoo-hubの
+`docs/work-items/registry.md`で一覧化し、各work-item fileを作業identity、scope、受入条件、
+tests、repository、branch、base、HEAD、完了・未完了事項、exact next actionの記録とする。
+Issueはoptionalであり、conversationやAI sessionは正本ではない。
+
+ZOO内では、work-itemが横断的な現在作業の索引・状態を持ち、branch-specific handoverは
+repository固有のcheckpoint事実・未確認事項・再実行上の注意を補足する。両者と実際のGit状態を
+再開時に照合する。
+
+**理由:** 旧来のIssue中心運用や単一handoverだけでは、複数workを独立に中断・再開する際の
+repository、branch、HEAD、次の一手を一意に探せない。zoo-hubのwork-itemを正本にすることで、
+古いIssue/handover記録を削除せずに、現在の読者が採用すべき運用を明確にする。
+
+**影響:** 既存のIssue中心の記述はhistorical decisionとして残す。新しい作業は、可能な限り
+zoo-hubでwork-itemを作成してから開始する。既存handoverは削除せず、work-itemから参照する。

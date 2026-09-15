@@ -1,5 +1,10 @@
 # Handoff: Phase 1 ZooConfig loader
 
+> **Historical checkpoint notice:** この文書はPhase 1の特定checkpointにおけるZOO固有の
+> 事実・検証記録です。現在の横断的な作業状態、Status、Current HEAD、Exact next actionの
+> 正本は、zoo-hubの`docs/work-items/registry.md`および`ZOO-001.md`と、実際のGit状態です。
+> 以下のcheckpoint情報は削除せず保持しますが、再開時に現在のGitと照合してください。
+
 - Issue: 未設定
 - Branch: `codex/phase1-zooconfig-loader`
 - 最新コードcommit: `346d40b8a277f01096572feb12532c965b50aebb` (DiffscanMaster restoration)
@@ -617,7 +622,7 @@ current hardware state; reverting Git alone does not undo hardware state.
   connection/local close without BSS commands); full hardware-dependent verification DEFERRED.
 - **Phase 2:** decide and test the CoaxImage config identity/ownership boundary.
 
-## Current next action
+## Checkpoint-time next action (historical)
 
 This documentation update ends after reviewing the two-document diff and git
 status, committing only those documents, and pushing
