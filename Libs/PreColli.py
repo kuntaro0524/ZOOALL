@@ -11,7 +11,7 @@ from Received import *
 from Motor import *
 import BSSconfig
 from ZooMyException import *
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 # BL44XU specific beam defining aperture before the 2nd collimator
 class PreColli:
@@ -20,8 +20,7 @@ class PreColli:
         self.bl_object = self.bssconf.getBLobject()
 
         # beamline.ini 
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        self.config = ZooConfig.load_config()
 
         self.s = server
         # names of collimator axes

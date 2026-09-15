@@ -11,7 +11,7 @@ from Motor import *
 import BSSconfig
 import datetime
 import Zoo
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 # This is very special code for BL44XU
 
@@ -22,8 +22,7 @@ class Gonio44:
         self.debug = False
 
         # beamline name is extracted from beamline.ini
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        self.config = ZooConfig.load_config()
         # section: beamline, option: beamline
         self.beamline = self.config.get("beamline", "beamline")
 

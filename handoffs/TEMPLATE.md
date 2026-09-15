@@ -5,7 +5,7 @@
 未確認は「未確認」、該当しない項目は「該当なし」と明記する。
 スクリプトは未実装のため、メタデータも現時点では手動で記録する。 -->
 
-- Issue: <番号とURL。未設定なら明記し、接続回復後に対応づける>
+- Issue: <番号とURL。任意。未作成なら「なし」>
 - Branch: <branch名>
 - コードcommit: <実装・検証対象の完全なhash。handoff自身のhashではない>
 - 記録者: <人・AIと引き継ぎ担当の識別情報>
@@ -45,7 +45,7 @@
 - 使用設定・ログ: <所在、識別情報、別端末・担当からの参照方法>
 - 復旧・切戻し上の注意: <コードを戻すだけでは復元できない状態等>
 
-<!-- 記入後：handoffをcommitしbranchをpush。remote反映を確認し、
-Issueの再開先リンクをhandoffを含むcommitに固定して更新する。
+<!-- 記入後：handoverをcommitし、可能ならbranchをpushする。
+Issueがある場合は再開先リンクをhandoverを含むcommitに固定して更新する。
 pushやIssue更新の失敗は共有未完了として報告する。
 詳細は ../docs/development/WORKFLOW.md を参照。 -->

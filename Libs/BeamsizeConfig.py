@@ -3,15 +3,13 @@ import sys, os
 import socket
 import numpy as np
 from scipy import interpolate
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 class BeamsizeConfig:
     def __init__(self):
         # configure file : "beamline.ini" を読む
         # section 'dirs'  bssconfig_dir
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        self.config.read(config_path)
+        self.config = ZooConfig.load_config()
 
         self.beamsize = []
         self.tcs_width = []

@@ -5,9 +5,9 @@ import re
 import logging
 import logging.config
 
-from configparser import ConfigParser, ExtendedInterpolation
 import requests
 import pandas as pd
+import ZooConfig
 
 # Version 2.0.0 2019/07/04 K.Hirata
 # Version 2.1.0 2023/05/29 K.Hirata
@@ -25,8 +25,7 @@ class ESA:
         self.logger = logging.getLogger('ZOO').getChild("ESA")
 
         # beamline.ini
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        self.config = ZooConfig.load_config()
 
     # For existing data base file
     def prepReadDB(self):
@@ -701,4 +700,3 @@ if __name__ == "__main__":
     #     print(("zoomcap_flag=", p['zoomcap_flag']))
     #     print(("warm_time=", p['warm_time']))
     #     print(("wavelength=", p['wavelength'], type(p['wavelength'])))
-

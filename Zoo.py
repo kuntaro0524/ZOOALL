@@ -1,11 +1,11 @@
-import os, sys, glob
+import sys, glob
 import time, datetime
 import numpy as np
 import socket
 from ZooMyException import *
 import logging
 import logging.config
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 # 150722 AM4:00
 # Debug: when SPACE has some troubles Zoo stops immediately
@@ -13,9 +13,7 @@ from configparser import ConfigParser, ExtendedInterpolation
 class Zoo:
     def __init__(self, emulator=True):
         # Get information from beamline.ini file.
-        config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path="%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        config.read(config_path)
+        config = ZooConfig.load_config()
 
         self.bss_srv=config.get("server", "bss_server")
         self.bss_port=config.getint("server", "bss_port")
@@ -604,10 +602,9 @@ class Zoo:
 if __name__ == "__main__":
     # Logging setting
     # open configure file
-    config = ConfigParser(interpolation=ExtendedInterpolation())
-    config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+    config_path = ZooConfig.get_config_path()
     print(config_path)
-    config.read(config_path)
+    config = ZooConfig.load_config()
     # logging_conf_file = config.get("files", "logging_conf")
     # logname = os.path.join(config.get("dirs","zoologdir"), "Zoo.log")
      

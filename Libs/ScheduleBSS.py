@@ -1,7 +1,7 @@
 from GonioVec import *
 import os
-from configparser import ConfigParser, ExtendedInterpolation
 import ECHA.ZooContext as ZooContext
+import ZooConfig
 
 # 2013/10/11 K.Hirata
 # MX225HS readout mode is different from MX225HE
@@ -55,8 +55,7 @@ class ScheduleBSS:
         self.isReadBeamSize = False
         self.transmission = 1.0
         # Read configure file
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read("%s/beamline.ini" % os.environ['ZOOCONFIGPATH'])
+        self.config = ZooConfig.load_config()
         self.beamline = self.config.get("beamline", "beamline")
         # is ECHA database is used? True or False
         self.isECHA = self.config.get("ECHA", "isECHA")

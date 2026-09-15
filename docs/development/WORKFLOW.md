@@ -2,15 +2,21 @@
 
 ## 基本原則と正本
 
-各端末は独立したGit cloneを持つ。コードと開発知識はGit、作業状態はGitHub Issueを正本とする。中断は通常運用として扱い、一週間後でも数分で次の操作を特定できる記録を残す。
+各端末は独立したGit cloneを持つ。コードと共通知識はGitを正本とする。複数repositoryに
+またがる作業のidentity・scope・acceptance criteria・branch/HEAD・exact next actionは、
+zoo-hubのwork-item registryと対応するwork-item fileから復元する。ZOO固有のhandoverは
+checkpoint時点の事実と再実行上の注意を記録する。Issueは必須ではなく、bug、future task、
+idea、未着手課題、複数人で共有する課題を管理する任意の手段とする。
+中断は通常運用として扱い、一週間後でも数分で次の操作を特定できる記録を残す。
 
 | 対象 | 役割 |
 | --- | --- |
-| Issue | これから行う作業、バグ、改善、受入条件、担当、現在の作業状態 |
+| Issue（任意） | bug、future task、idea、未着手課題、複数人で共有する課題、受入条件、担当 |
 | Branch | 実際の作業コードと未完成のcheckpoint |
 | PR | 完成した変更をmainに統合するためのレビュー・最終確認 |
+| zoo-hub work-item | 作業identity、scope、受入条件、branch/base/HEAD、完了・未完了、次の一手 |
 | decision log | 設計・仕様を選んだ理由と代替案。進捗は書かない |
-| handoff | 特定checkpoint時点の事実、未確認事項、次の一手、再実行上の注意 |
+| handover | repository固有の特定checkpoint時点の事実、未確認事項、次の一手、再実行上の注意 |
 
 新しいADR制度は作らない。Issueのopen/closedや中断状態を別の表・文書・Projectへ手入力で複製しない。
 
@@ -19,51 +25,68 @@
 | 変更 | 記録と検証 |
 | --- | --- |
 | 小さくその場で完了 | 短いIssue、branch、短いPR、影響に応じた検証 |
-| 複数モジュール | Issueに受入条件と影響範囲。引き継ぎ時だけhandoff |
-| 装置・DB・Web等を横断 | 必要に応じ親子Issueと段階的PR。環境別検証、復旧・切戻し方法 |
-| 規模を問わず中断 | checkpointのpushとhandoff |
+| 複数モジュール | Issueがあれば受入条件と影響範囲を記録。引き継ぎ時はhandover |
+| 装置・DB・Web等を横断 | 必要に応じIssueと段階的PR。環境別検証、復旧・切戻し方法 |
+| 規模を問わず中断 | checkpointのpushとhandover |
 
 1ファイルでも装置制御・DB更新に影響する場合は検証を厚くする。全変更に設計書・decision log・日報を要求しない。長期的に理由を残す必要がある判断だけdecision logへ書く。
 
-## 作業開始
+## START
 
-1. `git status --short --branch`、`git branch -vv`、`git rev-parse HEAD`でbranch・差分・upstream・HEADを確認する。
-2. 対象Issueの目的、受入条件、担当、中断情報を読む。新規作業は短いIssueを作成し、作業branchと対応づける。
-3. README、本文書、ENVIRONMENTSと対象handoffを読む。AIはAGENTSも読む。
-4. 新規実装はmainから作業branchを作る。命名は`work/123-short-topic`を基本とし、既存の作業branchを無用に改名しない。
-5. 別端末・別担当が同じbranchへ同時に書き込まないよう、Issue上で引き継ぎ先を明確にする。同時作業は別branchに分ける。
+1. `git status --short --branch`、`git branch -vv`、`git rev-parse HEAD`でrepositoryの
+   更新状態、current branch、upstream、HEADを確認する。
+2. zoo-hubのregistryから対応するwork-itemを確認し、目的、scope、受入条件、tests、
+   branch/base/HEAD、exact next actionを読む。Issueは存在する場合だけ補助的に読む。
+3. branch-specific handoverを作成または確認し、README、本文書、ENVIRONMENTS、
+   relevant architecture/decision文書、AIの場合はAGENTSも読む。
+4. 必要ならmainからwork branchを作る。既存の作業branchを無用に改名しない。
+5. baseline testを確認し、実行可能な範囲で実行する。別端末・別担当が同じbranchへ
+   同時に書き込まない。
 
 既存差分があれば内容と由来を確認し、勝手にstash・削除・commitしない。運転用cloneでは稼働中にcheckout・pull・mergeしない。開始時の自動pullは導入しない。
 
-Issueへ接続できない緊急の継続作業ではローカル保存を優先する。Issue番号を捏造せず、handoffに「Issue参照未設定」と記録し、接続回復後に対応づける。これは共有未完了であり、通常の別端末引き継ぎ完了とは扱わない。
+work-itemを作成しないlegacy作業では、branch、commit、handover、関連文書で目的と状態を
+復元可能にする。Issueへ接続できない場合もIssue番号を捏造しない。新しい横断作業では、
+実装前にzoo-hubへwork-itemを登録する。
 
-## PAUSED / 中断
+## STOP / 中断
 
-Issueはopenのまま`paused`ラベルを付ける。再開時に外す。ラベルの導入・GitHub更新がまだできない場合はIssue本文の一か所を暫定の中断表示とし、ラベル導入時に二重表示を解消する。
+測定対応、時間切れ、別作業などで中断する場合は、作業を数日から数週間後に復元
+できる状態にする。Issueがある場合は必要に応じて`paused`を付け、再開時に外す。
 
-handoffには独立した状態フィールドや完了チェックリストを作らない。「完了したこと」はcheckpoint時点の事実であり、Issueの完了状態ではない。
+handoverには独立した完了状態を作らず、checkpoint時点の事実として記録する。
 
 中断手順：
 
 1. 実機・測定・DB処理を現場の手順に従って中断可能な状態にする。終了を確認できない操作は不明と記録する。
 2. 差分を確認し、対象ファイルを明示して未完成コードをcommitする。無関係な変更・実データ・認証情報を含めない。未完成commitをmainに直接統合しない。
-3. [テンプレート](../../handoffs/TEMPLATE.md)から`handoffs/issue-123-short-topic.md`を作成・更新する。コードcommitを記録し、handoffを別commitで保存する。コード変更がない場合は検証・調査対象の既存commitを参照する。
-4. branchをpushし、handoffを含むcommitがremote branchへ反映されたことを確認する。
-5. Issueにbranchとhandoffへのリンクを置き、`paused`にする。handoffリンクはpushしたcommitに固定し、次のcheckpointで置き換える。進捗本文をIssueへ転載しない。
+3. [テンプレート](../../handoffs/TEMPLATE.md)からbranch-specific handoverを作成・更新する。
+   コードcommit、使用環境、実行したtest、未確認事項、次のactionを記録する。
+4. 必要に応じてcheckpoint commitを作成する。handoverのcommitはコードcommitと分けてもよい。
+5. work-itemがある場合はCurrent HEAD、Remaining、Known issues、Exact next action、
+   Statusを更新する。branch-specific handoverにもcheckpoint事実を記録する。
+6. push可能ならbranchをpushする。Issueがある場合はbranchとhandoverを関連付ける。
+   Issueがない場合も、work-item、branch、Git上のhandoverから再開できる状態を残す。
+
+実施できるtestがない場合も、未実行理由をhandoverに記録する。実機・DB・外部API操作を
+行った場合は、成否・現在状態・設定・復旧上の注意を記録する。
 
 push失敗時は「ローカル保存済み・共有未完了」とする。Issue更新だけ失敗した場合も「push済み・再開先の案内未更新」と区別する。どちらも引き継ぎ完了と報告しない。装置の中断をGit操作の成功待ちにしない。
 
 ## 再開
 
-1. Issueからbranchとhandoffを特定する。mainの`handoffs/`だけを探して中断作業の有無を判断しない。
+1. zoo-hubのwork-item registryからWork IDと再開対象を特定する。work-itemがないlegacy作業は
+   current branchとhandoverから再開先を特定する。mainの`handoffs/`だけを探して中断作業の
+   有無を判断しない。Issueは補助情報であり、必須ではない。
 2. 手元の差分と運転状況を確認後、remoteの対象branchを取得し、そのbranchで作業する。古いローカルbranchを無条件に上書きしない。
 3. handoffのコードcommit、取得したHEAD、設定・検証環境を照合する。handoffの後に変更があれば、その差分を先に確認する。
 4. 装置・試料・測定・DBの現在状態を現場の手順で確認する。中断時の状態を現在も同じと仮定しない。
-5. Issueの担当を確認して`paused`を外し、handoffの「次に最初にやること」から始める。
+5. work-itemのStatusとExact next actionを確認し、handoverのcheckpoint事実と矛盾しない
+   場合だけ最初の操作を行う。Issueがある場合は担当・共有課題も確認する。
 
 測定・DB更新などを繰り返す前に、前回操作の成否と二重実行の影響を確認する。コードを再開するために装置の初期化からやり直す必要があるとは限らない。
 
-## 作業終了
+## FINISH
 
 | 区分 | 扱い |
 | --- | --- |
@@ -71,17 +94,60 @@ push失敗時は「ローカル保存済み・共有未完了」とする。Issu
 | paused | 実装途中、実機試験待ち、後日継続など。上記の中断手順を実施する |
 | no meaningful change | 引き継ぐ成果がなければ日報や空commitは不要。既存差分や未pushを消さず、その存在を報告する |
 
-実装終了とIssue完了は同義ではない。実機試験が受入条件なら、実装済みでも試験待ちはopenのまま。調査のみでも次回に必要な結論が得られたらIssueまたはhandoffへ残す。
+FINISHでは、tests、documentation、work-itemとhandoverの最終更新、PR/review、merge後の
+branch/handover整理を確認する。Issueがある場合のみ、その受入条件とopen/closedを
+更新する。実装終了とIssue完了は同義ではない。実機試験が受入条件なら、実装済みでも
+試験待ちは未完了として扱う。
 
 PRは関連Issue、変更理由、検証環境・対象commit・結果、未確認事項を含める。段階的PRではIssue全体の受入条件が満たされる前に自動closeしない。実機影響がある変更には切戻し方法と、コードを戻すだけでは復元できないDB・測定状態も記載する。
 
-handoffは対応branch上で更新する。統合時に不要になったhandoffは削除し、履歴から参照可能にする。未確認事項が残る場合は先にIssueへ引き継ぐ。`open/`・`archive/`による作業状態管理は導入しない。
+handoverは対応branch上で更新する。統合時に不要になったhandoverは削除し、履歴から
+参照可能にする。未確認事項が残る場合はhandoverまたはIssueへ引き継ぐ。
+`open/`・`archive/`による作業状態管理は導入しない。
+
+## 実運用中のproduction code
+
+測定中にrunning production codeを直接変更しない。問題を発見した場合は、通常は記録して
+測定を継続し、別branchで修正する。運転中のcloneでcheckout・pull・mergeや実行コードの
+変更を行わない。
+
+## Emergency hotfix
+
+緊急修正が不可避な場合は、最低限以下を記録する。
+
+- hotfix branch
+- 修正前commit
+- 修正内容
+- 実行したtest
+- 使用したbeamline/runtime config
+- rollback方法
+- 測定再開時に使用したcommit
+
+hotfixでも実機影響と未確認事項をhandoverに残す。通常の修正branchへ後から混ぜる場合は
+別PRまたは明示的なreview対象として扱う。
+
+## Software/runtime traceability
+
+測定・解析結果を後から追跡できるよう、可能な範囲で以下を記録する。
+
+- ZOO commit
+- 使用した関連repoのcommit
+- Python/runtime
+- beamline
+- 使用したruntime configの識別情報
+
+具体的なファイル形式や`software_versions.json`の導入は未決定とする。
 
 ## 補助スクリプトの仕様（未実装）
 
-`scripts/start_work.sh`はbranch・HEAD・差分・upstream・未push、現在branchのhandoff、Issueから得た中断作業、必読文書を表示する。接続できない場合は「Issue状態未確認」とする。自動pull・checkout・装置接続はしない。
+`scripts/start_work.sh`はbranch・HEAD・差分・upstream・未push、work-item registryで
+特定した作業、現在branchのhandover、Issueがあればそこから得た補助情報、必読文書を表示する。
+work-itemやIssueがないlegacy作業も「未登録」として継続できる。自動pull・checkout・装置接続はしない。
 
-`scripts/finish_work.sh`は上記3区分を選択し、paused時のhandoff作成・更新を支援する。branch、コードcommit、host、タイムゾーン付き日時を自動取得し、Issue参照は初回指定後に引き継ぐ。人間の入力は事実・未確認・次の一手・注意に絞る。commit・pushの前に対象差分を表示し、一括`git add .`を前提としない。
+`scripts/finish_work.sh`は上記3区分を選択し、STOP/FINISH時のhandover作成・更新を支援する。
+branch、コードcommit、host、タイムゾーン付き日時を自動取得し、work-item更新とIssue参照は任意とする。
+人間の入力は事実・未確認・次の一手・注意に絞る。commit・pushの前に対象差分を表示し、
+一括`git add .`を前提としない。
 
 両スクリプトはZOOのPython環境や装置接続を必要としない構成とし、MacとUbuntuで確認する。Issueの取得・更新手段、認証、接続失敗時の表示は実装段階で決める。
 
