@@ -34,6 +34,19 @@ def test_get_config_path_uses_zooconfigpath(tmp_path, monkeypatch):
     assert ZooConfig.get_config_path() == str(tmp_path / "beamline.ini")
 
 
+def test_empty_zooconfigpath_keeps_legacy_absolute_path(monkeypatch):
+    monkeypatch.setenv("ZOOCONFIGPATH", "")
+    read_paths = []
+    monkeypatch.setattr(
+        configparser.ConfigParser, "read",
+        lambda self, path: read_paths.append(path) or [],
+    )
+
+    assert ZooConfig.get_config_path() == "/beamline.ini"
+    ZooConfig.load_config()
+    assert read_paths == ["/beamline.ini"]
+
+
 def test_load_config_reads_beamline_ini_and_expands_interpolation(
     tmp_path, monkeypatch
 ):

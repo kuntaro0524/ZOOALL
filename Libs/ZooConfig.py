@@ -16,7 +16,8 @@ def get_config_path():
     the existing ``KeyError`` behavior when ``ZOOCONFIGPATH`` is unset.
     """
 
-    return os.path.join(os.environ["ZOOCONFIGPATH"], "beamline.ini")
+    # Preserve the legacy absolute path even when ZOOCONFIGPATH is empty.
+    return "%s/beamline.ini" % os.environ["ZOOCONFIGPATH"]
 
 
 def load_config():

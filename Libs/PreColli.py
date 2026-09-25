@@ -152,11 +152,8 @@ class PreColli:
 
 
 if __name__ == "__main__":
-    import configparser
     # read IP address for BSS connection from beamline.config 
-    config = ConfigParser(interpolation=ExtendedInterpolation())
-    config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-    config.read(config_path)
+    config = ZooConfig.load_config()
     # host = config.get("server", "bss_server")
     host = config.get("server", "blanc_address")
     port = 10101

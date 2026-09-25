@@ -73,9 +73,7 @@ if __name__ == "__main__":
     blf.initDevice()
 
     # read configure file(beamline.init)
-    config = ConfigParser(interpolation=ExtendedInterpolation())
-    ini_file = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-    config.read(ini_file)
+    config = ZooConfig.load_config()
     zooroot = config.get('dirs', 'zooroot')
 
     dev = blf.device
