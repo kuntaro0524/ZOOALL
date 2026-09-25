@@ -3,18 +3,14 @@ import Device
 import socket
 import Gonio44
 import Gonio
-import os
 import BSSconfig
-
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 class BLFactory:
     def __init__(self):
         # 'beamline.ini' を ConfigParser で読み込む
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        print(config_path)
-        self.config.read(config_path)
+        print(ZooConfig.get_config_path())
+        self.config = ZooConfig.load_config()
 
         # configureファイルから beamline を取得
         self.beamline = self.config.get("beamline", "beamline")
@@ -67,4 +63,3 @@ if __name__=="__main__":
     #import time
     #blf.gonio.rotatePhi(225.0)
     #gonio.moveXYZmm(1.25525, 3.2166, -1.00825)
-

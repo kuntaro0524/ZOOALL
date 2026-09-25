@@ -1,7 +1,7 @@
 import os
-from configparser import ConfigParser, ExtendedInterpolation
 import BSSconfig  # BSSconfig モジュールをインポート
 import Motor
+import ZooConfig
 
 class BaseAxis:
     # axis_type
@@ -15,8 +15,7 @@ class BaseAxis:
         self.bl_object = self.bssconf.getBLobject()
 
         # beamline.ini を読み込む
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read(f"{os.environ['ZOOCONFIGPATH']}/beamline.ini")
+        self.config = ZooConfig.load_config()
 
         try:
             if axis_type.lower() == "pulse":

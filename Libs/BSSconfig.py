@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from Libs import ZooMyException
-import sys,os
-from configparser import ConfigParser, ExtendedInterpolation
+import sys
+import ZooConfig
 
 class BSSconfig:
     def __init__(self):
@@ -13,9 +13,8 @@ class BSSconfig:
         # BL32XU setting
         # beamline.ini から bssconfig_file のパスを読む
         # section: files, option: bssconfig_file
-        self.inifile_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        self.blini = ConfigParser(interpolation=ExtendedInterpolation())
-        self.blini.read(self.inifile_path)
+        self.inifile_path = ZooConfig.get_config_path()
+        self.blini = ZooConfig.load_config()
         self.confile = self.blini.get("files", "bssconfig_file")
         print(self.confile)
 

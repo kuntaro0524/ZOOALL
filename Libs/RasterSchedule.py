@@ -1,7 +1,6 @@
 import sys, os
-from configparser import ConfigParser, ExtendedInterpolation
-
 import ECHA.ZooContext as ZooContext
+import ZooConfig
 
 # This was coded for PILATUS 3 6M at BL45XU
 # modified for versatile code
@@ -11,10 +10,8 @@ class RasterSchedule:
     def __init__(self):
         # beamline.ini is a configure file.
         # reading config file.
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        print(config_path)
-        self.config.read(config_path)
+        self.config = ZooConfig.load_config()
+        print(ZooConfig.get_config_path())
         self.beamline = self.config.get("beamline", "beamline")
 
         # is ECHA database is used? True or False

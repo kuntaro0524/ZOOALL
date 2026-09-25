@@ -9,7 +9,7 @@ import logging
 import logging.config
 from Libs import File
 import os
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 class CryImageProc():
     def __init__(self, logdir = "./"):
@@ -23,8 +23,7 @@ class CryImageProc():
         self.ymax = 480
 
         # beamlineのなまえ、gonio_direction, pix_size, bin_threshについては beamline.ini から読み込む
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read(os.environ['ZOOCONFIGPATH']+"/beamline.ini")
+        self.config = ZooConfig.load_config()
         self.beamline = self.config.get("beamline", "beamline")
 
         # 最初に上下左右の一定ピクセルを解析から除外する→beamline.iniから読む

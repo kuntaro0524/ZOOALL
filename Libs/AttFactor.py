@@ -5,7 +5,7 @@ import math
 from numpy import *
 from Libs import BSSconfig
 import logging
-from configparser import ConfigParser, ExtendedInterpolation
+import ZooConfig
 
 class AttFactor:
     def __init__(self):
@@ -14,9 +14,7 @@ class AttFactor:
         self.logger = logging.getLogger('ZOO').getChild("AttFactor")
 
         # BSS config path is read from beamline.ini
-        conf_file_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        self.config.read(conf_file_path)
+        self.config = ZooConfig.load_config()
         self.bssconfig_path = self.config.get("files", "bssconfig_file")
 
     def cnFactor(self, wl):

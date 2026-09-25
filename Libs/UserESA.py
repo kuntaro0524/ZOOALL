@@ -16,8 +16,8 @@ import KUMA
 import AttFactor
 # logger の設定
 import logging
-from configparser import ConfigParser, ExtendedInterpolation
 #from dose.fields import get_dose_ds, get_dist_ds
+import ZooConfig
 
 class DoseDistanceHandler:
     def __init__(self, logger, debug: bool = False):
@@ -140,9 +140,7 @@ class DoseDistanceHandler:
 class UserESA():
     def __init__(self, fname=None, root_dir=".", beamline=None):
         # beamlineの名前はconfigから読む
-        self.config = ConfigParser(interpolation=ExtendedInterpolation())
-        config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
-        self.config.read(config_path)
+        self.config = ZooConfig.load_config()
 
         self.fname = fname
         self.isRead = None

@@ -1,11 +1,10 @@
 import sys,math,numpy,os
-from configparser import ConfigParser, ExtendedInterpolation
+from Libs import ZooConfig
 
 # Get information from beamline.ini file.
-config = ConfigParser(interpolation=ExtendedInterpolation())
-config_path = "%s/beamline.ini" % os.environ['ZOOCONFIGPATH']
+config_path = ZooConfig.get_config_path()
 print(config_path)
-config.read(config_path)
+config = ZooConfig.load_config()
 
 zoologdir = config.get("dirs", "zoologdir")
 beamline = config.get("beamline", "beamline")
