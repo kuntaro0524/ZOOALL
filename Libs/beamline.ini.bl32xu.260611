@@ -116,6 +116,7 @@ wait_time_change_energy = 15
 thinnest_att_thick = 100.0
 
 [detector]
+detector_model = EIGER_X_9M
 # カメラ長最短 [mm]
 min_camera_len=125.0
 # カメラの長さ（短て方向） [mm]
