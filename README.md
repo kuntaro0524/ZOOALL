@@ -14,6 +14,10 @@ ZOOの開発・保守作業を開始または再開するときは、まず[STAR
 
 設計を選んだ理由は[decision log](docs/development/decision_log.md)に残します。進捗や完了状態は転載しません。
 
+ZOO・kunpy共通ランタイムを別hostまたはビームラインへ配置する場合は、
+[zpython runtime deployment](docs/operations/zpython-runtime.md)を参照してください。
+ランチャーはGit管理しますが、live `beamline.ini`は自動配置・変更しません。
+
 ## 主な構成
 
 | 場所 | 主な内容 |

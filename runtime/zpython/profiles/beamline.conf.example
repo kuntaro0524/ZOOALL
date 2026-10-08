@@ -1,0 +1,6 @@
+# Copy to profiles/NAME.conf and replace every value for the target host.
+# Do not commit credentials or a live beamline.ini.
+ZOO_BASE_PYTHON=/path/to/dials-or-kamo/python
+KUNPY_ROOT=/path/to/kunpy
+ZOO_ROOT=/path/to/ZOO
+# ZOOCONFIGPATH is intentionally not selected here. Pass --config explicitly.
