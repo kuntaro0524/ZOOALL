@@ -66,7 +66,7 @@ def user(monkeypatch):
             },
             "detector": {
                 "min_camera_len": "100.0",
-                "min_camera_dim": "100.0",
+                "detector_model": "EIGER_X_9M",
             },
         }
     )
@@ -111,6 +111,22 @@ def prepare_for_define_scan_condition(user, rows):
     user.setDefaults()
     user.defineScanCondition()
     return user.df
+
+
+def test_calc_dist_uses_detector_model_active_area(user):
+    expected = user.calcDistFromLength(1.0, 2.0, 233.2)
+    assert user.calcDist(1.0, 2.0, isROI=False) == round(expected, 1)
+
+
+def test_calc_dist_roi_does_not_use_full_detector_size(user):
+    expected = user.calcDistFromLength(1.0, 2.0, 20.0)
+    assert user.calcDist(1.0, 2.0, isROI=True) == max(100.0, round(expected, 1))
+
+
+def test_calc_dist_rejects_unknown_detector_model(user):
+    user.config.set("detector", "detector_model", "EIGER_X_9M_typo")
+    with pytest.raises(ValueError, match="Unknown detector model"):
+        user.calcDist(1.0, 2.0, isROI=False)
 
 
 @pytest.mark.parametrize(

@@ -37,7 +37,6 @@ def bare_useresa(tmp_path, monkeypatch):
                 ("experiment", "resol_raster"): 3.0,
                 ("experiment", "max_hori_scan_speed"): 1000.0,
                 ("detector", "min_camera_len"): 100.0,
-                ("detector", "min_camera_dim"): 100.0,
                 ("experiment", "raster_roi_edge_mm"): 25.0,
             }
             return table[(section, option)]
@@ -52,6 +51,7 @@ def bare_useresa(tmp_path, monkeypatch):
         def get(self, section, option):
             table = {
                 ("beamline", "beamline"): "BL32XU",
+                ("detector", "detector_model"): "EIGER_X_9M",
             }
             return table[(section, option)]
 

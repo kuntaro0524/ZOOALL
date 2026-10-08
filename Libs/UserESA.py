@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 import KUMA
 import AttFactor
+from geometry.detector_specs import get_detector_spec
 # logger の設定
 import logging
 #from dose.fields import get_dose_ds, get_dist_ds
@@ -1138,7 +1139,9 @@ class UserESA():
             self.logger.info(f"ROI is False")
             # wavelength と resolution_limit から camera_len を計算する
             # camera_len が min_camera_len 以下なら min_camera_len を返す
-            min_camera_dim = self.config.getfloat("detector", "min_camera_dim")
+            detector_model = self.config.get("detector", "detector_model")
+            detector_spec = get_detector_spec(detector_model)
+            detector_diameter_mm = min(detector_spec.active_area_mm)
         else:
             self.logger.info(f"ROI is True")
 
@@ -1146,9 +1149,11 @@ class UserESA():
                 roi_edge_mm = self.config.getfloat("experiment", "raster_roi_edge_mm")
         
             # calcDistFromLength() は直径を要求するため、ROI中心から端までの距離を2倍する
-            min_camera_dim = float(roi_edge_mm) * 2.0
+            detector_diameter_mm = float(roi_edge_mm) * 2.0
 
-        camera_len = self.calcDistFromLength(wavelength, resolution_limit, min_camera_dim)
+        camera_len = self.calcDistFromLength(
+            wavelength, resolution_limit, detector_diameter_mm
+        )
         self.logger.info(f"calcuated camera_len: {camera_len}")
 
         # camera_len が　min_camera_len 以下なら min_camera_len を返す

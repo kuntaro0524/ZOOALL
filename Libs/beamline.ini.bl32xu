@@ -95,10 +95,9 @@ pin_channel = 3
 pulse_for_noatt = 3500
 
 [detector]
+detector_model = EIGER_X_9M
 # カメラ長最短 [mm]
 min_camera_len=125.0
-# カメラの長さ（短て方向） [mm]
-min_camera_dim = 233.0
 
 [axes]
 # beam stopper axis
