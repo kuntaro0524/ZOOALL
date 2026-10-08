@@ -35,6 +35,10 @@
   `BL32XU`と`EIGER_X_9M`を読み取れた。
 - profile未指定と`beamline.ini`欠損は、Python開始前にexit status 2で停止した。
 - Git版3ファイルとkuri04配備版の`git diff --no-index`は差分なし。
+- push済みremote branchから`/tmp/zoo005-recovery-check`へ新規detached worktreeを作り、
+  handoffと配置文書だけを入口に`/tmp/zoo005-recovered-runtime`へ再配置できた。
+  その新規配置から検出器pixel数`(3110, 3269)`と
+  `BL32XU EIGER_X_9M`を再度読み取れた。既存checkoutの未commit fileには依存していない。
 - 装置接続、測定、DB/API更新は実施していない。
 
 ## まだ確認していないこと
