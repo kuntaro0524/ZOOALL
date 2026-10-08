@@ -129,6 +129,18 @@ def test_calc_dist_rejects_unknown_detector_model(user):
         user.calcDist(1.0, 2.0, isROI=False)
 
 
+def test_bl32_current_config_uses_detector_model_without_legacy_dimension(user):
+    config_path = Path(__file__).parents[1] / "beamline.ini.bl32xu.261008"
+    cfg = configparser.ConfigParser()
+    assert cfg.read(config_path) == [str(config_path)]
+    assert cfg.get("detector", "detector_model") == "EIGER_X_9M"
+    assert not cfg.has_option("detector", "min_camera_dim")
+
+    user.config = cfg
+    expected = user.calcDistFromLength(1.0, 2.0, 233.2)
+    assert user.calcDist(1.0, 2.0, isROI=False) == round(expected, 1)
+
+
 @pytest.mark.parametrize(
     "dose_list,dist_list,expected_dose,expected_dist",
     [
