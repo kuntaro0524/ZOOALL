@@ -141,6 +141,43 @@ def test_bl32_current_config_uses_detector_model_without_legacy_dimension(user):
     assert user.calcDist(1.0, 2.0, isROI=False) == round(expected, 1)
 
 
+def test_bl32_current_config_flows_through_add_distance(user):
+    config_path = Path(__file__).parents[1] / "beamline.ini.bl32xu.261008"
+    cfg = configparser.ConfigParser()
+    assert cfg.read(config_path) == [str(config_path)]
+    user.config = cfg
+    user.df = pd.DataFrame(
+        [
+            {
+                "mode": "single",
+                "wavelength": "1.0",
+                "resolution_limit": "2.0",
+            },
+            {
+                "mode": "sponge",
+                "wavelength": "1.0",
+                "resolution_limit": "2.0",
+            },
+        ]
+    )
+
+    user.addDistance()
+
+    expected_ds = round(user.calcDistFromLength(1.0, 2.0, 233.2), 1)
+    expected_normal_raster = round(
+        user.calcDistFromLength(1.0, 4.0, 80.0), 1
+    )
+    expected_sponge_raster = round(
+        user.calcDistFromLength(1.0, 2.9, 200.0), 1
+    )
+    assert user.df["dist_ds"].tolist() == [expected_ds, expected_ds]
+    assert user.df["dist_raster"].tolist() == [
+        expected_normal_raster,
+        expected_sponge_raster,
+    ]
+    assert user.df.loc[1, "raster_roi"] == 1
+
+
 @pytest.mark.parametrize(
     "dose_list,dist_list,expected_dose,expected_dist",
     [
