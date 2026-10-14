@@ -4,6 +4,8 @@ import os
 import socket
 import time
 import datetime
+import math
+import logging
 from numpy import *
 
 # My library
@@ -120,18 +122,35 @@ class Device(Singleton.Singleton):
             self.tuneDt1(logpath)
             
     def measureFlux(self):
+        logger = logging.getLogger("ZOO.Device")
         en=self.mono.getE()
-        # Prep scan
-        self.prepScan()
-        # convertion 
-        conv_factor = self.config.getfloat("experiment","pin_uA_conv")
-        # Measurement
-        ipin,iic=self.countPin(pin_ch=self.pin_channel)
-        pin_uA=ipin * conv_factor
-        # Photon flux estimation
-        ff=Flux.Flux(en)
-        phosec=ff.calcFluxFromPIN(pin_uA)
-        self.finishScan(cover_off=True)
+        self.websock.shutter("close")
+        try:
+            closed = [self.countPin(pin_ch=self.pin_channel)[0] for _ in range(3)]
+            self.prepScan()
+            opened = [self.countPin(pin_ch=self.pin_channel)[0] for _ in range(3)]
+            closed_total = sum(closed)
+            opened_total = sum(opened)
+            signal = opened_total - closed_total
+            # Independent counting noise follows Poisson statistics. Require
+            # the open/closed difference to exceed five standard deviations.
+            noise = math.sqrt(opened_total + closed_total)
+            logger.info("PIN flux counts (1 sec each): shutter closed=%s, open=%s, net=%.1f counts/sec, significance=%.2f sigma",
+                        closed, opened, signal / 3.0,
+                        signal / noise if noise else 0.0)
+            if signal <= 0 or signal <= 5.0 * noise:
+                message = (
+                    "Fatal error: PIN signal is not distinguishable from background "
+                    "(shutter closed: %s, open: %s)" % (closed, opened))
+                logger.error(message)
+                raise RuntimeError(message)
+
+            conv_factor = self.config.getfloat("experiment", "pin_uA_conv")
+            pin_uA = (signal / 3.0) * conv_factor
+            phosec = Flux.Flux(en).calcFluxFromPIN(pin_uA)
+            logger.info("PIN flux: %.3e photons/sec (PIN current: %.6g uA)", phosec, pin_uA)
+        finally:
+            self.finishScan(cover_off=True)
         print("PHOSEC: %e"%phosec)
         return phosec
 
