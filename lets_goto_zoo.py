@@ -21,10 +21,25 @@ import logging
 import logging.config
 import subprocess
 import BLFactory
+import PuckConfig
+import argparse
 
 import logging.config
 
 if __name__ == "__main__":
+    # Parse the measurement list before any hardware access.
+    parser = argparse.ArgumentParser(description="ZOO: measure pins from ESA csv/db files.")
+    parser.add_argument("files", nargs="*", help="ZOO csv/db files (no time limit).")
+    parser.add_argument("--plan", help="CSV with columns meas_file,time_limit (e.g. 12h, 90m, 90min, 2s=2 shifts). One row per file.")
+    cmd_args = parser.parse_args()
+    try:
+        jobs = PuckConfig.jobs_from_args(cmd_args.files, cmd_args.plan)
+        if cmd_args.plan:
+            print(PuckConfig.summarize(PuckConfig.PuckConfig(cmd_args.plan).readConfig()))
+    except PuckConfig.PuckConfigError as e:
+        print("ERROR: %s" % e)
+        sys.exit(2)
+
     ms = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("connecting %s" % blanc_address)
     ms.connect((blanc_address, 10101))
@@ -79,18 +94,22 @@ if __name__ == "__main__":
         blf.zoo.setBeamsize(1)
 
     total_pins = 0
-    for input_file in sys.argv[1:]:
-        logger.info("Start processing %s" % input_file)
+    for input_file, time_limit_hour in jobs:
+        logger.info("Start processing %s (time limit: %s hours)" % (input_file, time_limit_hour))
         if input_file.rfind("csv") != -1:
             navi = ZooNavigator.ZooNavigator(blf, input_file, is_renew_db=True)
             # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
             # blf.zoo.setBeamsize(1)
+            if time_limit_hour is not None:
+                navi.setTimeLimit(time_limit_hour)
             num_pins = navi.goAround()
         elif input_file.rfind("db") != -1:
             esa_csv = "dummy.csv"
             navi=ZooNavigator.ZooNavigator(blf, esa_csv, is_renew_db=False)
             # it is possible that a current beamsize is 'undefined' in beamsize.config for ZOO
             blf.zoo.setBeamsize(1)
+            if time_limit_hour is not None:
+                navi.setTimeLimit(time_limit_hour)
             num_pins = navi.goAround(input_file)
         total_pins += num_pins
 
