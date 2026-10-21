@@ -10,6 +10,8 @@ import logging.config
 import subprocess
 import PuckExchanger
 import PuckConfig
+import ZooResume
+import argparse
 import BLFactory
 from configparser import ConfigParser, ExtendedInterpolation
 
@@ -74,12 +76,38 @@ if __name__ == "__main__":
     zoo=Zoo.Zoo()
     zoo.connect()
 
+    # Command line. 'plan' is the measurement configure file (meas_file,time_limit).
+    parser = argparse.ArgumentParser(description="ZOO with puck exchanger: one CSV after another.")
+    parser.add_argument("plan", help="CSV with columns meas_file,time_limit (e.g. 12h, 90m, 2s=2 shifts).")
+    parser.add_argument("--resume", action="store_true",
+                        help="Continue after a stop: use the previous zoo_*.db of each CSV (done pins are not measured again).")
+    cmd_args = parser.parse_args()
+
     # Read measurement configure file
-    pe_config = PuckConfig.PuckConfig(sys.argv[1])
+    pe_config = PuckConfig.PuckConfig(cmd_args.plan)
     puck_dict = pe_config.readConfig()
+    print(PuckConfig.summarize(puck_dict))
+
+    # Resume plan: only reads/updates the previous zoo_*.db files. No hardware access.
+    resume_plans = {}
+    if cmd_args.resume:
+        for meas_info in puck_dict:
+            csv_file = meas_info['meas_file']
+            if csv_file.endswith("csv"):
+                resume_plans[csv_file] = ZooResume.plan_resume(csv_file)
+                print(ZooResume.describe(csv_file, resume_plans[csv_file]))
 
     # Puck exchanger preparation
     pe = PuckExchanger.PuckExchanger(zoo)
+
+    if cmd_args.resume:
+        # The pin may remain on the goniometer when the previous run stopped.
+        try:
+            zoo.dismountCurrentPin()
+        except ZooMyException.MyException as e:
+            logger.error("Cannot dismount the current pin: %s" % e)
+            print("ERROR: ゴニオのpinを外せません（%s）。SPACEの状態を確認・復旧してから再開してください。" % e)
+            sys.exit(2)
 
     total_pins = 0
     # Currently only CSV files
@@ -91,11 +119,23 @@ if __name__ == "__main__":
 
         #logger.info("Start processing %s" % input_file)
         if input_file.rfind("csv") != -1:
-            pe.checkCurrentPucksAndMount(input_file)
-            navi = ZooNavigator.ZooNavigator(blf, input_file, is_renew_db=True)
-            navi.setTimeLimit(time_hour)
-            print("TimeLimit=%s"%time_hour)
-            n_pins = navi.goAround()
+            resume_plan = resume_plans.get(input_file)
+            if resume_plan is not None:
+                if resume_plan["finished"]:
+                    logger.info("All pins of %s have been processed. Skipped." % input_file)
+                    continue
+                # Pucks of the unfinished pins only. Finished ones are returned to PE.
+                pe.checkCurrentPucksAndMount(input_file, planned=resume_plan["planned"])
+                navi = ZooNavigator.ZooNavigator(blf, input_file, is_renew_db=False)
+                navi.setTimeLimit(time_hour)
+                print("TimeLimit=%s"%time_hour)
+                n_pins = navi.goAround(resume_plan["db"])
+            else:
+                pe.checkCurrentPucksAndMount(input_file)
+                navi = ZooNavigator.ZooNavigator(blf, input_file, is_renew_db=True)
+                navi.setTimeLimit(time_hour)
+                print("TimeLimit=%s"%time_hour)
+                n_pins = navi.goAround()
         elif input_file.rfind("db") != -1:
             print("Currently, DB restart function is not available. Wait for the next release!")
             sys.exit()

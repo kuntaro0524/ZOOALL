@@ -166,10 +166,14 @@ class PuckExchanger():
             self.logger.info(f"mount {p}")
             self.zoo.pe_mount_puck(p)    # 既存のマウント呼び出しに合わせる
 
-    def checkCurrentPucksAndMount(self, csv_path:str, dry_run:bool=False):
-        planned = self._get_planned_from_csv(csv_path)
-        pe_pucks = self.getAllPuckInfoPE()
-        self._validate_planned_exist_in_pe(planned)
+    def checkCurrentPucksAndMount(self, csv_path:str, dry_run:bool=False, planned=None):
+        # planned: 再開用。CSVの代わりに、このpuckのlist（DBの未完了pinのpuck）に合わせる。
+        # 再開では必要なpuckがすでにSPACEにあるので、PEの在庫の確認は入れる分（to_mount）だけにする。
+        resume = planned is not None
+        if not resume:
+            planned = self._get_planned_from_csv(csv_path)
+            pe_pucks = self.getAllPuckInfoPE()
+            self._validate_planned_exist_in_pe(planned)
 
         cur = self.zoo.getSampleInformation()
         space_pucks = [p for p in cur if ("Not-Mount" not in p) and ("Not-Mounted" not in p)]
@@ -177,6 +181,9 @@ class PuckExchanger():
         keep = [p for p in space_pucks if p in planned]
         to_unmount = [p for p in space_pucks if p not in planned]
         to_mount = [p for p in planned if p not in keep]
+
+        if resume and to_mount:
+            self._validate_planned_exist_in_pe(to_mount)
 
         # plan
         plan = {"keep": keep, "to_unmount": to_unmount, "to_mount": to_mount}

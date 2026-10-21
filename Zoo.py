@@ -493,7 +493,7 @@ class Zoo:
         recstr = self.communicate(com)
         try:
             self.waitTillReady(isPE=True)
-        except:
+        except ZooMyException as ttt:
             raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
 
     def pe_mount_puck(self, target_puck):
@@ -501,7 +501,8 @@ class Zoo:
         recstr = self.communicate(com)
         try:
             self.waitTillReady(isPE=True)
-        except:
+        except ZooMyException as ttt:
+            # error handling with ZooMyException
             raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
 
     def pe_unmount_puck(self, space_puck):
@@ -514,11 +515,11 @@ class Zoo:
             raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
 
     def pe_clean_both(self):
-        com = "put/puck/cleaningall" % (space_puck)
+        com = "put/puck/cleaningall"
         recstr = self.communicate(com)
         try:
             self.waitTillReady(isPE=True)
-        except:
+        except ZooMyException as ttt:
             raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
 
     def pe_clean_stock(self):
@@ -526,7 +527,7 @@ class Zoo:
         recstr = self.communicate(com)
         try:
             self.waitTillReady(isPE=True)
-        except:
+        except ZooMyException as ttt:
             raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
 
     def pe_clean_robot(self):
@@ -534,7 +535,7 @@ class Zoo:
         recstr = self.communicate(com)
         try:
             self.waitTillReady(isPE=True)
-        except:
+        except ZooMyException as ttt:
             raise ZooMyException("exchangeSample: failed. %s"%ttt.args[0])
 
     def pe_get_puck(self, puckid):

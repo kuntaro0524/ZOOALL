@@ -168,3 +168,32 @@ def test_capacity_violation_raises(tmp_path, px_with_zoo):
     with pytest.raises(RuntimeError):
         px_with_zoo.checkCurrentPucksAndMount(str(csv))
 
+
+
+# ---- ZOO45XU-006: 再開（DBの未完了pinのpuckから計画する）----
+def test_resume_planned_pucks_already_in_space_do_not_need_pe(tmp_path, px_with_zoo):
+    """再開では、必要なpuckがすでにSPACEにある。PEの在庫に無くてもエラーにしない（keepになる）。"""
+    zoo = MockZoo(space_pucks=["p2", "p3"], pe_pucks={"p9"})
+    px_with_zoo.zoo = zoo
+    csv = write_csv(tmp_path, ["p1", "p2", "p3"])
+    px_with_zoo.checkCurrentPucksAndMount(str(csv), planned=["p2", "p3"])
+    assert zoo.unmount_calls == [] and zoo.mount_calls == []
+    assert set(zoo.space) == {"p2", "p3"}
+
+
+def test_resume_unmounts_finished_pucks_and_mounts_missing(tmp_path, px_with_zoo):
+    zoo = MockZoo(space_pucks=["p1", "p2"], pe_pucks={"p3", "p9"})
+    px_with_zoo.zoo = zoo
+    csv = write_csv(tmp_path, ["p1", "p2", "p3"])
+    px_with_zoo.checkCurrentPucksAndMount(str(csv), planned=["p2", "p3"])   # p1は済み
+    assert zoo.unmount_calls == ["p1"] and zoo.mount_calls == ["p3"]
+    assert set(zoo.space) == {"p2", "p3"}
+
+
+def test_resume_still_stops_if_mount_target_missing_in_pe(tmp_path, px_with_zoo):
+    zoo = MockZoo(space_pucks=["p2"], pe_pucks={"p9"})
+    px_with_zoo.zoo = zoo
+    csv = write_csv(tmp_path, ["p2", "p3"])
+    with pytest.raises(RuntimeError):
+        px_with_zoo.checkCurrentPucksAndMount(str(csv), planned=["p2", "p3"])
+    assert zoo.unmount_calls == [] and zoo.mount_calls == []

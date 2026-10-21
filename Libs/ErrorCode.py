@@ -41,6 +41,15 @@ class ErrorCode(Enum):
     NOT_PROCESSED = 0 # 未処理
 
     @classmethod
+    def hardware_codes(cls):
+        """ 装置（SPACE）側の原因で付くコード。再開のとき isDone=0 に戻して測り直す対象。
+        試料側の失敗（センタリング、ラスター、データ測定）は含まない。 """
+        return [cls.SPACE_WARNING_SUSPECTED.value, cls.SPACE_WARNING_LHEAD_PUSHED.value,
+                cls.SPACE_WARNING_ROTATE_TOO_MUCH.value, cls.SPACE_WARNING_GRAB_FAILED.value,
+                cls.SPACE_ACCIDENT_LHEAD_PULLED.value, cls.SPACE_UNKNOWN_ACCIDENT.value,
+                cls.SPACE_ACCIDENT.value]
+
+    @classmethod
     def from_code(cls, code: int):
         """ エラーコード (int) から対応する Enum を取得 """
         return cls._value2member_map_.get(code, cls.UNKNOWN_ERROR)
